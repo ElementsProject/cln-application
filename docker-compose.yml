@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  bitcoind:
+    image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
+    env_file: .env
+    command:
+      - -${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - -rpcbind=0.0.0.0
+      - -rpcallowip=0.0.0.0/0
+      - -rpcauth=umbrel:5071d8b3ba93e53e414446ff9f1b7d7b$$375e9731abd2cd2c2c44d2327ec19f4f2644256fdeaf4fc5229bf98b778aafec
+    restart: on-failure
+    volumes:
+      - ${PWD}/data/bitcoin:/root/.bitcoin
+    networks:
+      networkcln:
+        ipv4_address: ${APP_BITCOIN_NODE_IP}
+
+  lightning:
+    image: elementsproject/lightningd:v22.11.1@sha256:14f1a7937f9692184e46ab6245ed51ed86262d208e81fd5ec5f0339ac5bf8096
+    env_file: .env
+    command: --bitcoin-rpcconnect=${APP_BITCOIN_NODE_IP} --bitcoin-rpcuser=${APP_BITCOIN_RPC_USER} --bitcoin-rpcpassword=${APP_BITCOIN_RPC_PASS} --bind-addr=${APP_CORE_LIGHTNING_DAEMON_IP}:9735 --network=${APP_CORE_LIGHTNING_BITCOIN_NETWORK} --grpc-port=${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT} --experimental-websocket-port=${APP_CORE_LIGHTNING_WS_PORT} --experimental-offers
+    restart: on-failure
+    volumes:
+      - ${PWD}/data/lightning:/root/.lightning
+    networks:
+      networkcln:
+        ipv4_address: ${APP_CORE_LIGHTNING_DAEMON_IP}
+
+  app:
+    # build:
+    #   dockerfile: ./Dockerfile
+    #   context: ./
+    image: shahanafarooqui/umbrel-core-lightning@sha256:3b040a754e9e1daef492393849b946dc2c66682e1fcdf537bb9f8ddcdec1fd7b
+    depends_on:
+      - bitcoind
+      - lightning
+    env_file: .env
+    command: npm run start
+    restart: on-failure
+    volumes:
+      - ${PWD}/data/lightning:/root/.lightning
+      - ${PWD}/data/app:/data/app
+    environment:
+      APP_HOST: "${APP_CORE_LIGHTNING_IP}"
+      APP_PORT: "${APP_CORE_LIGHTNING_PORT}"
+      APP_DATA_DIR: "${APP_DATA_DIR}/../../../../.."
+      APP_CORE_LIGHTNING_DAEMON_IP: "${APP_CORE_LIGHTNING_DAEMON_IP}"
+      APP_CORE_LIGHTNING_RUNE: "${APP_CORE_LIGHTNING_RUNE}"
+      APP_CORE_LIGHTNING_NODE_PUBKEY: "${APP_CORE_LIGHTNING_NODE_PUBKEY}"
+      APP_CORE_LIGHTNING_WS_PORT: ${APP_CORE_LIGHTNING_WS_PORT}
+      APP_CORE_LIGHTNING_TOR_HOST: "${APP_CORE_LIGHTNING_TOR_HOST}"
+      LIGHTNING_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
+      LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
+      LIGHTNING_REST_MACAROON_PATH: "${APP_DATA_DIR}/c-lightning-rest/certs/access.macaroon"
+      LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
+      LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
+    ports:
+      - "${APP_CORE_LIGHTNING_PORT}:${APP_CORE_LIGHTNING_PORT}"
+    networks:
+      networkcln:
+        ipv4_address: ${APP_CORE_LIGHTNING_IP}
+
+networks:
+  networkcln:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 170.21.21.0/16
+          gateway: 170.21.21.0

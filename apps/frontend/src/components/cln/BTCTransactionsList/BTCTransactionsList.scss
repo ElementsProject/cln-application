@@ -1,0 +1,46 @@
+@import '../../../styles/constants.scss';
+
+.btc-transactions-list {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-right: 0.5rem;
+  transition: all $transition-time ease;
+  & .btc-transaction-header {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    margin-top: 0.5rem;
+    border-radius: 0.675rem;
+    padding: 0.5rem 1rem 0.5rem 0.125rem;
+    transition: all $transition-time ease;
+    &.expanded {
+      border-bottom: 2px dashed rgba($light, 0.2);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    &:hover {
+      background-color: $body-bg-light !important;
+    }
+  }
+  & .btc-transaction-details {
+    transition: background-color $theme-transition ease;
+    background-color: $body-bg-light;
+    border-bottom-left-radius: 0.675rem;
+    border-bottom-right-radius: 0.675rem;  
+  }
+}
+
+@include color-mode(dark) {
+  .btc-transactions-list {
+    & .btc-transaction-header {
+      &:hover {
+        background-color: $body-bg-dark !important;
+      }
+    }
+    & .btc-transaction-details {
+      background-color: $body-bg-dark;
+    }
+  }
+}

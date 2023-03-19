@@ -1,0 +1,9 @@
+@import '../../../styles/constants.scss';
+
+.alert {
+  &.alert-danger,
+  &.alert-success,
+  &.alert-warning {
+    transition: all $transition-time ease;
+  }
+}

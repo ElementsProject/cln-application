@@ -1,0 +1,206 @@
+@import 'constants';
+
+@include color-mode(dark) {
+  
+  .text-light {
+    transition: color $theme-transition ease;
+    color: $light-dark !important;
+  }
+
+  .text-light-white, .text-dark, .text-contrast {
+    transition: color $theme-transition ease;
+    color: $white !important;
+  }
+
+  .text-white-dark {
+    transition: color $theme-transition ease;
+    color: $card-bg-dark;
+  }
+
+  .text-dark-primary {
+    transition: color $theme-transition ease;
+    color: $primary;
+  }
+  
+  .text-blue, .text-darker-blue {
+    transition: color $theme-transition ease;
+    color: $white;
+  }
+  
+  .card {
+    background-color: $card-bg-dark;
+    box-shadow: none;
+    &.bg-primary {
+      color: $text-dark;
+    }
+  }
+  
+  .list-group-item, .dropdown-menu {
+    background-color: $card-bg-dark;
+    box-shadow: none;
+  }
+  
+  .fill-light {
+    fill: $light-dark;
+  }
+
+  .fill-contrast,
+  .fill-1 {
+    fill: $text-dark;
+  }
+
+  .fill-primary, .fill-2 {
+    fill: $primary;
+  }
+
+  .fill-strong-contrast {
+    fill: $card-bg-dark;
+    stop-color: $card-bg-dark;
+  }
+
+  .fill-body-color {
+    fill: $light-dark;
+  }
+
+  .fill-body-bg {
+    fill: $body-bg-dark;
+  }
+
+  .stroke-body-bg {
+    stroke: $body-bg-dark;
+  }
+
+  .stroke-bg, .stroke-primary-bg {
+    stroke: $body-bg-dark;
+  }
+
+  .stroke-light {
+    stroke: $light-dark;
+  }
+
+  span.span-close-svg {
+    cursor: pointer;
+    & svg path {
+      transition: all $transition-time ease;
+    }
+    &:hover {
+      & svg path {
+        stroke: lighten($light-dark, 15%);
+      }
+    }
+  }
+
+  .btn.btn-primary {
+    &.hover, &:hover {
+      box-shadow: 0px 2px 4px 0px rgba($light-dark, 0.25);
+    }
+  }
+  
+  .btn-rounded {
+    &.btn.btn-primary, &.bg-primary {
+      color: $card-bg-dark;
+      &:hover {
+        box-shadow: 0px 2px 4px 0px rgba($light-dark, 0.25);
+      }
+    }
+    &.btn-sm {
+      &.btn-secondary {
+        border: 1px solid $white;
+        color: $white;
+        &:hover {
+          color: $card-bg-dark;
+        }  
+      }
+    }
+  }
+  
+  .btn-group {
+    &.btn-group-action .btn, &.btn-group-action button.btn-actions {
+      &:hover {
+        & + button.btn-actions {
+          border-color: $card-bg-dark;
+        }
+        border-color: $card-bg-dark;
+        background-color: $card-bg-dark;
+      }
+    }
+  }
+  
+  
+  .dropdown {
+    & a.dropdown-item {
+      color: $white;
+      &.active, &:active, &:focus, &:hover {
+        color: $primary !important;
+      }
+      &.no-focus {
+        &.active, &:active, &:focus, &:hover {
+          color: $white !important;
+        }
+      }
+    }
+    & div.dropdown-item {
+      color: $white;
+    }
+  }
+
+  .input-group {
+    & .form-control {
+      color: $white;
+      background-color: $form-ctrl-bg-dark;
+      &:focus {
+        border-color: $border-color-dark;
+      }
+      &::-webkit-input-placeholder { 
+        color: $light-dark;
+      }
+      &:-moz-placeholder {
+        color: $light-dark;
+        opacity: 1;
+      }
+      &::-moz-placeholder {
+        color: $light-dark;
+        opacity: 1;
+      }
+      &:-ms-input-placeholder {
+        color: $light-dark;
+      }
+    }
+    & .form-control-addon {
+      background-color: $form-ctrl-bg-dark;
+      &:focus {
+        border-color: $border-color-dark;
+      }
+    }
+  }
+
+  .switch {
+    border: 1px solid lighten($white, 20%);
+  
+    & .handle {
+      background-color: $dark;
+    }
+  
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba($light-dark, 0.25);
+    }
+
+    &[data-isswitchon='true'] {
+      border: 1px solid darken($success, 10%);
+    }
+ 
+  }
+
+  & .tooltip {
+    box-shadow: 0px 1px 2px 0px rgba($light-dark, 0.16);
+    & .tooltip-inner {
+      border: 1px solid $card-bg-dark;
+      color: $light-dark;
+      background-color: $body-bg-dark;
+      & svg path {
+        fill: $light-dark;
+      }
+    }
+  }
+
+} // CLOSE FOR DARK MODE

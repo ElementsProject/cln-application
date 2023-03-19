@@ -1,0 +1,38 @@
+@import '../../../styles/constants.scss';
+
+.channels-scroll-container {
+  overflow: hidden;
+  & .list-channels {
+    transition: background-color $theme-transition ease;
+    & .list-item-channel {
+      border-radius: 0.675rem;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      transition: background-color $theme-transition ease;
+      &:hover {
+        cursor: pointer;
+        background-color: $body-bg-light;
+      }
+      & .progress {
+        height: 6px;
+      }
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .channels-scroll-container {
+    & .list-channels {
+      transition: background-color $theme-transition ease;
+      & .list-item-channel {
+        transition: background-color $theme-transition ease;
+        &:hover {
+          background-color: $body-bg-dark;
+        }
+      }
+    }
+  }  
+}

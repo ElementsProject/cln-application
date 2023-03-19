@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target":"ES2022",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": false,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": "./source",
+    "skipLibCheck": true,
+    "lib": [
+      "ES2022"
+    ]  
+  },
+  "files": [
+    "./source/server.ts"
+  ],
+  "include": [
+    "./source/**/*.d.ts"
+  ]  
+}

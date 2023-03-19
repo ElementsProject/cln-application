@@ -1,0 +1,24 @@
+@import '../../../styles/constants.scss';
+
+.fa-circle-xmark {
+  & path {
+    fill: $light;
+  }
+}
+
+.modal-content {
+  & .modal-header,
+  & .modal-footer {
+    border: none;
+  }
+}
+
+@include color-mode(dark) {
+  
+  .fa-circle-xmark {
+    & path {
+      fill: $white;
+    }
+  }
+
+}
