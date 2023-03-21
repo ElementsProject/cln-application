@@ -19,10 +19,15 @@ RUN npm run build
 # Final image
 FROM node:18-buster-slim AS umbrel-lightning
 
+# Install jq for JSON parsing in entrypoint.sh
+RUN apt-get update && apt-get install -y jq
+
 # Copy built code from build stages to '/app' directory
 COPY --from=umbrel-lightning-app-builder /app /app
 
 # Change directory to '/app' 
 WORKDIR /app
 
-CMD [ "npm", "run", "start" ]
+COPY entrypoint.sh entrypoint.sh
+
+ENTRYPOINT ["bash", "./entrypoint.sh"]

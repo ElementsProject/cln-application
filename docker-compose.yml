@@ -28,10 +28,10 @@ services:
         ipv4_address: ${APP_CORE_LIGHTNING_DAEMON_IP}
 
   app:
-    # build:
-    #   dockerfile: ./Dockerfile
-    #   context: ./
-    image: shahanafarooqui/umbrel-core-lightning@sha256:3b040a754e9e1daef492393849b946dc2c66682e1fcdf537bb9f8ddcdec1fd7b
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    # image: shahanafarooqui/umbrel-core-lightning@sha256:3b040a754e9e1daef492393849b946dc2c66682e1fcdf537bb9f8ddcdec1fd7b
     depends_on:
       - bitcoind
       - lightning
@@ -41,20 +41,20 @@ services:
     volumes:
       - ${PWD}/data/lightning:/root/.lightning
       - ${PWD}/data/app:/data/app
-    environment:
-      APP_HOST: "${APP_CORE_LIGHTNING_IP}"
-      APP_PORT: "${APP_CORE_LIGHTNING_PORT}"
-      APP_DATA_DIR: "${APP_DATA_DIR}/../../../../.."
-      APP_CORE_LIGHTNING_DAEMON_IP: "${APP_CORE_LIGHTNING_DAEMON_IP}"
-      APP_CORE_LIGHTNING_RUNE: "${APP_CORE_LIGHTNING_RUNE}"
-      APP_CORE_LIGHTNING_NODE_PUBKEY: "${APP_CORE_LIGHTNING_NODE_PUBKEY}"
-      APP_CORE_LIGHTNING_WS_PORT: ${APP_CORE_LIGHTNING_WS_PORT}
-      APP_CORE_LIGHTNING_TOR_HOST: "${APP_CORE_LIGHTNING_TOR_HOST}"
-      LIGHTNING_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
-      LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
-      LIGHTNING_REST_MACAROON_PATH: "${APP_DATA_DIR}/c-lightning-rest/certs/access.macaroon"
-      LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
-      LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
+    # environment:
+      # APP_HOST: "${APP_CORE_LIGHTNING_IP}"
+      # APP_PORT: "${APP_CORE_LIGHTNING_PORT}"
+      # APP_DATA_DIR: "${APP_DATA_DIR}/../../../../.."
+      # APP_CORE_LIGHTNING_DAEMON_IP: "${APP_CORE_LIGHTNING_DAEMON_IP}"
+      # APP_CORE_LIGHTNING_RUNE: "${APP_CORE_LIGHTNING_RUNE}"
+      # APP_CORE_LIGHTNING_NODE_PUBKEY: "${APP_CORE_LIGHTNING_NODE_PUBKEY}"
+      # APP_CORE_LIGHTNING_WS_PORT: ${APP_CORE_LIGHTNING_WS_PORT}
+      # APP_CORE_LIGHTNING_TOR_HOST: "${APP_CORE_LIGHTNING_TOR_HOST}"
+      # LIGHTNING_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
+      # LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
+      # LIGHTNING_REST_MACAROON_PATH: "${APP_DATA_DIR}/c-lightning-rest/certs/access.macaroon"
+      # LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
+      # LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
     ports:
       - "${APP_CORE_LIGHTNING_PORT}:${APP_CORE_LIGHTNING_PORT}"
     networks:
