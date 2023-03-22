@@ -94,7 +94,7 @@ const BTCWithdraw = (props) => {
         delayedClearStatusAlert();
       } else {
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.data || response.message || 'Unknown Error');
+        setResponseMessage(response.response.data || response.message || 'Unknown Error');
         delayedClearStatusAlert();
       }
     })
@@ -117,7 +117,7 @@ const BTCWithdraw = (props) => {
               </div>
               <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
             </Card.Header>
-            <h4 className='text-blue fw-bold'>Withdraw</h4>
+            <h4 className='text-blue fw-bold mt-2'>Withdraw</h4>
             <Card.Body className='py-0 px-1 d-flex flex-column align-items-start justify-content-between'>
               <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>

@@ -96,7 +96,7 @@ const CLNReceive = (props) => {
         resetFormValues();
       } else {
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.data || response.message || 'Unknown Error');
+        setResponseMessage(response.response.data || response.message || 'Unknown Error');
         delayedClearStatusAlert();
       }
     })
@@ -111,7 +111,7 @@ const CLNReceive = (props) => {
   if (showInvoice) {
     return (
       <Row className='h-100 mx-1'>
-        <Card className='d-flex align-items-stretch'>
+        <Card className='d-flex align-items-stretch px-0'>
           <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
               <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
                 <div className='p-0 fw-bold text-primary d-flex align-items-center'>
@@ -120,8 +120,8 @@ const CLNReceive = (props) => {
                 </div>
                 <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
               </Card.Header>
-              <h4 className='text-blue fw-bold'>{paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</h4>
-              <Card.Body className='py-0 px-1 d-flex flex-column align-items-start justify-content-between'>
+              <h4 className='text-blue fw-bold mt-2'>{paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</h4>
+              <Card.Body className='p-0 d-flex align-items-start justify-content-center'>
                 <Row className='w-100 d-flex align-items-start justify-content-center'>
                   <QRCodeComponent message={responseMessage} toastMessage={(paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + ' Copied Successfully!'} className='py-0 px-1 d-flex flex-column align-items-center justify-content-start' />
                 </Row>
@@ -134,7 +134,7 @@ const CLNReceive = (props) => {
 
   return (
     <form onSubmit={CLNReceiveHandler} className='h-100'>
-      <Card className='h-100 d-flex align-items-stretch'>
+      <Card className='h-100 d-flex align-items-stretch px-0'>
         <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
               <div className='p-0 fw-bold text-primary d-flex align-items-center'>
@@ -143,7 +143,7 @@ const CLNReceive = (props) => {
               </div>
               <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
             </Card.Header>
-            <h4 className='text-blue fw-bold'>Generate {paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</h4>
+            <h4 className='text-blue fw-bold mt-2'>Generate {paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</h4>
             <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
               <Row className='d-flex align-items-start justify-content-center'>
                 <Col xs={12} className='mb-3 d-flex align-items-start justify-content-start'>

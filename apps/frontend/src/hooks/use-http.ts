@@ -8,7 +8,7 @@ import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
-  timeout: 30000,
+  timeout: 60000,
   withCredentials: true
 });
 

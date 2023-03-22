@@ -77,7 +77,7 @@ const ChannelDetails = (props) => {
           delayedClearStatusAlert();
         } else {
           setResponseStatus(CallStatus.ERROR);
-          setResponseMessage(response.data || response.message || 'Unknown Error');
+          setResponseMessage(response.response.data || response.message || 'Unknown Error');
           delayedClearStatusAlert();          
         }
       })

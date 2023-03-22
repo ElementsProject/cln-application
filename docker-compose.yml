@@ -28,10 +28,10 @@ services:
         ipv4_address: ${CLN_DAEMON_IP}
 
   application:
-    build:
-      dockerfile: ./Dockerfile
-      context: ./
-    # image: shahanafarooqui/umbrel-core-lightning@sha256:3b040a754e9e1daef492393849b946dc2c66682e1fcdf537bb9f8ddcdec1fd7b
+    # build:
+      # dockerfile: ./Dockerfile
+      # context: ./
+    image: shahanafarooqui/umbrel-core-lightning@sha256:57d21f2f2600ed60f1c4dba8ec9ed44f13e1bc5106605b19c2518316e379e16f
     depends_on:
       - bitcoind
       - lightning

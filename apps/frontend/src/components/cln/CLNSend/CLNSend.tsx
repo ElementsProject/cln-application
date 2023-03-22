@@ -89,7 +89,7 @@ const CLNSend = (props) => {
         delayedClearStatusAlert();
       } else {
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.data || response.message || 'Unknown Error');
+        setResponseMessage(response.response.data || response.message || 'Unknown Error');
         delayedClearStatusAlert();
       }
     })
@@ -153,7 +153,7 @@ const CLNSend = (props) => {
               </div>
               <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
             </Card.Header>
-            <h4 className='text-blue fw-bold'>Send Payment</h4>
+            <h4 className='text-blue fw-bold mt-2'>Send Payment</h4>
             <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
               <Row className='d-flex align-items-start justify-content-center'>
                 <Col xs={12} className='mb-3 d-flex align-items-start justify-content-between'>

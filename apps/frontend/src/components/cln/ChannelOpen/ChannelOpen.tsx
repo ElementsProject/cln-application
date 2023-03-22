@@ -82,10 +82,11 @@ const ChannelOpen = (props) => {
     setSelFeeRate(FeeRate.NORMAL);
   };
 
-  const delayedClearStatusAlert = () => {
+  const delayedClearStatusAlert = (shouldClose: boolean) => {
     setTimeout(() => {
+      if(shouldClose) { props.onClose(); }
       setResponseStatus(CallStatus.NONE);
-      setResponseMessage('');
+      setResponseMessage('');  
     }, CLEAR_STATUS_ALERT_DELAY);
   }
 
@@ -102,18 +103,18 @@ const ChannelOpen = (props) => {
         setResponseStatus(CallStatus.SUCCESS);
         setResponseMessage('Channel opened with ' + (response.data.channel_id ? ('channel id ' + response.data.channel_id) : ('transaction id ' + response.data.txid)));
         resetFormValues();
-        delayedClearStatusAlert();
+        delayedClearStatusAlert(true);
       } else {
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.data || response.message || 'Unknown Error');
-        delayedClearStatusAlert();
+        setResponseMessage(response.response.data || response.message || 'Unknown Error');
+        delayedClearStatusAlert(false);
       }
     })
     .catch(err => {
       logger.error(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
       setResponseStatus(CallStatus.ERROR);
       setResponseMessage(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
-      delayedClearStatusAlert();
+      delayedClearStatusAlert(false);
     });
   };
 

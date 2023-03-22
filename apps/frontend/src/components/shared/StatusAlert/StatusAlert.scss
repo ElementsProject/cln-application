@@ -1,9 +1,44 @@
 @import '../../../styles/constants.scss';
 
 .alert {
+  padding: 0.75rem;
   &.alert-danger,
   &.alert-success,
   &.alert-warning {
     transition: all $transition-time ease;
+  }
+  &.alert-danger .btn-sm-svg.btn-svg-copy {
+    & svg {
+      & path {
+        stroke: $danger;
+      }
+      &:hover {
+        & path {
+          stroke: darken($danger, 25%);
+        }
+      }
+    }
+  }
+  &.alert-success .btn-sm-svg.btn-svg-copy {
+    & svg {
+      & path {
+        stroke: $success;
+      }
+      &:hover {
+        & path {
+          stroke: darken($success, 25%);
+        }
+      }
+    }
+  }
+  & .text-status {
+    max-height: 8rem;
+    overflow: hidden;
+  }
+  & .btn-sm-svg.btn-svg-copy {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0;
+    cursor: pointer;
   }
 }

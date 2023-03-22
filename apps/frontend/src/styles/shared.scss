@@ -277,6 +277,7 @@ svg {
   }
   &.svg-small {
     width: 0.75rem;
+    height: 1.25rem;
   }
   
   &.svg-white {
@@ -495,15 +496,14 @@ label.form-label {
   position: relative;
   width: 220px;
   & .qr-cln-logo {
-    padding: 0;
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 41%;
+    left: 41%;
+    padding: 0;
     border-radius: 50%;
     width: 2.5rem;
     height: 2.5rem;
     border: 3px solid $white;
-    transform: translate3d(-50%, -50%, 0) scale(1);
   }
 }
 

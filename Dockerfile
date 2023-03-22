@@ -16,7 +16,8 @@ RUN npm install
 # Build assets
 RUN npm run build
 
-RUN npm prune --production --legacy-peer-deps
+# Prune development dependencies
+RUN npm prune --production
 
 # Final image
 FROM node:18-buster-slim AS umbrel-lightning

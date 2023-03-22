@@ -33,7 +33,7 @@ const BTCDeposit = (props) => {
         setResponseMessage((response.data.bech32));
       } else {
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.data || response.message || 'Unknown Error');
+        setResponseMessage(response.response.data || response.message || 'Unknown Error');
         delayedClearStatusAlert();
       }
     })
@@ -56,7 +56,7 @@ const BTCDeposit = (props) => {
           </div>
           <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
         </Card.Header>
-        <h4 className='text-blue fw-bold'>Deposit</h4>
+        <h4 className='text-blue fw-bold mt-2'>Deposit</h4>
         <Card.Body className='py-0 px-1'>
           {responseStatus === CallStatus.SUCCESS ?
             <QRCodeComponent message={responseMessage} toastMessage='Address Copied Successfully!' className='py-0 px-1 d-flex flex-column align-items-center justify-content-start' />

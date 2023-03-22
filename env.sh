@@ -10,8 +10,13 @@ export CLN_BITCOIN_NETWORK="${BITCOIN_NETWORK}"
 export BITCOIN_RPC_USER="umbrel"
 export BITCOIN_RPC_PASS="moneyprintergobrrr"
 export CLN_DAEMON_GRPC_PORT=2105
+
+# Workspace testnet
 export CLN_DAEMON_IP="localhost"
-export CLN_DAEMON_WS_PORT=5001
+export CLN_DAEMON_WS_PORT=5010
+# Local 1
+# export CLN_DAEMON_IP="localhost"
+# export CLN_DAEMON_WS_PORT=5001
 # BOX
 # export CLN_DAEMON_IP="192.168.1.89"
 # export CLN_DAEMON_WS_PORT=5050
