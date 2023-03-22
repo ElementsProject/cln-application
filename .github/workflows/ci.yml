@@ -1,0 +1,87 @@
+name: Artifact
+
+on:
+  push:
+    branches: [ 'release-*' ]
+    tags: [ 'v*' ]
+  release:
+    types: [released]
+  pull_request:
+    types: [closed]
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  CI: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-npm-packages
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install NPM dependencies
+        if: steps.cache-npm-packages.outputs.cache-hit != 'true'
+        run: npm clean-install
+
+      - name: Cache build frontend
+        uses: actions/cache@v3
+        id: cache-build-frontend
+        with:
+          path: apps/frontend
+          key: ${{ runner.os }}-frontend-${{ github.sha }}
+
+      - name: Run build production application
+        run: npm run frontend:build
+
+      - name: Cache build backend
+        uses: actions/cache@v3
+        id: cache-build-backend
+        with:
+          path: apps/backend
+          key: ${{ runner.os }}-backend-${{ github.sha }}
+
+      - name: Run build backend server
+        run: npm run backend:build
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Cache build frontend
+        uses: actions/cache@v3
+        id: cache-build-frontend
+        with:
+          path: apps/frontend
+          key: ${{ runner.os }}-frontend-${{ github.sha }}
+
+      - name: Cache build backend
+        uses: actions/cache@v3
+        id: cache-build-backend
+        with:
+          path: apps/backend
+          key: ${{ runner.os }}-backend-${{ github.sha }}
+
+      - name: Compress files
+        run: tar -czf /tmp/clnumbrelapp.tar.gz apps/frontend/build apps/backend/dist package.json package-lock.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: clnumbrelapp-build${{ github.event.release.tag_name }}
+          path: /tmp/clnumbrelapp.tar.gz

@@ -22,11 +22,26 @@ export enum HttpStatusCode {
 }
 
 export const APP_CONSTANTS = {
-  CLN_HOST_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
-  CLN_RUNE: process.env.APP_CORE_LIGHTNING_RUNE,
-  CLN_NODE_PUBKEY: process.env.APP_CORE_LIGHTNING_NODE_PUBKEY,
-  CLN_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WS_PORT || 5001),
-  APPLICATION_MODE: process.env.APP_CORE_LIGHTNING_APPLICATION_MODE || Environment.PRODUCTION,
+  COMMANDO_RUNE: '',
+  CLN_HOST_IP: process.env.CLN_DAEMON_IP || 'localhost',
+  CLN_WS_PORT: +(process.env.CLN_DAEMON_WS_PORT || 5001),
+  APPLICATION_MODE: process.env.APPLICATION_MODE || Environment.PRODUCTION,
+  COMMANDO_ENV_LOCATION: join(
+    dirname(fileURLToPath(import.meta.url)),
+    process.env.APP_DATA_DIR || '.',
+    process.env.APPLICATION_MODE === Environment.DEVELOPMENT
+      ? './.commando-env'
+      : '/root/.lightning/.commando-env',
+  ),
+  MACAROON_PATH: join(
+    dirname(fileURLToPath(import.meta.url)),
+    '..',
+    '..',
+    '..',
+    '..',
+    process.env.CLN_REST_CERT_DIR || '.',
+    'access.macaroon',
+  ),
   LOG_FILE_LOCATION: join(
     dirname(fileURLToPath(import.meta.url)),
     process.env.APP_DATA_DIR || '.',
@@ -40,7 +55,7 @@ export const APP_CONSTANTS = {
 };
 
 export const LN_MESSAGE_CONFIG = {
-  remoteNodePublicKey: APP_CONSTANTS.CLN_NODE_PUBKEY || '',
+  remoteNodePublicKey: '',
   wsProxy: 'ws://' + APP_CONSTANTS.CLN_HOST_IP + ':' + APP_CONSTANTS.CLN_WS_PORT,
   ip: APP_CONSTANTS.CLN_HOST_IP,
   port: APP_CONSTANTS.CLN_WS_PORT,

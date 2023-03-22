@@ -40,7 +40,7 @@
 @include color-mode(dark) {
   .dropdown.dropdown-network {
     & .dropdown-toggle.btn.btn-secondary {
-      color: $light-dark;
+      color: $white;
       background-color: $form-ctrl-bg-dark;
       border-color: $border-color-dark;
     }

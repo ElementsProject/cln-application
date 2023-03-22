@@ -18,7 +18,7 @@ const NETWORK_TYPES = ['Local Network', 'Tor']
 const ConnectWallet = () => {
   const appCtx = useContext(AppContext);
   const [selNetwork, setSelNetwork] = useState(0);
-  const [clnConnectUrl, setClnConnectUrl] = useState('c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
+  const [clnConnectUrl, setClnConnectUrl] = useState('c-lightning-rest://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
 
   const copyHandler = (event) => {
     switch (event.target.id) {
@@ -26,7 +26,7 @@ const ConnectWallet = () => {
         navigator.clipboard.writeText(appCtx.walletConnect.REST_PORT || '');
         break;
       case 'Host':
-        navigator.clipboard.writeText((selNetwork === 0 ? appCtx.walletConnect.LOCAL_HOST : appCtx.walletConnect.TOR_HOST) || '');
+        navigator.clipboard.writeText((selNetwork === 0 ? appCtx.walletConnect.DEVICE_DOMAIN_NAME : appCtx.walletConnect.TOR_HOST) || '');
         break;
       case 'Macaroon':
         navigator.clipboard.writeText(appCtx.walletConnect.REST_MACAROON || '');
@@ -45,7 +45,7 @@ const ConnectWallet = () => {
   const networkChangeHandler = (event) => {
     setSelNetwork(+event.target.id);
     const url = (+event.target.id === 0) ?
-      'c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http'
+      'c-lightning-rest://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http'
     :
       'c-lightning-rest://' + appCtx.walletConnect.TOR_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http'
     setClnConnectUrl(url);
@@ -106,8 +106,8 @@ const ConnectWallet = () => {
                 <Form.Control 
                   onClick={copyHandler}
                   id='Host'
-                  value={selNetwork === 0 ? appCtx.walletConnect.LOCAL_HOST : appCtx.walletConnect.TOR_HOST}
-                  aria-label={selNetwork === 0 ? appCtx.walletConnect.LOCAL_HOST : appCtx.walletConnect.TOR_HOST}
+                  value={selNetwork === 0 ? appCtx.walletConnect.DEVICE_DOMAIN_NAME : appCtx.walletConnect.TOR_HOST}
+                  aria-label={selNetwork === 0 ? appCtx.walletConnect.DEVICE_DOMAIN_NAME : appCtx.walletConnect.TOR_HOST}
                   aria-describedby='copy-addon-host'
                   className='form-control-left'
                   readOnly

@@ -6,3 +6,4 @@ data/bitcoin/*
 data/lightning/*
 data/c-lightning-rest/*
 data/app/application-cln.log
+.commando-env

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { join } from 'path';
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
@@ -32,23 +31,20 @@ class SharedController {
     try {
       logger.info('Getting Connection Settings');
       let macaroon = '';
-      if (
-        typeof process.env.LIGHTNING_REST_MACAROON_PATH === 'string' &&
-        fs.existsSync(process.env.LIGHTNING_REST_MACAROON_PATH + '/access.macaroon')
+      if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)
       ) {
-        logger.info(
-          'Getting REST Access Macaroon from ' + process.env.LIGHTNING_REST_MACAROON_PATH,
-        );
+        logger.info('Getting REST Access Macaroon from ' + process.env.CLN_REST_CERT_DIR);
         macaroon = Buffer.from(
-          fs.readFileSync(join(process.env.LIGHTNING_REST_MACAROON_PATH, 'access.macaroon')),
+          fs.readFileSync(APP_CONSTANTS.MACAROON_PATH),
         ).toString('hex');
       }
+      logger.warn(macaroon);
       const CONNECT_WALLET_SETTINGS = {
-        LOCAL_HOST: process.env.LOCAL_HOST || '',
-        TOR_HOST: process.env.LIGHTNING_REST_HIDDEN_SERVICE || '',
-        WS_PORT: process.env.APP_CORE_LIGHTNING_WS_PORT || '',
-        GRPC_PORT: process.env.LIGHTNING_GRPC_PORT || '',
-        REST_PORT: process.env.LIGHTNING_REST_PORT || '',
+        DEVICE_DOMAIN_NAME: 'http://' + process.env.DEVICE_DOMAIN_NAME || '',
+        TOR_HOST: 'http://' + process.env.CLN_REST_HIDDEN_SERVICE || '',
+        WS_PORT: process.env.CLN_DAEMON_WS_PORT || '',
+        GRPC_PORT: process.env.CLN_DAEMON_GRPC_PORT || '',
+        REST_PORT: process.env.CLN_REST_PORT || '',
         REST_MACAROON: macaroon,
       };
       res.status(200).json(CONNECT_WALLET_SETTINGS);

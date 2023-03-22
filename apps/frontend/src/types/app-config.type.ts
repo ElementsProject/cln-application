@@ -5,7 +5,7 @@ export type ToastPosition = 'top-start' | 'top-center' | 'top-end' | 'middle-sta
 export type WalletConnect = {
   isLoading: boolean;
   GRPC_PORT?: string;
-  LOCAL_HOST?: string;
+  DEVICE_DOMAIN_NAME?: string;
   REST_MACAROON?: string;
   REST_PORT?: string;
   TOR_HOST?: string;

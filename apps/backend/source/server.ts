@@ -13,7 +13,7 @@ import { CommonRoutesConfig } from './shared/routes.config.js';
 import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
 import { APIError } from './models/errors.js';
-import { Environment, APP_CONSTANTS } from './shared/consts.js';
+import { APP_CONSTANTS, Environment } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 
 let directoryName = dirname(fileURLToPath(import.meta.url));
@@ -23,7 +23,7 @@ const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 
 const CLN_PORT = normalizePort(process.env.APP_PORT || '2103');
-const CLN_HOST = process.env.APP_HOST || 'localhost';
+const CLN_HOST = process.env.APP_IP || 'localhost';
 
 function normalizePort(val: string) {
   var port = parseInt(val, 10);
