@@ -31,14 +31,10 @@ class SharedController {
     try {
       logger.info('Getting Connection Settings');
       let macaroon = '';
-      if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)
-      ) {
+      if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
         logger.info('Getting REST Access Macaroon from ' + process.env.CLN_REST_CERT_DIR);
-        macaroon = Buffer.from(
-          fs.readFileSync(APP_CONSTANTS.MACAROON_PATH),
-        ).toString('hex');
+        macaroon = Buffer.from(fs.readFileSync(APP_CONSTANTS.MACAROON_PATH)).toString('hex');
       }
-      logger.warn(macaroon);
       const CONNECT_WALLET_SETTINGS = {
         DEVICE_DOMAIN_NAME: 'http://' + process.env.DEVICE_DOMAIN_NAME || '',
         TOR_HOST: 'http://' + process.env.CLN_REST_HIDDEN_SERVICE || '',

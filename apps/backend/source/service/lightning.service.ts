@@ -9,7 +9,7 @@ export class LightningService {
 
   constructor() {
     try {
-      logger.info('Getting Commando Rune new');
+      logger.info('Getting Commando Rune');
       if (fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
         const DATA_SPLIT = (
           Buffer.from(fs.readFileSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)).toString() || '\n'

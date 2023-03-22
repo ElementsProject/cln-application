@@ -40,6 +40,7 @@ services:
     restart: on-failure
     volumes:
       - ${PWD}/data/lightning:/root/.lightning
+      - ${PWD}/data/c-lightning-rest:/data/c-lightning-rest
       - ${PWD}/data/app:/data/app
     ports:
       - "${APP_PORT}:${APP_PORT}"

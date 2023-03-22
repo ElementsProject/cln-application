@@ -60,9 +60,9 @@ app.use((req, res, next) => {
 const corsOptions = {
   methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
   origin:
-    APP_CONSTANTS.APPLICATION_MODE === Environment.DEVELOPMENT
-      ? 'http://' + CLN_HOST + ':4300'
-      : 'http://' + CLN_HOST + ':' + CLN_PORT,
+    APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION
+      ? 'http://' + CLN_HOST + ':' + CLN_PORT
+      : 'http://' + CLN_HOST + ':4300',
   credentials: true,
   allowedHeaders: 'Content-Type, X-XSRF-TOKEN',
 };

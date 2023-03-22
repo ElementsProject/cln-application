@@ -29,16 +29,14 @@ export const APP_CONSTANTS = {
   COMMANDO_ENV_LOCATION: join(
     dirname(fileURLToPath(import.meta.url)),
     process.env.APP_DATA_DIR || '.',
-    process.env.APPLICATION_MODE === Environment.DEVELOPMENT
-      ? './.commando-env'
-      : '/root/.lightning/.commando-env',
+    process.env.APPLICATION_MODE === Environment.PRODUCTION ||
+      process.env.APPLICATION_MODE === Environment.TESTING
+      ? '/root/.lightning/.commando-env'
+      : './.commando-env',
   ),
   MACAROON_PATH: join(
     dirname(fileURLToPath(import.meta.url)),
-    '..',
-    '..',
-    '..',
-    '..',
+    process.env.APP_DATA_DIR || '.',
     process.env.CLN_REST_CERT_DIR || '.',
     'access.macaroon',
   ),
@@ -61,8 +59,8 @@ export const LN_MESSAGE_CONFIG = {
   port: APP_CONSTANTS.CLN_WS_PORT,
   privateKey: crypto.randomBytes(32).toString('hex'),
   logger: {
-    info: APP_CONSTANTS.APPLICATION_MODE === Environment.DEVELOPMENT ? console.info : () => {},
-    warn: APP_CONSTANTS.APPLICATION_MODE === Environment.DEVELOPMENT ? console.warn : () => {},
+    info: APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION ? () => {} : console.info,
+    warn: APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION ? () => {} : console.warn,
     error: console.error,
   },
 };
