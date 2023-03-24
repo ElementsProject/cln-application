@@ -31,7 +31,7 @@ services:
     # build:
       # dockerfile: ./Dockerfile
       # context: ./
-    image: shahanafarooqui/umbrel-core-lightning@sha256:57d21f2f2600ed60f1c4dba8ec9ed44f13e1bc5106605b19c2518316e379e16f
+    image: clnbot/umbrel-core-lightning@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
     depends_on:
       - bitcoind
       - lightning

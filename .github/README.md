@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://umbrel.com">
-    <img src="images/Dashboard.png" alt="Core Lightning Dashboard">
+    <img src="./images/Dashboard.png" alt="Core Lightning Dashboard">
   </a>
   <h1 align="center">Core Lightning Node for Umbrel</h1>
   <p align="center">
@@ -34,9 +34,11 @@ This app can be installed in one click via the Umbrel App Store.
 
 We welcome and appreciate new contributions!
 
-If you're a developer looking to help but not sure where to begin, look for [these issues](https://github.com/getumbrel/umbrel-core-lightning/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) that have specifically been marked as being friendly to new contributors.
+If you're a developer looking to help but not sure where to begin, look for [these issues](https://github.com/ElementsProject/umbrel-core-lightning/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) that have specifically been marked as being friendly to new contributors.
 
-If you're looking for a bigger challenge, before opening a pull request please [create an issue](https://github.com/getumbrel/umbrel-core-lightning/issues/new/choose) or [join our community chat](https://t.me/getumbrel) to get feedback, discuss the best way to tackle the challenge, and to ensure that there's no duplication of work.
+If you're looking for a bigger challenge, before opening a pull request please [create an issue](https://github.com/ElementsProject/umbrel-core-lightning/issues/new/choose) or [join umbrel community chat](https://t.me/getumbrel) to get feedback, discuss the best way to tackle the challenge, and to ensure that there's no duplication of work.
+
+Click [here](./docs/Contributing.md) for instructions on how to run it in development mode.
 
 ## Acknowledgements
 

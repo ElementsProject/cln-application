@@ -5,9 +5,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "frontend:dev": ". ./env.sh && npm run start -w umbrel-cln-frontend",
+    "frontend:dev": ". ./env.sh & npm run start -w umbrel-cln-frontend",
     "frontend:build": "npm run build -w umbrel-cln-frontend",
-    "backend:dev": ". ./env.sh && npm run start -w umbrel-cln-backend",
+    "backend:dev": ". ./env.sh & npm run start -w umbrel-cln-backend",
     "backend:build": "npm run build -w umbrel-cln-backend",
     "backend:serve": "npm run serve -w umbrel-cln-backend",
     "backend:watch": "npm run watch -w umbrel-cln-backend",
