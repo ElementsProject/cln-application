@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://umbrel.com">
-    <img src="" alt="Core Lightning Dashboard">
+    <img src="images/Dashboard.png" alt="Core Lightning Dashboard">
   </a>
   <h1 align="center">Core Lightning Node for Umbrel</h1>
   <p align="center">
-    Run a Core Lightning node on your Umbrel personal server. An official app by Umbrel. Powered by Core Lightning.
+    Run a Core Lightning node on your Umbrel personal server. An official app by Blockstream. Powered by Core Lightning.
     <br />
     <a href="https://umbrel.com"><strong>umbrel.com »</strong></a>
     <br />
@@ -42,9 +42,3 @@ If you're looking for a bigger challenge, before opening a pull request please [
 
 This app is inpired by the work done by [Umbrel lightning app](https://github.com/getumbrel/umbrel-lightning).
 The backend api connects with core lightning via [lnmessage](https://github.com/aaronbarnardsound/lnmessage).
-
----
-
-[![License](https://img.shields.io/github/license/getumbrel/umbrel-core-lightning?color=%235351FB)](https://github.com/getumbrel/umbrel-core-lightning/blob/master/LICENSE.md)
-
-[umbrel.com](https://umbrel.com)
