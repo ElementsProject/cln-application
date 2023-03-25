@@ -84,6 +84,7 @@ const ChannelOpen = (props) => {
 
   const delayedClearStatusAlert = (shouldClose: boolean) => {
     setTimeout(() => {
+      logger.info('Should Close: ' + shouldClose);
       if(shouldClose) { props.onClose(); }
       setResponseStatus(CallStatus.NONE);
       setResponseMessage('');  

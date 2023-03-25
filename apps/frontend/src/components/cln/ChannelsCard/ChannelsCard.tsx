@@ -8,6 +8,7 @@ import ChannelOpen from '../ChannelOpen/ChannelOpen';
 import ChannelDetails from '../ChannelDetails/ChannelDetails';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { Channel } from '../../../types/lightning-wallet.type';
+import logger from '../../../services/logger.service';
 
 const ChannelsCard = () => {
   const [selChannelCard, setSelChannelCard] = useState('channels');
@@ -25,7 +26,7 @@ const ChannelsCard = () => {
           className='h-100 overflow-hidden'
         >
           {selChannelCard === 'open' ? 
-            <ChannelOpen onClose={() => setSelChannelCard('channels')} />
+            <ChannelOpen onClose={() => { logger.info('Closed Open Channel Card'); setSelChannelCard('channels') }} />
             : selChannelCard === 'details' ? 
               <ChannelDetails onClose={() => setSelChannelCard('channels')} selChannel={selChannel} />
             :

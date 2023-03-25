@@ -97,7 +97,7 @@ export enum PaymentType {
   KEYSEND = 'Keysend'
 };
 
-export const CLEAR_STATUS_ALERT_DELAY = 30000;
+export const CLEAR_STATUS_ALERT_DELAY = 15000;
 export const TRANSITION_DURATION = 0.3;
 export const THEME_TRANSITION_DURATION = 0.5;
 export const COUNTUP_DURATION = 1.5;
