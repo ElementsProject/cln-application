@@ -38,15 +38,7 @@ function normalizePort(val: string) {
 
 app.set('trust proxy', true);
 app.use(cookieParser());
-app.use(
-  csurf({
-    cookie: {
-      key: '_csrf',
-      httpOnly: true,
-      maxAge: 3600,
-    },
-  }),
-);
+app.use(csurf({ cookie: true }));
 app.use(bodyParser.json({ limit: '25mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.use((req, res, next) => {

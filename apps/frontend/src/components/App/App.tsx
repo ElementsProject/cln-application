@@ -7,7 +7,7 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import useHttp from '../../hooks/use-http';
 import { AppContext } from '../../store/AppContext';
-import { ApplicationModes } from '../../utilities/constants';
+import { ApplicationModes, APP_WAIT_TIME } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
 import Header from '../ui/Header/Header';
 import NodeInfo from '../modals/NodeInfo/NodeInfo';
@@ -34,7 +34,7 @@ const App = () => {
     getAppConfigurations();
     window.setInterval(() => {
       fetchData();
-    }, 60 * 1000); // one minute
+    }, APP_WAIT_TIME);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
