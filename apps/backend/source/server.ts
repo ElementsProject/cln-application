@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 const corsOptions = {
   methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
   origin:
-    APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION
+    APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
       ? 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT
       : 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':4300',
   credentials: true,

@@ -25,11 +25,11 @@ export const APP_CONSTANTS = {
   COMMANDO_RUNE: '',
   APP_CORE_LIGHTNING_DAEMON_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
   LIGHTNING_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || 5001),
-  APPLICATION_MODE: process.env.APPLICATION_MODE || Environment.PRODUCTION,
-  COMMANDO_ENV_LOCATION: join(process.env.APP_COMMANDO_ENV_DIR || '.', '.commando-env'),
+  APP_MODE: process.env.APP_MODE || Environment.PRODUCTION,
+  COMMANDO_ENV_LOCATION: join(process.env.APP_CORE_LIGHTNING_COMMANDO_ENV_DIR || '.', '.commando-env'),
   MACAROON_PATH: join(process.env.APP_CORE_LIGHTNING_REST_CERT_DIR || '.', 'access.macaroon'),
-  LOG_FILE_LOCATION: join(process.env.APP_DATA_DIR || '.', 'application-cln.log'),
-  CONFIG_LOCATION: join(process.env.APP_DATA_DIR || '.', 'config.json'),
+  LOG_FILE_LOCATION: join(process.env.APP_DATA_DIR || '.', 'data', 'app', 'application-cln.log'),
+  CONFIG_LOCATION: join(process.env.APP_DATA_DIR || '.', 'data', 'app', 'config.json'),
 };
 
 export const LN_MESSAGE_CONFIG = {
@@ -40,8 +40,8 @@ export const LN_MESSAGE_CONFIG = {
   port: APP_CONSTANTS.LIGHTNING_WS_PORT,
   privateKey: crypto.randomBytes(32).toString('hex'),
   logger: {
-    info: APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION ? () => {} : console.info,
-    warn: APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION ? () => {} : console.warn,
+    info: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.info,
+    warn: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.warn,
     error: console.error,
   },
 };

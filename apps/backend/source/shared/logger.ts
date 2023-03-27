@@ -13,9 +13,9 @@ export const logConfiguration = {
   transports: [
     new winston.transports.Console({
       level:
-        APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION
+        APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
           ? LogLevel.WARN
-          : APP_CONSTANTS.APPLICATION_MODE === Environment.TESTING
+          : APP_CONSTANTS.APP_MODE === Environment.TESTING
           ? LogLevel.DEBUG
           : LogLevel.INFO,
       format: winston.format.combine(
@@ -29,9 +29,9 @@ export const logConfiguration = {
     new winston.transports.File({
       filename: APP_CONSTANTS.LOG_FILE_LOCATION,
       level:
-        APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION
+        APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
           ? LogLevel.WARN
-          : APP_CONSTANTS.APPLICATION_MODE === Environment.TESTING
+          : APP_CONSTANTS.APP_MODE === Environment.TESTING
           ? LogLevel.DEBUG
           : LogLevel.INFO,
       format: winston.format.combine(
@@ -47,7 +47,7 @@ export const logConfiguration = {
 
 export const expressLogConfiguration = {
   ...logConfiguration,
-  meta: APP_CONSTANTS.APPLICATION_MODE !== Environment.PRODUCTION,
+  meta: APP_CONSTANTS.APP_MODE !== Environment.PRODUCTION,
   message: 'HTTP {{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}',
   expressFormat: false,
   colorize: true,
