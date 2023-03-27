@@ -14,9 +14,9 @@ export class LightningService {
         const DATA_SPLIT = (
           Buffer.from(fs.readFileSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)).toString() || '\n'
         ).split('\n');
-        process.env.CLN_PUBKEY = DATA_SPLIT[0].substring(12, DATA_SPLIT[0].length - 1);
-        process.env.COMMANDO_RUNE = DATA_SPLIT[1].substring(10, DATA_SPLIT[1].length - 1);
-        LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.CLN_PUBKEY;
+        process.env.LIGHTNING_PUBKEY = DATA_SPLIT[0].substring(18, DATA_SPLIT[0].length - 1);
+        process.env.COMMANDO_RUNE = DATA_SPLIT[1].substring(16, DATA_SPLIT[1].length - 1);
+        LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.LIGHTNING_PUBKEY;
         APP_CONSTANTS.COMMANDO_RUNE = process.env.COMMANDO_RUNE;
         logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
         this.lnMessage = new Lnmessage(LN_MESSAGE_CONFIG);
@@ -43,13 +43,18 @@ export class LightningService {
         logger.error('Lightning error from ' + method + ' command');
         if (typeof err === 'string') {
           logger.error(err);
-          throw new LightningError(err, err, HttpStatusCode.CLN_SERVER, 'Core Lightning API Error');
+          throw new LightningError(
+            err,
+            err,
+            HttpStatusCode.LIGHTNING_SERVER,
+            'Core Lightning API Error',
+          );
         } else {
           logger.error(JSON.stringify(err));
           throw new LightningError(
             err.message || err.error,
             err.error || err.message,
-            HttpStatusCode.CLN_SERVER,
+            HttpStatusCode.LIGHTNING_SERVER,
             'Core Lightning API Error',
           );
         }

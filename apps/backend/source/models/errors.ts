@@ -44,7 +44,7 @@ export class LightningError extends BaseError {
   constructor(
     message: string = 'Unknown Core Lightning API Error',
     error: any = 'Unkwown Core Lightning API Error',
-    statusCode: HttpStatusCode = HttpStatusCode.CLN_SERVER,
+    statusCode: HttpStatusCode = HttpStatusCode.LIGHTNING_SERVER,
     name: string = 'Core Lightning API Error',
   ) {
     super(message, error, statusCode, name);

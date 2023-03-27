@@ -40,7 +40,7 @@ export const getNodesInfo = (lightningPeers: any) => {
       throw new LightningError(
         'Controller caught lightning error from list nodes: ' + JSON.stringify(err),
         err,
-        HttpStatusCode.CLN_SERVER,
+        HttpStatusCode.LIGHTNING_SERVER,
         'Get Network Nodes Information',
       );
     });

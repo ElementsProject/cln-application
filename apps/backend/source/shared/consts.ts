@@ -18,45 +18,26 @@ export enum HttpStatusCode {
   INVALID_DATA = 421,
   INTERNAL_SERVER = 500,
   BITCOIN_SERVER = 520,
-  CLN_SERVER = 521,
+  LIGHTNING_SERVER = 521,
 }
 
 export const APP_CONSTANTS = {
   COMMANDO_RUNE: '',
-  CLN_HOST_IP: process.env.CLN_DAEMON_IP || 'localhost',
-  CLN_WS_PORT: +(process.env.CLN_DAEMON_WS_PORT || 5001),
+  APP_CORE_LIGHTNING_DAEMON_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
+  LIGHTNING_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || 5001),
   APPLICATION_MODE: process.env.APPLICATION_MODE || Environment.PRODUCTION,
-  COMMANDO_ENV_LOCATION: join(
-    dirname(fileURLToPath(import.meta.url)),
-    process.env.APP_DATA_DIR || '.',
-    process.env.APPLICATION_MODE === Environment.PRODUCTION ||
-      process.env.APPLICATION_MODE === Environment.TESTING
-      ? '/root/.lightning/.commando-env'
-      : './.commando-env',
-  ),
-  MACAROON_PATH: join(
-    dirname(fileURLToPath(import.meta.url)),
-    process.env.APP_DATA_DIR || '.',
-    process.env.CLN_REST_CERT_DIR || '.',
-    'access.macaroon',
-  ),
-  LOG_FILE_LOCATION: join(
-    dirname(fileURLToPath(import.meta.url)),
-    process.env.APP_DATA_DIR || '.',
-    '/data/app/application-cln.log',
-  ),
-  CONFIG_LOCATION: join(
-    dirname(fileURLToPath(import.meta.url)),
-    process.env.APP_DATA_DIR || '.',
-    '/data/app/config.json',
-  ),
+  COMMANDO_ENV_LOCATION: join(process.env.APP_COMMANDO_ENV_DIR || '.', '.commando-env'),
+  MACAROON_PATH: join(process.env.APP_CORE_LIGHTNING_REST_CERT_DIR || '.', 'access.macaroon'),
+  LOG_FILE_LOCATION: join(process.env.APP_DATA_DIR || '.', 'application-cln.log'),
+  CONFIG_LOCATION: join(process.env.APP_DATA_DIR || '.', 'config.json'),
 };
 
 export const LN_MESSAGE_CONFIG = {
   remoteNodePublicKey: '',
-  wsProxy: 'ws://' + APP_CONSTANTS.CLN_HOST_IP + ':' + APP_CONSTANTS.CLN_WS_PORT,
-  ip: APP_CONSTANTS.CLN_HOST_IP,
-  port: APP_CONSTANTS.CLN_WS_PORT,
+  wsProxy:
+    'ws://' + APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP + ':' + APP_CONSTANTS.LIGHTNING_WS_PORT,
+  ip: APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP,
+  port: APP_CONSTANTS.LIGHTNING_WS_PORT,
   privateKey: crypto.randomBytes(32).toString('hex'),
   logger: {
     info: APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION ? () => {} : console.info,

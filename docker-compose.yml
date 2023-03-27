@@ -3,9 +3,8 @@ version: "3.8"
 services:
   bitcoind:
     image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
-    env_file: .env
     command:
-      - -${CLN_BITCOIN_NETWORK}
+      - -${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
       - -rpcbind=0.0.0.0
       - -rpcallowip=0.0.0.0/0
       - -rpcauth=umbrel:5071d8b3ba93e53e414446ff9f1b7d7b$$375e9731abd2cd2c2c44d2327ec19f4f2644256fdeaf4fc5229bf98b778aafec
@@ -14,39 +13,63 @@ services:
       - ${PWD}/data/bitcoin:/root/.bitcoin
     networks:
       networkcln:
-        ipv4_address: ${BITCOIN_NODE_IP}
+        ipv4_address: ${APP_BITCOIN_NODE_IP}
 
-  lightning:
+  lightningd:
     image: elementsproject/lightningd:v22.11.1@sha256:14f1a7937f9692184e46ab6245ed51ed86262d208e81fd5ec5f0339ac5bf8096
-    env_file: .env
-    command: --bitcoin-rpcconnect=${BITCOIN_NODE_IP} --bitcoin-rpcuser=${BITCOIN_RPC_USER} --bitcoin-rpcpassword=${BITCOIN_RPC_PASS} --bind-addr=${CLN_DAEMON_IP}:9735 --network=${CLN_BITCOIN_NETWORK} --grpc-port=${CLN_DAEMON_GRPC_PORT} --experimental-websocket-port=${CLN_DAEMON_WS_PORT} --experimental-offers
+    command:
+      - --bitcoin-rpcconnect=${APP_BITCOIN_NODE_IP}
+      - --bitcoin-rpcuser=${APP_BITCOIN_RPC_USER}
+      - --bitcoin-rpcpassword=${APP_BITCOIN_RPC_PASS}
+      - --bind-addr=${APP_CORE_LIGHTNING_DAEMON_IP}:9735
+      - --network=${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - --database-upgrade=true
+      - --grpc-port=${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
+      - --experimental-websocket-port=${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
+      - --experimental-offers
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightning:/root/.lightning
+      - ${PWD}/data/lightningd:/root/.lightning
     networks:
       networkcln:
-        ipv4_address: ${CLN_DAEMON_IP}
+        ipv4_address: ${APP_CORE_LIGHTNING_DAEMON_IP}
 
   application:
-    # build:
-      # dockerfile: ./Dockerfile
-      # context: ./
-    image: clnbot/umbrel-core-lightning@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    # image: clnbot/umbrel-core-lightning@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
     depends_on:
       - bitcoind
-      - lightning
-    env_file: .env
+      - lightningd
+    environment:
+      APP_CORE_LIGHTNING_PORT: ${APP_CORE_LIGHTNING_PORT}
+      APP_CORE_LIGHTNING_DAEMON_IP: ${APP_CORE_LIGHTNING_DAEMON_IP}
+      LIGHTNING_NETWORK: ${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      APP_CORE_LIGHTNING_IP: ${APP_CORE_LIGHTNING_IP}
+      APP_DATA_DIR: ${APP_DATA_DIR}
+      APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
+      APP_CORE_LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
+      APP_CORE_LIGHTNING_WEBSOCKET_PORT: ${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
+      APP_CORE_LIGHTNING_REST_CERT_DIR: ${APP_CORE_LIGHTNING_REST_CERT_DIR}
+      LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
+      APP_COMMANDO_ENV_DIR: ${APP_COMMANDO_ENV_DIR}
+      APPLICATION_MODE: "production"
+      LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
+      CA_CERT: /lightningd/bitcoin/ca.pem
+      CLIENT_KEY: /lightningd/bitcoin/client-key.pem
+      CLIENT_CERT: /lightningd/bitcoin/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightning:/root/.lightning
-      - ${PWD}/data/c-lightning-rest:/data/c-lightning-rest
+      - ${PWD}/data/lightningd:/root/.lightning
+      - ${PWD}/data/c-lightning-rest/certs:/c-lightning-rest/certs
       - ${PWD}/data/app:/data/app
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - "${APP_CORE_LIGHTNING_PORT}:${APP_CORE_LIGHTNING_PORT}"
     networks:
       networkcln:
-        ipv4_address: ${APP_IP}
+        ipv4_address: ${APP_CORE_LIGHTNING_IP}
 
 networks:
   networkcln:

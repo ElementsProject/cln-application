@@ -22,8 +22,8 @@ let routes: Array<CommonRoutesConfig> = [];
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 
-const CLN_PORT = normalizePort(process.env.APP_PORT || '2103');
-const CLN_HOST = process.env.APP_IP || 'localhost';
+const LIGHTNING_PORT = normalizePort(process.env.APP_CORE_LIGHTNING_PORT || '2103');
+const APP_CORE_LIGHTNING_DAEMON_IP = process.env.APP_CORE_LIGHTNING_IP || 'localhost';
 
 function normalizePort(val: string) {
   var port = parseInt(val, 10);
@@ -53,8 +53,8 @@ const corsOptions = {
   methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
   origin:
     APP_CONSTANTS.APPLICATION_MODE === Environment.PRODUCTION
-      ? 'http://' + CLN_HOST + ':' + CLN_PORT
-      : 'http://' + CLN_HOST + ':4300',
+      ? 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT
+      : 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':4300',
   credentials: true,
   allowedHeaders: 'Content-Type, X-XSRF-TOKEN',
 };
@@ -81,17 +81,29 @@ const throwApiError = (err: any) => {
   switch (err.code) {
     case 'EACCES':
       return new APIError(
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' requires elevated privileges',
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' requires elevated privileges',
+        'http://' +
+          APP_CORE_LIGHTNING_DAEMON_IP +
+          ':' +
+          LIGHTNING_PORT +
+          ' requires elevated privileges',
+        'http://' +
+          APP_CORE_LIGHTNING_DAEMON_IP +
+          ':' +
+          LIGHTNING_PORT +
+          ' requires elevated privileges',
         406,
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' requires elevated privileges',
+        'http://' +
+          APP_CORE_LIGHTNING_DAEMON_IP +
+          ':' +
+          LIGHTNING_PORT +
+          ' requires elevated privileges',
       );
     case 'EADDRINUSE':
       return new APIError(
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' is already in use',
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' is already in use',
+        'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
+        'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
         409,
-        'http://' + CLN_HOST + ':' + CLN_PORT + ' is already in use',
+        'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
       );
     case 'ECONNREFUSED':
       return new APIError(
@@ -118,5 +130,7 @@ const throwApiError = (err: any) => {
 };
 
 server.on('error', throwApiError);
-server.on('listening', () => logger.info('Server running at http://' + CLN_HOST + ':' + CLN_PORT));
-server.listen({ port: CLN_PORT, host: CLN_HOST });
+server.on('listening', () =>
+  logger.info('Server running at http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT),
+);
+server.listen({ port: LIGHTNING_PORT, host: APP_CORE_LIGHTNING_DAEMON_IP });

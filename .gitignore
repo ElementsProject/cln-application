@@ -3,7 +3,7 @@ node_modules
 dist
 build
 data/bitcoin/*
-data/lightning/*
+data/lightningd/*
 data/c-lightning-rest/*
 data/app/application-cln.log
 .commando-env

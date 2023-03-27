@@ -32,15 +32,17 @@ class SharedController {
       logger.info('Getting Connection Settings');
       let macaroon = '';
       if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
-        logger.info('Getting REST Access Macaroon from ' + process.env.CLN_REST_CERT_DIR);
+        logger.info(
+          'Getting REST Access Macaroon from ' + process.env.APP_CORE_LIGHTNING_REST_CERT_DIR,
+        );
         macaroon = Buffer.from(fs.readFileSync(APP_CONSTANTS.MACAROON_PATH)).toString('hex');
       }
       const CONNECT_WALLET_SETTINGS = {
-        DEVICE_DOMAIN_NAME: 'http://' + process.env.DEVICE_DOMAIN_NAME || '',
-        TOR_HOST: 'http://' + process.env.CLN_REST_HIDDEN_SERVICE || '',
-        WS_PORT: process.env.CLN_DAEMON_WS_PORT || '',
-        GRPC_PORT: process.env.CLN_DAEMON_GRPC_PORT || '',
-        REST_PORT: process.env.CLN_REST_PORT || '',
+        LOCAL_HOST: process.env.LOCAL_HOST || '',
+        TOR_HOST: process.env.LIGHTNING_REST_HIDDEN_SERVICE || '',
+        WS_PORT: process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || '',
+        GRPC_PORT: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || '',
+        REST_PORT: process.env.APP_CORE_LIGHTNING_REST_PORT || '',
         REST_MACAROON: macaroon,
       };
       res.status(200).json(CONNECT_WALLET_SETTINGS);
