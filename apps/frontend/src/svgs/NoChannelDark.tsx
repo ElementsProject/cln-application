@@ -1,11 +1,18 @@
+import { easeOut, motion } from 'framer-motion';
+import { OPACITY_VARIANTS } from '../utilities/constants';
+
 export const NoChannelDarkSVG = props => {
   return (
-      <svg
+      <motion.svg
         className={props.className}
         id="Layer_2"
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         viewBox="0 0 935.88 763.33"
+        variants={OPACITY_VARIANTS}
+        initial={{ opacity: 0.5, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0, ease: easeOut }}
       >
         <defs>
           <clipPath id="clippath">
@@ -222,6 +229,6 @@ export const NoChannelDarkSVG = props => {
             />
           </g>
         </g>
-      </svg>
+      </motion.svg>
   );
 };

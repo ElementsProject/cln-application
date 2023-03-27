@@ -30,8 +30,6 @@ export enum ApplicationModes {
   DARK = 'DARK'
 };
 
-export const APPLICATION_MODES = ['LIGHT', 'DARK'];
-
 export const CURRENCY_UNITS = ['SATS', 'BTC'];
 
 export const CURRENCY_UNIT_FORMATS = { Sats: '1.0-0', BTC: '1.6-6', OTHER: '1.2-2' };
