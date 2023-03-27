@@ -56,13 +56,13 @@ services:
       APP_DATA_DIR: ${APP_DATA_DIR}
       APP_MODE: "production"
       LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
-      CA_CERT: /root/.lightning/bitcoin/ca.pem
-      CLIENT_KEY: /root/.lightning/bitcoin/client-key.pem
-      CLIENT_CERT: /root/.lightning/bitcoin/client.pem
+      CA_CERT: /lightningd/bitcoin/ca.pem
+      CLIENT_KEY: /lightningd/bitcoin/client-key.pem
+      CLIENT_CERT: /lightningd/bitcoin/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd:/root/.lightning
+      - ${PWD}/data/lightningd:/lightningd
       - ${PWD}/data/c-lightning-rest/certs:/c-lightning-rest/certs
       - ${PWD}/data/app:/data/app
     ports:

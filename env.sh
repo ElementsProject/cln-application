@@ -22,7 +22,7 @@ if [ "$SETUP" == "docker" ]; then
     export APP_CORE_LIGHTNING_IP="170.21.21.5"
     export APP_DATA_DIR="/"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="/c-lightning-rest/certs"
-    export APP_CORE_LIGHTNING_COMMANDO_ENV_DIR="/root/.lightning"
+    export APP_CORE_LIGHTNING_COMMANDO_ENV_DIR="/lightningd"
     export APP_CORE_LIGHTNING_WEBSOCKET_PORT=2106
     export APP_BITCOIN_RPC_USER="umbrel"
     export APP_BITCOIN_RPC_PASS="moneyprintergobrrr"
