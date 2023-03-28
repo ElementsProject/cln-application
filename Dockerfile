@@ -23,7 +23,7 @@ RUN npm prune --production
 FROM node:18-buster-slim AS umbrel-lightning
 
 # Install jq for JSON parsing in entrypoint.sh
-RUN apt-get update && apt-get install -y jq
+RUN apt-get update && apt-get install -y jq socat
 
 # Copy built code from build stages to '/app/frontend' directory
 COPY --from=umbrel-lightning-app-builder /app/apps/frontend/build /app/apps/frontend/build

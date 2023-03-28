@@ -45,7 +45,7 @@ services:
     environment:
       APP_CORE_LIGHTNING_PORT: ${APP_CORE_LIGHTNING_PORT}
       APP_CORE_LIGHTNING_DAEMON_IP: ${APP_CORE_LIGHTNING_DAEMON_IP}
-      APP_CORE_LIGHTNING_NETWORK: ${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      APP_CORE_LIGHTNING_BITCOIN_NETWORK: ${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
       APP_CORE_LIGHTNING_IP: ${APP_CORE_LIGHTNING_IP}
       APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
       APP_CORE_LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
@@ -56,13 +56,13 @@ services:
       APP_DATA_DIR: ${APP_DATA_DIR}
       APP_MODE: "production"
       LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
-      CA_CERT: /lightningd/bitcoin/ca.pem
-      CLIENT_KEY: /lightningd/bitcoin/client-key.pem
-      CLIENT_CERT: /lightningd/bitcoin/client.pem
+      CA_CERT: /root/.lightning/bitcoin/ca.pem
+      CLIENT_KEY: /root/.lightning/bitcoin/client-key.pem
+      CLIENT_CERT: /root/.lightning/bitcoin/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd:/lightningd
+      - ${PWD}/data/lightningd:/root/.lightning
       - ${PWD}/data/c-lightning-rest/certs:/c-lightning-rest/certs
       - ${PWD}/data/app:/data/app
     ports:

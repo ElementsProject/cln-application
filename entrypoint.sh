@@ -1,22 +1,55 @@
-#!/bin/bash
+#!/bin/sh
 EXISTING_PUBKEY=""
-GET_INFO=""
-
-LIGHTNINGD_PATH="/lightningd/"
+GETINFO_RESPONSE=""
+LIGHTNINGD_PATH=$APP_CORE_LIGHTNING_COMMANDO_ENV_DIR"/"
+LIGHTNING_RPC="$LIGHTNINGD_PATH""$APP_CORE_LIGHTNING_BITCOIN_NETWORK""/lightning-rpc"
 ENV_FILE_PATH="$LIGHTNINGD_PATH"".commando-env"
-LIGHTNING_CLI_PATH="$LIGHTNINGD_PATH""lightning-cli"
 
-echo $LIGHTNING_CLI_PATH
+echo "$LIGHTNING_RPC"
 
-function generate_new_rune() {
-  NEW_RUNE_OBJ=$($LIGHTNING_CLI_PATH --network="$APP_CORE_LIGHTNING_NETWORK" --lightning-dir="$APP_CORE_LIGHTNING_COMMANDO_ENV_DIR" commando-rune restrictions='[["For Umbrel#"]]')
-  UNIQUE_ID=$(jq -n "$NEW_RUNE_OBJ" | jq ".unique_id")
-  RUNE=$(jq -n "$NEW_RUNE_OBJ" | jq ".rune")
-  echo "$RUNE"
+getinfo_request() {
+  cat <<EOF
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "getinfo",
+  "params": []
+}
+EOF
+}
+
+commando_rune_request() {
+  cat <<EOF
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "commando-rune",
+  "params": [null, [["For Umbrel#"]]]
+}
+EOF
+}
+
+commando_datastore_request() {
+  cat <<EOF
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "datastore",
+  "params": [["commando", "runes", "$UNIQUE_ID"], "$RUNE"]
+}
+EOF
+}
+
+generate_new_rune() {
+  # Send 'commando-rune' request
+  RUNE_RESPONSE=$( (echo "$(commando_rune_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
+  RUNE=$(echo "$RUNE_RESPONSE" | jq -r '.result.rune')
+  UNIQUE_ID=$(echo "$RUNE_RESPONSE" | jq -r '.result.unique_id')
   # Save rune in env file
-  echo "LIGHTNING_RUNE=$RUNE" >> $ENV_FILE_PATH
+  echo "LIGHTNING_RUNE=\"$RUNE\"" >> $ENV_FILE_PATH
+  echo "$RUNE"
   # This will fail for v>23.05
-  $LIGHTNING_CLI_PATH --network="$APP_CORE_LIGHTNING_NETWORK" --lightning-dir="$APP_CORE_LIGHTNING_COMMANDO_ENV_DIR" datastore '["commando", "runes", '"$UNIQUE_ID"']' "$RUNE" > /dev/null
+  DATASTORE_RESPONSE=$( (echo "$(commando_datastore_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC") > /dev/null
 }
 
 # Read existing pubkey
@@ -25,20 +58,23 @@ if [ -f "$ENV_FILE_PATH" ]; then
 fi
 
 # Getinfo from CLN
-until [[ "$GET_INFO" != "" ]]
+until [ "$GETINFO_RESPONSE" != "" ]
 do
   echo "Waiting for lightningd"
-  sleep 0.5
-  GET_INFO=$($LIGHTNING_CLI_PATH --network="$APP_CORE_LIGHTNING_NETWORK" --lightning-dir="$APP_CORE_LIGHTNING_COMMANDO_ENV_DIR" getinfo)
+  # Send 'getinfo' request
+  GETINFO_RESPONSE=$( (echo "$(getinfo_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
+  echo "$GETINFO_RESPONSE"
 done
-LIGHTNING_PUBKEY="$(jq -n "$GET_INFO" | jq ".id")"
+# Write 'id' from the response as pubkey
+LIGHTNING_PUBKEY="$(jq -n "$GETINFO_RESPONSE" | jq -r '.result.id')"
+echo "$LIGHTNING_PUBKEY"
 
 # Compare existing pubkey with current
-if [[ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=$LIGHTNING_PUBKEY" ]]; then
+if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=$LIGHTNING_PUBKEY" ]; then
   # Pubkey changed; rewrite new data on the file.
   echo "Pubkey mismatched; Rewriting the data."
   cat /dev/null > $ENV_FILE_PATH
-  echo LIGHTNING_PUBKEY="$LIGHTNING_PUBKEY" >> $ENV_FILE_PATH
+  echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> $ENV_FILE_PATH
   generate_new_rune
 else
   echo "Pubkey matches with existing pubkey."
