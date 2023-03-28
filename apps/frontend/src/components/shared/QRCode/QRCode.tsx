@@ -8,13 +8,18 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { CopySVG } from '../../../svgs/Copy';
 import { ApplicationModes } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
+import logger from '../../../services/logger.service';
+import { copyTextToClipboard } from '../../../utilities/data-formatters';
 
 const QRCodeComponent = (props) => {
   const appCtx = useContext(AppContext);
 
   const copyHandler = () => {
-    navigator.clipboard.writeText(props.message || '');
-    appCtx.setShowToast({show: true, message: (props.toastMessage || props.message), bg: 'success'});
+    copyTextToClipboard(props.message).then((response) => {
+      appCtx.setShowToast({show: true, message: (props.toastMessage || props.message), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   return (

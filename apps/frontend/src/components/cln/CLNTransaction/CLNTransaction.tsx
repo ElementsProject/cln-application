@@ -5,10 +5,11 @@ import Row from 'react-bootstrap/esm/Row';
 import Col from 'react-bootstrap/esm/Col';
 
 import { AppContext } from '../../../store/AppContext';
-import { formatCurrency } from '../../../utilities/data-formatters';
+import { copyTextToClipboard, formatCurrency } from '../../../utilities/data-formatters';
 import { TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
 import DateBox from '../../shared/DateBox/DateBox';
+import logger from '../../../services/logger.service';
 
 const TODAY = Math.floor(Date.now() / 1000);
 
@@ -90,21 +91,26 @@ const CLNTransaction = (props) => {
   const appCtx = useContext(AppContext);
   
   const copyHandler = (event) => {
+    let textToCopy = '';
     switch (event.target.id) {
       case 'Destination':
-        navigator.clipboard.writeText(props.transaction.destination || '');
+        textToCopy = props.transaction.destination;
         break;
       case 'Invoice':
-        navigator.clipboard.writeText(props.transaction.bolt11 || props.transaction.bolt12 || '');
+        textToCopy = props.transaction.bolt11 || props.transaction.bolt12;
         break;
       case 'Preimage':
-        navigator.clipboard.writeText(props.transaction.payment_preimage || '');
+        textToCopy = props.transaction.payment_preimage;
         break;
       default:
-        navigator.clipboard.writeText(props.transaction.payment_hash || '');
+        textToCopy = props.transaction.payment_hash;
         break;
     }
-    appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    copyTextToClipboard(textToCopy).then((response) => {
+      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   return (

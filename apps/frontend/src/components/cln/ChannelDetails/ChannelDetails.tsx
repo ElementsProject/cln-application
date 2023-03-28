@@ -10,7 +10,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 
 import useHttp from '../../../hooks/use-http';
-import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
+import { copyTextToClipboard, formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, Units } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
@@ -41,18 +41,23 @@ const ChannelDetails = (props) => {
   };
 
   const copyHandler = (event) => {
+    let textToCopy = '';
     switch (event.target.id) {
       case 'Channel ID':
-        navigator.clipboard.writeText(props.selChannel.channel_id || '');
+        textToCopy = props.selChannel.channel_id;
         break;
       case 'Funding ID':
-        navigator.clipboard.writeText(props.selChannel.funding_txid || '');
+        textToCopy = props.selChannel.funding_txid;
         break;
       default:
-        navigator.clipboard.writeText(props.selChannel.channel_id || '');
+        textToCopy = props.selChannel.channel_id;
         break;
     }
-    appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    copyTextToClipboard(textToCopy).then((response) => {
+      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   const delayedClearStatusAlert = () => {

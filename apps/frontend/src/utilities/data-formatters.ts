@@ -62,3 +62,22 @@ export const sortDescByKey = (array, key) => {
 export const titleCase = (str: string | undefined) => {
   return (str) ? (str[0].toUpperCase() + str.substring(1).toLowerCase()) : '';
 };
+
+export const copyTextToClipboard = (textToCopy: string | undefined) => {
+  return new Promise((resolve, reject) => {
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      try{
+        return navigator.clipboard.writeText(textToCopy || '').then(res => resolve(true));
+      } catch(err) {
+        reject(err);
+      }
+    } else {
+      try{
+        document.execCommand('copy', false, (textToCopy || ''));
+        resolve(false);
+      } catch(err) {
+        reject(err);
+      }
+    }  
+  });
+}

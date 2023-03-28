@@ -10,13 +10,18 @@ import { AppContext } from '../../../store/AppContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { ApplicationModes } from '../../../utilities/constants';
 import { CloseSVG } from '../../../svgs/Close';
+import logger from '../../../services/logger.service';
+import { copyTextToClipboard } from '../../../utilities/data-formatters';
 
 const NodeInfo = () => {
   const appCtx = useContext(AppContext);
 
   const copyHandler = () => {
-    navigator.clipboard.writeText(appCtx.nodeInfo.id || '');
-    appCtx.setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'});
+    copyTextToClipboard(appCtx.nodeInfo.id).then((response) => {
+      appCtx.setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   const closeHandler = () => {

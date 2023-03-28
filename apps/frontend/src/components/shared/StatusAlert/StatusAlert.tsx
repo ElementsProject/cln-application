@@ -4,18 +4,22 @@ import Spinner from 'react-bootstrap/Spinner';
 import Col from 'react-bootstrap/Col';
 
 import { CallStatus, OPACITY_VARIANTS } from '../../../utilities/constants';
-import { titleCase } from '../../../utilities/data-formatters';
+import { copyTextToClipboard, titleCase } from '../../../utilities/data-formatters';
 import { InformationSVG } from '../../../svgs/Information';
 import { CopySVG } from '../../../svgs/Copy';
 import { AppContext } from '../../../store/AppContext';
 import { useContext } from 'react';
+import logger from '../../../services/logger.service';
 
 const StatusAlert = props => {
   const appCtx = useContext(AppContext);
 
   const copyHandler = (event) => {
-    navigator.clipboard.writeText(props.responseMessage || '');
-    appCtx.setShowToast({show: true, message: ('Response Copied Successfully!'), bg: 'success'});
+    copyTextToClipboard(props.responseMessage).then((response) => {
+      appCtx.setShowToast({show: true, message: ('Response Copied Successfully!'), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   return (

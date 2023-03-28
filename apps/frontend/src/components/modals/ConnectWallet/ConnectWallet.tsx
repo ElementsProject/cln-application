@@ -12,6 +12,8 @@ import { ApplicationModes } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
 import { AppContext } from '../../../store/AppContext';
 import { CloseSVG } from '../../../svgs/Close';
+import { copyTextToClipboard } from '../../../utilities/data-formatters';
+import logger from '../../../services/logger.service';
 
 const NETWORK_TYPES = ['Local Network', 'Tor']
 
@@ -21,21 +23,26 @@ const ConnectWallet = () => {
   const [clnConnectUrl, setClnConnectUrl] = useState('c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
 
   const copyHandler = (event) => {
+    let textToCopy = '';
     switch (event.target.id) {
       case 'REST Port':
-        navigator.clipboard.writeText(appCtx.walletConnect.REST_PORT || '');
+        textToCopy = appCtx.walletConnect.REST_PORT || '';
         break;
       case 'Host':
-        navigator.clipboard.writeText((selNetwork === 0 ? appCtx.walletConnect.LOCAL_HOST : appCtx.walletConnect.TOR_HOST) || '');
+        textToCopy = (selNetwork === 0 ? appCtx.walletConnect.LOCAL_HOST : appCtx.walletConnect.TOR_HOST) || '';
         break;
       case 'Macaroon':
-        navigator.clipboard.writeText(appCtx.walletConnect.REST_MACAROON || '');
+        textToCopy = appCtx.walletConnect.REST_MACAROON || '';
         break;
       default:
-        navigator.clipboard.writeText(clnConnectUrl || '');
+        textToCopy = clnConnectUrl;
         break;
     }
-    appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    copyTextToClipboard(textToCopy).then((response) => {
+      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   const closeHandler = () => {

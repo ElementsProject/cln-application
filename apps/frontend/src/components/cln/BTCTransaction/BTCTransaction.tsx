@@ -8,6 +8,8 @@ import { AppContext } from '../../../store/AppContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { OpenLinkSVG } from '../../../svgs/OpenLink';
+import { copyTextToClipboard } from '../../../utilities/data-formatters';
+import logger from '../../../services/logger.service';
 
 const TransactionDetail = ({transaction, copyHandler, openLinkHandler}) => {
   return (
@@ -70,21 +72,26 @@ const BTCTransaction = (props) => {
   };
 
   const copyHandler = (event) => {
+    let textToCopy = '';
     switch (event.target.id) {
       case 'Outpoint':
-        navigator.clipboard.writeText(props.transaction.outpoint || '');
+        textToCopy = props.transaction.outpoint;
         break;
       case 'Transaction ID':
-        navigator.clipboard.writeText(props.transaction.txid || '');
+        textToCopy = props.transaction.txid;
         break;
       case 'Payment ID':
-        navigator.clipboard.writeText(props.transaction.payment_id || '');
+        textToCopy = props.transaction.payment_id;
         break;
       default:
-        navigator.clipboard.writeText(props.transaction.payment_id || '');
+        textToCopy = props.transaction.payment_id;
         break;
     }
-    appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    copyTextToClipboard(textToCopy).then((response) => {
+      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+    }).catch((err) => {
+      logger.error(err);
+    });
   }
 
   return (
