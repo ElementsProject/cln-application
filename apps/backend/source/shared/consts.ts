@@ -30,8 +30,8 @@ export const APP_CONSTANTS = {
     '.commando-env',
   ),
   MACAROON_PATH: join(process.env.APP_CORE_LIGHTNING_REST_CERT_DIR || '.', 'access.macaroon'),
-  LOG_FILE_LOCATION: join(process.env.APP_DATA_DIR || '.', 'data', 'app', 'application-cln.log'),
-  CONFIG_LOCATION: join(process.env.APP_DATA_DIR || '.', 'data', 'app', 'config.json'),
+  LOG_FILE_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'application-cln.log'),
+  CONFIG_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'config.json'),
 };
 
 export const LN_MESSAGE_CONFIG = {
