@@ -6,6 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 
 import useHttp from '../../hooks/use-http';
+import useBreakpoint from '../../hooks/use-breakpoint';
 import { AppContext } from '../../store/AppContext';
 import { ApplicationModes, APP_WAIT_TIME } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
@@ -19,6 +20,7 @@ import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
 
 const App = () => {
   const appCtx = useContext(AppContext);
+  const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, fetchData } = useHttp();
 
   const bodyHTML = document.getElementsByTagName('body')[0];
@@ -40,7 +42,7 @@ const App = () => {
 
   if (appCtx.nodeInfo.isLoading) {
     return (
-      <Container className='py-4' id='root-container' data-testid='container'>
+      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
         <Header />
         <Row className='mt-10'>
           <Col xs={12} className='d-flex align-items-center justify-content-center'>
@@ -56,7 +58,7 @@ const App = () => {
 
   if (appCtx.nodeInfo.error) {
     return (
-      <Container className='py-4' id='root-container' data-testid='container'>
+      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
         <Header />
         <Row className='message invalid mt-10'>
           <Col xs={12} className='d-flex align-items-center justify-content-center'>
@@ -69,7 +71,7 @@ const App = () => {
 
   return (
     <>
-      <Container className='py-4' id='root-container' data-testid='container'>
+      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
         <Header />
         <Row>
           <Col className='mx-1'>

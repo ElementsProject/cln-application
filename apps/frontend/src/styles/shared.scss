@@ -2,12 +2,14 @@
 @import './mode-light.scss';
 
 body {
-  overflow: hidden;
   transition: background-color $theme-transition ease;
   &.modal-open #root-container {
     filter: blur(5px);
   }
   & #root-container {
+    &[data-screensize='XL'], &[data-screensize='XXL'] {
+      overflow: hidden;
+    }
     transition: filter $transition-time ease;
   }
   & .tooltip {
