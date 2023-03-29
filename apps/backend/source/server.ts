@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-src 'self'; style-src 'self'; manifest-src 'self';",
+    "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-src 'self'; style-src 'self'; manifest-src 'self' http://umbrel.local;",
   );
   next();
 });
