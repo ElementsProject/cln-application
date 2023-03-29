@@ -37,6 +37,6 @@ else
     export APP_CONFIG_DIR="$PWD/data/app"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="$PWD/data/c-lightning-rest/certs"
     export APP_CORE_LIGHTNING_COMMANDO_ENV_DIR="$PWD"
-    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5006
+    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5001
     echo "Local Environment Variables Set"
 fi

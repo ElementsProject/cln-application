@@ -418,10 +418,14 @@ label.form-label {
       cursor: pointer;
       border-right: 0;
       padding-right: 0;
+      border-top-left-radius: 0.375rem !important;
+      border-bottom-left-radius: 0.375rem !important;
     }
     &.form-control-right {
       border-left: 0;
       padding-left: 0;
+      border-top-right-radius: 0.375rem !important;
+      border-bottom-right-radius: 0.375rem !important;
     }  
     &.form-control-middle {
       transition: background-color $theme-transition ease;
@@ -496,6 +500,7 @@ label.form-label {
   position: relative;
   width: 220px;
   & .qr-cln-logo {
+    z-index: 9999;
     position: absolute;
     top: 41%;
     left: 41%;

@@ -132,7 +132,7 @@ const ChannelOpen = (props) => {
             <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
               <Row className='d-flex align-items-start justify-content-center'>
                 <Col xs={12}>
-                  <Form.Label className='text-dark'>Node ID</Form.Label>
+                  <Form.Label className='text-dark'>Node ID*</Form.Label>
                   <InputGroup className={(pubkeyHasError ? 'invalid' : '')}>
                     <InputGroup.Text className='form-control-addon form-control-addon-left'>
                       <AddressSVG />
@@ -155,7 +155,7 @@ const ChannelOpen = (props) => {
                   }
                 </Col>
                 <Col xs={12}>
-                  <Form.Label className='text-dark'>Amount</Form.Label>
+                  <Form.Label className='text-dark'>Amount*</Form.Label>
                   <InputGroup className={(amountHasError ? 'invalid ' : '')}>
                     <InputGroup.Text className='form-control-addon form-control-addon-left'>
                       <AmountSVG />

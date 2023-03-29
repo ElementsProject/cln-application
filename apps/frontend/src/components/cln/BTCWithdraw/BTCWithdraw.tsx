@@ -122,7 +122,7 @@ const BTCWithdraw = (props) => {
               <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                   <Form.Label className='text-dark d-flex align-items-center justify-content-between'>
-                    <span>Amount</span>
+                    <span>Amount*</span>
                     {amountValue !== 'All' ? 
                       <Button variant='link' onClick={() => amountChangeHandler({target: {value: 'All'}})}>Send All</Button>
                     :
@@ -174,7 +174,7 @@ const BTCWithdraw = (props) => {
                   }
                 </Col>
                 <Col xs={12}>
-                  <Form.Label className=' text-dark'>Address</Form.Label>
+                  <Form.Label className=' text-dark'>Address*</Form.Label>
                   <InputGroup className={(addressHasError ? 'invalid ' : '')}>
                     <InputGroup.Text className='form-control-addon form-control-addon-left'>
                       <AddressSVG />

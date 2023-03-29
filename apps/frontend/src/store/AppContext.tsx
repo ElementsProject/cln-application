@@ -287,7 +287,11 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_INVOICES:
-      const sortedInvoices = action.payload.invoices?.sort((i1: Invoice, i2: Invoice) => ((i1.expires_at && i2.expires_at && i1.expires_at > i2.expires_at) ? -1 : 1));
+      const sortedInvoices = action.payload.invoices?.sort((i1: Invoice, i2: Invoice) => {
+        const compareValue1 = i1.paid_at || i1.expires_at || 0;
+        const compareValue2 = i2.paid_at || i2.expires_at || 0;
+        return compareValue1 > compareValue2 ? -1 : 1;
+      });
       if (!state.listPayments.isLoading) {
         const mergedTransactions = mergeLightningTransactions(sortedInvoices, state.listPayments.payments);
         return {

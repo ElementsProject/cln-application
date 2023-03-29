@@ -110,19 +110,21 @@ const useHttp = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'newaddr', 'params': { 'addresstype': 'bech32' } });
   };
 
-  const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number = 0) => {
+  const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number | null) => {
     if (paymentType === PaymentType.KEYSEND) {
-      return sendRequest(true, 'post', '/cln/call', { 'method': 'keysend', 'params': { 'destination': invoice, 'amount_msat': amount * SATS_MSAT } });
+      return sendRequest(true, 'post', '/cln/call', { 'method': 'keysend', 'params': { 'destination': invoice, 'amount_msat': amount } });
     } else {
-      return sendRequest(true, 'post', '/cln/call', { 'method': 'pay', 'params': { 'bolt11': invoice } }); // For bolt11 & Offers both
+      // Same pay method can be used for bolt11 & offers
+      let sendPayParams = !amount ? { 'bolt11': invoice } : { 'bolt11': invoice, 'amount_msat': amount }
+      return sendRequest(true, 'post', '/cln/call', { 'method': 'pay', 'params': sendPayParams });
     }
   };
 
-  const clnReceiveInvoice = (invoiceType: PaymentType, amount: number, description: string, label: string) => {
+  const clnReceiveInvoice = (invoiceType: PaymentType, amount: number | string, description: string, label: string) => {
     if (invoiceType === PaymentType.OFFER) {
-      return sendRequest(false, 'post', '/cln/call', { 'method': 'offer', 'params': { 'amount': (amount * SATS_MSAT), 'description': description } });
+      return sendRequest(false, 'post', '/cln/call', { 'method': 'offer', 'params': { 'amount': amount, 'description': description } });
     } else {
-      return sendRequest(false, 'post', '/cln/call', { 'method': 'invoice', 'params': { 'amount_msat': (amount * SATS_MSAT), 'label': label, 'description': description } });
+      return sendRequest(false, 'post', '/cln/call', { 'method': 'invoice', 'params': { 'amount_msat': amount, 'label': label, 'description': description } });
     }
   };
 

@@ -11,7 +11,8 @@ import Spinner from 'react-bootstrap/Spinner';
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
-import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType } from '../../../utilities/constants';
+import { formatCurrency } from '../../../utilities/data-formatters';
+import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT, Units } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
@@ -25,11 +26,13 @@ const CLNSend = (props) => {
   const appCtx = useContext(AppContext);
   const { clnSendPayment, decodeInvoice, fetchInvoice } = useHttp();
   const [paymentType, setPaymentType] = useState(PaymentType.INVOICE);
+  const [emptyInvoice, setEmptyInvoice] = useState(false);
+  const [decodeResponse, setDecodeResponse] = useState({ description:'', amount: '' });
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
   const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (appCtx.walletBalances.clnLocalBalance || 0);
-  const isValidInvoice = (value) => value.trim() !== '';
+  const isValidInvoice = (value) => value.trim() !== '' && (paymentType === PaymentType.KEYSEND || (paymentType === PaymentType.INVOICE && value.startsWith('lnb')) || (paymentType === PaymentType.OFFER && value.startsWith('lno')));
 
   const {
     value: invoiceValue,
@@ -50,7 +53,10 @@ const CLNSend = (props) => {
 
   let formIsValid = false;
 
-  if ((paymentType !== PaymentType.KEYSEND && invoiceIsValid) || (paymentType === PaymentType.KEYSEND && invoiceIsValid && amountIsValid)) {
+  if (
+    (paymentType !== PaymentType.KEYSEND && invoiceIsValid && !emptyInvoice) || 
+    (paymentType !== PaymentType.KEYSEND && invoiceIsValid && emptyInvoice && amountIsValid) || 
+    (paymentType === PaymentType.KEYSEND && invoiceIsValid && amountIsValid)) {
     formIsValid = true;
   };
 
@@ -60,15 +66,83 @@ const CLNSend = (props) => {
   };
 
   const resetFormValues = () => {
+    setEmptyInvoice(false);
+    setDecodeResponse({ description:'', amount: '' });
     setPaymentType(PaymentType.INVOICE);
     resetInvoice();
     resetAmount();
   };
 
   const paymentTypeChangeHandler = (event) => {
+    setEmptyInvoice(false);
+    setDecodeResponse({ description:'', amount: '' });
     setPaymentType(event.target.id);
     resetInvoice();
     resetAmount();
+  }
+
+  const invoiceDecodeHandler = (event) => {
+    if (paymentType !== PaymentType.KEYSEND) {
+      if (!isValidInvoice(event.target.value)) {
+        event.preventDefault();
+        touchFormControls();
+        return;
+      }
+      decodeInvoice(event.target.value)
+      .then((decodeRes: any) => {
+        logger.info(decodeRes);
+        if (decodeRes.data) {
+          if (paymentType === PaymentType.OFFER) {
+            if (!decodeRes.data.valid) {
+              logger.error('Offer Invalid');
+              setResponseStatus(CallStatus.ERROR);
+              setResponseMessage('Invalid or Open Offer');
+              delayedClearStatusAlert();
+            } else if (!decodeRes.data.offer_amount_msat) {
+              setEmptyInvoice(true);
+              setDecodeResponse({ 
+                description: (decodeRes.data.offer_description),
+                amount: ('Open Offer')
+              });
+            } else {
+              const amountmSats = +(decodeRes.data.offer_amount_msat.substring(0, (decodeRes.data.offer_amount_msat.length - 4))) || 0;
+              amountChangeHandler({target: {value: (amountmSats / SATS_MSAT).toString()}});
+              setDecodeResponse({ 
+                description: (decodeRes.data.offer_description),
+                amount: (formatCurrency(amountmSats, Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+              });
+            }
+          } else {
+            if (decodeRes && decodeRes.data) {
+              if (!decodeRes.data.msatoshi) {
+                setEmptyInvoice(true);
+                setDecodeResponse({ 
+                  description: (decodeRes.data.description),
+                  amount: ('Open Invoice')
+                });
+              } else {
+                amountChangeHandler({target: {value: (decodeRes.data.msatoshi / SATS_MSAT).toString()}});
+                setDecodeResponse({ 
+                  description: (decodeRes.data.description),
+                  amount: (formatCurrency((decodeRes.data.msatoshi || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                });
+              }
+            }
+          }
+        } else {
+          logger.error(decodeRes);
+          setResponseStatus(CallStatus.ERROR);
+          setResponseMessage(decodeRes.response.data || decodeRes.message || 'Unknown Error');
+          delayedClearStatusAlert();
+        }
+      })
+      .catch(err => {
+        logger.error(err.response.data);
+        setResponseStatus(CallStatus.ERROR);
+        setResponseMessage(err.response.data);
+        delayedClearStatusAlert();
+      });
+    }
   }
 
   const delayedClearStatusAlert = () => {
@@ -79,7 +153,8 @@ const CLNSend = (props) => {
   }
 
   const sendInvoice = (type: PaymentType, invoice: string, amount: number) => {
-    clnSendPayment(type, invoice, amount)
+    let amtMSats = ((type === PaymentType.INVOICE && !emptyInvoice) || type === PaymentType.OFFER) ? null : (amount * SATS_MSAT);
+    clnSendPayment(type, invoice, amtMSats)
     .then((response: any) => {
       logger.info(response);
       if (response.data && response.data.payment_hash) {
@@ -108,28 +183,10 @@ const CLNSend = (props) => {
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Sending Payment...');
     if (paymentType === PaymentType.OFFER) {
-      decodeInvoice(invoiceValue)
-      .then((decodeRes: any) => {
-        logger.info(decodeRes);
-        if (!decodeRes.data.valid || !decodeRes.data.offer_amount_msat) {
-          logger.error('Offer Invalid');
-          setResponseStatus(CallStatus.ERROR);
-          setResponseMessage('Invalid or Open Offer');
-          delayedClearStatusAlert();
-        } else {
-          const amountSats = +(decodeRes.data.offer_amount_msat.substring(0, (decodeRes.data.offer_amount_msat.length - 4))) / 1000 || 0;
-          fetchInvoice(invoiceValue, amountSats)
-          .then((fetchInvoiceRes: any) => {
-            logger.info(fetchInvoiceRes);
-            sendInvoice(PaymentType.INVOICE, fetchInvoiceRes.data.invoice, amountSats);
-          })
-          .catch(err => {
-            logger.error(err.response.data);
-            setResponseStatus(CallStatus.ERROR);
-            setResponseMessage(err.response.data);
-            delayedClearStatusAlert();
-          });
-        }
+      fetchInvoice(invoiceValue, +amountValue)
+      .then((fetchInvoiceRes: any) => {
+        logger.info(fetchInvoiceRes);
+        sendInvoice(PaymentType.OFFER, fetchInvoiceRes.data.invoice, (+amountValue || 0));
       })
       .catch(err => {
         logger.error(err.response.data);
@@ -138,7 +195,7 @@ const CLNSend = (props) => {
         delayedClearStatusAlert();
       });
     } else {
-      sendInvoice(PaymentType.INVOICE, invoiceValue, (+amountValue || 0));
+      sendInvoice(paymentType, invoiceValue, (+amountValue || 0));
     }
   };
 
@@ -162,7 +219,7 @@ const CLNSend = (props) => {
                   <Form.Check tabIndex={3} onChange={paymentTypeChangeHandler} checked={paymentType === PaymentType.KEYSEND} inline className='text-dark' label='Keysend' name='payType' type='radio' id='Keysend' />
                 </Col>
                 <Col xs={12}>
-                  <Form.Label className='text-dark'>{paymentType === PaymentType.KEYSEND ? 'Pubkey' : paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</Form.Label>
+                  <Form.Label className='text-dark'>{paymentType === PaymentType.KEYSEND ? 'Pubkey' : paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}*</Form.Label>
                   <InputGroup className={(invoiceHasError ? 'invalid' : '')}>
                     <InputGroup.Text className='form-control-addon form-control-addon-left'>
                       <AddressSVG />
@@ -176,9 +233,15 @@ const CLNSend = (props) => {
                       aria-describedby='addon-invoice'
                       className='form-control-right'
                       value={invoiceValue}
-                      onChange={invoiceChangeHandler}
+                      onChange={(event) => { invoiceChangeHandler(event); invoiceDecodeHandler(event)}}
                       onBlur={invoiceBlurHandler}
                     />
+                    <Form.Text className='text-light col-12'>
+                      <Row>
+                        <Col xs={8} className='d-flex align-items-start justify-content-start overflow-x-ellipsis'>{decodeResponse.description}</Col>
+                        <Col xs={4} className='d-flex align-items-end justify-content-end'>{decodeResponse.amount}</Col>
+                      </Row>
+                    </Form.Text>
                   </InputGroup>
                   {(invoiceHasError) ?
                       <InvalidInputMessage message={('Invalid ' + (paymentType === PaymentType.KEYSEND ? 'Pubkey' : paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'))} /> 
@@ -186,9 +249,9 @@ const CLNSend = (props) => {
                       <div className='message'></div>
                   }
                 </Col>
-                {paymentType === PaymentType.KEYSEND ? 
+                {(paymentType === PaymentType.KEYSEND || emptyInvoice) ? 
                   <Col xs={12}>
-                    <Form.Label className='text-dark'>Amount</Form.Label>
+                    <Form.Label className='text-dark'>Amount*</Form.Label>
                     <InputGroup className={(amountHasError ? 'invalid' : '')}>
                       <InputGroup.Text className='form-control-addon form-control-addon-left'>
                         <AmountSVG />

@@ -11,7 +11,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
-import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType } from '../../../utilities/constants';
+import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
@@ -31,7 +31,7 @@ const CLNReceive = (props) => {
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const isValidAmount = (value) => value.trim() !== '' && value >= 0;
+  const isValidAmount = (value) => value.trim() === '' || !isNaN(value);
   const isValidDescription = (value) => value.trim() !== '';
 
   const {
@@ -86,7 +86,8 @@ const CLNReceive = (props) => {
     if (!formIsValid) { return; }
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Generating ' + (paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + '...');
-    clnReceiveInvoice(paymentType, +amountValue, descriptionValue, ('umbrellbl' + Math.random().toString(36).slice(2) + Date.now()))
+    let amtValueMSats = (amountValue === '') ? 'any' : (+amountValue * SATS_MSAT);
+    clnReceiveInvoice(paymentType, amtValueMSats, descriptionValue, ('umbrellbl' + Math.random().toString(36).slice(2) + Date.now()))
     .then((response: any) => {
       logger.info(response);
       if (response.data && (response.data.bolt11 || response.data.bolt12)) {
@@ -151,7 +152,7 @@ const CLNReceive = (props) => {
                   <Form.Check tabIndex={2} onChange={paymentTypeChangeHandler} checked={paymentType === PaymentType.OFFER} inline className='ms-3 text-dark' label='Offer' name='payType' type='radio' id='Offer' />
                 </Col>
                 <Col xs={12}>
-                  <Form.Label className='text-dark'>Description</Form.Label>
+                  <Form.Label className='text-dark'>Description*</Form.Label>
                   <InputGroup className={(descriptionHasError ? 'invalid' : '')}>
                     <InputGroup.Text className='form-control-addon form-control-addon-left'>
                       <DescriptionSVG />
