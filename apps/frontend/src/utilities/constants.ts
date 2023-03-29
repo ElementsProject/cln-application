@@ -8,6 +8,7 @@ export const API_BASE_URL = 'http://' + HOST + ':' + PORT;
 export const API_VERSION = '/v1';
 
 export const APP_WAIT_TIME = 10 * 1000; // 10 seconds
+export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
 export const BTC_MSAT = 100000000000;
 export const BTC_SATS = 100000000;
 export const SATS_MSAT = 1000;
@@ -96,7 +97,6 @@ export enum PaymentType {
   KEYSEND = 'Keysend'
 };
 
-export const CLEAR_STATUS_ALERT_DELAY = 15000;
 export const TRANSITION_DURATION = 0.3;
 export const THEME_TRANSITION_DURATION = 0.5;
 export const COUNTUP_DURATION = 1.5;

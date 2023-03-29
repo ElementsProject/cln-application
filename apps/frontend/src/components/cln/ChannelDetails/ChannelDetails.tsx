@@ -76,6 +76,7 @@ const ChannelDetails = (props) => {
       .then((response: any) => {
         logger.info(response);
         if (response.data && response.data.type) {
+          props.selChannel.current_state = 'PENDING';
           setChannelClosed(true);
           setResponseStatus(CallStatus.SUCCESS);
           setResponseMessage('Channel ' + response.data.type + ' closed' + (response.data.txid ? (' with transaction id ' + response.data.txid) : ''));
