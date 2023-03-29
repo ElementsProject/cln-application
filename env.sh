@@ -3,7 +3,7 @@ SETUP=${1:-local}
 
 export APP_BITCOIN_NETWORK="regtest"
 export APP_CORE_LIGHTNING_BITCOIN_NETWORK="$APP_BITCOIN_NETWORK"
-if [[ "$APP_BITCOIN_NETWORK" == "mainnet" ]]; then
+if [ "$APP_BITCOIN_NETWORK" == "mainnet" ]; then
 	export APP_CORE_LIGHTNING_BITCOIN_NETWORK="bitcoin"
 fi
 

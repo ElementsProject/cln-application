@@ -29,7 +29,10 @@ const App = () => {
   theme.value = appCtx.appConfig.appMode?.toLowerCase() || 'dark';
   bodyHTML.style.backgroundColor =
     appCtx.appConfig.appMode === ApplicationModes.LIGHT ? '#EBEFF9' : '#0C0C0F';
+  const screensize = document.createAttribute('data-screensize');
+  screensize.value = currentScreenSize;
   htmlAttributes.setNamedItem(theme);
+  htmlAttributes.setNamedItem(screensize);
 
   useEffect(() => {
     setCSRFToken();
@@ -42,7 +45,7 @@ const App = () => {
 
   if (appCtx.nodeInfo.isLoading) {
     return (
-      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
+      <Container className='py-4' id='root-container' data-testid='container'>
         <Header />
         <Row className='mt-10'>
           <Col xs={12} className='d-flex align-items-center justify-content-center'>
@@ -58,7 +61,7 @@ const App = () => {
 
   if (appCtx.nodeInfo.error) {
     return (
-      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
+      <Container className='py-4' id='root-container' data-testid='container'>
         <Header />
         <Row className='message invalid mt-10'>
           <Col xs={12} className='d-flex align-items-center justify-content-center'>
@@ -71,7 +74,7 @@ const App = () => {
 
   return (
     <>
-      <Container className='py-4' id='root-container' data-testid='container' data-screensize={currentScreenSize}>
+      <Container className='py-4' id='root-container' data-testid='container'>
         <Header />
         <Row>
           <Col className='mx-1'>
