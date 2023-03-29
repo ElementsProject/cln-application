@@ -1,5 +1,6 @@
 import './Channels.scss';
 import { useContext } from 'react';
+import { motion } from "framer-motion";
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
@@ -14,7 +15,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import { AppContext } from '../../../store/AppContext';
 import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { ActionSVG } from '../../../svgs/Action';
-import { ApplicationModes, Units } from '../../../utilities/constants';
+import { ApplicationModes, STAGERRED_SPRING_VARIANTS_3, Units } from '../../../utilities/constants';
 import { NoChannelLightSVG } from '../../../svgs/NoChannelLight';
 import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
 
@@ -37,10 +38,10 @@ const Channels = (props) => {
               <PerfectScrollbar className='ps-show-always'>
                 <ListGroup as='ul' variant='flush' className='list-channels'>
                   {allChannelsMerged.map((channel, idx) => (
-                    <ListGroup.Item
+                    <motion.li
                       key={channel.short_channel_id || channel.node_alias || idx}
-                      as='li'
-                      className='list-item-channel'
+                      className={'list-group-item list-item-channel ' + (props.newlyOpenedChannelId === channel.channel_id ? 'newly-opened' : '')}
+                      variants={props.newlyOpenedChannelId === channel.channel_id ? STAGERRED_SPRING_VARIANTS_3 : {}} initial='hidden' animate='visible' exit='hidden' custom={0}
                       onClick={() => (props.onChannelClick(channel))}
                     >
                       <div className='flex-fill text-dark'>
@@ -71,7 +72,7 @@ const Channels = (props) => {
                           </Row>
                         </>
                       </div>
-                    </ListGroup.Item>
+                    </motion.li>
                   ))}
                 </ListGroup>
               </PerfectScrollbar>

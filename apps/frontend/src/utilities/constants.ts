@@ -137,6 +137,32 @@ export const STAGERRED_SPRING_VARIANTS_2 = {
   }
 };
 
+export const STAGERRED_SPRING_VARIANTS_3 = {
+  hidden: { y: -10 },
+  visible: (i) => {
+    const delay = 0 + i * 0.5;
+    return {
+      y: 0,
+      transition: {
+        y: { delay, type: 'spring', stiffness: 700, damping: 4 }
+      }
+    };
+  }
+};
+
+export const STAGERRED_SPRING_VARIANTS_4 = {
+  hidden: { opacity: 0 },
+  visible: (i) => {
+    const delay = 0 + i * 0.5;
+    return {
+      opacity: 1,
+      transition: {
+        opacity: { delay, type: 'spring', stiffness: 500, damping: 3 }
+      }
+    };
+  }
+};
+
 export const STAGERRED_COLOR_DRAIN = {
   primary: { fill: '#E1BA2D' },
   dark: (i) => {

@@ -4,13 +4,14 @@
 // 3: Polling after every 10 seconds can make it even slower.
 
 import React, { useReducer } from 'react';
-import { AppContextType } from '../types/app-context.type';
+import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+
 import { ApplicationActions, ApplicationModes, SATS_MSAT, Units } from '../utilities/constants';
+import { sortDescByKey } from '../utilities/data-formatters';
+import logger from '../services/logger.service';
+import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, FiatConfig, WalletConnect } from '../types/app-config.type';
 import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
-import logger from '../services/logger.service';
-import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { sortDescByKey } from '../utilities/data-formatters';
 
 const aggregateChannels = (peers: Peer[]) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };

@@ -12,6 +12,9 @@
       justify-content: space-between;
       align-items: flex-start;
       transition: background-color $theme-transition ease;
+      &.newly-opened {
+        background-color: $body-bg-light;
+      }
       &:hover {
         cursor: pointer;
         background-color: $body-bg-light;
@@ -29,6 +32,9 @@
       transition: background-color $theme-transition ease;
       & .list-item-channel {
         transition: background-color $theme-transition ease;
+        &.newly-opened {
+          background-color: $body-bg-dark;
+        }
         &:hover {
           background-color: $body-bg-dark;
         }
