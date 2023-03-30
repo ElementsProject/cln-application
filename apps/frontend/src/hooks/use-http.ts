@@ -140,7 +140,7 @@ const useHttp = () => {
     try {
       logger.info('Base URL: ' + API_BASE_URL + API_VERSION);
       return axiosInstance.get('/shared/csrf').then(res => {
-        return axiosInstance.defaults.headers.post = { 'X-XSRF-TOKEN': res.data.csrfToken };
+        return axiosInstance.defaults.headers.post = { 'XSRF-TOKEN': res.data.csrfToken };
       }).catch(err => {
         logger.error(err);
         return err;

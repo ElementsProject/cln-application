@@ -36,11 +36,11 @@ function normalizePort(val: string) {
   return false;
 }
 
+app.use(bodyParser.json({ limit: '25mb' }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.set('trust proxy', true);
 app.use(cookieParser());
 app.use(csurf({ cookie: true }));
-app.use(bodyParser.json({ limit: '25mb' }));
-app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader(
@@ -56,7 +56,7 @@ const corsOptions = {
       ? 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT
       : 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':4300',
   credentials: true,
-  allowedHeaders: 'Content-Type, X-XSRF-TOKEN',
+  allowedHeaders: 'Content-Type, X-XSRF-TOKEN, XSRF-TOKEN',
 };
 app.use(cors(corsOptions));
 
