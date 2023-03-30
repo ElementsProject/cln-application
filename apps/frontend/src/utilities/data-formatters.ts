@@ -78,6 +78,6 @@ export const copyTextToClipboard = (textToCopy: string | undefined) => {
       } catch(err) {
         reject(err);
       }
-    }  
+    }
   });
 }

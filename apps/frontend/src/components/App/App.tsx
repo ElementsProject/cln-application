@@ -17,6 +17,7 @@ import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
 import BTCCard from '../cln/BTCCard/BTCCard';
 import CLNCard from '../cln/CLNCard/CLNCard';
 import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
+import logger from '../../services/logger.service';
 
 const App = () => {
   const appCtx = useContext(AppContext);
@@ -35,11 +36,26 @@ const App = () => {
   htmlAttributes.setNamedItem(screensize);
 
   useEffect(() => {
-    setCSRFToken();
-    getAppConfigurations();
-    window.setInterval(() => {
-      fetchData();
-    }, APP_WAIT_TIME);
+    setCSRFToken().then((isCsrfSet: any) => {
+      if (isCsrfSet) {
+        getAppConfigurations();
+        window.setInterval(() => {
+          fetchData();
+        }, APP_WAIT_TIME);
+      } else {
+        logger.error(isCsrfSet);
+        appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
+      }
+    }).catch(err => {
+      logger.error(err);
+      if (err.response && err.response.data) {
+        appCtx.setNodeInfo({ isLoading: false, error: err.response.data });
+      } else if (!err.response && err.message) {
+        appCtx.setNodeInfo({ isLoading: false, error: err.message })
+      } else {
+        appCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(err)});
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -137,18 +137,21 @@ const useHttp = () => {
   };
 
   const setCSRFToken = () => {
-    try {
-      logger.info('Base URL: ' + API_BASE_URL + API_VERSION);
-      return axiosInstance.get('/shared/csrf').then(res => {
-        return axiosInstance.defaults.headers.post = { 'XSRF-TOKEN': res.data.csrfToken };
-      }).catch(err => {
+    return new Promise((resolve, reject) => {
+      try {
+        logger.info('Base URL: ' + API_BASE_URL + API_VERSION);
+        return axiosInstance.get('/shared/csrf').then(res => {
+          axiosInstance.defaults.headers.post = { 'XSRF-TOKEN': res.data.csrfToken };
+          resolve(true);
+        }).catch(err => {
+          logger.error(err);
+          reject(err);
+        });
+      } catch (err: any) {
         logger.error(err);
-        return err;
-      });
-    } catch (err: any) {
-      logger.error(err);
-      return err;
-    }
+        reject(err);
+      }
+    });
   };
 
   const getAppConfigurations = useCallback(() => {
