@@ -1,5 +1,5 @@
 import './NodeInfo.scss';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
@@ -15,9 +15,22 @@ import { copyTextToClipboard } from '../../../utilities/data-formatters';
 
 const NodeInfo = () => {
   const appCtx = useContext(AppContext);
+  const [nodeURI, setNodeURI] = useState('');
+
+  useEffect(() => {
+    let uri = (appCtx.nodeInfo.id || '');
+    if (appCtx.nodeInfo.address && appCtx.nodeInfo.address?.length && appCtx.nodeInfo.address.length > 0) {
+      uri = uri + '@' + appCtx.nodeInfo.address[0].address + ':' + appCtx.nodeInfo.address[0].port;
+    } else if (appCtx.nodeInfo.binding && appCtx.nodeInfo.binding?.length && appCtx.nodeInfo.binding.length > 0) {
+      uri = uri + '@' + appCtx.nodeInfo.binding[0].address + ':' + appCtx.nodeInfo.binding[0].port;
+    } else {
+      uri = uri + '@ : ';
+    }
+    setNodeURI(uri);
+  }, [appCtx]);
 
   const copyHandler = () => {
-    copyTextToClipboard(appCtx.nodeInfo.id).then((response) => {
+    copyTextToClipboard(nodeURI).then((response) => {
       appCtx.setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'});
     }).catch((err) => {
       logger.error(err);
@@ -36,7 +49,7 @@ const NodeInfo = () => {
         <Modal.Body className='py-0'>
           <Row className='qr-container m-auto d-flex'>
             <img alt='cln-logo' src={appCtx.appConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'} className='qr-cln-logo' />
-            <QRCodeCanvas value={appCtx.nodeInfo.id || ''} size={220} includeMargin={true} bgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
+            <QRCodeCanvas value={nodeURI || ''} size={220} includeMargin={true} bgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
           </Row>
           <Row className='d-flex align-items-start justify-content-center pt-2'>
             <h4 className='text-blue fw-bold d-flex justify-content-center'>Node ID</h4>
@@ -47,14 +60,14 @@ const NodeInfo = () => {
             <InputGroup className='mb-3'>
               <Form.Control 
                 onClick={copyHandler}
-                placeholder={appCtx.nodeInfo.id}
-                aria-label={appCtx.nodeInfo.id}
+                placeholder={nodeURI}
+                aria-label={nodeURI}
                 aria-describedby='copy-addon'
                 className='form-control-left'
                 readOnly
               />
               <InputGroup.Text className='form-control-addon form-control-addon-right' onClick={copyHandler}>
-                <CopySVG id={appCtx.nodeInfo.id} />
+                <CopySVG id={nodeURI} />
               </InputGroup.Text>
             </InputGroup>
             </div>
