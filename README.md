@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://umbrel.com">
-    <img src="./images/Dashboard.png" alt="Core Lightning Dashboard">
+    <img src="./.github/images/Dashboard.png" alt="Core Lightning Dashboard">
   </a>
   <h1 align="center">Core Lightning Node for Umbrel</h1>
   <p align="center">
