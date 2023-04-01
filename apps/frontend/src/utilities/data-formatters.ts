@@ -1,3 +1,4 @@
+import copy from 'copy-to-clipboard';
 import { BTC_SATS, BTC_MSAT, SATS_MSAT, Units } from './constants';
 
 export const ConvertSatsToMSats = (num: number) => {
@@ -65,19 +66,10 @@ export const titleCase = (str: string | undefined) => {
 
 export const copyTextToClipboard = (textToCopy: string | undefined) => {
   return new Promise((resolve, reject) => {
-    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
-      try{
-        return navigator.clipboard.writeText(textToCopy || '').then(res => resolve(true));
-      } catch(err) {
-        reject(err);
-      }
-    } else {
-      try{
-        document.execCommand('copy', false, (textToCopy || ''));
-        resolve(false);
-      } catch(err) {
-        reject(err);
-      }
+    try {
+      resolve(copy(textToCopy || ''));
+    } catch (err) {
+      reject(err);
     }
   });
 }
