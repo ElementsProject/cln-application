@@ -66,7 +66,7 @@ const NodeInfo = () => {
                 className='form-control-left'
                 readOnly
               />
-              <InputGroup.Text className='form-control-addon form-control-addon-right' onClick={copyHandler}>
+              <InputGroup.Text id={nodeURI} className='form-control-addon form-control-addon-right' onClick={copyHandler}>
                 <CopySVG id={nodeURI} />
               </InputGroup.Text>
             </InputGroup>

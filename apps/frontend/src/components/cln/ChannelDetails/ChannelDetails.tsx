@@ -181,12 +181,12 @@ const ChannelDetails = (props) => {
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Channel ID</Col>
                     <Col xs={11} className='pe-1 overflow-x-ellipsis fw-bold'>{props.selChannel.channel_id}</Col>
-                    <Col xs={1} onClick={copyHandler} className='btn-sm-svg btn-svg-copy'><CopySVG id='Channel ID' showTooltip={true} /></Col>
+                    <Col xs={1} onClick={copyHandler} className='btn-sm-svg btn-svg-copy' id='Channel ID'><CopySVG id='Channel ID' showTooltip={true} /></Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Funding ID</Col>
                     <Col xs={10} className='pe-1 overflow-x-ellipsis fw-bold'>{props.selChannel.funding_txid}</Col>
-                    <Col xs={1} onClick={copyHandler} className='btn-sm-svg btn-svg-copy'><CopySVG id='Funding ID' showTooltip={true} /></Col>
+                    <Col xs={1} onClick={copyHandler} className='btn-sm-svg btn-svg-copy' id='Funding ID'><CopySVG id='Funding ID' showTooltip={true} /></Col>
                     <Col xs={1} onClick={openLinkHandler} className='btn-sm-svg btn-svg-open'><OpenLinkSVG id={props.selChannel.funding_txid} /></Col>
                   </Row>
                 </Row>

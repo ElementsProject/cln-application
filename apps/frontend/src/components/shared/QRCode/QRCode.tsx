@@ -39,6 +39,7 @@ const QRCodeComponent = (props) => {
             readOnly
           />
           <InputGroup.Text
+            id={props.message}
             className='form-control-addon form-control-addon-right'
             onClick={copyHandler}
           >

@@ -37,7 +37,7 @@ const StatusAlert = props => {
         </Col>
         <Col xs={10} className='px-1 text-status'>{titleCase(props.responseMessage)}</Col>
         { props.responseStatus !== CallStatus.PENDING ?
-          <Col xs={1} onClick={copyHandler} className='d-flex align-items-start justify-content-end btn-sm-svg btn-svg-copy mt-1'><CopySVG id='' showTooltip={true} /></Col>
+          <Col xs={1} onClick={copyHandler} className='d-flex align-items-start justify-content-end btn-sm-svg btn-svg-copy mt-1' id=''><CopySVG id='' showTooltip={true} /></Col>
           :
           <></>
         }

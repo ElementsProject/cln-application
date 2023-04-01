@@ -44,6 +44,9 @@ class SharedController {
         GRPC_PORT: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || '',
         REST_PORT: process.env.APP_CORE_LIGHTNING_REST_PORT || '',
         REST_MACAROON: macaroon,
+        CLN_NODE_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || '',
+        NODE_PUBKEY: process.env.LIGHTNING_PUBKEY || '',
+        COMMANDO_RUNE: process.env.COMMANDO_RUNE,
       };
       res.status(200).json(CONNECT_WALLET_SETTINGS);
     } catch (error: any) {
