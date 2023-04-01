@@ -1,9 +1,9 @@
 name: Build and publish Github image
 
 on:
-  push:
-    branches: [ 'release-*' ]
-    tags: [ 'v*' ]
+  # push:
+  #   branches: [ 'release-*' ]
+  #   tags: [ 'v*' ]
   release:
     types: [released]
   pull_request:
