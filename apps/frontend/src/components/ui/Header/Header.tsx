@@ -1,5 +1,6 @@
 import './Header.scss';
 import { useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
@@ -27,7 +28,17 @@ const Header = (props) => {
     return (
       <Row className='header mb-5 mx-1' data-testid='header'>
         <Col xs={12} data-testid='header-info'>
-          <Image src={appCtx.appConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
+          <AnimatePresence>
+            <motion.img
+              key='cln-logo'
+              alt='Core Lightning Logo'
+              src={appCtx.appConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'}
+              className='header-info-logo me-3 rounded float-start'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.05, duration: 0.01 }}
+          />
+          </AnimatePresence>
           <Col className='h-100 d-flex align-items-center justify-content-between'>
             <h4 className='m-0 text-dark'><strong>CLN</strong></h4>
             <div className='d-flex align-items-center'>

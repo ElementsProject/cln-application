@@ -172,7 +172,7 @@ const filterOnChainTransactions = (events: BkprTransaction[]) => {
       if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
         event.credit_msat = event.credit_msat && event.credit_msat.length ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : '0';
         event.debit_msat = event.debit_msat && event.debit_msat.length ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : '0';  
-        const lastTx = i > 0 ? acc[acc.length - 1] : { tag: '' };
+        const lastTx = acc.length && acc.length > 0 ? acc[acc.length - 1] : { tag: '' };
         if (lastTx.tag === 'withdrawal' && event.tag === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
           lastTx.debit_msat = (lastTx.debit_msat - +event.credit_msat);
         } else {
