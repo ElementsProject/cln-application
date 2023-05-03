@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { APP_CONSTANTS, FIAT_RATE_API, FIAT_VENUES } from '../shared/consts.js';
+import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
@@ -11,6 +11,9 @@ class SharedController {
   getApplicationSettings(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info('Getting Application Settings from ' + APP_CONSTANTS.CONFIG_LOCATION);
+      if (!fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
+        fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf-8');
+      }
       res.status(200).json(JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8')));
     } catch (error: any) {
       handleError(error, req, res, next);

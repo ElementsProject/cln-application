@@ -1,6 +1,6 @@
 {
   "name": "umbrel-cln",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Core lightning application on Umbrel",
   "private": true,
   "license": "MIT",

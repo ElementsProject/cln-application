@@ -1,9 +1,6 @@
 name: Artifact
 
 on:
-  # push:
-  #   branches: [ 'release-*' ]
-  #   tags: [ 'v*' ]
   release:
     types: [released]
   pull_request:
@@ -25,6 +22,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
+      - name: Get version from package.json
+          id: package_version
+          run: |
+            echo "VERSION=$(node -p "require('./package.json').version")"
+            echo "Project Version: $VERSION"
 
       - name: Cache node_modules
         uses: actions/cache@v3
@@ -79,9 +82,9 @@ jobs:
           key: ${{ runner.os }}-backend-${{ github.sha }}
 
       - name: Compress files
-        run: tar -czf /tmp/clnumbrelapp.tar.gz apps/frontend/build apps/backend/dist package.json package-lock.json
+        run: tar -czf /tmp/clnapp.tar.gz apps/frontend/build apps/backend/dist package.json package-lock.json
 
       - uses: actions/upload-artifact@v3
         with:
-          name: clnumbrelapp-build${{ github.event.release.tag_name }}
-          path: /tmp/clnumbrelapp.tar.gz
+          name: clnapp-build$VERSION
+          path: /tmp/clnapp.tar.gz

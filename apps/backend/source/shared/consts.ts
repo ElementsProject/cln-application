@@ -34,6 +34,14 @@ export const APP_CONSTANTS = {
   CONFIG_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'config.json'),
 };
 
+export const DEFAULT_CONFIG = {
+  "unit": "SATS",
+  "fiatUnit": "USD",
+  "appMode": "DARK",
+  "isLoading": false,
+  "error": null
+};
+
 export const LN_MESSAGE_CONFIG = {
   remoteNodePublicKey: '',
   wsProxy:
