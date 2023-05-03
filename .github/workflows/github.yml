@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  build:
+  create:
     name: Build image
     runs-on: ubuntu-22.04
 
@@ -30,12 +30,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get version from package.json
-          id: package_version
-          run: |
-            echo "VERSION=$(node -p "require('./package.json').version")"
-            echo "Image Name: $IMAGE_NAME"
-            echo "Branch Name: $BRANCH"
-            echo "Project Version: $VERSION"
+        id: package-version
+        run: |
+          echo "VERSION=$(node -p "require('./package.json').version")"
+          echo "Image Name: $IMAGE_NAME"
+          echo "Branch Name: $BRANCH"
+          echo "Project Version: $VERSION"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

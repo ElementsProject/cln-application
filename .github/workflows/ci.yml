@@ -24,10 +24,10 @@ jobs:
           node-version: 18.x
 
       - name: Get version from package.json
-          id: package_version
-          run: |
-            echo "VERSION=$(node -p "require('./package.json').version")"
-            echo "Project Version: $VERSION"
+        id: package-version
+        run: |
+          echo "VERSION=$(node -p "require('./package.json').version")"
+          echo "Project Version: $VERSION"
 
       - name: Cache node_modules
         uses: actions/cache@v3

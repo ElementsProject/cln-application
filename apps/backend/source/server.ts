@@ -13,7 +13,7 @@ import { CommonRoutesConfig } from './shared/routes.config.js';
 import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
 import { APIError } from './models/errors.js';
-import { APP_CONSTANTS, Environment } from './shared/consts.js';
+import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 
 let directoryName = dirname(fileURLToPath(import.meta.url));
@@ -91,7 +91,7 @@ const throwApiError = (err: any) => {
           ':' +
           LIGHTNING_PORT +
           ' requires elevated privileges',
-        406,
+        HttpStatusCode.ACCESS_DENIED,
         'http://' +
           APP_CORE_LIGHTNING_DAEMON_IP +
           ':' +
@@ -102,21 +102,21 @@ const throwApiError = (err: any) => {
       return new APIError(
         'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
         'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
-        409,
+        HttpStatusCode.ADDR_IN_USE,
         'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT + ' is already in use',
       );
     case 'ECONNREFUSED':
       return new APIError(
         'Server is down/locked',
         'Server is down/locked',
-        401,
+        HttpStatusCode.UNAUTHORIZED,
         'Server is down/locked',
       );
     case 'EBADCSRFTOKEN':
       return new APIError(
         'Invalid CSRF token. Form tempered.',
         'Invalid CSRF token. Form tempered.',
-        403,
+        HttpStatusCode.BAD_CSRF_TOKEN,
         'Invalid CSRF token. Form tempered.',
       );
     default:
