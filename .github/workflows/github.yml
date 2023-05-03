@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  create:
+  build:
     name: Build image
     runs-on: ubuntu-22.04
 
@@ -29,10 +29,15 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
       - name: Get version from package.json
         id: package-version
         run: |
-          echo "VERSION=$(node -p "require('./package.json').version")"
+          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
           echo "Image Name: $IMAGE_NAME"
           echo "Branch Name: $BRANCH"
           echo "Project Version: $VERSION"
@@ -47,7 +52,7 @@ jobs:
 
       - name: Run Docker buildx
         run: |
-                docker buildx build \
-                --platform linux/amd64,linux/arm64,linux/arm/v7 \
-                --tag ghcr.io/$IMAGE_NAME:$VERSION \
-                --output "type=registry" .
+          docker buildx build \
+          --platform linux/amd64,linux/arm64,linux/arm/v7 \
+          --tag ghcr.io/$IMAGE_NAME:$VERSION \
+          --output "type=registry" .
