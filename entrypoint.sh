@@ -69,7 +69,7 @@ LIGHTNING_PUBKEY="$(jq -n "$GETINFO_RESPONSE" | jq -r '.result.id')"
 echo "$LIGHTNING_PUBKEY"
 
 # Compare existing pubkey with current
-if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=$LIGHTNING_PUBKEY" ]; then
+if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" ]; then
   # Pubkey changed; rewrite new data on the file.
   echo "Pubkey mismatched; Rewriting the data."
   cat /dev/null > $COMMANDO_CONFIG
