@@ -22,7 +22,10 @@ let routes: Array<CommonRoutesConfig> = [];
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 
-const LIGHTNING_PORT = normalizePort(process.env.APP_CORE_LIGHTNING_PORT || '2103');
+const LIGHTNING_PORT =
+  APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
+    ? normalizePort(process.env.APP_CORE_LIGHTNING_PORT || '2103')
+    : 4300;
 const APP_CORE_LIGHTNING_DAEMON_IP = process.env.APP_CORE_LIGHTNING_IP || 'localhost';
 
 function normalizePort(val: string) {
@@ -51,10 +54,7 @@ app.use((req, res, next) => {
 });
 const corsOptions = {
   methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-  origin:
-    APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
-      ? 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT
-      : 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':4300',
+  origin: 'http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT,
   credentials: true,
   allowedHeaders: 'Content-Type, X-XSRF-TOKEN, XSRF-TOKEN',
 };

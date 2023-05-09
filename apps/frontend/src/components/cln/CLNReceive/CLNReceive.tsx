@@ -87,7 +87,7 @@ const CLNReceive = (props) => {
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Generating ' + (paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + '...');
     let amtValueMSats = (amountValue === '') ? 'any' : (+amountValue * SATS_MSAT);
-    clnReceiveInvoice(paymentType, amtValueMSats, descriptionValue, ('umbrellbl' + Math.random().toString(36).slice(2) + Date.now()))
+    clnReceiveInvoice(paymentType, amtValueMSats, descriptionValue, ('invoicelbl' + Math.random().toString(36).slice(2) + Date.now()))
     .then((response: any) => {
       logger.info(response);
       if (response.data && (response.data.bolt11 || response.data.bolt12)) {

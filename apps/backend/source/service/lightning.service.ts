@@ -1,5 +1,6 @@
-import Lnmessage from 'lnmessage';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
+import Lnmessage from 'lnmessage';
 import { LightningError } from '../models/errors.js';
 import { HttpStatusCode, APP_CONSTANTS, LN_MESSAGE_CONFIG } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
@@ -34,6 +35,8 @@ export class LightningService {
         method: method,
         params: methodParams,
         rune: APP_CONSTANTS.COMMANDO_RUNE,
+        reqId: crypto.randomBytes(8).toString('hex'),
+        reqIdPrefix: 'clnapp',
       })
       .then((commandRes: any) => {
         logger.info('Command Res for ' + method + ': ' + JSON.stringify(commandRes));

@@ -28,21 +28,18 @@ export const APP_CONSTANTS = {
   APP_CORE_LIGHTNING_DAEMON_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
   LIGHTNING_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || 5001),
   APP_MODE: process.env.APP_MODE || Environment.PRODUCTION,
-  COMMANDO_ENV_LOCATION: join(
-    process.env.APP_CORE_LIGHTNING_COMMANDO_ENV_DIR || '.',
-    '.commando-env',
-  ),
+  COMMANDO_ENV_LOCATION: process.env.COMMANDO_CONFIG || './.commando-env',
   MACAROON_PATH: join(process.env.APP_CORE_LIGHTNING_REST_CERT_DIR || '.', 'access.macaroon'),
   LOG_FILE_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'application-cln.log'),
   CONFIG_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'config.json'),
 };
 
 export const DEFAULT_CONFIG = {
-  "unit": "SATS",
-  "fiatUnit": "USD",
-  "appMode": "DARK",
-  "isLoading": false,
-  "error": null
+  unit: 'SATS',
+  fiatUnit: 'USD',
+  appMode: 'DARK',
+  isLoading: false,
+  error: null,
 };
 
 export const LN_MESSAGE_CONFIG = {

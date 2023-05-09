@@ -1,7 +1,7 @@
 {
-  "name": "umbrel-cln-backend",
+  "name": "cln-application-backend",
   "version": "0.0.3",
-  "description": "Core lightning application backend on Umbrel",
+  "description": "Core lightning application backend",
   "private": true,
   "license": "MIT",
   "type": "module",

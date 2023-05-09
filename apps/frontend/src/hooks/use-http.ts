@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useCallback, useContext } from 'react';
-import { API_BASE_URL, API_VERSION, FIAT_CURRENCIES, APP_WAIT_TIME, PaymentType, SATS_MSAT } from '../utilities/constants';
+import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
@@ -8,7 +8,7 @@ import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
-  timeout: APP_WAIT_TIME,
+  timeout: APP_WAIT_TIME * 5,
   withCredentials: true
 });
 

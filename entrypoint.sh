@@ -1,9 +1,8 @@
 #!/bin/sh
 EXISTING_PUBKEY=""
 GETINFO_RESPONSE=""
-LIGHTNINGD_PATH=$APP_CORE_LIGHTNING_COMMANDO_ENV_DIR"/"
-LIGHTNING_RPC="$LIGHTNINGD_PATH""$APP_CORE_LIGHTNING_BITCOIN_NETWORK""/lightning-rpc"
-ENV_FILE_PATH="$LIGHTNINGD_PATH"".commando-env"
+LIGHTNING_RPC=$CORE_LIGHTNING_PATH"/$APP_CORE_LIGHTNING_BITCOIN_NETWORK""/lightning-rpc"
+COMMANDO_CONFIG="$COMMANDO_CONFIG"
 
 echo "$LIGHTNING_RPC"
 
@@ -24,7 +23,7 @@ commando_rune_request() {
   "jsonrpc": "2.0",
   "id": 1,
   "method": "commando-rune",
-  "params": [null, [["For Umbrel#"]]]
+  "params": [null, [["For Application#"]]]
 }
 EOF
 }
@@ -46,15 +45,15 @@ generate_new_rune() {
   RUNE=$(echo "$RUNE_RESPONSE" | jq -r '.result.rune')
   UNIQUE_ID=$(echo "$RUNE_RESPONSE" | jq -r '.result.unique_id')
   # Save rune in env file
-  echo "LIGHTNING_RUNE=\"$RUNE\"" >> $ENV_FILE_PATH
+  echo "LIGHTNING_RUNE=\"$RUNE\"" >> $COMMANDO_CONFIG
   echo "$RUNE"
   # This will fail for v>23.05
   DATASTORE_RESPONSE=$( (echo "$(commando_datastore_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC") > /dev/null
 }
 
 # Read existing pubkey
-if [ -f "$ENV_FILE_PATH" ]; then
-  EXISTING_PUBKEY=$(head -n1 $ENV_FILE_PATH)
+if [ -f "$COMMANDO_CONFIG" ]; then
+  EXISTING_PUBKEY=$(head -n1 $COMMANDO_CONFIG)
 fi
 
 # Getinfo from CLN
@@ -73,8 +72,8 @@ echo "$LIGHTNING_PUBKEY"
 if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=$LIGHTNING_PUBKEY" ]; then
   # Pubkey changed; rewrite new data on the file.
   echo "Pubkey mismatched; Rewriting the data."
-  cat /dev/null > $ENV_FILE_PATH
-  echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> $ENV_FILE_PATH
+  cat /dev/null > $COMMANDO_CONFIG
+  echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> $COMMANDO_CONFIG
   generate_new_rune
 else
   echo "Pubkey matches with existing pubkey."

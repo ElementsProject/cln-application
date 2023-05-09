@@ -1,22 +1,22 @@
 {
-  "name": "umbrel-cln",
+  "name": "cln-application",
   "version": "0.0.3",
-  "description": "Core lightning application on Umbrel",
+  "description": "Core lightning application",
   "private": true,
   "license": "MIT",
   "scripts": {
-    "frontend:dev": "npm run start -w umbrel-cln-frontend",
-    "frontend:build": "npm run build -w umbrel-cln-frontend",
-    "backend:dev": "npm run start -w umbrel-cln-backend",
-    "backend:build": "npm run build -w umbrel-cln-backend",
-    "backend:serve": "npm run serve -w umbrel-cln-backend",
-    "backend:watch": "npm run watch -w umbrel-cln-backend",
+    "frontend:dev": "npm run start -w cln-application-frontend",
+    "frontend:build": "npm run build -w cln-application-frontend",
+    "backend:dev": "npm run start -w cln-application-backend",
+    "backend:build": "npm run build -w cln-application-backend",
+    "backend:serve": "npm run serve -w cln-application-backend",
+    "backend:watch": "npm run watch -w cln-application-backend",
     "dev": "npm run backend:dev & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
-    "start": "npm run serve -w umbrel-cln-backend"
+    "start": "npm run serve -w cln-application-backend"
   },
   "keywords": [
-    "umbrel",
+    "cln application",
     "core lightning"
   ],
   "workspaces": [

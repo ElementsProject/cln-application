@@ -7,7 +7,7 @@ services:
       - -${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
       - -rpcbind=0.0.0.0
       - -rpcallowip=0.0.0.0/0
-      - -rpcauth=umbrel:5071d8b3ba93e53e414446ff9f1b7d7b$$375e9731abd2cd2c2c44d2327ec19f4f2644256fdeaf4fc5229bf98b778aafec
+      - -rpcauth=user:2ba7454abfebe5d5766bda9d93c9e633$df4fc916583a0089daf1c4b33332651df281ba08a4750f8b4c118b13a50aed7c
     restart: on-failure
     volumes:
       - ${PWD}/data/bitcoin:/root/.bitcoin
@@ -38,7 +38,7 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    # image: clnbot/umbrel-core-lightning@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
+    # image: clnbot/cln-application@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
     depends_on:
       - bitcoind
       - lightningd
