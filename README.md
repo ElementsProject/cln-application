@@ -97,7 +97,7 @@
       ```
 
 - ## Umbrel Store
-  ### This application is also available on Umbrel App Store with one click install.
+  - This application is also available on Umbrel App Store with one click install.
 
 ---
 
