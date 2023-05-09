@@ -84,12 +84,6 @@
         ```
 
   - ### Start The Application
-      Run `build` script to build the aplication's backend and frontend
-
-      ```
-        npm run build
-      ```
-
       Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```

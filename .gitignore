@@ -1,7 +1,5 @@
 .vscode
 node_modules
-dist
-build
 data/bitcoin/*
 data/lightningd/*
 data/c-lightning-rest/*

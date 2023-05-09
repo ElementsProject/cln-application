@@ -14,10 +14,10 @@ export APP_MODE="testing"
 if [ "$SETUP" == "docker" ]; then
     export DEVICE_DOMAIN_NAME="docker.local"
     export LOCAL_HOST="http://""$DEVICE_DOMAIN_NAME"
-    export APP_BITCOIN_NODE_IP="170.21.21.2"
-    export APP_CORE_LIGHTNING_DAEMON_IP="170.21.21.3"
-    export LIGHTNING_REST_IP="170.21.21.4"
-    export APP_CORE_LIGHTNING_IP="170.21.21.5"
+    export APP_BITCOIN_NODE_IP="170.21.22.2"
+    export APP_CORE_LIGHTNING_DAEMON_IP="170.21.22.3"
+    export LIGHTNING_REST_IP="170.21.22.4"
+    export APP_CORE_LIGHTNING_IP="170.21.22.5"
     export APP_CONFIG_DIR="/data/app"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="/c-lightning-rest/certs"
     export APP_CORE_LIGHTNING_WEBSOCKET_PORT=2106
@@ -37,10 +37,10 @@ else
     export APP_CORE_LIGHTNING_IP="localhost"
     export APP_CONFIG_DIR="$PWD/data/app"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="$PWD/data/c-lightning-rest/certs"
-    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5010
-    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5011
+    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5001
+    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5002
     export APP_CORE_LIGHTNING_REST_PORT=3001
-    export CORE_LIGHTNING_PATH="/home/shahana/workspace/.lightning/l1-regtest"
+    export CORE_LIGHTNING_PATH="/.lightning/l1-regtest"
     export COMMANDO_CONFIG="$PWD/.commando"
     echo "Local Environment Variables Set"
 fi

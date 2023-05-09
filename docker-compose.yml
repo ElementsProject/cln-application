@@ -38,7 +38,7 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    # image: clnbot/cln-application@sha256:3d46211b995fc198c6ab8bee2b73c68170cef77ba984edb61368fd93fd392b22
+    # image: ghcr.io/elementsproject/cln-application:0.0.1@sha256:631f765969324aaf3b26958d91f47626570092bd2babfd4189d5d6f46918a5ba
     depends_on:
       - bitcoind
       - lightningd
@@ -76,5 +76,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 170.21.21.0/16
-          gateway: 170.21.21.0
+        - subnet: 170.21.22.0/16
+          gateway: 170.21.22.0

@@ -12,7 +12,11 @@ class SharedController {
     try {
       logger.info('Getting Application Settings from ' + APP_CONSTANTS.CONFIG_LOCATION);
       if (!fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
-        fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf-8');
+        fs.writeFileSync(
+          APP_CONSTANTS.CONFIG_LOCATION,
+          JSON.stringify(DEFAULT_CONFIG, null, 2),
+          'utf-8',
+        );
       }
       res.status(200).json(JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8')));
     } catch (error: any) {
