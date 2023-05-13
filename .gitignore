@@ -7,3 +7,5 @@ data/app/application-cln.log
 application-cln.log
 .commando-env
 env.sh
+.commando
+data/app/config.json

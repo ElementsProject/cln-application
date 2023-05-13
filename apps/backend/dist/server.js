@@ -88,5 +88,5 @@ const throwApiError = (err) => {
     }
 };
 server.on('error', throwApiError);
-server.on('listening', () => logger.info('Server running at http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT));
+server.on('listening', () => logger.warn('Server running at http://' + APP_CORE_LIGHTNING_DAEMON_IP + ':' + LIGHTNING_PORT));
 server.listen({ port: LIGHTNING_PORT, host: APP_CORE_LIGHTNING_DAEMON_IP });

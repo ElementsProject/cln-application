@@ -29,7 +29,7 @@
     "csurf": "^1.11.0",
     "express": "^4.18.2",
     "express-winston": "^4.2.0",
-    "lnmessage": "^0.2.1",
+    "lnmessage": "^0.2.2",
     "ts-node": "^10.9.1",
     "winston": "^3.8.2"
   }
