@@ -46,6 +46,7 @@ class SharedController {
       }
       const CONNECT_WALLET_SETTINGS = {
         LOCAL_HOST: process.env.LOCAL_HOST || '',
+        DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
         TOR_HOST: process.env.APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE || '',
         WS_PORT: process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || '',
         GRPC_PORT: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || '',

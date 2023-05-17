@@ -54,6 +54,7 @@
         - APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: REST hidden service url (optional; for connect wallet screen)
         - LOCAL_HOST: Docker setup variable (optional; for connect wallet screen)
         - APP_MODE: Mode for logging and other settings (optional; valid values: production/development/testing)
+        - APP_PROTOCOL: Protocol on which the application will be served (optional; valid values: http/https)
         - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       ```
 

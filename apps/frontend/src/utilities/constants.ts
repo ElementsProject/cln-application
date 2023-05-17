@@ -2,10 +2,10 @@ import { faDollarSign, faYenSign, faEuroSign, faSterlingSign, faIndianRupeeSign,
 
 export const HOST = process.env.NODE_ENV !== 'production' ? 'localhost' : window.location.hostname;
 export const PORT = process.env.NODE_ENV !== 'production' ? 2103 : window.location.port;
-
-export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn';
-export const API_BASE_URL = 'http://' + HOST + ':' + PORT;
+export const PROTOCOL = window.location.protocol || 'http:';
+export const API_BASE_URL = PROTOCOL + '//' + HOST + ':' + PORT;
 export const API_VERSION = '/v1';
+export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn';
 
 export const APP_WAIT_TIME = 10 * 1000; // 10 seconds
 export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds

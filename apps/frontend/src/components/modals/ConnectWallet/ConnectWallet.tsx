@@ -22,7 +22,7 @@ const ConnectWallet = () => {
   const appCtx = useContext(AppContext);
   const [selNetwork, setSelNetwork] = useState(0);
   const [clnConnectUrl, setClnConnectUrl] = useState('c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
-  const [lnMessageConnectUrl, setLnMessageConnectUrl] = useState('ln-message://' + appCtx.walletConnect.CLN_NODE_IP + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
+  const [lnMessageConnectUrl, setLnMessageConnectUrl] = useState('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
   const [connectValues, setConnectValues] = useState({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'Host', field: 'LOCAL_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, connectUrl: { title: 'REST URL', field: '' } });
 
   const copyHandler = (event) => {
@@ -32,7 +32,7 @@ const ConnectWallet = () => {
         textToCopy = appCtx.walletConnect.WS_PORT || '';
         break;
       case 'CLN Host':
-        textToCopy = appCtx.walletConnect.CLN_NODE_IP || '';
+        textToCopy = appCtx.walletConnect.DEVICE_DOMAIN_NAME || '';
         break;
       case 'Rune':
         textToCopy = appCtx.walletConnect.COMMANDO_RUNE || '';
@@ -73,8 +73,8 @@ const ConnectWallet = () => {
         break;
 
       case 2:
-        setConnectValues({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'CLN_NODE_IP' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setLnMessageConnectUrl('ln-message://' + appCtx.walletConnect.CLN_NODE_IP + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
+        setConnectValues({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setLnMessageConnectUrl('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
         break;
     
       default:
