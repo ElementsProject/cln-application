@@ -163,19 +163,19 @@ const ChannelDetails = (props) => {
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Dust Limit</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.dust_limit_satoshis, Units.SATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency((props.selChannel.dust_limit_satoshis || props.selChannel.dust_limit_msat), (props.selChannel.dust_limit_satoshis ? Units.SATS : Units.MSATS), appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Spendable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.spendable_msatoshi, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency((props.selChannel.spendable_msatoshi || props.selChannel.spendable_msat), Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Receivable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.receivable_msatoshi, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency((props.selChannel.receivable_msatoshi || props.selChannel.receivable_msat), Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>

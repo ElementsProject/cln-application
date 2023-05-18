@@ -38,7 +38,7 @@ class SharedController {
     try {
       logger.info('Getting Connection Settings');
       let macaroon = '';
-      let packageData = '{ version: "0.0.2" }';
+      let packageData = '{ version: "0.0.3" }';
 
       if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
         logger.info(

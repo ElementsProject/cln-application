@@ -7,7 +7,7 @@ import React, { useReducer } from 'react';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 import { ApplicationActions, ApplicationModes, SATS_MSAT, Units } from '../utilities/constants';
-import { sortDescByKey } from '../utilities/data-formatters';
+import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters';
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, FiatConfig, WalletConnect } from '../types/app-config.type';
@@ -20,9 +20,9 @@ const aggregateChannels = (peers: Peer[]) => {
       peer.channels.map(channel => {
         channel.connected = peer.connected || false;
         channel.node_alias = peer.alias || peer.id?.substring(0,20) || '';
-        channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || 0) / SATS_MSAT);
-        channel.satoshi_total = Math.floor((channel.msatoshi_total || 0) / SATS_MSAT);
-        channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || 0) - (channel.msatoshi_to_us || 0)) / SATS_MSAT);
+        channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
+        channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
+        channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
         if (channel.state === 'CHANNELD_NORMAL') {
           if (channel.connected) {
             channel.current_state = 'ACTIVE';
@@ -104,24 +104,24 @@ const mergeLightningTransactions = (invoices: Invoice[], payments: Payment[]) =>
   for (let i = 0, v = 0, p = 0; i < totalTransactionsLength; i++) {
     if (v === (invoices?.length || 0)) {
       payments.slice(p)?.map(payment => {
-        mergedTransactions.push({type: 'PAYMENT', payment_hash: payment.payment_hash, status: payment.status, msatoshi: payment.msatoshi, label: payment.label, bolt11: payment.bolt11, description: payment.description, bolt12: payment.bolt12, payment_preimage: payment.payment_preimage, created_at: payment.created_at, msatoshi_sent: payment.msatoshi_sent, destination: payment.destination, expires_at: null, msatoshi_received: null, paid_at: null});
+        mergedTransactions.push({type: 'PAYMENT', payment_hash: payment.payment_hash, status: payment.status, msatoshi: (payment.msatoshi || payment.amount_msat), label: payment.label, bolt11: payment.bolt11, description: payment.description, bolt12: payment.bolt12, payment_preimage: payment.payment_preimage, created_at: payment.created_at, msatoshi_sent: (payment.msatoshi_sent || payment.amount_sent_msat), destination: payment.destination, expires_at: null, msatoshi_received: null, paid_at: null});
         return payment;
       })
       i = totalTransactionsLength;
     } else if (p === (payments?.length || 0)) {
       invoices.slice(v)?.map(invoice => {
         if (invoice.status !== 'expired') {
-          mergedTransactions.push({type: 'INVOICE', payment_hash: invoice.payment_hash, status: invoice.status, msatoshi: invoice.msatoshi, label: invoice.label, bolt11: invoice.bolt11, description: invoice.description, bolt12: invoice.bolt12, payment_preimage: invoice.payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoice.expires_at, msatoshi_received: invoice.msatoshi_received, paid_at: invoice.paid_at});
+          mergedTransactions.push({type: 'INVOICE', payment_hash: invoice.payment_hash, status: invoice.status, msatoshi: (invoice.msatoshi || invoice.amount_msat), label: invoice.label, bolt11: invoice.bolt11, description: invoice.description, bolt12: invoice.bolt12, payment_preimage: invoice.payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoice.expires_at, msatoshi_received: (invoice.msatoshi_received || invoice.amount_received_msat), paid_at: invoice.paid_at});
         }
         return invoice;
       });
       i = totalTransactionsLength;
     } else if((payments[p].created_at || 0) >= (invoices[v].paid_at || invoices[v].expires_at || 0)) {
-      mergedTransactions.push({type: 'PAYMENT', payment_hash: payments[p].payment_hash, status: payments[p].status, msatoshi: payments[p].msatoshi, label: payments[p].label, bolt11: payments[p].bolt11, description: payments[p].description, bolt12: payments[p].bolt12, payment_preimage: payments[p].payment_preimage, created_at: payments[p].created_at, msatoshi_sent: payments[p].msatoshi_sent, destination: payments[p].destination, expires_at: null, msatoshi_received: null, paid_at: null});
+      mergedTransactions.push({type: 'PAYMENT', payment_hash: payments[p].payment_hash, status: payments[p].status, msatoshi: (payments[p].msatoshi || payments[p].amount_msat), label: payments[p].label, bolt11: payments[p].bolt11, description: payments[p].description, bolt12: payments[p].bolt12, payment_preimage: payments[p].payment_preimage, created_at: payments[p].created_at, msatoshi_sent: (payments[p].msatoshi_sent || payments[p].amount_sent_msat), destination: payments[p].destination, expires_at: null, msatoshi_received: null, paid_at: null});
       p++;
     } else if((payments[p].created_at || 0) < (invoices[v].paid_at || invoices[v].expires_at || 0)) {
       if (invoices[v].status !== 'expired') {
-        mergedTransactions.push({type: 'INVOICE', payment_hash: invoices[v].payment_hash, status: invoices[v].status, msatoshi: invoices[v].msatoshi, label: invoices[v].label, bolt11: invoices[v].bolt11, description: invoices[v].description, bolt12: invoices[v].bolt12, payment_preimage: invoices[v].payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoices[v].expires_at, msatoshi_received: invoices[v].msatoshi_received, paid_at: invoices[v].paid_at});
+        mergedTransactions.push({type: 'INVOICE', payment_hash: invoices[v].payment_hash, status: invoices[v].status, msatoshi: (invoices[v].msatoshi || invoices[v].amount_msat), label: invoices[v].label, bolt11: invoices[v].bolt11, description: invoices[v].description, bolt12: invoices[v].bolt12, payment_preimage: invoices[v].payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoices[v].expires_at, msatoshi_received: (invoices[v].msatoshi_received || invoices[v].amount_received_msat), paid_at: invoices[v].paid_at});
       }
       v++;
     }
@@ -142,36 +142,41 @@ const calculateBalances = (listFunds: Fund) => {
   };
   listFunds.channels?.map((channel: FundChannel) => {
     if(channel.state === 'CHANNELD_NORMAL' && channel.connected) {
-      walletBalances.clnLocalBalance = walletBalances.clnLocalBalance + (channel.channel_sat || 0);
-      walletBalances.clnRemoteBalance = walletBalances.clnRemoteBalance + ((channel.channel_total_sat || 0) - (channel.channel_sat || 0));
+      walletBalances.clnLocalBalance = walletBalances.clnLocalBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
+      walletBalances.clnRemoteBalance = walletBalances.clnRemoteBalance + (((channel.channel_total_sat || ((channel.amount_msat || 0) / SATS_MSAT) || 0) - (channel.channel_sat || ((channel.our_amount_msat || 0) / SATS_MSAT)) || 0));
     }
     else if(channel.state === 'CHANNELD_NORMAL' && !channel.connected) {
-      walletBalances.clnInactiveBalance = walletBalances.clnInactiveBalance + (channel.channel_sat || 0);
+      walletBalances.clnInactiveBalance = walletBalances.clnInactiveBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
     }
     else if(channel.state === 'CHANNELD_AWAITING_LOCKIN') {
-      walletBalances.clnPendingBalance = walletBalances.clnPendingBalance + (channel.channel_sat || 0);
+      walletBalances.clnPendingBalance = walletBalances.clnPendingBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
     }
     return walletBalances;
   });
   listFunds.outputs?.map((output: FundOutput) => {
     if(output.status === 'confirmed') {
-      walletBalances.btcSpendableBalance = walletBalances.btcSpendableBalance + (output.value || 0);
+      walletBalances.btcSpendableBalance = walletBalances.btcSpendableBalance + (output.value || output.amount_msat || 0);
     } else if(output.status === 'unconfirmed') {
-      walletBalances.btcReservedBalance = walletBalances.btcReservedBalance + (output.value || 0);
+      walletBalances.btcReservedBalance = walletBalances.btcReservedBalance + (output.value || output.amount_msat || 0);
     }
     return walletBalances;
   });
   return walletBalances;
 };
 
-const filterOnChainTransactions = (events: BkprTransaction[]) => {
+const filterOnChainTransactions = (events: BkprTransaction[], state) => {
   if (!events) {
     return [];
   } else {
     return events.reduce((acc: any[], event, i) => {
       if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
-        event.credit_msat = event.credit_msat && event.credit_msat.length ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : '0';
-        event.debit_msat = event.debit_msat && event.debit_msat.length ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : '0';  
+        if (isCompatibleVersion(state.nodeInfo.version, '23.02')) {
+          event.credit_msat = event.credit_msat || 0;
+          event.debit_msat = event.debit_msat || 0;
+        } else {
+          event.credit_msat = event.credit_msat && typeof event.credit_msat === 'string' ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : 0;
+          event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : 0;
+        }
         const lastTx = acc.length && acc.length > 0 ? acc[acc.length - 1] : { tag: '' };
         if (lastTx.tag === 'withdrawal' && event.tag === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
           lastTx.debit_msat = (lastTx.debit_msat - +event.credit_msat);
@@ -335,7 +340,7 @@ const appReducer = (state, action) => {
 
     case ApplicationActions.SET_LIST_BITCOIN_TRANSACTIONS:
       const sortedTransactions = action.payload.events?.sort((t1: BkprTransaction, t2: BkprTransaction) => ((t1.timestamp && t2.timestamp && t1.timestamp > t2.timestamp) ? -1 : 1));
-      const filteredTransactions = filterOnChainTransactions(sortedTransactions);
+      const filteredTransactions = filterOnChainTransactions(sortedTransactions, state);
       return {
         ...state,
         listBitcoinTransactions: { isLoading: false, error: action.payload.error, btcTransactions: filteredTransactions },

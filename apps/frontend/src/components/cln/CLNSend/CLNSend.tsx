@@ -11,7 +11,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
-import { formatCurrency } from '../../../utilities/data-formatters';
+import { formatCurrency, isCompatibleVersion } from '../../../utilities/data-formatters';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT, Units } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
@@ -105,7 +105,12 @@ const CLNSend = (props) => {
                 amount: ('Open Offer')
               });
             } else {
-              const amountmSats = +(decodeRes.data.offer_amount_msat.substring(0, (decodeRes.data.offer_amount_msat.length - 4))) || 0;
+              let amountmSats = 0;
+              if (isCompatibleVersion((appCtx.nodeInfo.version || ''), '23.02')) {
+                amountmSats = decodeRes.data.offer_amount_msat || 0;
+              } else {
+                amountmSats = +(decodeRes.data.offer_amount_msat.substring(0, (decodeRes.data.offer_amount_msat.length - 4))) || 0;
+              }
               amountChangeHandler({target: {value: (amountmSats / SATS_MSAT).toString()}});
               setDecodeResponse({ 
                 description: (decodeRes.data.offer_description),
@@ -114,17 +119,17 @@ const CLNSend = (props) => {
             }
           } else {
             if (decodeRes && decodeRes.data) {
-              if (!decodeRes.data.msatoshi) {
+              if (!decodeRes.data.msatoshi && !decodeRes.data.amount_msat) {
                 setEmptyInvoice(true);
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
                   amount: ('Open Invoice')
                 });
               } else {
-                amountChangeHandler({target: {value: (decodeRes.data.msatoshi / SATS_MSAT).toString()}});
+                amountChangeHandler({target: {value: ((decodeRes.data.msatoshi || decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
-                  amount: (formatCurrency((decodeRes.data.msatoshi || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                  amount: (formatCurrency((decodeRes.data.msatoshi || decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
                 });
               }
             }

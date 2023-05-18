@@ -16,12 +16,12 @@ const TODAY = Math.floor(Date.now() / 1000);
 const Payment = ({payment, copyHandler}) => {
   return (
     <>
-    {payment.msatoshi ?        
+    {payment.msatoshi || payment.amount_msat ?        
       <Row className='cln-transaction-detail'>
         <Col xs={12} className='fs-7 text-light'>Transaction Fee (mSats)</Col>
         <Col xs={11} className='fs-7 overflow-x-ellipsis'>
-          {payment.msatoshi_sent ? 
-            formatCurrency((payment.msatoshi_sent - payment.msatoshi), Units.MSATS, Units.MSATS, false, 0, 'string')
+          {payment.msatoshi_sent || payment.amount_sent_msat ? 
+            formatCurrency(((payment.msatoshi_sent || payment.amount_sent_msat) - (payment.msatoshi || payment.amount_msat)), Units.MSATS, Units.MSATS, false, 0, 'string')
           :
             0
           }

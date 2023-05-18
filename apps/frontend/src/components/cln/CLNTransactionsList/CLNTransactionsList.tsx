@@ -32,7 +32,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
           </Col>
           <Col xs={5} className='ps-0 d-flex align-items-center justify-content-end fw-bold text-darker-blue'>
             { payment.status === 'complete' ?
-              '-' + (formatCurrency((payment.msatoshi_sent || 0), Units.MSATS, appConfig.unit, false, 0, 'string'))
+              '-' + (formatCurrency((payment.msatoshi_sent || payment.amount_sent_msat || 0), Units.MSATS, appConfig.unit, false, 0, 'string'))
             :
               0
             }
@@ -44,7 +44,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
             <DateBox dataValue={payment.created_at} dataType={'Created At'} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(payment.msatoshi_sent || 0)} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(payment.msatoshi_sent || payment.amount_sent_msat || 0)} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>
@@ -65,9 +65,9 @@ const InvoiceHeader = ({invoice, appConfig, fiatConfig}) => {
           </Col>
           <Col xs={5} className='ps-0 d-flex align-items-center justify-content-end fw-bold text-darker-blue'>
             {invoice.paid_at ?
-              <span>{'+' + (formatCurrency((invoice.msatoshi_received || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))}</span>
+              <span>{'+' + (formatCurrency((invoice.msatoshi_received || invoice.amount_received_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))}</span>
             :
-              (formatCurrency((invoice.msatoshi || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))
+              (formatCurrency((invoice.msatoshi || invoice.amount_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))
             }
           </Col>
         </Row>
@@ -82,7 +82,7 @@ const InvoiceHeader = ({invoice, appConfig, fiatConfig}) => {
             <DateBox dataValue={invoice.paid_at ? invoice.paid_at : invoice.expires_at} dataType={''} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(invoice.paid_at ? invoice.msatoshi_received : invoice.msatoshi)} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(invoice.paid_at ? (invoice.msatoshi_received || invoice.amount_received_msat) : (invoice.msatoshi || invoice.amount_msat))} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>

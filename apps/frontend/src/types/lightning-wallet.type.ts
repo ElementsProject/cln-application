@@ -89,14 +89,19 @@ export type Channel = {
   msatoshi_to_us_min?: number;
   msatoshi_to_us_max?: number;
   msatoshi_total?: number;
+  to_us_msat?: number;
+  total_msat?: number;
   fee_base_msat?: string;
   fee_proportional_millionths?: number;
   dust_limit_satoshis?: number;
+  dust_limit_msat?: number;
   max_htlc_value_in_flight_msat?: number;
   their_channel_reserve_satoshis?: number;
   our_channel_reserve_satoshis?: number;
   spendable_msatoshi?: number;
   receivable_msatoshi?: number;
+  spendable_msat?: number;
+  receivable_msat?: number;
   htlc_minimum_msat?: number;
   their_to_self_delay?: number;
   our_to_self_delay?: number;
@@ -159,6 +164,8 @@ export type Invoice = {
   label?: string;
   msatoshi?: number;
   msatoshi_received?: number;
+  amount_msat?: number;
+  amount_received_msat?: number;
   local_offer_id?: string;
   invreq_payer_note?: string;
   paid_at?: number;
@@ -185,6 +192,8 @@ export type Payment = {
   created_at?: number;
   msatoshi?: number;
   msatoshi_sent?: number;
+  amount_msat?: number;
+  amount_sent_msat?: number;
   destination?: string;
   label?: string;
   bolt11?: string;
@@ -281,8 +290,8 @@ export type btcWithdraw = {
 export type BkprTransaction = {
   account: string;
   type?: string; // 'onchain_fee', 'chain', 'channel'
-  credit_msat?: string;
-  debit_msat?: string;
+  credit_msat?: string | number;
+  debit_msat?: string | number;
   currency?: string;
   timestamp?: number;
   tag?: string;
@@ -307,7 +316,7 @@ export type FundOutput = {
   txid?: string;
   output?: string;
   value?: number;
-  amount_msat?: string;
+  amount_msat?: number;
   scriptpubkey?: string;
   status?: string;
   reserved?: boolean;
@@ -319,16 +328,15 @@ export type FundOutput = {
 
 export type FundChannel = {
   peer_id?: string;
-  our_amount_msat?: string;
-  amount_msat?: string;
   funding_txid?: string;
   funding_output?: string;
   connected?: boolean;
   state?: string;
   short_channel_id?: string;
+  our_amount_msat?: number;
   channel_sat?: number;
   channel_total_sat?: number;
-
+  amount_msat?: number;
 }
 
 export type Fund = {
