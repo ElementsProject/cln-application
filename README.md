@@ -10,6 +10,9 @@
     <a href="https://twitter.com/Blockstream">
       <img src="https://img.shields.io/twitter/follow/blockstream?style=social" />
     </a>
+    <a href="https://apps.umbrel.com/app/core-lightning" style="margin-left:10px">
+      <img src="https://apps.umbrel.com/badge-light.svg" width="101" height="21"/>
+    </a>
   </h3>
 </p>
 
