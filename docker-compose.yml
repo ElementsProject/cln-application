@@ -5,6 +5,7 @@ services:
     image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
     command:
       - -${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - -fallbackfee=0.0002
       - -rpcbind=0.0.0.0
       - -rpcallowip=0.0.0.0/0
       - -rpcauth=user:d58ddb294b3a3812ff5fee50d6f24b29$19212992730deeaf6e596d471260a966b011a00446d45b193c94e79c4f4a1266
@@ -30,17 +31,17 @@ services:
     restart: on-failure
     volumes:
       - ${PWD}/data/lightningd:/root/.lightning
-    expose:
-      - ${APP_CORE_LIGHTNING_WEBSOCKET_PORT}:${APP_CORE_LIGHTNING_WEBSOCKET_PORT}      
+    ports:
+      - ${APP_CORE_LIGHTNING_WEBSOCKET_PORT}:${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
     networks:
       networkcln:
         ipv4_address: ${APP_CORE_LIGHTNING_DAEMON_IP}
 
   application:
-    # build:
-      # dockerfile: ./Dockerfile
-      # context: ./
-    image: ghcr.io/elementsproject/cln-application:0.0.1@sha256:c43642d578bb22754e1e6eb054be86d0a6af51f30752cd51e942996870d4c8f5
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    # image: ghcr.io/elementsproject/cln-application:0.0.2@sha256:6188255f56a679b9e5785036ab50ad1d2c869568c2f29d07f0c482917c7442e9
     depends_on:
       - bitcoind
       - lightningd
@@ -58,6 +59,7 @@ services:
       COMMANDO_CONFIG: ${COMMANDO_CONFIG}
       APP_CONFIG_DIR: ${APP_CONFIG_DIR}
       APP_MODE: "production"
+      DEVICE_DOMAIN_NAME: ${DEVICE_DOMAIN_NAME}
       LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
       CA_CERT: /root/.lightning/bitcoin/ca.pem
       CLIENT_KEY: /root/.lightning/bitcoin/client-key.pem

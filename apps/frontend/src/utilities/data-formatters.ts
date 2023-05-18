@@ -36,6 +36,7 @@ export const formatCurrencyType = (num: number, shorten: boolean, returnFormat: 
 };
 
 export const formatCurrency = (num: number, fromUnit: Units, toUnit: Units = Units.SATS, shorten: boolean = false, numDecimalPlaces: number = 5, returnFormat: string = 'string') => {
+  if (typeof num === 'undefined') { num = 0; }
   switch (fromUnit) {
     case Units.MSATS:
       return toUnit === Units.BTC ? ConvertMSatsToBTC(num, numDecimalPlaces) : toUnit === Units.SATS ? ConvertMSatsToSats(num, numDecimalPlaces, returnFormat) : formatCurrencyType(num, shorten, returnFormat);

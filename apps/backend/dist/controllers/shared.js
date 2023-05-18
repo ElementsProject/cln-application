@@ -31,9 +31,13 @@ class SharedController {
         try {
             logger.info('Getting Connection Settings');
             let macaroon = '';
+            let packageData = '{ version: "0.0.2" }';
             if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
                 logger.info('Getting REST Access Macaroon from ' + process.env.APP_CORE_LIGHTNING_REST_CERT_DIR);
                 macaroon = Buffer.from(fs.readFileSync(APP_CONSTANTS.MACAROON_PATH)).toString('hex');
+            }
+            if (fs.existsSync('package.json')) {
+                packageData = Buffer.from(fs.readFileSync('package.json')).toString();
             }
             const CONNECT_WALLET_SETTINGS = {
                 LOCAL_HOST: process.env.LOCAL_HOST || '',
@@ -46,6 +50,7 @@ class SharedController {
                 CLN_NODE_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || '',
                 NODE_PUBKEY: process.env.LIGHTNING_PUBKEY || '',
                 COMMANDO_RUNE: process.env.COMMANDO_RUNE,
+                APP_VERSION: JSON.parse(packageData).version || '',
             };
             res.status(200).json(CONNECT_WALLET_SETTINGS);
         }

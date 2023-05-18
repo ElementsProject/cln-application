@@ -14,6 +14,7 @@ export type WalletConnect = {
   WS_PORT?: string;
   NODE_PUBKEY?: string;
   COMMANDO_RUNE?: string;
+  APP_VERSION?: string;
   error?: any;
 }
 

@@ -116,6 +116,7 @@
   
   .btn-group {
     &.btn-group-action .btn, &.btn-group-action button.btn-actions {
+      color: $text-dark;
       &:hover {
         & + button.btn-actions {
           border-color: $card-bg-dark;
@@ -126,7 +127,12 @@
     }
   }
   
-  
+  .form-check.form-check-inline {  
+    & .form-check-input[type="radio"] {
+      background-color: $form-ctrl-bg-dark;
+    }
+  }
+
   .dropdown {
     & a.dropdown-item {
       color: $white;
