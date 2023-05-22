@@ -31,7 +31,7 @@ class SharedController {
         try {
             logger.info('Getting Connection Settings');
             let macaroon = '';
-            let packageData = '{ version: "0.0.4" }';
+            let packageData = '{ version: "0.0.3" }';
             if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
                 logger.info('Getting REST Access Macaroon from ' + process.env.APP_CORE_LIGHTNING_REST_CERT_DIR);
                 macaroon = Buffer.from(fs.readFileSync(APP_CONSTANTS.MACAROON_PATH)).toString('hex');
