@@ -1,0 +1,31 @@
+@import '../../../styles/constants.scss';
+
+.cln-offer-placeholder {
+  transform-origin: top left;
+  & .cln-offer-detail {
+    align-items: center;
+    margin: 0.5rem;
+  }
+  & .cln-offer-copy {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      svg path {
+        stroke: darken($primary, 10%);
+      }
+    }
+  }
+  & .cln-offer-open {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      svg path {
+        fill: darken($primary, 10%);
+      }
+    }
+  }
+}
