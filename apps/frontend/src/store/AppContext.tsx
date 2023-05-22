@@ -11,18 +11,25 @@ import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, FiatConfig, WalletConnect } from '../types/app-config.type';
-import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
+import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
 
-const aggregateChannels = (peers: Peer[]) => {
+const aggregateChannels = (peers: Peer[], currentVersion: string) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
   peers?.forEach((peer: Peer) => {
     if (peer.channels && peer.channels.length > 0) {
       peer.channels.map(channel => {
         channel.connected = peer.connected || false;
         channel.node_alias = peer.alias || peer.id?.substring(0,20) || '';
-        channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
-        channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
-        channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
+        if (isCompatibleVersion(currentVersion, '23.02')) {
+          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
+          channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
+          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
+        } else {
+          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || 0) / SATS_MSAT);
+          channel.satoshi_total = Math.floor((channel.msatoshi_total || 0) / SATS_MSAT);
+          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || 0) - (channel.msatoshi_to_us || 0)) / SATS_MSAT);
+        }
+
         if (channel.state === 'CHANNELD_NORMAL') {
           if (channel.connected) {
             channel.current_state = 'ACTIVE';
@@ -164,13 +171,13 @@ const calculateBalances = (listFunds: Fund) => {
   return walletBalances;
 };
 
-const filterOnChainTransactions = (events: BkprTransaction[], state) => {
+const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: string) => {
   if (!events) {
     return [];
   } else {
     return events.reduce((acc: any[], event, i) => {
       if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
-        if (isCompatibleVersion(state.nodeInfo.version, '23.02')) {
+        if (isCompatibleVersion(currentVersion, '23.02')) {
           event.credit_msat = event.credit_msat || 0;
           event.debit_msat = event.debit_msat || 0;
         } else {
@@ -202,6 +209,7 @@ const AppContext = React.createContext<AppContextType>({
   listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
   listInvoices: {isLoading: true, invoices: []},
   listPayments: {isLoading: true, payments: []},
+  listOffers: {isLoading: true, offers: []},
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
   walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
@@ -216,6 +224,7 @@ const AppContext = React.createContext<AppContextType>({
   setListPeers: (peersList: ListPeers) => {},
   setListInvoices: (invoicesList: ListInvoices) => {},
   setListPayments: (paymentsList: ListPayments) => {},
+  setListOffers: (offersList: ListOffers) => {},
   setListBitcoinTransactions: (transactionsList: ListBitcoinTransactions) => {},
   setStore: (storeData) => {},
   clearStore: () => {}
@@ -234,6 +243,7 @@ const defaultAppState = {
   listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
   listInvoices: {isLoading: true, invoices: []},
   listPayments: {isLoading: true, payments: []},
+  listOffers: {isLoading: true, offers: []},
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
   walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0}
@@ -256,6 +266,7 @@ const appReducer = (state, action) => {
       };
   
     case ApplicationActions.SET_WALLET_CONNECT:
+      action.payload.TOR_DOMAIN_NAME = action.payload.TOR_HOST?.replace('https://', '').replace('http://', '');
       return {
         ...state,
         walletConnect: action.payload
@@ -294,7 +305,7 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_PEERS:
-      let filteredChannels = aggregateChannels(action.payload.peers);
+      let filteredChannels = aggregateChannels(action.payload.peers, state.nodeInfo.version);
       return {
         ...state,
         listChannels: { ...filteredChannels, isLoading: false, error: action.payload.error },
@@ -338,9 +349,15 @@ const appReducer = (state, action) => {
         listPayments: {...action.payload, payments: sortedPayments}
       };
 
+    case ApplicationActions.SET_LIST_OFFERS:
+      return {
+        ...state,
+        listOffers: action.payload
+      };
+  
     case ApplicationActions.SET_LIST_BITCOIN_TRANSACTIONS:
       const sortedTransactions = action.payload.events?.sort((t1: BkprTransaction, t2: BkprTransaction) => ((t1.timestamp && t2.timestamp && t1.timestamp > t2.timestamp) ? -1 : 1));
-      const filteredTransactions = filterOnChainTransactions(sortedTransactions, state);
+      const filteredTransactions = filterOnChainTransactions(sortedTransactions, state.nodeInfo.version);
       return {
         ...state,
         listBitcoinTransactions: { isLoading: false, error: action.payload.error, btcTransactions: filteredTransactions },
@@ -404,6 +421,10 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_SEND_PAYS, payload: list });
   };
 
+  const setListOffersHandler = (list: ListOffers) => {
+    dispatchApplicationAction({ type: ApplicationActions.SET_LIST_OFFERS, payload: list });
+  };
+
   const setListBitcoinTransactionsHandler = (list: any) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_BITCOIN_TRANSACTIONS, payload: list });
   };
@@ -429,6 +450,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     listChannels: applicationState.listChannels,
     listInvoices: applicationState.listInvoices,
     listPayments: applicationState.listPayments,
+    listOffers: applicationState.listOffers,
     listLightningTransactions: applicationState.listLightningTransactions,
     listBitcoinTransactions: applicationState.listBitcoinTransactions,
     walletBalances: applicationState.walletBalances,
@@ -443,6 +465,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     setListPeers: setListPeersHandler,
     setListInvoices: setListInvoicesHandler,
     setListPayments: setListPaymentsHandler,
+    setListOffers: setListOffersHandler,
     setListBitcoinTransactions: setListBitcoinTransactionsHandler,
     setStore: setContextStore,
     clearStore: clearContextHandler
