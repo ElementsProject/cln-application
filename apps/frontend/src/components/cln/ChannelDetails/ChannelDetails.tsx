@@ -139,7 +139,7 @@ const ChannelDetails = (props) => {
                   <Row className='mt-1'>
                     <Col xs={12} className='fs-7 text-light'>Short Channel Id</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {props.selChannel.short_channel_id}
+                      {props.selChannel.short_channel_id || '-'}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>

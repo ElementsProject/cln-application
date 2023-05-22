@@ -2,8 +2,10 @@
 node_modules
 data/bitcoin/*
 data/lightningd/*
+data/lightningd-2/*
 data/c-lightning-rest/*
 data/app/application-cln.log
+data/app-2/*
 application-cln.log
 .commando-env
 env.sh

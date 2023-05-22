@@ -1,12 +1,15 @@
 import './CLNWallet.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
+import Tab from 'react-bootstrap/Tab';
+import Nav from 'react-bootstrap/Nav';
 
 import { AppContext } from '../../../store/AppContext';
 import { LightningWalletSVG } from '../../../svgs/LightningWallet';
@@ -14,10 +17,13 @@ import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
 import CLNTransactionsList from '../CLNTransactionsList/CLNTransactionsList';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
+import { TRANSITION_DURATION } from '../../../utilities/constants';
+import CLNOffersList from '../CLNOffersList/CLNOffersList';
 
 const CLNWallet = (props) => {
   const appCtx = useContext(AppContext);
-  
+  const [selectedTab, setSelectedTab] = useState('transactions');
+
   return (
     <Card className='h-100 d-flex align-items-stretch'>
       <Card.Body className='d-flex align-items-stretch flex-column p-0'>
@@ -48,10 +54,45 @@ const CLNWallet = (props) => {
           </ButtonGroup>
         </Card>
         <Card.Body className='px-4 list-scroll-container'>
-          <div className='text-light'>Transactions</div>
+          {/* <div className='text-light'>Transactions</div>
           <PerfectScrollbar className='ps-show-always'>
             <CLNTransactionsList />
-          </PerfectScrollbar>
+          </PerfectScrollbar> */}
+
+            <Tab.Container id='cln-transactions-tab-id' 
+              activeKey={selectedTab}
+              onSelect={(selTab) => setSelectedTab(selTab || 'transactions')}
+              
+              >
+              <Nav className='flex-row cln-transactions-tabs'>
+                <Nav.Item>
+                  <Nav.Link eventKey='transactions'>Transactions</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey='offers'>Offers</Nav.Link>
+                </Nav.Item>
+              </Nav>
+              <PerfectScrollbar className='ps-show-always'>
+                <AnimatePresence mode='wait'>
+                  <motion.div
+                    key={selectedTab}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: TRANSITION_DURATION }}
+                    className='h-100'
+                  >
+                    <Tab.Content>
+                          <Tab.Pane className='list-scroll-container' eventKey='transactions'>
+                              <CLNTransactionsList />
+                          </Tab.Pane>
+                          <Tab.Pane eventKey='offers'>
+                            <CLNOffersList />
+                          </Tab.Pane>
+                    </Tab.Content>
+                  </motion.div>
+                </AnimatePresence>
+              </PerfectScrollbar>
+            </Tab.Container>
         </Card.Body>
       </Card.Body>
     </Card>

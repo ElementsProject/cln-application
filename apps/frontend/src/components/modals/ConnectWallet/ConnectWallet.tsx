@@ -16,7 +16,7 @@ import { CloseSVG } from '../../../svgs/Close';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
 import logger from '../../../services/logger.service';
 
-const NETWORK_TYPES = ['REST (Local Network)', 'REST (Tor)', 'LN Message']
+const NETWORK_TYPES = ['REST (Local Network)', 'REST (Tor)', 'LN Message', 'LN Message (Tor)']
 
 const ConnectWallet = () => {
   const appCtx = useContext(AppContext);
@@ -32,7 +32,7 @@ const ConnectWallet = () => {
         textToCopy = appCtx.walletConnect.WS_PORT || '';
         break;
       case 'CLN Host':
-        textToCopy = appCtx.walletConnect.DEVICE_DOMAIN_NAME || '';
+        textToCopy = ((selNetwork === 2 || selNetwork === 3) ? appCtx.walletConnect.DEVICE_DOMAIN_NAME : appCtx.walletConnect.TOR_DOMAIN_NAME) || '';
         break;
       case 'Rune':
         textToCopy = appCtx.walletConnect.COMMANDO_RUNE || '';
@@ -50,7 +50,7 @@ const ConnectWallet = () => {
         textToCopy = appCtx.walletConnect.REST_MACAROON || '';
         break;
       default:
-        textToCopy = selNetwork === 2 ? lnMessageConnectUrl : clnConnectUrl;
+        textToCopy = (selNetwork === 2 || selNetwork === 3) ? lnMessageConnectUrl : clnConnectUrl;
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
@@ -76,7 +76,12 @@ const ConnectWallet = () => {
         setConnectValues({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
         setLnMessageConnectUrl('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
         break;
-    
+
+      case 3:
+        setConnectValues({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setLnMessageConnectUrl('ln-message://' + appCtx.walletConnect.TOR_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?pubkey=' + appCtx.walletConnect.NODE_PUBKEY + '&rune=' + appCtx.walletConnect.COMMANDO_RUNE);
+        break;
+  
       default:
         setConnectValues({ pubkey: { title: 'Node Pubkey', field: 'NODE_PUBKEY' }, port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'Host', field: 'LOCAL_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, connectUrl: { title: 'REST URL', field: '' } });
         setClnConnectUrl('c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
@@ -103,7 +108,7 @@ const ConnectWallet = () => {
                 transition={{ delay: 0.05, duration: 0.01 }}
               />
             </AnimatePresence>
-            <QRCodeCanvas value={selNetwork === 2 ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')} size={220} includeMargin={true} bgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
+            <QRCodeCanvas value={(selNetwork === 2 || selNetwork === 3) ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')} size={220} includeMargin={true} bgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={appCtx.appConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
           </Row>
           <Row className='d-flex align-items-start justify-content-center pt-2'>
             <h4 className='w-75 text-blue fw-bold d-flex justify-content-center text-center'>
@@ -161,7 +166,7 @@ const ConnectWallet = () => {
               </InputGroup>
             </Col>
           </Row>
-          { selNetwork === 2 ? 
+          { (selNetwork === 2 || selNetwork === 3) ? 
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.pubkey.title}</Form.Label>
@@ -210,8 +215,8 @@ const ConnectWallet = () => {
                 <Form.Control 
                   onClick={copyHandler}
                   id={connectValues.connectUrl.title}
-                  value={selNetwork === 2 ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')}
-                  aria-label={selNetwork === 2 ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')}
+                  value={(selNetwork === 2 || selNetwork === 3) ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')}
+                  aria-label={(selNetwork === 2 || selNetwork === 3) ? (lnMessageConnectUrl || '') : (clnConnectUrl || '')}
                   aria-describedby='copy-addon-macaroon'
                   className='form-control-left'
                   readOnly

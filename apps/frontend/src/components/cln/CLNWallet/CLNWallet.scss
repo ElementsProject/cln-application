@@ -1,0 +1,26 @@
+@import '../../../styles/constants.scss';
+
+.nav.cln-transactions-tabs {
+  border: none;
+  border-bottom: 0.5px solid $border-color;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  & .nav-item .nav-link {
+    padding: 0 2rem 0 0.25rem;
+    color: $light;
+    &.active, &:hover, &:focus {
+      background-color: transparent;
+      border-bottom: 1px solid $primary;
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .nav.cln-transactions-tabs {
+    border-bottom: 0.5px solid $border-color-dark;
+    & .nav-item .nav-link {
+      color: $light-dark;
+    }
+  }
+}

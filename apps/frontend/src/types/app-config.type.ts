@@ -9,6 +9,7 @@ export type WalletConnect = {
   LOCAL_HOST?: string;
   REST_MACAROON?: string;
   REST_PORT?: string;
+  TOR_DOMAIN_NAME?: string;
   TOR_HOST?: string;
   CLN_NODE_IP?: string;
   WS_PORT?: string;

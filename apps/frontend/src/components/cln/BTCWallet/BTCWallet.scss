@@ -1,0 +1,12 @@
+@import '../../../styles/constants.scss';
+
+.btc-transactions-tabs {
+  border-bottom: 0.5px solid $border-color;
+}
+
+@include color-mode(dark) {
+  .btc-transactions-tabs {
+    border-bottom: 0.5px solid $border-color-dark;
+    padding: 0 2rem 0 0.25rem;
+  }
+}
