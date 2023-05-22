@@ -394,3 +394,18 @@ export type NodeFeeRate = {
   onchain_fee_estimates?: OnChainFeeEstimates;
   error?: any;
 }
+
+export type Offer = {
+  bolt12: string;
+  offer_id?: string;
+  active?: boolean;
+  single_use?: boolean;
+  used?: boolean;
+  label?: string;
+}
+
+export type ListOffers = {
+  isLoading: boolean;
+  offers?: Offer[];
+  error?: any;
+}

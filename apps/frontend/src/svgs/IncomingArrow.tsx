@@ -7,7 +7,7 @@ export const IncomingArrowSVG = props => {
     <OverlayTrigger
       placement='auto'
       delay={{ show: 250, hide: 250 }}
-      overlay={(props.txStatus === 'deposit') ? <></> : <Tooltip>{props.txStatus === 'paid' ? 'Received' : titleCase(props.txStatus)}</Tooltip>}
+      overlay={(props.txStatus === 'used' || props.txStatus === 'unused') ? <Tooltip>{titleCase(props.txStatus)}</Tooltip> : (props.txStatus === 'deposit') ? <></> : <Tooltip>{props.txStatus === 'paid' ? 'Received' : titleCase(props.txStatus)}</Tooltip>}
       >
       <svg
         className={props.className}
