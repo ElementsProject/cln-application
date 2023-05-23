@@ -177,7 +177,7 @@ const ChannelOpen = (props) => {
                     !amountHasError ?
                       amountValue ?
                         <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                          ~ <FiatBox value={(+amountValue || 0)} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+                          ~ <FiatBox value={(+amountValue || 0)} fiatUnit={appCtx.appConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
                         </p>
                       :
                         <p className='message'></p>

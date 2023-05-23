@@ -1,8 +1,8 @@
 import './BTCTransaction.scss';
 import { useContext } from 'react';
 import { motion } from 'framer-motion';
-import Row from 'react-bootstrap/esm/Row';
-import Col from 'react-bootstrap/esm/Col';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import { AppContext } from '../../../store/AppContext';
 import { CopySVG } from '../../../svgs/Copy';
