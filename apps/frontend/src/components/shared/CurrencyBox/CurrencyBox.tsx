@@ -31,7 +31,7 @@ const CurrencyBox = props => {
     <OverlayTrigger
       placement='right'
       delay={{ show: 250, hide: 250 }}
-      overlay={<Tooltip><FiatBox value={(+props.value || 0)} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} iconSize='lg' /></Tooltip>}
+      overlay={<Tooltip><FiatBox value={(+props.value || 0)} fiatUnit={appCtx.appConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} iconSize='lg' /></Tooltip>}
       >
       <div className={props.rootClasses}>
         {

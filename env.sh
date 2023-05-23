@@ -7,7 +7,7 @@ if [ "$APP_BITCOIN_NETWORK" == "mainnet" ]; then
 	export APP_CORE_LIGHTNING_BITCOIN_NETWORK="bitcoin"
 fi
 
-export APP_CORE_LIGHTNING_PORT=2123
+export APP_CORE_LIGHTNING_PORT=2103
 export APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE="http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq7qd.onion"
 export APP_MODE="testing"
 export APP_PROTOCOL="http"

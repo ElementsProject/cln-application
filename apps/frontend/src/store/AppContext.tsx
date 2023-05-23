@@ -162,9 +162,9 @@ const calculateBalances = (listFunds: Fund) => {
   });
   listFunds.outputs?.map((output: FundOutput) => {
     if(output.status === 'confirmed') {
-      walletBalances.btcSpendableBalance = walletBalances.btcSpendableBalance + (output.value || output.amount_msat || 0);
+      walletBalances.btcSpendableBalance = walletBalances.btcSpendableBalance + (output.value || ((output.amount_msat || 0) / SATS_MSAT) || 0);
     } else if(output.status === 'unconfirmed') {
-      walletBalances.btcReservedBalance = walletBalances.btcReservedBalance + (output.value || output.amount_msat || 0);
+      walletBalances.btcReservedBalance = walletBalances.btcReservedBalance + (output.value || ((output.amount_msat || 0) / SATS_MSAT) || 0);
     }
     return walletBalances;
   });

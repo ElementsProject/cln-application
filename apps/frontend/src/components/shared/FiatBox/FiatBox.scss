@@ -1,10 +1,23 @@
+@import '../../../styles/constants.scss';
+
 .fiat-box-span {
+  & .svg-currency {
+    fill: $light;
+  }
   & .svg-inline--fa {
     display: inline-block;
     height: .6rem;
     vertical-align: -1px;
     &.fa-lg {
       height: .75rem;
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .fiat-box-span {
+    & .svg-currency {
+      fill: $light-dark;
     }
   }
 }

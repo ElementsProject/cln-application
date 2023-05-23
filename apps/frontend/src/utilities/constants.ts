@@ -1,4 +1,4 @@
-import { faDollarSign, faYenSign, faEuroSign, faSterlingSign, faIndianRupeeSign, faRubleSign  } from '@fortawesome/free-solid-svg-icons'
+import { faDollarSign, faYenSign, faEuroSign, faSterlingSign, faIndianRupeeSign, faRubleSign, faShekelSign, faLiraSign  } from '@fortawesome/free-solid-svg-icons'
 
 export const HOST = process.env.NODE_ENV !== 'production' ? 'localhost' : window.location.hostname;
 export const PORT = process.env.NODE_ENV !== 'production' ? 2103 : window.location.port;
@@ -36,18 +36,34 @@ export const CURRENCY_UNITS = ['SATS', 'BTC'];
 export const CURRENCY_UNIT_FORMATS = { Sats: '1.0-0', BTC: '1.6-6', OTHER: '1.2-2' };
 
 export const FIAT_CURRENCIES = [
-  { currency:	'USD', symbol: faDollarSign },
+	{ currency:	'USD', symbol: faDollarSign },
 	{ currency:	'AUD', symbol: faDollarSign },
+	{ currency:	'BRL', symbol: null },
 	{ currency:	'CAD', symbol: faDollarSign },
+	{ currency:	'CHF', symbol: null },
 	{ currency:	'CNY', symbol: faYenSign },
+	{ currency:	'CZK', symbol: null },
+	{ currency:	'DKK', symbol: null },
 	{ currency:	'EUR', symbol: faEuroSign },
 	{ currency:	'GBP', symbol: faSterlingSign },
 	{ currency:	'HKD', symbol: faDollarSign },
+	{ currency:	'IDR', symbol: null },
+	{ currency:	'ILS', symbol: faShekelSign },
 	{ currency:	'INR', symbol: faIndianRupeeSign },
 	{ currency:	'JPY', symbol: faYenSign },
+	{ currency:	'MXN', symbol: faDollarSign },
+	{ currency:	'MYR', symbol: null },
+	{ currency:	'NGN', symbol: null },
+	{ currency:	'NOK', symbol: null },
 	{ currency:	'NZD', symbol: faDollarSign },
+	{ currency:	'PLN', symbol: null },
 	{ currency:	'RUB', symbol: faRubleSign },
+	{ currency:	'SEK', symbol: null },
 	{ currency:	'SGD', symbol: faDollarSign },
+	{ currency:	'THB', symbol: null },
+	{ currency:	'TRY', symbol: faLiraSign },
+	{ currency:	'VND', symbol: null },
+	{ currency:	'ZAR', symbol: null }
 ];
 
 export enum ApplicationActions {

@@ -34,8 +34,7 @@ const FeerateRange = (props) => {
             <Tooltip className={'feerate-tooltip feerate-tooltip-' + props.selFeeRate}>
               {Math.round(getSelFeeRateValue() / 1000)} Sats/vB
                ≈ 
-              {/* <FiatBox className='ms-1' value={Math.round(getSelFeeRateValue() * .22)} fromUnit={Units.SATS} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} /> */}
-              <FiatBox className='ms-1' value={Math.round(getSelFeeRateValue() * .18)} fromUnit={Units.SATS} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+              <FiatBox className='ms-1' value={Math.round(getSelFeeRateValue() * .18)} fromUnit={Units.SATS} fiatUnit={appCtx.appConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
             </Tooltip>
             }
           >

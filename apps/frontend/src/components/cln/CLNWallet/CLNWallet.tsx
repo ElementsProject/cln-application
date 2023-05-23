@@ -54,11 +54,6 @@ const CLNWallet = (props) => {
           </ButtonGroup>
         </Card>
         <Card.Body className='px-4 list-scroll-container'>
-          {/* <div className='text-light'>Transactions</div>
-          <PerfectScrollbar className='ps-show-always'>
-            <CLNTransactionsList />
-          </PerfectScrollbar> */}
-
             <Tab.Container id='cln-transactions-tab-id' 
               activeKey={selectedTab}
               onSelect={(selTab) => setSelectedTab(selTab || 'transactions')}
@@ -79,9 +74,9 @@ const CLNWallet = (props) => {
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: TRANSITION_DURATION }}
-                    className='h-100'
+                    className='h-100 d-flex flex-column align-items-stretch'
                   >
-                    <Tab.Content>
+                    <Tab.Content className='d-flex flex-column'>
                           <Tab.Pane className='list-scroll-container' eventKey='transactions'>
                               <CLNTransactionsList />
                           </Tab.Pane>
