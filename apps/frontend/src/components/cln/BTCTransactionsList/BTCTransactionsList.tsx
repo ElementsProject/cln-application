@@ -37,7 +37,7 @@ const WithdrawHeader = ({withdraw, appConfig, fiatConfig}) => {
             <DateBox dataValue={withdraw.timestamp} dataType={'Created At'} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(withdraw.debit_msat || 0)} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(withdraw.debit_msat || 0)} fromUnit={Units.MSATS} fiatUnit={appConfig.fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>
@@ -65,7 +65,7 @@ const DepositHeader = ({deposit, appConfig, fiatConfig}) => {
             <DateBox dataValue={deposit.timestamp} dataType={'Created At'} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(deposit.credit_msat || 0)} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(deposit.credit_msat || 0)} fromUnit={Units.MSATS} fiatUnit={appConfig.fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>
