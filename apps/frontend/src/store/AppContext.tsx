@@ -168,6 +168,12 @@ const calculateBalances = (listFunds: Fund) => {
     }
     return walletBalances;
   });
+  walletBalances.btcReservedBalance = Math.round(walletBalances.btcReservedBalance);
+  walletBalances.btcSpendableBalance = Math.round(walletBalances.btcSpendableBalance);
+  walletBalances.clnInactiveBalance = Math.round(walletBalances.clnInactiveBalance);
+  walletBalances.clnLocalBalance = Math.round(walletBalances.clnLocalBalance);
+  walletBalances.clnPendingBalance = Math.round(walletBalances.clnPendingBalance);
+  walletBalances.clnRemoteBalance = Math.round(walletBalances.clnRemoteBalance);  
   return walletBalances;
 };
 
