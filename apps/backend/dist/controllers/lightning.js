@@ -28,7 +28,6 @@ export const getNodesInfo = (lightningPeers) => {
         throw new LightningError('Controller caught lightning error from list nodes: ' + JSON.stringify(err), err, HttpStatusCode.LIGHTNING_SERVER, 'Get Network Nodes Information');
     });
 };
-const ALLOWED_ACTIONS = { getNodesInfo: getNodesInfo };
 class LightningController {
     callMethod(req, res, next) {
         try {
@@ -40,20 +39,19 @@ class LightningController {
                     req.body.method +
                     ': ' +
                     JSON.stringify(commandRes));
-                if (req.body.nextAction &&
-                    ALLOWED_ACTIONS[req.body.nextAction] &&
-                    typeof ALLOWED_ACTIONS[req.body.nextAction] === 'function') {
+                if (req.body.method && req.body.method === 'listpeers') {
                     try {
-                        ALLOWED_ACTIONS[req.body.nextAction](commandRes).then((resFromNextAction) => {
-                            logger.info(resFromNextAction);
-                            res.status(200).json(resFromNextAction);
+                        // Filter out ln message pubkey from peers list
+                        const lnmPubkey = lnMessage.getLNMsgPubkey();
+                        commandRes.peers = commandRes.peers.filter((peer) => peer.id !== lnmPubkey);
+                        // To get node aliases from liseNodes
+                        getNodesInfo(commandRes).then((resWithAliases) => {
+                            logger.info(resWithAliases);
+                            res.status(200).json(resWithAliases);
                         });
                     }
                     catch (error) {
-                        logger.error('Lightning error from nextAction ' +
-                            req.body.nextAction +
-                            ': ' +
-                            JSON.stringify(error));
+                        logger.error('Lightning error from Get Nodes Info : ' + JSON.stringify(error));
                         return handleError(error, req, res, next);
                     }
                 }
