@@ -39,8 +39,6 @@ export const getNodesInfo = (lightningPeers: any) => {
     });
 };
 
-const ALLOWED_ACTIONS: any = { getNodesInfo: getNodesInfo };
-
 class LightningController {
   callMethod(req: Request, res: Response, next: NextFunction) {
     try {
@@ -54,23 +52,18 @@ class LightningController {
               ': ' +
               JSON.stringify(commandRes),
           );
-          if (
-            req.body.nextAction &&
-            ALLOWED_ACTIONS[req.body.nextAction] &&
-            typeof ALLOWED_ACTIONS[req.body.nextAction] === 'function'
-          ) {
+          if (req.body.method && req.body.method === 'listpeers') {
             try {
-              ALLOWED_ACTIONS[req.body.nextAction](commandRes).then((resFromNextAction: any) => {
-                logger.info(resFromNextAction);
-                res.status(200).json(resFromNextAction);
+              // Filter out ln message pubkey from peers list
+              const lnmPubkey = lnMessage.getLNMsgPubkey();
+              commandRes.peers = commandRes.peers.filter((peer: any) => peer.id !== lnmPubkey);
+              // To get node aliases from liseNodes
+              getNodesInfo(commandRes).then((resWithAliases: any) => {
+                logger.info(resWithAliases);
+                res.status(200).json(resWithAliases);
               });
             } catch (error: any) {
-              logger.error(
-                'Lightning error from nextAction ' +
-                  req.body.nextAction +
-                  ': ' +
-                  JSON.stringify(error),
-              );
+              logger.error('Lightning error from Get Nodes Info : ' + JSON.stringify(error));
               return handleError(error, req, res, next);
             }
           } else {

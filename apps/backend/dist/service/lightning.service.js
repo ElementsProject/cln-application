@@ -25,6 +25,9 @@ export class LightningService {
             throw error;
         }
     }
+    getLNMsgPubkey = () => {
+        return this.lnMessage.publicKey;
+    };
     call = async (method, methodParams) => {
         return this.lnMessage
             .commando({
