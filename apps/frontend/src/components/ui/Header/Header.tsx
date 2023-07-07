@@ -1,3 +1,4 @@
+import React from 'react';
 import './Header.scss';
 import { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

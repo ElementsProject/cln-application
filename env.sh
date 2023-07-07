@@ -38,10 +38,10 @@ else
     export APP_CORE_LIGHTNING_IP="127.0.0.1"
     export APP_CONFIG_DIR="$PWD/data/app"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="$PWD/data/c-lightning-rest/certs"
-    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5001
-    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5003
-    export APP_CORE_LIGHTNING_REST_PORT=3001
-    export CORE_LIGHTNING_PATH="/home/shahana/.lightning/l1-regtest"
+    export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5002
+    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5004
+    export APP_CORE_LIGHTNING_REST_PORT=3002
+    export CORE_LIGHTNING_PATH="/home/shahana/.lightning/l2-regtest"
     export COMMANDO_CONFIG="$PWD/.commando"
     echo "Local Environment Variables Set"
 fi

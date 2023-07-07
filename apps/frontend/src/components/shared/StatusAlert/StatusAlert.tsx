@@ -1,3 +1,4 @@
+import React from 'react';
 import './StatusAlert.scss';
 import { motion } from 'framer-motion';
 import Spinner from 'react-bootstrap/Spinner';

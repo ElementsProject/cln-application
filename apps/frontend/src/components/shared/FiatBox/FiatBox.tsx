@@ -1,3 +1,4 @@
+import React from 'react';
 import './FiatBox.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use(csurf({ cookie: true }));
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-src 'self'; style-src 'self';");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; font-src 'self'; img-src 'self' data:; script-src 'self'; frame-src 'self'; style-src 'self';");
     next();
 });
 const corsOptions = {

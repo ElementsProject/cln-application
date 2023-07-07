@@ -1,3 +1,4 @@
+import React from 'react';
 import './CLNWallet.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext, useState } from 'react';

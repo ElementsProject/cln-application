@@ -1,3 +1,4 @@
+import React from 'react';
 import './CLNReceive.scss';
 import { useContext, useState } from 'react';
 import Card from 'react-bootstrap/Card';

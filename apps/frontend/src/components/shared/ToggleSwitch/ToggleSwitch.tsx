@@ -1,3 +1,4 @@
+import React from 'react';
 import './ToggleSwitch.scss';
 import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';

@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const ActionSVG = props => {
   return (
     <svg

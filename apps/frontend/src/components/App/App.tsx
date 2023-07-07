@@ -1,3 +1,4 @@
+import React from 'react';
 import './App.scss';
 import { useContext, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';

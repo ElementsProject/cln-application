@@ -8,7 +8,9 @@ export class SharedRoutes extends CommonRoutesConfig {
     }
     configureRoutes() {
         this.app.route(API_VERSION + SHARED_ROUTE + '/csrf/').get((req, res, next) => {
-            res.send({ csrfToken: req.csrfToken() });
+            res.send({
+                csrfToken: req.csrfToken && typeof req.csrfToken === 'function' ? req.csrfToken() : 'not-set',
+            });
         });
         this.app
             .route(API_VERSION + SHARED_ROUTE + '/config/')

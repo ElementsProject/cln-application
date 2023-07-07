@@ -1,3 +1,4 @@
+import React from 'react';
 import { forwardRef } from "react";
 
 export const InformationSVG = props => {

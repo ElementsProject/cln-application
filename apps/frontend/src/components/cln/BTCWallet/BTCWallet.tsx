@@ -1,3 +1,4 @@
+import React from 'react';
 import './BTCWallet.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext } from 'react';

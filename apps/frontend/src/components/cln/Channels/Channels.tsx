@@ -1,3 +1,4 @@
+import React from 'react';
 import './Channels.scss';
 import { useContext } from 'react';
 import { motion } from "framer-motion";

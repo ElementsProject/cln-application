@@ -510,10 +510,6 @@ label.form-label {
   }
 }
 
-.form-check-input:checked[type="radio"] {
-  background-image: url(../../public/images/radio-button.svg), var(--bs-gradient);
-}
-
 .qr-container {
   position: relative;
   width: 220px;

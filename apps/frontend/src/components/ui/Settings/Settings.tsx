@@ -1,3 +1,4 @@
+import React from 'react';
 import './Settings.scss';
 import { useContext } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';

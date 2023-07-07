@@ -1,3 +1,4 @@
+import React from 'react';
 import './CLNCard.scss';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

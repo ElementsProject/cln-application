@@ -1,3 +1,4 @@
+import React from 'react';
 import './Overview.scss';
 import { useContext, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';

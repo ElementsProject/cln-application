@@ -1,3 +1,4 @@
+import React from 'react';
 import './BTCTransactionsList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
