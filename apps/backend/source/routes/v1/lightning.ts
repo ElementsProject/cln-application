@@ -1,5 +1,6 @@
 import express from 'express';
 import { CommonRoutesConfig } from '../../shared/routes.config.js';
+import AuthController from '../../controllers/auth.js';
 import LightningController from '../../controllers/lightning.js';
 import { API_VERSION } from '../../shared/consts.js';
 
@@ -13,7 +14,7 @@ export class LightningRoutes extends CommonRoutesConfig {
   configureRoutes() {
     this.app
       .route(API_VERSION + LIGHTNING_ROOT_ROUTE + '/call')
-      .post(LightningController.callMethod);
+      .post(AuthController.isUserAuthenticated, LightningController.callMethod);
     return this.app;
   }
 }

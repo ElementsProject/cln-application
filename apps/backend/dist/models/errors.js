@@ -34,3 +34,8 @@ export class ValidationError extends BaseError {
         super(message, error, statusCode, name);
     }
 }
+export class AuthError extends BaseError {
+    constructor(message = 'Unknown Authentication Error', error = 'Unkwown Authentication Error', statusCode = HttpStatusCode.UNAUTHORIZED, name = 'Authentication Error') {
+        super(message, error, statusCode, name);
+    }
+}

@@ -23,6 +23,8 @@ export enum HttpStatusCode {
   LIGHTNING_SERVER = 521,
 }
 
+export const SECRET_KEY = crypto.randomBytes(64).toString('hex');
+
 export const APP_CONSTANTS = {
   COMMANDO_RUNE: '',
   APP_CORE_LIGHTNING_DAEMON_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
@@ -40,6 +42,8 @@ export const DEFAULT_CONFIG = {
   appMode: 'DARK',
   isLoading: false,
   error: null,
+  sso: false,
+  password: '',
 };
 
 export const LN_MESSAGE_CONFIG = {

@@ -89,6 +89,7 @@
         ```
 
   - ### Start The Application
+      Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
       Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```
