@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './Channels.scss';
 import { useContext } from 'react';
 import { motion } from "framer-motion";
@@ -28,7 +29,7 @@ const Channels = (props) => {
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3'>
       <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
-        { appCtx.listChannels.isLoading ? 
+        { appCtx.isAuthenticated && appCtx.listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
               <Spinner animation='grow' variant='primary' />
             </span> 

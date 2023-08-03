@@ -11,7 +11,7 @@ export class AuthRoutes extends CommonRoutesConfig {
         this.app.route(API_VERSION + AUTH_ROUTE + '/login/').post(AuthController.userLogin);
         this.app.route(API_VERSION + AUTH_ROUTE + '/reset/').post(AuthController.resetPassword);
         this.app
-            .route(API_VERSION + AUTH_ROUTE + '/authenticated/')
+            .route(API_VERSION + AUTH_ROUTE + '/isauthenticated/')
             .post(AuthController.isUserAuthenticated);
         return this.app;
     }

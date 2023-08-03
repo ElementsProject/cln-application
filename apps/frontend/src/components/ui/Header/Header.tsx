@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './Header.scss';
 import { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,7 +50,7 @@ const Header = (props) => {
           </Col>
           <Row className='header-info-text my-2'>
             <Col xs={12} className='d-flex align-items-center text-light'>
-            { appCtx.nodeInfo.isLoading ? 
+            { appCtx.isAuthenticated && appCtx.nodeInfo.isLoading ? 
                 <>
                   <OverlayTrigger
                     placement='auto'
@@ -108,7 +109,7 @@ const Header = (props) => {
             </Col>
           }
           <Col xs={12} className='d-flex align-items-center text-light'>
-            { appCtx.nodeInfo.isLoading ? 
+            { appCtx.isAuthenticated && appCtx.nodeInfo.isLoading ? 
                 <>
                   <OverlayTrigger
                     placement='auto'

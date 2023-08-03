@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './FiatSelection.scss';
 import { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

@@ -38,6 +38,7 @@ export type FiatConfig = {
 export type ModalConfig = {
   nodeInfoModal: boolean;
   connectWalletModal: boolean;
+  loginModal: boolean;
 }
 
 export type ToastConfig = {

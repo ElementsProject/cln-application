@@ -28,7 +28,7 @@ export function verifyPassword(password) {
                 return true;
             }
             else {
-                return new AuthError('Incorrect password', 'Incorrect password', HttpStatusCode.UNAUTHORIZED, 'Incorrect password');
+                throw new AuthError('Incorrect password', 'Incorrect password', HttpStatusCode.UNAUTHORIZED, 'Incorrect password');
             }
         }
         catch (error) {

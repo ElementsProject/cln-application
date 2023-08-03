@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './ChannelDetails.scss';
 import { useContext, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';

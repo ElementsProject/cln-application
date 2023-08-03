@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './App.scss';
 import { useContext, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
@@ -12,9 +13,10 @@ import { AppContext } from '../../store/AppContext';
 import { ApplicationModes, APP_WAIT_TIME } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
 import Header from '../ui/Header/Header';
-import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import Overview from '../cln/Overview/Overview';
+import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
+import LoginComponent from '../modals/Login/Login';
 import BTCCard from '../cln/BTCCard/BTCCard';
 import CLNCard from '../cln/CLNCard/CLNCard';
 import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
@@ -38,14 +40,19 @@ const App = () => {
 
   useEffect(() => {
     setCSRFToken().then((isCsrfSet: any) => {
-      if (isCsrfSet) {
+      if (isCsrfSet && appCtx.isAuthenticated) {
         getAppConfigurations();
         window.setInterval(() => {
           fetchData();
         }, APP_WAIT_TIME);
       } else {
-        logger.error(isCsrfSet);
-        appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
+        if (!isCsrfSet) {
+          logger.error(isCsrfSet);
+          appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
+        }
+        if (!appCtx.isAuthenticated) {
+          appCtx.setShowModals({...appCtx.showModals, loginModal: true});
+        }
       }
     }).catch(err => {
       logger.error(err);
@@ -60,7 +67,7 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (appCtx.nodeInfo.isLoading) {
+  if (appCtx.isAuthenticated && appCtx.nodeInfo.isLoading) {
     return (
       <Container className='py-4' id='root-container' data-testid='container'>
         <Header />
@@ -91,7 +98,7 @@ const App = () => {
 
   return (
     <>
-      <Container className='py-4' id='root-container' data-testid='container'>
+      <Container className={appCtx.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
         <Header />
         <Row>
           <Col className='mx-1'>
@@ -113,6 +120,7 @@ const App = () => {
       <ToastMessage />
       <NodeInfo />
       <ConnectWallet />
+      <LoginComponent />
     </>
   );
 };

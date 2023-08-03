@@ -26,7 +26,7 @@ class AuthController {
     try {
       logger.info('Logging out');
       res.clearCookie('token');
-      res.status(401).json({ isAuthenticated: false });
+      res.status(201).json({ isAuthenticated: false });
     } catch (error: any) {
       handleError(error, req, res, next);
     }
@@ -93,7 +93,6 @@ class AuthController {
       handleError(error, req, res, next);
     }
   }
-
 }
 
 export default new AuthController();

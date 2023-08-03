@@ -10,7 +10,7 @@ import { ApplicationActions, ApplicationModes, SATS_MSAT, Units } from '../utili
 import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters';
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
-import { ApplicationConfiguration, FiatConfig, WalletConnect } from '../types/app-config.type';
+import { ApplicationConfiguration, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
 import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
 
 const aggregateChannels = (peers: Peer[], currentVersion: string) => {
@@ -203,7 +203,8 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
 };
 
 const AppContext = React.createContext<AppContextType>({
-  showModals: { nodeInfoModal: false, connectWalletModal: false},
+  isAuthenticated: false,
+  showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
   appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
@@ -219,9 +220,10 @@ const AppContext = React.createContext<AppContextType>({
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
   walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
-  setShowModals: (newShowModals) => {}, 
-  setShowToast: (newShowToast) => {},
-  setWalletConnect: (newWalletConnect) => {},
+  setIsAuthenticated: (isAuth: boolean) => {},
+  setShowModals: (newShowModals: ModalConfig) => {}, 
+  setShowToast: (newShowToast: ToastConfig) => {},
+  setWalletConnect: (newWalletConnect: WalletConnect) => {},
   setConfig: (config: ApplicationConfiguration) => {},
   setFiatConfig: (fiatConfig: FiatConfig) => {},
   setFeeRate: (feeRate: NodeFeeRate) => {},
@@ -232,12 +234,13 @@ const AppContext = React.createContext<AppContextType>({
   setListPayments: (paymentsList: ListPayments) => {},
   setListOffers: (offersList: ListOffers) => {},
   setListBitcoinTransactions: (transactionsList: ListBitcoinTransactions) => {},
-  setStore: (storeData) => {},
+  setStore: (storeData: any) => {},
   clearStore: () => {}
 });
 
 const defaultAppState = {
-  showModals: {nodeInfoModal: false, connectWalletModal: false, toastComponent: false},
+  isAuthenticated: false,
+  showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
   appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
@@ -383,6 +386,10 @@ const appReducer = (state, action) => {
 const AppProvider: React.PropsWithChildren<any> = (props) => {
   const [applicationState, dispatchApplicationAction] = useReducer(appReducer, defaultAppState);
   
+  const setIsAuthenticatedHandler = (isAuthenticated: boolean) => {
+    dispatchApplicationAction({ type: ApplicationActions.SET_IS_AUTHENTICATED, payload: isAuthenticated });
+  };
+
   const setShowModalsHandler = (newShowModals: any) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_SHOW_MODALS, payload: newShowModals });
   };
@@ -444,6 +451,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
   };
 
   const appContext: AppContextType = {
+    isAuthenticated: applicationState.isAuthenticated,
     showModals: applicationState.showModals,
     showToast: applicationState.showToast,
     walletConnect: applicationState.walletConnect,
@@ -460,6 +468,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     listLightningTransactions: applicationState.listLightningTransactions,
     listBitcoinTransactions: applicationState.listBitcoinTransactions,
     walletBalances: applicationState.walletBalances,
+    setIsAuthenticated: setIsAuthenticatedHandler,
     setShowModals: setShowModalsHandler,
     setShowToast: setShowToastHandler,
     setWalletConnect: setWalletConnectHandler,

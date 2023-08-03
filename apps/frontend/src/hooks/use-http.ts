@@ -159,6 +159,41 @@ const useHttp = () => {
     sendRequestToSetStore(appCtx.setConfig, 'get', '/shared/config');
     sendRequestToSetStore(appCtx.setWalletConnect, 'get', '/shared/connectwallet');
   }, [appCtx, sendRequestToSetStore]);
+  
+  const userLogin = (password: string) => {
+    return axiosInstance.post('/auth/login', {password: password})
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.setIsAuthenticated(true);
+      return true;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
+  const resetPassword = (currPassword: string, newPassword: string) => {
+    return axiosInstance.post('/auth/login', {currPassword: currPassword, newPassword: newPassword})
+    .then((response: any) => {
+      logger.info(response);
+      return response;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
+  const userLogout = () => {
+    return axiosInstance.get('/auth/logout')
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.clearStore();
+      appCtx.setShowModals({...appCtx.showModals, loginModal: true});
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
 
   return {
     setCSRFToken,
@@ -173,7 +208,10 @@ const useHttp = () => {
     clnSendPayment,
     clnReceiveInvoice,
     decodeInvoice,
-    fetchInvoice
+    fetchInvoice,
+    userLogin,
+    resetPassword,
+    userLogout
   };
 };
 

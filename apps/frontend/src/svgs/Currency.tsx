@@ -104,6 +104,5 @@ export const CurrencySVG = props => {
         <path className={props.className} d='M26,54.56h8.41q12.35,0,18.21-4.14c3.93-2.72,5.88-7.05,5.88-12.93s-2-10-6-12.45-10.21-3.7-18.62-3.7H26V54.56Zm0,21.16v47.16H0V0H35.8q25,0,37,9.12t12,27.68a32.59,32.59,0,0,1-6,19.3Q72.94,64.54,62,69.33q27.72,41.43,36.12,53.55H69.21L39.9,75.72Z'/>
       </svg>
   };
-  console.warn(props.fiat);
   return currencies[props.fiat];
 };

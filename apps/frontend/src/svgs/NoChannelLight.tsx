@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { easeOut, motion } from 'framer-motion';
 import { OPACITY_VARIANTS } from '../utilities/constants';
 
