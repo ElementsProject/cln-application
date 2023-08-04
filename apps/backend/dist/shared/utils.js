@@ -39,3 +39,22 @@ export function verifyPassword(password) {
         throw new AuthError('Config file does not exist', 'Config file does not exist', HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
     }
 }
+export function isValidPassword() {
+    if (fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
+        try {
+            const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+            if (config.password !== '') {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        catch (error) {
+            throw new AuthError(error, error, HttpStatusCode.UNAUTHORIZED, error);
+        }
+    }
+    else {
+        throw new AuthError('Config file does not exist', 'Config file does not exist', HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
+    }
+}

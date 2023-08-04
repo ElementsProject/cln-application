@@ -52,3 +52,8 @@ export type ToastConfig = {
   containerClassName?: string;
   confirmRes?: any;
 }
+
+export type AuthResponse = {
+  isAuthenticated: boolean;
+  isValidPassword: boolean;
+}

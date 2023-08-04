@@ -164,8 +164,8 @@ const useHttp = () => {
     return axiosInstance.post('/auth/login', {password: password})
     .then((response: any) => {
       logger.info(response);
-      appCtx.setIsAuthenticated(true);
-      return true;
+      appCtx.setIsAuthenticated(response);
+      return response;
     }).catch(err => {
       logger.error(err);
       throw err;
@@ -176,6 +176,7 @@ const useHttp = () => {
     return axiosInstance.post('/auth/login', {currPassword: currPassword, newPassword: newPassword})
     .then((response: any) => {
       logger.info(response);
+      appCtx.setIsAuthenticated(response);
       return response;
     }).catch(err => {
       logger.error(err);
@@ -195,8 +196,21 @@ const useHttp = () => {
     });
   };
 
+  const isUserAuthenticated = () => {
+    return axiosInstance.post('/auth/isauthenticated', { returnResponse: true })
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.setIsAuthenticated(response);
+      return response;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
   return {
     setCSRFToken,
+    isUserAuthenticated,
     getAppConfigurations,
     fetchData,
     getFiatRate,

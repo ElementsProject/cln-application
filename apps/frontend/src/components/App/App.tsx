@@ -21,11 +21,12 @@ import BTCCard from '../cln/BTCCard/BTCCard';
 import CLNCard from '../cln/CLNCard/CLNCard';
 import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
 import logger from '../../services/logger.service';
+import { AuthResponse } from '../../types/app-config.type';
 
 const App = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
-  const { setCSRFToken, getAppConfigurations, fetchData } = useHttp();
+  const { setCSRFToken, getAppConfigurations, fetchData, isUserAuthenticated } = useHttp();
 
   const bodyHTML = document.getElementsByTagName('body')[0];
   const htmlAttributes = bodyHTML.attributes;
@@ -39,8 +40,12 @@ const App = () => {
   htmlAttributes.setNamedItem(screensize);
 
   useEffect(() => {
-    setCSRFToken().then((isCsrfSet: any) => {
-      if (isCsrfSet && appCtx.isAuthenticated) {
+    Promise.all([
+      setCSRFToken(),
+      isUserAuthenticated()
+    ])
+    .then(([isCsrfSet, isUserAuthenticated]: [any, AuthResponse]) => {
+      if (isCsrfSet && isUserAuthenticated.isAuthenticated && isUserAuthenticated.isValidPassword) {
         getAppConfigurations();
         window.setInterval(() => {
           fetchData();
@@ -50,8 +55,8 @@ const App = () => {
           logger.error(isCsrfSet);
           appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
         }
-        if (!appCtx.isAuthenticated) {
-          appCtx.setShowModals({...appCtx.showModals, loginModal: true});
+        if (!isUserAuthenticated.isAuthenticated) {
+          appCtx.setShowModals({ ...appCtx.showModals, loginModal: true });
         }
       }
     }).catch(err => {

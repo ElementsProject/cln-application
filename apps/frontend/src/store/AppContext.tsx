@@ -10,7 +10,7 @@ import { ApplicationActions, ApplicationModes, SATS_MSAT, Units } from '../utili
 import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters';
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
-import { ApplicationConfiguration, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
+import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
 import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
 
 const aggregateChannels = (peers: Peer[], currentVersion: string) => {
@@ -203,14 +203,14 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
 };
 
 const AppContext = React.createContext<AppContextType>({
-  isAuthenticated: false,
+  isAuthenticated: { isAuthenticated: false, isValidPassword: false },
   showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
   appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
   fiatConfig: {isLoading: true, symbol: faDollarSign, venue: '', rate: 1},
   feeRate: {isLoading: true},
-  nodeInfo: {isLoading: true},
+  nodeInfo: {isLoading: true, alias: '', version: ''},
   listFunds: {isLoading: true, channels: [], outputs: []},
   listPeers: {isLoading: true, peers: []},
   listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
@@ -220,7 +220,7 @@ const AppContext = React.createContext<AppContextType>({
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
   walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
-  setIsAuthenticated: (isAuth: boolean) => {},
+  setIsAuthenticated: (isAuth: AuthResponse) => {},
   setShowModals: (newShowModals: ModalConfig) => {}, 
   setShowToast: (newShowToast: ToastConfig) => {},
   setWalletConnect: (newWalletConnect: WalletConnect) => {},
@@ -239,14 +239,14 @@ const AppContext = React.createContext<AppContextType>({
 });
 
 const defaultAppState = {
-  isAuthenticated: false,
+  isAuthenticated: { isAuthenticated: false, isValidPassword: false },
   showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
   appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
   fiatConfig: {isLoading: true, symbol: faDollarSign, venue: '', rate: 1},
   feeRate: {isLoading: true},
-  nodeInfo: {isLoading: true},
+  nodeInfo: {isLoading: true, alias: '', version: ''},
   listFunds: {isLoading: true, channels: [], outputs: []},
   listPeers: {isLoading: true, peers: []},
   listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
@@ -386,7 +386,7 @@ const appReducer = (state, action) => {
 const AppProvider: React.PropsWithChildren<any> = (props) => {
   const [applicationState, dispatchApplicationAction] = useReducer(appReducer, defaultAppState);
   
-  const setIsAuthenticatedHandler = (isAuthenticated: boolean) => {
+  const setIsAuthenticatedHandler = (isAuthenticated: AuthResponse) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_IS_AUTHENTICATED, payload: isAuthenticated });
   };
 

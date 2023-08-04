@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { APP_CONSTANTS, HttpStatusCode, SECRET_KEY } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
-import { verifyPassword, isAuthenticated } from '../shared/utils.js';
+import { verifyPassword, isAuthenticated, isValidPassword } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 class AuthController {
     userLogin(req, res, next) {
@@ -74,6 +74,9 @@ class AuthController {
     isUserAuthenticated(req, res, next) {
         try {
             if (isAuthenticated(req.cookies.token)) {
+                if (req.body.returnResponse) {
+                    return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
+                }
                 return next();
             }
             res.status(401).json({ error: 'Unauthorized user' });

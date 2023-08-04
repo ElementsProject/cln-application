@@ -9,7 +9,7 @@ body {
   &.modal-open #root-container {
     filter: blur(5px);
     &.blurred-container {
-      filter: blur(10px);
+      filter: blur(5px);
     }
   }
   & #root-container {
