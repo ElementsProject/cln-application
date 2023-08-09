@@ -1,7 +1,5 @@
 import { ApplicationModes, Units } from '../utilities/constants';
 
-export type ToastPosition = 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' | 'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
-
 export type WalletConnect = {
   isLoading: boolean;
   GRPC_PORT?: string;
@@ -24,6 +22,7 @@ export type ApplicationConfiguration = {
   unit: Units;
   fiatUnit: string;
   appMode: ApplicationModes;
+  sso?: boolean;
   error?: any;
 }
 
@@ -39,18 +38,19 @@ export type ModalConfig = {
   nodeInfoModal: boolean;
   connectWalletModal: boolean;
   loginModal: boolean;
+  logoutModal: boolean;
+  setPasswordModal: boolean;
 }
 
 export type ToastConfig = {
   show: boolean;
   message: string;
-  position?: ToastPosition;
   delay?: number;
   type?: string;
   bg?: string;
   className?: string;
   containerClassName?: string;
-  confirmRes?: any;
+  onConfirmResponse?: any;
 }
 
 export type AuthResponse = {

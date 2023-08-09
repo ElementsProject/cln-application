@@ -35,7 +35,7 @@ const CLNWallet = (props) => {
               <LightningWalletSVG svgClassName='me-4' className='fill-contrast' />
               <div>
                 <div className='fs-6 fw-bold'>Lightning Wallet</div>
-                { appCtx.isAuthenticated && appCtx.walletBalances.isLoading ? 
+                { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
                     <Spinner animation='grow' variant='secondary' /> : 
                   appCtx.walletBalances.error ? 
                     <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 

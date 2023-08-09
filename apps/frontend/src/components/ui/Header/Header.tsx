@@ -15,6 +15,7 @@ import { AppContext } from '../../../store/AppContext';
 import { ApplicationModes, Breakpoints } from '../../../utilities/constants';
 import { DayModeSVG } from '../../../svgs/DayMode';
 import { NightModeSVG } from '../../../svgs/NightMode';
+import { LogoutSVG } from '../../../svgs/Logout';
 import Settings from '../Settings/Settings';
 
 const Header = (props) => {
@@ -25,6 +26,10 @@ const Header = (props) => {
   const modeChangeHandler = (event: any) => {
     updateConfig({...appCtx.appConfig, appMode: (appCtx.appConfig.appMode === ApplicationModes.DARK ? ApplicationModes.LIGHT : ApplicationModes.DARK)});
   };
+
+  const logoutHandler = (event: any) => {
+    appCtx.setShowModals({ ...appCtx.showModals, logoutModal: true });
+  }
 
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
@@ -45,12 +50,17 @@ const Header = (props) => {
             <h4 className='m-0 text-dark'><strong>CLN</strong></h4>
             <div className='d-flex align-items-center'>
               <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night ms-3 me-2' /> : <DayModeSVG className='svg-day ms-3 me-2' />}
+              <div onClick={logoutHandler}>
+                <LogoutSVG className='svg-logout mx-2 cursor-pointer' />
+              </div>
+              <div onClick={modeChangeHandler}>
+                {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
+              </div>
             </div>
           </Col>
           <Row className='header-info-text my-2'>
             <Col xs={12} className='d-flex align-items-center text-light'>
-            { appCtx.isAuthenticated && appCtx.nodeInfo.isLoading ? 
+            { appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading ? 
                 <>
                   <OverlayTrigger
                     placement='auto'
@@ -104,12 +114,17 @@ const Header = (props) => {
               <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
               <div className='d-flex align-items-center'>
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
-                {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night ms-3 me-2' /> : <DayModeSVG className='svg-day ms-3 me-2' />}
+                <div onClick={logoutHandler}>
+                  <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
+                </div>
+                <div onClick={modeChangeHandler}>
+                  {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
+                </div>
               </div>
             </Col>
           }
           <Col xs={12} className='d-flex align-items-center text-light'>
-            { appCtx.isAuthenticated && appCtx.nodeInfo.isLoading ? 
+            { appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading ? 
                 <>
                   <OverlayTrigger
                     placement='auto'
@@ -151,8 +166,11 @@ const Header = (props) => {
         <Col xs={12} lg={4} className='d-flex align-items-center justify-content-end' data-testid='header-context'>
           <div className='d-flex align-items-center'>
             <Settings onShowConnectWallet={props.onShowConnectWallet} />
+            <div onClick={logoutHandler}>
+              <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
+            </div>
             <div onClick={modeChangeHandler}>
-              {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night ms-3 me-2' /> : <DayModeSVG className='svg-day ms-3 me-2'/>}
+              {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2'/>}
             </div>
           </div>
         </Col>

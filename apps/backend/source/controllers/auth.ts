@@ -12,10 +12,14 @@ class AuthController {
   userLogin(req: Request, res: Response, next: NextFunction) {
     logger.info('Logging in');
     try {
-      if (verifyPassword(req.body.password)) {
+      const vpRes = verifyPassword(req.body.password);
+      if (vpRes === true) {
         const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
         res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
-        res.status(200).json({ isAuthenticated: true });
+        return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
+      } else {
+        const err = new AuthError(vpRes, vpRes, HttpStatusCode.UNAUTHORIZED, vpRes);
+        handleError(err, req, res, next);
       }
     } catch (error: any) {
       handleError(error, req, res, next);
@@ -26,7 +30,7 @@ class AuthController {
     try {
       logger.info('Logging out');
       res.clearCookie('token');
-      res.status(201).json({ isAuthenticated: false });
+      res.status(201).json({ isAuthenticated: false, isValidPassword: isValidPassword() });
     } catch (error: any) {
       handleError(error, req, res, next);
     }
@@ -35,15 +39,15 @@ class AuthController {
   resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info('Resetting password');
+      const isValid = req.body.isValid;
       const currPassword = req.body.currPassword;
       const newPassword = req.body.newPassword;
       if (fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
         try {
           const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
-          if (config.password === currPassword) {
+          if (config.password === currPassword || !isValid) {
             try {
               config.password = newPassword;
-              delete config.password;
               try {
                 fs.writeFileSync(
                   APP_CONSTANTS.CONFIG_LOCATION,
@@ -52,7 +56,7 @@ class AuthController {
                 );
                 const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
                 res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
-                res.status(200).json({ isAuthenticated: true });
+                res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
               } catch (error: any) {
                 handleError(error, req, res, next);
               }
@@ -61,10 +65,10 @@ class AuthController {
             }
           } else {
             return new AuthError(
-              'Incorrect password',
-              'Incorrect password',
+              'Incorrect current password',
+              'Incorrect current password',
               HttpStatusCode.UNAUTHORIZED,
-              'Incorrect password',
+              'Incorrect current password',
             );
           }
         } catch (error: any) {
@@ -85,18 +89,29 @@ class AuthController {
 
   isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
     try {
-      if (isAuthenticated(req.cookies.token)) {
-        if (req.body.returnResponse) {
-          return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
+      const uaRes = isAuthenticated(req.cookies.token);
+      if (req.body.returnResponse) {
+        const vpRes = isValidPassword();
+        if (uaRes === true) {
+          if (vpRes === true) {
+            return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
+          } else {
+            return res.status(201).json({ isAuthenticated: true, isValidPassword: vpRes });
+          }
+        } else {
+          return res.status(201).json({ isAuthenticated: false, isValidPassword: vpRes });
         }
-        return next();
+      } else {
+        if (uaRes === true) {
+          return next();
+        } else {
+          res.status(401).json({ error: 'Unauthorized user' });
+        }
       }
-      res.status(401).json({ error: 'Unauthorized user' });
     } catch (error: any) {
       handleError(error, req, res, next);
     }
   }
-
 }
 
 export default new AuthController();

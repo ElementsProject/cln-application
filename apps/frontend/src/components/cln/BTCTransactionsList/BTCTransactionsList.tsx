@@ -114,7 +114,7 @@ export const BTCTransactionsList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.isAuthenticated && appCtx.listBitcoinTransactions.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listBitcoinTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 

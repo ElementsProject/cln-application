@@ -25,7 +25,7 @@ import { HideSVG } from '../../../svgs/Hide';
 
 const LoginComponent = () => {
   const appCtx = useContext(AppContext);
-  const { userLogin, fetchData } = useHttp();
+  const { userLogin, initiateDataLoading } = useHttp();
   const [hidePassword, setHidePassword] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
@@ -68,7 +68,7 @@ const LoginComponent = () => {
         setResponseStatus(CallStatus.NONE);
         setResponseMessage('');
         resetFormValues();
-        fetchData();
+        initiateDataLoading();
         appCtx.setShowModals({...appCtx.showModals, loginModal: false});
       } else {
         setResponseStatus(CallStatus.ERROR);
@@ -89,7 +89,7 @@ const LoginComponent = () => {
   return (
     <form className='h-100'>
       <Modal show={appCtx.showModals.loginModal} centered className='modal-lg'>
-        <Modal.Header className='d-flex align-items-start justify-content-end pb-0'></Modal.Header>
+        <Modal.Header className='d-flex align-items-start justify-content-start pb-0'></Modal.Header>
         <Modal.Body className='py-0'>
           <Row className='d-flex align-items-start justify-content-center'>
             <Col xs={12}>

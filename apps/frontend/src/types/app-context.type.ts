@@ -2,7 +2,7 @@ import { ApplicationConfiguration, FiatConfig, ModalConfig, ToastConfig, WalletC
 import { Fund, ListInvoices, ListPayments, ListPeers, ListBitcoinTransactions, NodeInfo, WalletBalances, ListLightningTransactions, ListChannels, NodeFeeRate, ListOffers } from './lightning-wallet.type';
 
 export type AppContextType = {
-  isAuthenticated: AuthResponse;
+  authStatus: AuthResponse;
   showModals: ModalConfig;
   showToast: ToastConfig;
   walletConnect: WalletConnect;
@@ -19,7 +19,7 @@ export type AppContextType = {
   listLightningTransactions: ListLightningTransactions;
   listBitcoinTransactions: ListBitcoinTransactions;
   walletBalances: WalletBalances;
-  setIsAuthenticated: (newValue: AuthResponse) => void;
+  setAuthStatus: (newValue: AuthResponse) => void;
   setShowModals: (newShowModals: ModalConfig) => void;
   setShowToast: (newShowToast: ToastConfig) => void;
   setWalletConnect: (newWalletConnect: WalletConnect) => void;
@@ -33,6 +33,5 @@ export type AppContextType = {
   setListPayments: (paymentsList: ListPayments) => void;
   setListOffers: (offersList: ListOffers) => void;
   setListBitcoinTransactions: (transactionsList: ListBitcoinTransactions) => void;
-  setStore: (storeData: any) => void;
   clearStore: () => void;
 };

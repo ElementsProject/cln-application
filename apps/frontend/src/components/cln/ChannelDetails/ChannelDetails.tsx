@@ -71,6 +71,7 @@ const ChannelDetails = (props) => {
 
   const confirmResponseHandler = (response) => {
     setShowToast(false);
+    appCtx.setShowToast({...appCtx.showToast, show: false, onConfirmResponse: null});
     if (response) {
       setResponseStatus(CallStatus.PENDING);
       setResponseMessage('Closing Channel...');

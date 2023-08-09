@@ -9,10 +9,15 @@ class AuthController {
     userLogin(req, res, next) {
         logger.info('Logging in');
         try {
-            if (verifyPassword(req.body.password)) {
+            const vpRes = verifyPassword(req.body.password);
+            if (vpRes === true) {
                 const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
                 res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
-                res.status(200).json({ isAuthenticated: true });
+                return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
+            }
+            else {
+                const err = new AuthError(vpRes, vpRes, HttpStatusCode.UNAUTHORIZED, vpRes);
+                handleError(err, req, res, next);
             }
         }
         catch (error) {
@@ -23,7 +28,7 @@ class AuthController {
         try {
             logger.info('Logging out');
             res.clearCookie('token');
-            res.status(201).json({ isAuthenticated: false });
+            res.status(201).json({ isAuthenticated: false, isValidPassword: isValidPassword() });
         }
         catch (error) {
             handleError(error, req, res, next);
@@ -32,20 +37,20 @@ class AuthController {
     resetPassword(req, res, next) {
         try {
             logger.info('Resetting password');
+            const isValid = req.body.isValid;
             const currPassword = req.body.currPassword;
             const newPassword = req.body.newPassword;
             if (fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
                 try {
                     const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
-                    if (config.password === currPassword) {
+                    if (config.password === currPassword || !isValid) {
                         try {
                             config.password = newPassword;
-                            delete config.password;
                             try {
                                 fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(config, null, 2), 'utf-8');
                                 const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
                                 res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
-                                res.status(200).json({ isAuthenticated: true });
+                                res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
                             }
                             catch (error) {
                                 handleError(error, req, res, next);
@@ -56,7 +61,7 @@ class AuthController {
                         }
                     }
                     else {
-                        return new AuthError('Incorrect password', 'Incorrect password', HttpStatusCode.UNAUTHORIZED, 'Incorrect password');
+                        return new AuthError('Incorrect current password', 'Incorrect current password', HttpStatusCode.UNAUTHORIZED, 'Incorrect current password');
                     }
                 }
                 catch (error) {
@@ -73,13 +78,29 @@ class AuthController {
     }
     isUserAuthenticated(req, res, next) {
         try {
-            if (isAuthenticated(req.cookies.token)) {
-                if (req.body.returnResponse) {
-                    return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
+            const uaRes = isAuthenticated(req.cookies.token);
+            if (req.body.returnResponse) {
+                const vpRes = isValidPassword();
+                if (uaRes === true) {
+                    if (vpRes === true) {
+                        return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
+                    }
+                    else {
+                        return res.status(201).json({ isAuthenticated: true, isValidPassword: vpRes });
+                    }
                 }
-                return next();
+                else {
+                    return res.status(201).json({ isAuthenticated: false, isValidPassword: vpRes });
+                }
             }
-            res.status(401).json({ error: 'Unauthorized user' });
+            else {
+                if (uaRes === true) {
+                    return next();
+                }
+                else {
+                    res.status(401).json({ error: 'Unauthorized user' });
+                }
+            }
         }
         catch (error) {
             handleError(error, req, res, next);

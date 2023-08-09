@@ -79,7 +79,7 @@ export const CLNOffersList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.isAuthenticated && appCtx.listOffers.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 
