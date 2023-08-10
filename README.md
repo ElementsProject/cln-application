@@ -58,6 +58,7 @@
         - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
         - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
         - APP_MODE: Mode for logging and other settings (optional; valid values: production/development/testing)
+        - SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
         - APP_PROTOCOL: Protocol on which the application will be served (optional; valid values: http/https)
         - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       ```
@@ -73,7 +74,9 @@
           "fiatUnit": "USD",
           "appMode": "DARK",
           "isLoading": false,
-          "error": null
+          "error": null,
+          "singleSignOn": false,
+          "password": ""
         }
       ```
 
@@ -89,6 +92,7 @@
         ```
 
   - ### Start The Application
+      Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
       Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```

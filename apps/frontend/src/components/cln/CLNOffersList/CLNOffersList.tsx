@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './CLNOffersList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -77,7 +79,7 @@ export const CLNOffersList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.listOffers.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 
@@ -93,8 +95,8 @@ export const CLNOffersList = () => {
           }
         </div>
       :
-        <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
-          <Row className='d-flex align-items-center justify-content-center'>
+        <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
+          <Row className='d-flex align-items-center justify-content-center mt-2'>
             { appCtx.appConfig.appMode === ApplicationModes.DARK ? 
               <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />

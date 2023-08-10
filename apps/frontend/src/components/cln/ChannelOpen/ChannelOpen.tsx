@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './ChannelOpen.scss';
 import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';

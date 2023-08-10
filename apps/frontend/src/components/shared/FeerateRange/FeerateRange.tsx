@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './FeerateRange.scss';
 import { useContext } from 'react';
 import Row from 'react-bootstrap/Row';

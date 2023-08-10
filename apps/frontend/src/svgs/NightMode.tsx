@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const NightModeSVG = props => {
   return (
     <svg

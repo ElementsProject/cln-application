@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './ToastMessage.scss';
 import { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,13 +16,13 @@ import { QuestionMarkSVG } from '../../../svgs/QuestionMark';
 const ToastMessage = (props) => {
   const appCtx = useContext(AppContext);
   const [y, setY] = useState('0');
-  const TOAST_TYPE = props.showOnComponent ? (props.type ? props.type : '') : (appCtx.showToast.type ? appCtx.showToast.type : '');
   const TOAST_SHOW = props.showOnComponent ? !!props.show : !!appCtx.showToast.show;
-  const SHOW_DELAY = props.showOnComponent ? (props.showDelay ? props.showDelay : 3000) : (appCtx.showToast.delay ? appCtx.showToast.delay : 3000);
-  const TOAST_BG = props.showOnComponent ? (props.bg ? props.bg : 'primary') : (appCtx.showToast.bg ? appCtx.showToast.bg : 'primary');
-  const TOAST_CONTAINER_CLASS_NAME = 'toast-container w-100 d-flex justify-content-center ' + (props.showOnComponent ? (props.containerClassName ? props.containerClassName : 'top-0') : (appCtx.showToast.containerClassName ? appCtx.showToast.containerClassName : 'top-0'));
-  const TOAST_CLASS_NAME = 'd-flex align-items-start justify-content-between ' + (props.showOnComponent ? (props.className ? props.className : '') : (appCtx.showToast.className ? appCtx.showToast.className : ''));
-  const TOAST_MESSAGE = props.showOnComponent ? (props.message ? props.message : '') : (appCtx.showToast.message ? appCtx.showToast.message : '');
+  const TOAST_TYPE = props.type || appCtx.showToast.type || '';
+  const SHOW_DELAY = props.showDelay  || appCtx.showToast.delay || 3000;
+  const TOAST_BG = props.bg || appCtx.showToast.bg || 'primary';
+  const TOAST_CONTAINER_CLASS_NAME = 'toast-container w-100 d-flex justify-content-center ' + (props.containerClassName || appCtx.showToast.containerClassName || 'top-0');
+  const TOAST_CLASS_NAME = 'd-flex align-items-start justify-content-between ' + (props.className || appCtx.showToast.className || '');
+  const TOAST_MESSAGE = props.message || appCtx.showToast.message || '';
 
   useEffect(() => {
     if (!props.showOnComponent) {
@@ -36,7 +38,7 @@ const ToastMessage = (props) => {
 
   const confirmCloseHandler = (response) => {
     if (!props.showOnComponent) {
-      appCtx.setShowToast({...appCtx.showToast, show: false, confirmRes: response});
+      appCtx.setShowToast({...appCtx.showToast, show: false, onConfirmResponse: response});
     } else {
       props.onConfirmResponse(response);
     }

@@ -26,6 +26,7 @@ if [ "$SETUP" == "docker" ]; then
     export APP_BITCOIN_RPC_PASS="password"
     export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=2105
     export APP_CORE_LIGHTNING_REST_PORT=2104
+    export SINGLE_SIGN_ON=true
     export CORE_LIGHTNING_PATH="/data/.lightning"
     export COMMANDO_CONFIG="/data/.lightning/.commando-env"
     echo "Docker Environment Variables Set"
@@ -39,8 +40,9 @@ else
     export APP_CONFIG_DIR="$PWD/data/app"
     export APP_CORE_LIGHTNING_REST_CERT_DIR="$PWD/data/c-lightning-rest/certs"
     export APP_CORE_LIGHTNING_WEBSOCKET_PORT=5001
-    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5003
+    export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5002
     export APP_CORE_LIGHTNING_REST_PORT=3001
+    export SINGLE_SIGN_ON=false
     export CORE_LIGHTNING_PATH="/home/shahana/.lightning/l1-regtest"
     export COMMANDO_CONFIG="$PWD/.commando"
     echo "Local Environment Variables Set"

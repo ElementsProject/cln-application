@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './InvalidInputMessage.scss';
 import { motion } from 'framer-motion';
 import { STAGERRED_SPRING_VARIANTS_2 } from '../../../utilities/constants';

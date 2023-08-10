@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './App.scss';
 import { useContext, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
@@ -8,21 +10,25 @@ import Spinner from 'react-bootstrap/Spinner';
 import useHttp from '../../hooks/use-http';
 import useBreakpoint from '../../hooks/use-breakpoint';
 import { AppContext } from '../../store/AppContext';
-import { ApplicationModes, APP_WAIT_TIME } from '../../utilities/constants';
+import { ApplicationModes } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
 import Header from '../ui/Header/Header';
-import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import Overview from '../cln/Overview/Overview';
+import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
+import LoginComponent from '../modals/Login/Login';
+import LogoutComponent from '../modals/Logout/Logout';
+import SetPasswordComponent from '../modals/SetPassword/SetPassword';
 import BTCCard from '../cln/BTCCard/BTCCard';
 import CLNCard from '../cln/CLNCard/CLNCard';
 import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
 import logger from '../../services/logger.service';
+import { AuthResponse } from '../../types/app-config.type';
 
 const App = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
-  const { setCSRFToken, getAppConfigurations, fetchData } = useHttp();
+  const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
 
   const bodyHTML = document.getElementsByTagName('body')[0];
   const htmlAttributes = bodyHTML.attributes;
@@ -36,12 +42,28 @@ const App = () => {
   htmlAttributes.setNamedItem(screensize);
 
   useEffect(() => {
-    setCSRFToken().then((isCsrfSet: any) => {
+    Promise.all([
+      setCSRFToken(),
+      getAppConfigurations()
+    ])
+    .then(([isCsrfSet, config]: [any, any]) => {
       if (isCsrfSet) {
-        getAppConfigurations();
-        window.setInterval(() => {
-          fetchData();
-        }, APP_WAIT_TIME);
+        getAuthStatus().then((authStatus: AuthResponse) => {
+          if (!authStatus.isAuthenticated) {
+            if (authStatus.isValidPassword) {
+              appCtx.setShowModals({ ...appCtx.showModals, loginModal: true });
+            } else {
+              appCtx.setShowModals({ ...appCtx.showModals, setPasswordModal: true });
+            }
+          } else {
+            if (authStatus.isValidPassword) {
+              initiateDataLoading();
+            } else {
+              logger.error(authStatus);
+              appCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(authStatus) });
+            }
+          }
+        });
       } else {
         logger.error(isCsrfSet);
         appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
@@ -59,7 +81,7 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (appCtx.nodeInfo.isLoading) {
+  if (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading) {
     return (
       <Container className='py-4' id='root-container' data-testid='container'>
         <Header />
@@ -90,7 +112,7 @@ const App = () => {
 
   return (
     <>
-      <Container className='py-4' id='root-container' data-testid='container'>
+      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
         <Header />
         <Row>
           <Col className='mx-1'>
@@ -112,6 +134,9 @@ const App = () => {
       <ToastMessage />
       <NodeInfo />
       <ConnectWallet />
+      <LoginComponent />
+      <LogoutComponent />
+      <SetPasswordComponent />
     </>
   );
 };

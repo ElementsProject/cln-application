@@ -10,6 +10,7 @@ import expressWinston from 'express-winston';
 import { logger, expressLogConfiguration } from './shared/logger.js';
 import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
+import { AuthRoutes } from './routes/v1/auth.js';
 import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
@@ -37,7 +38,7 @@ app.use(cookieParser());
 app.use(csurf({ cookie: true }));
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-src 'self'; style-src 'self';");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; font-src 'self'; img-src 'self' data:; script-src 'self'; frame-src 'self'; style-src 'self';");
     next();
 });
 const corsOptions = {
@@ -51,6 +52,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(expressWinston.logger(expressLogConfiguration));
 app.use(expressWinston.errorLogger(expressLogConfiguration));
+routes.push(new AuthRoutes(app));
 routes.push(new SharedRoutes(app));
 routes.push(new LightningRoutes(app));
 // serve frontend

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { motion } from 'framer-motion';
 import { STAGERRED_SPRING_VARIANTS_1 } from '../utilities/constants';
 

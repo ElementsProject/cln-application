@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './CLNTransaction.scss';
 import { useContext } from 'react';
 import { motion } from 'framer-motion';

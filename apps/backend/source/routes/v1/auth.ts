@@ -1,0 +1,22 @@
+import express from 'express';
+import { CommonRoutesConfig } from '../../shared/routes.config.js';
+import AuthController from '../../controllers/auth.js';
+import { API_VERSION } from '../../shared/consts.js';
+
+const AUTH_ROUTE = '/auth';
+
+export class AuthRoutes extends CommonRoutesConfig {
+  constructor(app: express.Application) {
+    super(app, 'Auth Routes');
+  }
+
+  configureRoutes() {
+    this.app.route(API_VERSION + AUTH_ROUTE + '/logout/').get(AuthController.userLogout);
+    this.app.route(API_VERSION + AUTH_ROUTE + '/login/').post(AuthController.userLogin);
+    this.app.route(API_VERSION + AUTH_ROUTE + '/reset/').post(AuthController.resetPassword);
+    this.app
+      .route(API_VERSION + AUTH_ROUTE + '/isauthenticated/')
+      .post(AuthController.isUserAuthenticated);
+    return this.app;
+  }
+}

@@ -1,0 +1,18 @@
+@import '../../../styles/constants.scss';
+
+.modal-content {
+  border: none;
+  & .modal-body {
+    & .modal-box {
+      box-shadow: 0px 8px 16px 0px rgba($dark, 0.2);
+      border-radius: 0.5rem;
+      border: 1px solid $primary;
+    }
+
+    & .message-type-box {
+      background-color: $primary;
+      border-top-left-radius: .35rem;
+      border-bottom-left-radius: .35rem;
+    }
+  }
+}

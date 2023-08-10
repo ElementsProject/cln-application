@@ -8,6 +8,9 @@ body {
   transition: background-color $theme-transition ease;
   &.modal-open #root-container {
     filter: blur(5px);
+    &.blurred-container {
+      filter: blur(5px);
+    }
   }
   & #root-container {
     transition: filter $transition-time ease;
@@ -190,7 +193,10 @@ button.btn-rounded.btn, button.btn-rounded {
       border-color: darken($primary, 8%) !important;
     }
   }
-
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 .btn-group {
@@ -444,6 +450,11 @@ label.form-label {
       border-right: 0;
       padding-right: 0;
     }
+    &.password-input-ctrl {
+      font-size: 175%;
+      padding-top: 2px;
+      padding-bottom: 4px;
+    }
     &:focus {
       box-shadow: 0px 1px 2px 0px rgba($dark-blue, 0.05);
     }
@@ -508,10 +519,6 @@ label.form-label {
       }  
     }
   }
-}
-
-.form-check-input:checked[type="radio"] {
-  background-image: url(../../public/images/radio-button.svg), var(--bs-gradient);
 }
 
 .qr-container {
@@ -611,4 +618,12 @@ label.form-label {
   transition: all $theme-transition ease;
   height: 11.5rem;
   .cls-1, & .cls-2{fill:none;} & .cls-3{fill:url(#lgchlight1);} & .cls-4{clip-path:url(#clippath);} & .cls-5{fill:#b3b3b3;} & .cls-6{fill:#fff;stroke-miterlimit:10;stroke-width:2px;} & .cls-6, & .cls-2{stroke:#b3b3b3;} & .cls-7{clip-path:url(#clippath-1);} & .cls-8{fill:#e0ba2d;opacity:.13;} & .cls-9{fill:url(#lgchlight2);} & .cls-2{stroke-dasharray:0 20;stroke-linecap:round;stroke-linejoin:round;stroke-width:4px;}
+}
+
+.opacity-8 {
+  opacity: 0.8;
+}
+
+.opacity-7 {
+  opacity: 0.7;
 }

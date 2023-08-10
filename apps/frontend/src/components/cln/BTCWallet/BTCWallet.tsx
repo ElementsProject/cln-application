@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './BTCWallet.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext } from 'react';
@@ -27,7 +29,7 @@ const BTCWallet = (props) => {
               <BitcoinWalletSVG svgClassName='me-4' className='fill-contrast' />
               <div>
                 <div className='fs-6 fw-bold'>Bitcoin Wallet</div>
-                { appCtx.walletBalances.isLoading ? 
+                { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
                     <Spinner animation='grow' variant='secondary' /> : 
                   appCtx.walletBalances.error ? 
                     <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './QRCode.scss';
 import { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

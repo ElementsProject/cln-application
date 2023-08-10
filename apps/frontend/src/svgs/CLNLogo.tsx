@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const CLNLogoSVG = props => {
   return (
     <svg

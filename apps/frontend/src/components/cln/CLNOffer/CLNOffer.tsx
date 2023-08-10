@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './CLNOffer.scss';
 import { useContext } from 'react';
 import { motion } from 'framer-motion';
