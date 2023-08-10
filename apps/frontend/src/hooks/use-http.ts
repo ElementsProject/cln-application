@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useCallback, useContext, useRef } from 'react';
+import { useCallback, useContext } from 'react';
 import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';

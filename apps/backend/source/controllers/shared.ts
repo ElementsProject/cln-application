@@ -6,7 +6,7 @@ import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES } from '../sh
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
-import { setApplicationConfig } from '../shared/utils.js';
+import { setSharedApplicationConfig, overrideSettingsWithEnvVariables } from '../shared/utils.js';
 
 class SharedController {
   getApplicationSettings(req: Request, res: Response, next: NextFunction) {
@@ -19,8 +19,9 @@ class SharedController {
           'utf-8',
         );
       }
-      const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
-      setApplicationConfig(config);
+      let config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+      config = overrideSettingsWithEnvVariables(config);
+      setSharedApplicationConfig(config);
       delete config.password;
       res.status(200).json(config);
     } catch (error: any) {
@@ -32,7 +33,7 @@ class SharedController {
     try {
       logger.info('Updating Application Settings: ' + JSON.stringify(req.body));
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
-      req.body.password = config.password;
+      req.body.password = config.password; // Before saving, add password in the config received from frontend
       fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(req.body, null, 2), 'utf-8');
       res.status(201).json({ message: 'Application Settings Updated Successfully' });
     } catch (error: any) {

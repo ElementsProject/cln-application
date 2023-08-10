@@ -39,7 +39,7 @@ export const DEFAULT_CONFIG = {
     appMode: 'DARK',
     isLoading: false,
     error: null,
-    sso: false,
+    singleSignOn: false,
     password: '',
 };
 export const LN_MESSAGE_CONFIG = {

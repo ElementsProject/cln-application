@@ -2,7 +2,12 @@ import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { APP_CONSTANTS, SECRET_KEY } from '../shared/consts.js';
 export var applicationConfig = null;
-export function setApplicationConfig(config) {
+export function overrideSettingsWithEnvVariables(config) {
+    config.singleSignOn =
+        process.env.SINGLE_SIGN_ON === 'true' || process.env.SINGLE_SIGN_ON || false;
+    return config;
+}
+export function setSharedApplicationConfig(config) {
     try {
         applicationConfig = config;
     }

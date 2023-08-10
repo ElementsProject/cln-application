@@ -27,7 +27,7 @@ const Settings = (props) => {
         <Dropdown.Item>Version: {appCtx.walletConnect.APP_VERSION}</Dropdown.Item>
         <Dropdown.Item data-bs-toggle='modal' data-bs-target='#staticBackdrop' onClick={() => appCtx.setShowModals({...appCtx.showModals, nodeInfoModal: true})}>Show node ID</Dropdown.Item>
         <Dropdown.Item data-bs-toggle='modal' data-bs-target='#staticBackdrop' onClick={() => appCtx.setShowModals({...appCtx.showModals, connectWalletModal: true})}>Connect wallet</Dropdown.Item>
-        { appCtx.appConfig.sso ?
+        { appCtx.appConfig.singleSignOn ?
             <></>
           :
             <Dropdown.Item data-bs-toggle='modal' data-bs-target='#staticBackdrop' onClick={() => appCtx.setShowModals({ ...appCtx.showModals, setPasswordModal: true })}>Reset Password</Dropdown.Item>

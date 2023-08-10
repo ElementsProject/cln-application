@@ -22,7 +22,7 @@ export type ApplicationConfiguration = {
   unit: Units;
   fiatUnit: string;
   appMode: ApplicationModes;
-  sso?: boolean;
+  singleSignOn?: boolean;
   error?: any;
 }
 

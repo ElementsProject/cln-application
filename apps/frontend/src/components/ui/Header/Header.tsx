@@ -50,7 +50,7 @@ const Header = (props) => {
             <h4 className='m-0 text-dark'><strong>CLN</strong></h4>
             <div className='d-flex align-items-center'>
               <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              { appCtx.appConfig.sso ?
+              { appCtx.appConfig.singleSignOn ?
                 <span className='mx-2'></span>
                 :
                 <div onClick={logoutHandler}>
@@ -118,7 +118,7 @@ const Header = (props) => {
               <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
               <div className='d-flex align-items-center'>
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
-                { appCtx.appConfig.sso ?
+                { appCtx.appConfig.singleSignOn ?
                   <span className='mx-2'></span>
                   :
                   <div onClick={logoutHandler}>
@@ -174,7 +174,7 @@ const Header = (props) => {
         <Col xs={12} lg={4} className='d-flex align-items-center justify-content-end' data-testid='header-context'>
           <div className='d-flex align-items-center'>
             <Settings onShowConnectWallet={props.onShowConnectWallet} />
-            { appCtx.appConfig.sso ?
+            { appCtx.appConfig.singleSignOn ?
               <span className='mx-2'></span>
               :
               <div onClick={logoutHandler}>
