@@ -4,7 +4,7 @@ import { APP_CONSTANTS, SECRET_KEY } from '../shared/consts.js';
 export var applicationConfig = null;
 export function overrideSettingsWithEnvVariables(config) {
     config.singleSignOn =
-        process.env.SINGLE_SIGN_ON === 'true' || process.env.SINGLE_SIGN_ON || false;
+        (process.env.SINGLE_SIGN_ON && process.env.SINGLE_SIGN_ON === 'true') || false;
     return config;
 }
 export function setSharedApplicationConfig(config) {

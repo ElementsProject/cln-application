@@ -6,7 +6,7 @@ export var applicationConfig: any = null;
 
 export function overrideSettingsWithEnvVariables(config: any) {
   config.singleSignOn =
-    process.env.SINGLE_SIGN_ON === 'true' || process.env.SINGLE_SIGN_ON || false;
+    (process.env.SINGLE_SIGN_ON && process.env.SINGLE_SIGN_ON === 'true') || false;
   return config;
 }
 
