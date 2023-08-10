@@ -6,6 +6,7 @@ import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES } from '../sh
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
+import { setApplicationConfig } from '../shared/utils.js';
 
 class SharedController {
   getApplicationSettings(req: Request, res: Response, next: NextFunction) {
@@ -19,6 +20,7 @@ class SharedController {
         );
       }
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+      setApplicationConfig(config);
       delete config.password;
       res.status(200).json(config);
     } catch (error: any) {

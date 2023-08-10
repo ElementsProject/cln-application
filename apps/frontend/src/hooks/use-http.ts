@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
@@ -7,6 +7,7 @@ import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 let intervalID;
+let localAuthStatus: any = null;
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -16,13 +17,13 @@ const axiosInstance = axios.create({
 
 const useHttp = () => {
   let appCtx = useContext(AppContext);
-  let localAuthStatus: any = null;
 
   const initiateDataLoading = () => {
     getConnectWallet();
     fetchData();
     if (intervalID) { window.clearInterval(intervalID); }
     intervalID = window.setInterval(() => {
+      logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
       // Check if the user has logged out before next data refresh
       if (localAuthStatus?.isAuthenticated) {
         fetchData();
@@ -208,6 +209,7 @@ const useHttp = () => {
     .then((response: any) => {
       logger.info(response);
       appCtx.clearStore();
+      localAuthStatus = JSON.parse(JSON.stringify(response.data));
       appCtx.setShowModals({...appCtx.showModals, loginModal: true, logoutModal: false});
     }).catch(err => {
       logger.error(err);

@@ -50,9 +50,13 @@ const Header = (props) => {
             <h4 className='m-0 text-dark'><strong>CLN</strong></h4>
             <div className='d-flex align-items-center'>
               <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              <div onClick={logoutHandler}>
-                <LogoutSVG className='svg-logout mx-2 cursor-pointer' />
-              </div>
+              { appCtx.appConfig.sso ?
+                <span className='mx-2'></span>
+                :
+                <div onClick={logoutHandler}>
+                  <LogoutSVG className='svg-logout mx-2 cursor-pointer' />
+                </div>
+              }
               <div onClick={modeChangeHandler}>
                 {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
               </div>
@@ -114,9 +118,13 @@ const Header = (props) => {
               <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
               <div className='d-flex align-items-center'>
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
-                <div onClick={logoutHandler}>
-                  <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
-                </div>
+                { appCtx.appConfig.sso ?
+                  <span className='mx-2'></span>
+                  :
+                  <div onClick={logoutHandler}>
+                    <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
+                  </div>
+                }
                 <div onClick={modeChangeHandler}>
                   {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
                 </div>
@@ -166,9 +174,13 @@ const Header = (props) => {
         <Col xs={12} lg={4} className='d-flex align-items-center justify-content-end' data-testid='header-context'>
           <div className='d-flex align-items-center'>
             <Settings onShowConnectWallet={props.onShowConnectWallet} />
-            <div onClick={logoutHandler}>
-              <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
-            </div>
+            { appCtx.appConfig.sso ?
+              <span className='mx-2'></span>
+              :
+              <div onClick={logoutHandler}>
+                <LogoutSVG className='svg-logout mx-3 cursor-pointer' />
+              </div>
+            }
             <div onClick={modeChangeHandler}>
               {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2'/>}
             </div>

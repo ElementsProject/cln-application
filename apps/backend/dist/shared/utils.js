@@ -1,6 +1,15 @@
 import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { APP_CONSTANTS, SECRET_KEY } from '../shared/consts.js';
+export var applicationConfig = null;
+export function setApplicationConfig(config) {
+    try {
+        applicationConfig = config;
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export function isAuthenticated(token) {
     try {
         if (!token) {
@@ -41,7 +50,7 @@ export function isValidPassword() {
     if (fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
         try {
             const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
-            if (config.password !== '') {
+            if (config.password && config.password !== '') {
                 return true;
             }
             else {

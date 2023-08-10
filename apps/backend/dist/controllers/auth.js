@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { APP_CONSTANTS, HttpStatusCode, SECRET_KEY } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
-import { verifyPassword, isAuthenticated, isValidPassword } from '../shared/utils.js';
+import { verifyPassword, isAuthenticated, isValidPassword, applicationConfig } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 class AuthController {
     userLogin(req, res, next) {
@@ -45,6 +45,9 @@ class AuthController {
                     const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
                     if (config.password === currPassword || !isValid) {
                         try {
+                            if (typeof config.sso === 'undefined') {
+                                config.sso = false;
+                            }
                             config.password = newPassword;
                             try {
                                 fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(config, null, 2), 'utf-8');
@@ -79,26 +82,31 @@ class AuthController {
     isUserAuthenticated(req, res, next) {
         try {
             const uaRes = isAuthenticated(req.cookies.token);
-            if (req.body.returnResponse) {
-                const vpRes = isValidPassword();
-                if (uaRes === true) {
-                    if (vpRes === true) {
-                        return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
-                    }
-                    else {
-                        return res.status(201).json({ isAuthenticated: true, isValidPassword: vpRes });
-                    }
+            if (req.body.returnResponse) { // Frontend is asking if user is authenticated or not
+                if (applicationConfig?.sso === true) {
+                    return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
                 }
                 else {
-                    return res.status(201).json({ isAuthenticated: false, isValidPassword: vpRes });
+                    const vpRes = isValidPassword();
+                    if (uaRes === true) {
+                        if (vpRes === true) {
+                            return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
+                        }
+                        else {
+                            return res.status(201).json({ isAuthenticated: true, isValidPassword: vpRes });
+                        }
+                    }
+                    else {
+                        return res.status(201).json({ isAuthenticated: false, isValidPassword: vpRes });
+                    }
                 }
             }
-            else {
-                if (uaRes === true) {
+            else { // Backend APIs are asking if user is authenticated or not
+                if (uaRes === true || applicationConfig?.sso === true) {
                     return next();
                 }
                 else {
-                    res.status(401).json({ error: 'Unauthorized user' });
+                    return res.status(401).json({ error: 'Unauthorized user' });
                 }
             }
         }
