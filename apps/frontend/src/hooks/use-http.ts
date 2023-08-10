@@ -6,6 +6,9 @@ import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
+let intervalID;
+let localAuthStatus: any = null;
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
   timeout: APP_WAIT_TIME * 5,
@@ -13,7 +16,20 @@ const axiosInstance = axios.create({
 });
 
 const useHttp = () => {
-  const appCtx = useContext(AppContext);
+  let appCtx = useContext(AppContext);
+
+  const initiateDataLoading = () => {
+    getConnectWallet();
+    fetchData();
+    if (intervalID) { window.clearInterval(intervalID); }
+    intervalID = window.setInterval(() => {
+      logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
+      // Check if the user has logged out before next data refresh
+      if (localAuthStatus?.isAuthenticated) {
+        fetchData();
+      }
+    }, APP_WAIT_TIME);
+  };
 
   const getFiatRate = useCallback((fiatUnit: string) => {
     return axiosInstance.get('/shared/rate/' + fiatUnit)
@@ -31,7 +47,6 @@ const useHttp = () => {
         logger.info(response);
         if(url === '/shared/config') {
           getFiatRate(response.data.fiatUnit);
-          fetchData();
         }
         setStoreFunction({...response.data, ...{ isLoading: false, error: null }});
       })
@@ -157,12 +172,70 @@ const useHttp = () => {
 
   const getAppConfigurations = useCallback(() => {
     sendRequestToSetStore(appCtx.setConfig, 'get', '/shared/config');
+  }, [appCtx, sendRequestToSetStore]);
+
+  const getConnectWallet = useCallback(() => {
     sendRequestToSetStore(appCtx.setWalletConnect, 'get', '/shared/connectwallet');
   }, [appCtx, sendRequestToSetStore]);
 
+  const userLogin = (password: string) => {
+    return axiosInstance.post('/auth/login', {password: password})
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.setAuthStatus(response.data);
+      localAuthStatus = response.data;
+      return response.data;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
+  const resetUserPassword = (isValid: boolean, currPassword: string, newPassword: string) => {
+    return axiosInstance.post('/auth/reset', {isValid: isValid, currPassword: currPassword, newPassword: newPassword})
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.setAuthStatus(response.data);
+      localAuthStatus = response.data;
+      return response.data;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
+  const userLogout = () => {
+    return axiosInstance.get('/auth/logout')
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.clearStore();
+      localAuthStatus = JSON.parse(JSON.stringify(response.data));
+      appCtx.setShowModals({...appCtx.showModals, loginModal: true, logoutModal: false});
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
+  const getAuthStatus = () => {
+    return axiosInstance.post('/auth/isauthenticated', { returnResponse: true })
+    .then((response: any) => {
+      logger.info(response);
+      appCtx.setAuthStatus(response.data);
+      localAuthStatus = response.data;
+      return response.data;
+    }).catch(err => {
+      logger.error(err);
+      throw err;
+    });
+  };
+
   return {
     setCSRFToken,
+    getAuthStatus,
     getAppConfigurations,
+    initiateDataLoading,
+    getConnectWallet,
     fetchData,
     getFiatRate,
     updateConfig,
@@ -173,7 +246,10 @@ const useHttp = () => {
     clnSendPayment,
     clnReceiveInvoice,
     decodeInvoice,
-    fetchInvoice
+    fetchInvoice,
+    userLogin,
+    resetUserPassword,
+    userLogout
   };
 };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './CurrencyBox.scss';
 import { useContext, useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';

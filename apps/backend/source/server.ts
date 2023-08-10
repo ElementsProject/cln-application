@@ -12,6 +12,7 @@ import { logger, expressLogConfiguration } from './shared/logger.js';
 import { CommonRoutesConfig } from './shared/routes.config.js';
 import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
+import { AuthRoutes } from './routes/v1/auth.js';
 import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
@@ -64,6 +65,7 @@ app.use(cors(corsOptions));
 app.use(expressWinston.logger(expressLogConfiguration));
 app.use(expressWinston.errorLogger(expressLogConfiguration));
 
+routes.push(new AuthRoutes(app));
 routes.push(new SharedRoutes(app));
 routes.push(new LightningRoutes(app));
 

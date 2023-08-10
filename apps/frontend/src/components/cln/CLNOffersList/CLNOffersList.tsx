@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './CLNOffersList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -78,7 +79,7 @@ export const CLNOffersList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.listOffers.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { motion } from 'framer-motion';
 import { OPACITY_VARIANTS, ANIMATION_INITIAL_STATE, ANIMATION_TRANSITION, ANIMATION_DELAYED_TRANSITION, ANIMATION_FINAL_STATE } from '../utilities/constants';
 

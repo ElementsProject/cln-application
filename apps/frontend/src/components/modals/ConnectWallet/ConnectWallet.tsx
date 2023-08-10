@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './ConnectWallet.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

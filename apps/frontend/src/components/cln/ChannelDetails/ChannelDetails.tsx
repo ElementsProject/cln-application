@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './ChannelDetails.scss';
 import { useContext, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -70,6 +71,7 @@ const ChannelDetails = (props) => {
 
   const confirmResponseHandler = (response) => {
     setShowToast(false);
+    appCtx.setShowToast({...appCtx.showToast, show: false, onConfirmResponse: null});
     if (response) {
       setResponseStatus(CallStatus.PENDING);
       setResponseMessage('Closing Channel...');

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './CLNTransactionsList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -130,7 +131,7 @@ export const CLNTransactionsList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.listLightningTransactions.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listLightningTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 

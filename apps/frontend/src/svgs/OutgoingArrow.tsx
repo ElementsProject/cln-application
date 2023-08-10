@@ -1,4 +1,5 @@
 import React from 'react';
+
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip';
 import { titleCase } from '../utilities/data-formatters';

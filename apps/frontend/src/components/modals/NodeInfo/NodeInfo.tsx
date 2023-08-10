@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './NodeInfo.scss';
 import { useContext, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

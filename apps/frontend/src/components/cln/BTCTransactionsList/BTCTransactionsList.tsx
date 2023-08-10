@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './BTCTransactionsList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -113,7 +114,7 @@ export const BTCTransactionsList = () => {
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.listBitcoinTransactions.isLoading ?
+    appCtx.authStatus.isAuthenticated && appCtx.listBitcoinTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 
