@@ -112,7 +112,7 @@
 
 - If you're looking for a bigger challenge, before opening a pull request please [create an issue](https://github.com/ElementsProject/cln-application/issues/new/choose) to get feedback, discuss the best way to tackle the challenge, and to ensure that there's no duplication of work.
 
-- Click [here](./docs/Contributing.md) for instructions on how to run it in development mode.
+- Click [here](./.github/docs/Contributing.md) for instructions on how to run it in development mode.
 
 ---
 
