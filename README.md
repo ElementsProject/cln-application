@@ -118,6 +118,6 @@
 
 # Acknowledgements
 
-- This app is inpired by the work done by [Umbrel lightning app](https://github.com/getumbrel/umbrel-lightning).
+- This app is inspired by the work done by [Umbrel lightning app](https://github.com/getumbrel/umbrel-lightning).
 
 - The backend api connects with core lightning via [lnmessage](https://github.com/aaronbarnardsound/lnmessage).

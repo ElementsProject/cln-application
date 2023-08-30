@@ -31,7 +31,7 @@ if [ "$SETUP" == "docker" ]; then
     export COMMANDO_CONFIG="/data/.lightning/.commando-env"
     echo "Docker Environment Variables Set"
 else
-    export DEVICE_DOMAIN_NAME="umbrel.local"
+    export DEVICE_DOMAIN_NAME="local.local"
     export LOCAL_HOST="http://""$DEVICE_DOMAIN_NAME"
     export APP_BITCOIN_NODE_IP="localhost"
     export APP_CORE_LIGHTNING_DAEMON_IP="localhost"

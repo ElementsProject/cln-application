@@ -7,11 +7,16 @@
   border-right: none;
   border-top: none;
   & .nav-item .nav-link {
-    padding: 0 2rem 0 0.25rem;
+    padding: 0 1rem 0.25rem 0.25rem;
     color: $light;
+    & span {
+      padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+    }
     &.active, &:hover, &:focus {
       background-color: transparent;
-      border-bottom: 1px solid $primary;
+      & span {
+        border-bottom: 2px solid $primary;
+      }
     }
   }
 }

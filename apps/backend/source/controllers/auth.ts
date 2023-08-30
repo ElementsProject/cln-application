@@ -20,7 +20,8 @@ class AuthController {
       const vpRes = verifyPassword(req.body.password);
       if (vpRes === true) {
         const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
+        // Expire the token in a day
+        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 24 });
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
       } else {
         const err = new AuthError(vpRes, vpRes, HttpStatusCode.UNAUTHORIZED, vpRes);

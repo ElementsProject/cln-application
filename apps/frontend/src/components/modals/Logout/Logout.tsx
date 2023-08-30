@@ -33,9 +33,9 @@ const LogoutComponent = () => {
             <Col xs={2} className='message-type-box d-flex align-items-center justify-content-center'>
               <QuestionMarkSVG />
             </Col>
-            <Col xs={10} className='py-3 px-2'>
+            <Col xs={10} className='p-3'>
               <Col className='d-flex align-items-center justify-content-between'>
-                <Col xs={7}>Logout?</Col>
+                <Col xs={7} className='ps-1'>Logout?</Col>
                 <button type="button" className="btn btn-rounded btn-sm btn-secondary" onClick={() => logoutHandler(true)}>Yes</button>
                 <button type="button" className="btn btn-rounded btn-sm btn-secondary" onClick={() => logoutHandler(false)}>No</button>
               </Col>

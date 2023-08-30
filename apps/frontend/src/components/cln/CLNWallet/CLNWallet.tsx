@@ -63,10 +63,10 @@ const CLNWallet = (props) => {
               >
               <Nav className='flex-row cln-transactions-tabs'>
                 <Nav.Item>
-                  <Nav.Link eventKey='transactions'>Transactions</Nav.Link>
+                  <Nav.Link eventKey='transactions'><span>Transactions</span></Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey='offers'>Offers</Nav.Link>
+                  <Nav.Link eventKey='offers'><span>Offers</span></Nav.Link>
                 </Nav.Item>
               </Nav>
               <PerfectScrollbar className='ps-show-always'>

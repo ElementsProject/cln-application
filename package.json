@@ -7,11 +7,10 @@
   "scripts": {
     "frontend:dev": "npm run start -w cln-application-frontend",
     "frontend:build": "npm run build -w cln-application-frontend",
-    "backend:dev": "npm run start -w cln-application-backend",
     "backend:build": "npm run build -w cln-application-backend",
     "backend:serve": "npm run serve -w cln-application-backend",
     "backend:watch": "npm run watch -w cln-application-backend",
-    "dev": "npm run backend:dev & npm run frontend:dev",
+    "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
     "start": "npm run serve -w cln-application-backend"
   },
