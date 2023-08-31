@@ -64,6 +64,8 @@
       ```
 
       Set these variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      Important Note: Environment variables take precedence over config.json variables. Like `SINGLE_SIGN_ON` will take higher precedence over 
+      `singleSignOn` from config.json.
 
   - ### Application Configuration
       This is the config.json file which is required by application's frontend. If the file named `config.json` is missing at `APP_CONFIG_DIR` location, one like below will be auto created:
@@ -92,8 +94,8 @@
         ```
 
   - ### Start The Application
-      Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
-      Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
+      - Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      - Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```
         npm run start
