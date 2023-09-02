@@ -86,6 +86,8 @@
       - This application utilizes [lnmessage](https://github.com/aaronbarnardsound/lnmessage) and [commando](https://docs.corelightning.org/reference/lightning-commando) for connecting with core lightning node. The connection is trustless and end-to-end encrypted. Commando manages authentication and authorization through runes, which can grant either full or fine-grained permissions. 
       - The backend server reads `LIGHTNING_PUBKEY` & `LIGHTNING_RUNE` from the `COMMANDO_CONFIG` file for this communication. 
       - Values can either be set manually or script `entrypoint.sh` can be used to call `getinfo` and `commando-rune` methods and save values in `COMMANDO_CONFIG`.
+      - `entrypoint.sh` can only run for the locally installed lightning. If `cln-application` is running remotely then pubkey and 
+      rune can be set manually.
       - Sample commando config should look like:
 
         ```
