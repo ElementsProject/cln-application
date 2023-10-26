@@ -1,6 +1,6 @@
 {
   "name": "cln-application-frontend",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Core lightning application frontend",
   "private": true,
   "license": "MIT",
@@ -16,7 +16,7 @@
     "axios": "^1.2.2",
     "bootstrap": "^5.3.0-alpha1",
     "copy-to-clipboard": "^3.3.3",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "framer-motion": "^9.0.2",
     "node-sass": "^7.0.3",
     "qrcode.react": "^3.1.0",
@@ -27,10 +27,10 @@
     "react-scripts": "5.0.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
+    "@types/jest": "^29.5.6",
     "@types/node": "^16.18.10",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.10",
