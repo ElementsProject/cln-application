@@ -37,7 +37,7 @@
   - ### Dependency Installation
       ```
           cd cln-application-0.0.1
-          npm install --omit=dev
+          npm install
       ```
 
   - ### Environment Variables
@@ -95,8 +95,15 @@
           LIGHTNING_RUNE="iv...4j"
         ```
 
-  - ### Start The Application
+  - ### Build the Application
       - Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      - Run `build` script for building your application.
+
+      ```
+        npm run build
+      ```
+
+  - ### Start The Application
       - Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```
