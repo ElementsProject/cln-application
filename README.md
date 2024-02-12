@@ -41,12 +41,12 @@
       ```
 
   - ### Environment Variables
-      This application accepts & depeneds upon these variables to be passed through environment:
+      This application accepts & depends upon these variables to be passed through environment:
 
       ```
         - APP_CORE_LIGHTNING_IP: IP address of the core lightning container (required)
         - APP_CORE_LIGHTNING_PORT: Port on which this application should be served (required)
-        - APP_CORE_LIGHTNING_DAEMON_IP: Core lightning deamon bind address (cln config bind-addr; required)
+        - APP_CORE_LIGHTNING_DAEMON_IP: Core lightning daemon bind address (cln config bind-addr; required)
         - APP_CORE_LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (cln config experimental-websocket-port; required)
         - APP_CONFIG_DIR: Path for application's configuration file (config.json; required)
         - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
@@ -63,7 +63,7 @@
         - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       ```
 
-      Set these variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
       Important Note: Environment variables take precedence over config.json variables. Like `SINGLE_SIGN_ON` will take higher precedence over 
       `singleSignOn` from config.json.
 
@@ -96,7 +96,7 @@
         ```
 
   - ### Start The Application
-      - Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      - Setup environment variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
       - Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```
