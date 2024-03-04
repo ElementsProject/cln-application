@@ -14,7 +14,7 @@ const CLNCard = () => {
   const [selCLNCard, setSelCLNCard] = useState('wallet');
 
   return (
-    <Card className='h-100 overflow-hidden inner-box-shadow'>
+    <Card className='h-100 overflow-hidden inner-box-shadow' data-testid='cln-card'>
       <AnimatePresence mode='wait'>
         <motion.div
           key={selCLNCard}

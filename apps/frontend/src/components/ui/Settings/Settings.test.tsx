@@ -5,10 +5,7 @@ describe('Settings component ', () => {
   beforeEach(() => render(<Settings />));
 
   it('should be in the document', () => {
-    expect(screen.getByTestId('Settings-context')).toBeInTheDocument();
+    expect(screen.getByTestId('settings')).toBeInTheDocument();
   });
 
-  it('should be in the document', () => {
-    expect(screen.getByTestId('Settings-context')).toBeInTheDocument();
-  });
 });

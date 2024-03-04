@@ -17,9 +17,9 @@ const DateBox = props => {
     <OverlayTrigger
       placement='top'
       delay={{ show: 250, hide: 250 }}
-      overlay={(props.showTooltip ? <Tooltip>{props.dataType}</Tooltip> : <></>)}
+      overlay={(props.showTooltip ? <Tooltip data-testid='tooltip'>{props.dataType}</Tooltip> : <></>)}
       >
-      <div className={props.className}>
+      <div className={props.className} data-testid='overlay-trigger'>
         {convertIntoDateFormat()}
       </div>
     </OverlayTrigger>

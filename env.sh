@@ -1,9 +1,8 @@
-#!/bin/bash
 SETUP=${1:-local}
 
 export APP_BITCOIN_NETWORK="regtest"
 export APP_CORE_LIGHTNING_BITCOIN_NETWORK="$APP_BITCOIN_NETWORK"
-if [ "$APP_BITCOIN_NETWORK" == "mainnet" ]; then
+if [[ "$APP_BITCOIN_NETWORK" == "mainnet" ]]; then
 	export APP_CORE_LIGHTNING_BITCOIN_NETWORK="bitcoin"
 fi
 
@@ -12,7 +11,7 @@ export APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE="http://oqaer4kd7ufryngx6dsztovs4p
 export APP_MODE="testing"
 export APP_PROTOCOL="http"
 
-if [ "$SETUP" == "docker" ]; then
+if [[ "$SETUP" == "docker" ]]; then
     export DEVICE_DOMAIN_NAME="docker.local"
     export LOCAL_HOST="http://""$DEVICE_DOMAIN_NAME"
     export APP_BITCOIN_NODE_IP="170.21.22.2"

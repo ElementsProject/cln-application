@@ -38,7 +38,7 @@ const CurrencyBox = props => {
       <div className={props.rootClasses}>
         {
           animationFinished ? 
-            <div className={props.currencyClasses}>
+            <div className={props.currencyClasses} data-testid="currency-box-finished-text">
               {formatCurrency(props.value, Units.SATS, appCtx.appConfig.unit, props.shorten, 5, 'string')}
             </div>
           : 

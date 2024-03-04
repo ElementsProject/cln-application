@@ -49,7 +49,7 @@ const BTCDeposit = (props) => {
   }, []);
 
   return (
-    <Card className='h-100 d-flex align-items-stretch'>
+    <Card className='h-100 d-flex align-items-stretch' data-testid='btc-deposit'>
       <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
         <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
           <div className='p-0 fw-bold text-primary d-flex align-items-center'>

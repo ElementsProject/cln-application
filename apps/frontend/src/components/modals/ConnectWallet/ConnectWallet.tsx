@@ -93,7 +93,7 @@ const ConnectWallet = () => {
 
   return (
     <>
-      <Modal show={appCtx.showModals.connectWalletModal} onHide={closeHandler} centered className='modal-lg'>
+      <Modal show={appCtx.showModals.connectWalletModal} onHide={closeHandler} centered className='modal-lg' data-testid='connect-wallet'> 
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
           <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
         </Modal.Header>

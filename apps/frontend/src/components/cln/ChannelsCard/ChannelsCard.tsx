@@ -25,7 +25,7 @@ const ChannelsCard = () => {
   }
 
   return (
-    <Card className='h-100 overflow-hidden inner-box-shadow'>
+    <Card className='h-100 overflow-hidden inner-box-shadow' data-testid='channels-card'>
       <AnimatePresence mode='wait'>
         <motion.div
           key={selChannelCard}

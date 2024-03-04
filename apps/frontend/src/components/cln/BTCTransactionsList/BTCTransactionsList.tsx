@@ -21,7 +21,7 @@ import { NoBTCTransactionLightSVG } from '../../../svgs/NoBTCTransactionLight';
 
 const WithdrawHeader = ({withdraw, appConfig, fiatConfig}) => {
   return (
-    <Row className='transaction-list-item d-flex justify-content-between align-items-center'>
+    <Row className='transaction-list-item d-flex justify-content-between align-items-center' data-testid='withdraw-header'>
       <Col xs={2}>
         <OutgoingArrowSVG className='me-1' txStatus={withdraw.tag} />
       </Col>
@@ -49,7 +49,7 @@ const WithdrawHeader = ({withdraw, appConfig, fiatConfig}) => {
 
 const DepositHeader = ({deposit, appConfig, fiatConfig}) => {
   return (
-    <Row className='transaction-list-item d-flex justify-content-between align-items-center'>
+    <Row className='transaction-list-item d-flex justify-content-between align-items-center' data-testid='deposit-header'>
       <Col xs={2}>
         <IncomingArrowSVG className='me-1' txStatus={deposit.tag} />
       </Col>
@@ -112,7 +112,6 @@ export const BTCTransactionsList = () => {
   const appCtx = useContext(AppContext);
   const initExpansions = (appCtx.listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
-
   return (
     appCtx.authStatus.isAuthenticated && appCtx.listBitcoinTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
@@ -122,7 +121,7 @@ export const BTCTransactionsList = () => {
     appCtx.listBitcoinTransactions.error ? 
       <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listBitcoinTransactions.error}</Alert> : 
       appCtx.listBitcoinTransactions?.btcTransactions && appCtx.listBitcoinTransactions?.btcTransactions.length && appCtx.listBitcoinTransactions?.btcTransactions.length > 0 ?
-        <div className='btc-transactions-list'>
+        <div className='btc-transactions-list' data-testid="btc-transactions-list">
           { 
             appCtx.listBitcoinTransactions?.btcTransactions?.map((transaction, i) => (
               <BTCTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />

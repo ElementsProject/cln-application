@@ -24,6 +24,68 @@ import CLNCard from '../cln/CLNCard/CLNCard';
 import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+
+export const routeConfig = [
+  {
+    path: "/", Component: Root,
+    children: [
+      { path: "/", Component: () => <Navigate to="/home" replace /> },
+      { path: "home", Component: CLN },
+      { path: "bookkeeper", Component: Bookkeeper },
+    ]
+  },
+];
+
+const router = createBrowserRouter(routeConfig);
+
+function Root() {
+  const appCtx = useContext(AppContext)
+  return (
+    <>
+      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
+        <Header />
+        <Outlet />
+      </Container>
+      <ToastMessage />
+      <NodeInfo />
+      <ConnectWallet />
+      <LoginComponent />
+      <LogoutComponent />
+      <SetPasswordComponent />
+    </>
+  );
+}
+
+function CLN() {
+  return (
+    <div data-testid='cln-container'>
+      <Row>
+        <Col className='mx-1'>
+          <Overview />
+        </Col>
+      </Row>
+      <Row className='px-3'>
+        <Col xs={12} lg={4} className='cards-container'>
+          <BTCCard />
+        </Col>
+        <Col xs={12} lg={4} className='cards-container'>
+          <CLNCard />
+        </Col>
+        <Col xs={12} lg={4} className='cards-container'>
+          <ChannelsCard />
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
+function Bookkeeper() {
+  return(
+    <div data-testid='bookkeeper-container'>
+    </div>
+  );
+}
 
 const App = () => {
   const appCtx = useContext(AppContext);
@@ -111,33 +173,7 @@ const App = () => {
   }
 
   return (
-    <>
-      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
-        <Header />
-        <Row>
-          <Col className='mx-1'>
-            <Overview />
-          </Col>
-        </Row>
-        <Row className='px-3'>
-          <Col xs={12} lg={4} className='cards-container'>
-            <BTCCard />
-          </Col>
-          <Col xs={12} lg={4} className='cards-container'>
-            <CLNCard />
-          </Col>
-          <Col xs={12} lg={4} className='cards-container'>
-            <ChannelsCard />
-          </Col>
-        </Row>
-      </Container>
-      <ToastMessage />
-      <NodeInfo />
-      <ConnectWallet />
-      <LoginComponent />
-      <LogoutComponent />
-      <SetPasswordComponent />
-    </>
+    <RouterProvider router={router} />
   );
 };
 
