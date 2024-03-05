@@ -1,14 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import CurrencyBox from './CurrencyBox';
-import { AppContext } from '../../../store/AppContext';
 import { Units, ApplicationModes } from '../../../utilities/constants';
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 describe('CurrencyBox component ', () => {
   const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };

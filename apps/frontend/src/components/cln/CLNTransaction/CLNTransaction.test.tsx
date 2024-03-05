@@ -1,15 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import CLNTransaction from './CLNTransaction';
-import { AppContext } from '../../../store/AppContext';
 import { ApplicationModes, Units } from '../../../utilities/constants';
 import { LightningTransaction } from '../../../types/lightning-wallet.type';
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 const clnTransaction: LightningTransaction = {
   type: 'INVOICE',

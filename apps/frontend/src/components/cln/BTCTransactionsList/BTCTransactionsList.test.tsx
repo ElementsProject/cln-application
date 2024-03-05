@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import BTCTransactionsList from './BTCTransactionsList';
-import { AppContext } from '../../../store/AppContext';
 import { ApplicationModes, Units } from '../../../utilities/constants';
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 jest.mock('framer-motion', () => {
   const RealFramerMotion = jest.requireActual('framer-motion');
@@ -14,13 +14,6 @@ jest.mock('framer-motion', () => {
     },
   };
 });
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
 
 describe('BTCTransactionsList component ', () => {
   const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };

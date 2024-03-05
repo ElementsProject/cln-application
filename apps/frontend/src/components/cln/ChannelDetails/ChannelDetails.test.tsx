@@ -1,15 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import ChannelDetails from './ChannelDetails';
-import { AppContext } from '../../../store/AppContext';
 import { Channel } from '../../../types/lightning-wallet.type';
 import { ApplicationModes, Units } from '../../../utilities/constants';
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 export const selChannel: Channel = {
   channel_id: "1234567890abcdef",

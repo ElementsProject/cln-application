@@ -1,15 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import CLNOffersList from './CLNOffersList';
-import { AppContext } from '../../../store/AppContext';
 import { ApplicationModes, Units } from '../../../utilities/constants';
-
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 describe('CLNOffersList component ', () => {
   const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };

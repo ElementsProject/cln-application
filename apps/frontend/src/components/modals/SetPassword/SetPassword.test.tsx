@@ -1,14 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { AppContext } from '../../../store/AppContext';
+import { screen } from '@testing-library/react';
 import { Units, ApplicationModes } from '../../../utilities/constants';
 import SetPasswordComponent from './SetPassword';
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 describe('Password component ', () => {
   const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };

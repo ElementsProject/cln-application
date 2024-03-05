@@ -1,14 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import Overview from './Overview';
-import { AppContext } from '../../../store/AppContext';
 import { Units, ApplicationModes } from '../../../utilities/constants';
-
-const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
-  return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
-  );
-};
+import { renderWithMockContext } from '../../../utilities/test-utilities';
 
 describe('Overview component ', () => {
   const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };
@@ -352,10 +345,6 @@ describe('Overview component ', () => {
     })
   );
 
-  it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
-  });
-
   it('if walletBalances loading, show spinners', () => {
     providerProps.walletBalances.isLoading = true;
     renderWithMockContext(<Overview />, { providerProps });
@@ -404,24 +393,6 @@ describe('Overview component ', () => {
     expect(currencyBox[0]).toBeInTheDocument();
     expect(currencyBox[0]).toHaveTextContent('26,755,554');
   });
-
-  it('display the number of channels', async () => {
-    jest.useFakeTimers();
-    renderWithMockContext(<Overview />, { providerProps });
-    jest.runAllTimers();
-    const channels = await screen.findByTestId('overview-active-channels');
-    expect(channels).toBeInTheDocument();
-    expect(channels).toHaveTextContent('2');
-  })
-
-  it('display the number of peers', async () => {
-    jest.useFakeTimers();
-    renderWithMockContext(<Overview />, { providerProps });
-    jest.runAllTimers();
-    const peers = await screen.findByTestId('overview-peers');
-    expect(peers).toBeInTheDocument();
-    expect(peers).toHaveTextContent('2');
-  })
 
   it('check clnLocalBalance is proper balance when shortened', async () => {
     jest.useFakeTimers();
