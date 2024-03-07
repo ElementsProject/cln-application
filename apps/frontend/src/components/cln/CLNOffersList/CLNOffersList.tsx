@@ -81,13 +81,13 @@ export const CLNOffersList = () => {
   return (
     appCtx.authStatus.isAuthenticated && appCtx.listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
-        <Spinner animation='grow' variant='primary' />
+        <Spinner animation='grow' variant='primary' data-testid='cln-offers-list-spinner'/>
       </span> 
     : 
     appCtx.listOffers.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listOffers.error}</Alert> : 
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>{appCtx.listOffers.error}</Alert> : 
       appCtx.listOffers?.offers && appCtx.listOffers?.offers.length && appCtx.listOffers?.offers.length > 0 ?
-        <div className='cln-offers-list'>
+        <div className='cln-offers-list' data-testid='cln-offers-list'>
           { 
             appCtx.listOffers?.offers?.map((offer, i) => (
               <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />

@@ -132,7 +132,7 @@ const SetPasswordComponent = () => {
 
   return (
     <form className='h-100'>
-      <Modal show={appCtx.showModals.setPasswordModal} onHide={appCtx.authStatus.isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg'>
+      <Modal show={appCtx.showModals.setPasswordModal} onHide={appCtx.authStatus.isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
           { appCtx.authStatus.isValidPassword
             ? <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>

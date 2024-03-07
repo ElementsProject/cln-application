@@ -25,7 +25,7 @@ const FeerateRange = (props) => {
 
   return (
     <>
-      <Form.Label className='text-dark d-flex align-items-center justify-content-start'>
+      <Form.Label className='text-dark d-flex align-items-center justify-content-start' data-testid='fee-rate-container'>
         Fee Rate
       </Form.Label>
       <div className='slider-container'>

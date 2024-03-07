@@ -5,7 +5,7 @@ describe('QRCodeComponent component ', () => {
   beforeEach(() => render(<QRCodeComponent />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('qr-code-component')).toBeInTheDocument();
   });
 
 });

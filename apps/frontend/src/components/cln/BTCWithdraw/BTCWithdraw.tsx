@@ -109,7 +109,7 @@ const BTCWithdraw = (props) => {
   };
 
   return (
-    <form onSubmit={withdrawHandler} className='h-100'>
+    <form onSubmit={withdrawHandler} className='h-100' data-testid='btc-withdraw'>
       <Card className='h-100 d-flex align-items-stretch'>
         <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>

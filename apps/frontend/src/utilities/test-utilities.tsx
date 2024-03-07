@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { AppContext, AppProvider } from '../store/AppContext';
+import { render } from '@testing-library/react';
+import { AppContext } from '../store/AppContext';
 
 export const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
   return render(
