@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
-import App, { routeConfig } from './App';
+import App, { rootRouteConfig } from './App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { cleanup } from "@testing-library/react";
 
@@ -22,9 +22,9 @@ describe('App component ', () => {
   });
 });
 
-describe('App routing', () => {
+describe('Root routing', () => {
   const setUp = (async () => {
-    const router = createMemoryRouter(routeConfig, { initialEntries: ['/'] })
+    const router = createMemoryRouter(rootRouteConfig, { initialEntries: ['/'] })
 
     render(
       <RouterProvider router={router} />
@@ -38,7 +38,7 @@ describe('App routing', () => {
     expect((await router).router.state.location.pathname).toBe("/home");
   });
 
-  it('going to bookkeeper hides the app view, preserves header', async () => {
+  it('going to bookkeeper hides the cln view, preserves header', async () => {
     let router = setUp();
     expect(screen.getByTestId('header')).not.toBeEmptyDOMElement();
     expect(screen.queryByTestId('cln-container')).toBeInTheDocument();

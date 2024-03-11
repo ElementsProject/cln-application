@@ -2,10 +2,8 @@ import React from 'react';
 
 import './App.scss';
 import { useContext, useEffect } from 'react';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Spinner from 'react-bootstrap/Spinner';
 
 import useHttp from '../../hooks/use-http';
 import useBreakpoint from '../../hooks/use-breakpoint';
@@ -13,81 +11,30 @@ import { AppContext } from '../../store/AppContext';
 import { ApplicationModes } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
 import Header from '../ui/Header/Header';
-import Overview from '../cln/Overview/Overview';
 import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
 import LoginComponent from '../modals/Login/Login';
 import LogoutComponent from '../modals/Logout/Logout';
 import SetPasswordComponent from '../modals/SetPassword/SetPassword';
-import BTCCard from '../cln/BTCCard/BTCCard';
-import CLNCard from '../cln/CLNCard/CLNCard';
-import ChannelsCard from '../cln/ChannelsCard/ChannelsCard';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Bookkeeper from '../bookkeeper/BkprRoot/BkprRoot';
+import CLNHome from '../cln/CLNHome/CLNHome';
 
-export const routeConfig = [
+export const rootRouteConfig = [
   {
     path: "/", Component: Root,
     children: [
       { path: "/", Component: () => <Navigate to="/home" replace /> },
-      { path: "home", Component: CLN },
+      { path: "home", Component: CLNHome },
       { path: "bookkeeper", Component: Bookkeeper },
     ]
   },
 ];
 
-const router = createBrowserRouter(routeConfig);
+const rootRouter = createBrowserRouter(rootRouteConfig);
 
 function Root() {
-  const appCtx = useContext(AppContext)
-  return (
-    <>
-      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
-        <Header />
-        <Outlet />
-      </Container>
-      <ToastMessage />
-      <NodeInfo />
-      <ConnectWallet />
-      <LoginComponent />
-      <LogoutComponent />
-      <SetPasswordComponent />
-    </>
-  );
-}
-
-function CLN() {
-  return (
-    <div data-testid='cln-container'>
-      <Row>
-        <Col className='mx-1'>
-          <Overview />
-        </Col>
-      </Row>
-      <Row className='px-3'>
-        <Col xs={12} lg={4} className='cards-container'>
-          <BTCCard />
-        </Col>
-        <Col xs={12} lg={4} className='cards-container'>
-          <CLNCard />
-        </Col>
-        <Col xs={12} lg={4} className='cards-container'>
-          <ChannelsCard />
-        </Col>
-      </Row>
-    </div>
-  );
-}
-
-function Bookkeeper() {
-  return(
-    <div data-testid='bookkeeper-container'>
-    </div>
-  );
-}
-
-const App = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
@@ -143,37 +90,25 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading) {
-    return (
-      <Container className='py-4' id='root-container' data-testid='container'>
-        <Header />
-        <Row className='mt-10'>
-          <Col xs={12} className='d-flex align-items-center justify-content-center'>
-            <Spinner animation='grow' variant='primary' />
-          </Col>
-          <Col xs={12} className='d-flex align-items-center justify-content-center'>
-            <div>Loading...</div>
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
-
-  if (appCtx.nodeInfo.error) {
-    return (
-      <Container className='py-4' id='root-container' data-testid='container'>
-        <Header />
-        <Row className='message invalid mt-10'>
-          <Col xs={12} className='d-flex align-items-center justify-content-center'>
-            {appCtx.nodeInfo.error}
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
-
   return (
-    <RouterProvider router={router} />
+    <>
+      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
+        <Header />
+        <Outlet />
+      </Container>
+      <ToastMessage />
+      <NodeInfo />
+      <ConnectWallet />
+      <LoginComponent />
+      <LogoutComponent />
+      <SetPasswordComponent />
+    </>
+  );
+}
+
+const App = () => {
+  return (
+    <RouterProvider router={rootRouter} />
   );
 };
 

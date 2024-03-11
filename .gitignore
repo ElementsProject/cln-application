@@ -12,3 +12,4 @@ env.sh
 .commando
 data/app/config.json
 release
+env.sh

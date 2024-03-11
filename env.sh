@@ -42,7 +42,7 @@ else
     export APP_CORE_LIGHTNING_DAEMON_GRPC_PORT=5002
     export APP_CORE_LIGHTNING_REST_PORT=3001
     export SINGLE_SIGN_ON=false
-    export CORE_LIGHTNING_PATH="/home/shahana/.lightning/l1-regtest"
+    export CORE_LIGHTNING_PATH="/home/.lightning/l1-regtest"
     export COMMANDO_CONFIG="$PWD/.commando"
     echo "Local Environment Variables Set"
 fi
