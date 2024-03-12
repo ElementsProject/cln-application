@@ -5,7 +5,7 @@ describe('ChannelOpen component ', () => {
   beforeEach(() => render(<ChannelOpen />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('channel-open')).toBeInTheDocument();
   });
 
 });

@@ -14,7 +14,7 @@ const BTCCard = () => {
   const [selBTCCard, setSelBTCCard] = useState('wallet');
 
   return (
-    <Card className='h-100 overflow-hidden inner-box-shadow'>
+    <Card className='h-100 overflow-hidden inner-box-shadow' data-testid='btc-card'>
       <AnimatePresence mode='wait'>
         <motion.div
           key={selBTCCard}

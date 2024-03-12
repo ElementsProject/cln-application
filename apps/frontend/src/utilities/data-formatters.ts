@@ -1,6 +1,13 @@
 import copy from 'copy-to-clipboard';
 import { BTC_SATS, BTC_MSAT, SATS_MSAT, Units } from './constants';
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export const convertIntoDateFormat = (dataValue) => {
+  let newDate = new Date(dataValue * 1000);
+  return newDate.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[newDate.getMonth()] + ', ' + newDate.getHours().toString().padStart(2, '0') + ':' + newDate.getMinutes().toString().padStart(2, '0');
+}
+
 export const ConvertSatsToMSats = (num: number) => {
   return num * SATS_MSAT;
 };

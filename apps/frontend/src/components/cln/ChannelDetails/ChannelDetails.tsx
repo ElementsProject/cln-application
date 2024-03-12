@@ -103,7 +103,7 @@ const ChannelDetails = (props) => {
   };
 
   return (
-    <form onSubmit={ChannelCloseHandler} className='h-100'>
+    <form onSubmit={ChannelCloseHandler} className='h-100' data-testid='channel-details'>
       <Card className='h-100 d-flex align-items-stretch'>
         <Card.Body className='text-dark d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>

@@ -114,8 +114,8 @@ export enum PaymentType {
   KEYSEND = 'Keysend'
 };
 
+export const APP_ANIMATION_DURATION = 2;
 export const TRANSITION_DURATION = 0.3;
-export const THEME_TRANSITION_DURATION = 0.5;
 export const COUNTUP_DURATION = 1.5;
 export const ANIMATION_INITIAL_STATE = { opacity: 0, scale: 0.1 };
 export const ANIMATION_FINAL_STATE = { opacity: 1, scale: 1 };

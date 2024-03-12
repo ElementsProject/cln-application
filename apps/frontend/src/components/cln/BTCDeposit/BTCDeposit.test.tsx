@@ -5,7 +5,7 @@ describe('BTCDeposit component ', () => {
   beforeEach(() => render(<BTCDeposit />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('btc-deposit')).toBeInTheDocument();
   });
 
 });

@@ -5,7 +5,8 @@ describe('InvalidInputMessage component ', () => {
   beforeEach(() => render(<InvalidInputMessage />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    render(<InvalidInputMessage message="my message!" />);
+    expect(screen.getByText('my message!')).toBeInTheDocument();
   });
 
 });

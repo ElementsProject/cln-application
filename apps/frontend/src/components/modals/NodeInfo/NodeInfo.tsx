@@ -45,7 +45,7 @@ const NodeInfo = () => {
   }
 
   return (
-      <Modal show={appCtx.showModals.nodeInfoModal} onHide={closeHandler} centered className='modal-lg'>
+      <Modal show={appCtx.showModals.nodeInfoModal} onHide={closeHandler} centered className='modal-lg' data-testid='node-info-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
           <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
         </Modal.Header>

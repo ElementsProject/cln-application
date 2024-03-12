@@ -1,11 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import CLNTransaction from './CLNTransaction';
+import { renderWithMockContext, getMockStoreData, mockClnTransaction } from '../../../utilities/test-utilities';
 
 describe('CLNTransaction component ', () => {
-  beforeEach(() => render(<CLNTransaction />));
+  let providerProps;
+  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData())));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    renderWithMockContext(<CLNTransaction transaction={mockClnTransaction} />, { providerProps });
+    expect(screen.getByTestId('invoice')).toBeInTheDocument();
+    expect(screen.getByTestId('preimage')).toBeInTheDocument();
+    expect(screen.queryByTestId('valid-till')).not.toBeInTheDocument();
   });
 
 });

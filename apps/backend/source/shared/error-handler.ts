@@ -24,7 +24,7 @@ function handleError(
     ? JSON.stringify(error)
     : typeof error === 'string'
     ? error
-    : 'Unknow Error!';
+    : 'Unknown Error!';
   logger.error(message, route, error.stack);
   return res.status(error.statusCode || HttpStatusCode.INTERNAL_SERVER).json(message);
 }
