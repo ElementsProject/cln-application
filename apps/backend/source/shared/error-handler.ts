@@ -19,12 +19,12 @@ function handleError(
   var message = error.message
     ? error.message
     : error.error
-    ? error.error
-    : typeof error === 'object'
-    ? JSON.stringify(error)
-    : typeof error === 'string'
-    ? error
-    : 'Unknown Error!';
+      ? error.error
+      : typeof error === 'object'
+        ? JSON.stringify(error)
+        : typeof error === 'string'
+          ? error
+          : 'Unknown Error!';
   logger.error(message, route, error.stack);
   return res.status(error.statusCode || HttpStatusCode.INTERNAL_SERVER).json(message);
 }
