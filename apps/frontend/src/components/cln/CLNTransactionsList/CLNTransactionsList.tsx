@@ -153,7 +153,7 @@ export const CLNTransactionsList = () => {
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
             }
             <Row className='text-center'>
-            { (appCtx.listChannels?.activeChannels && appCtx.listChannels.activeChannels.length && appCtx.listChannels.activeChannels.length > 0) ? 
+            { (appCtx.channels?.activeChannels && appCtx.channels.activeChannels.length && appCtx.channels.activeChannels.length > 0) ? 
               'No transaction found. Click send/receive to start!' : 
               'No transaction found. Open channel to start!'
             }

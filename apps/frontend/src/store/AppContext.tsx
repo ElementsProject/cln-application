@@ -11,40 +11,87 @@ import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
-import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
+import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer, ChannelsDomain, ChannelDomain, ListPeerChannels, ListPeerChannel, ListNodes, Node } from '../types/lightning-wallet.type';
 
-const aggregateChannels = (peers: Peer[], currentVersion: string) => {
+const aggregateChannelsUsingListPeerChannels = (listPeerChannels: ListPeerChannel[], listNodes: Node[]) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
-  peers?.forEach((peer: Peer) => {
-    if (peer.channels && peer.channels.length > 0) {
-      peer.channels.map(channel => {
-        channel.connected = peer.connected || false;
-        channel.node_alias = peer.alias || peer.id?.substring(0,20) || '';
-        if (isCompatibleVersion(currentVersion, '23.02')) {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
-        } else {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || 0) - (channel.msatoshi_to_us || 0)) / SATS_MSAT);
-        }
 
-        if (channel.state === 'CHANNELD_NORMAL') {
-          if (channel.connected) {
-            channel.current_state = 'ACTIVE';
-            aggregatedChannels.activeChannels.push(channel);
-          } else {
-            channel.current_state = 'INACTIVE';
-            aggregatedChannels.inactiveChannels.push(channel);
-          }
+  if (listPeerChannels == null) {
+    return;
+  }
+
+  listPeerChannels.forEach((channelDto: ListPeerChannel) => {
+    //if these fields are null, channel may not be ready to consume.  so skip displaying it.
+    if (listPeerChannels && listPeerChannels.length > 0) {
+      if (channelDto.channel_id == null || channelDto.short_channel_id == null) {
+        return;
+      }
+
+      let current_state;
+      let whichChannelArray;
+
+      if (channelDto.state === 'CHANNELD_NORMAL') {
+        if (channelDto.peer_connected) {
+          current_state = 'ACTIVE';
+          whichChannelArray = aggregatedChannels.activeChannels;
         } else {
-          channel.current_state = 'PENDING';
-          aggregatedChannels.pendingChannels.push(channel);
+          current_state = 'INACTIVE';
+          whichChannelArray = aggregatedChannels.inactiveChannels;
         }
-        return aggregatedChannels;
-      });
-    }
+      } else {
+        current_state = 'PENDING';
+        whichChannelArray = aggregatedChannels.pendingChannels;
+      }
+
+      let channelDomain: ChannelDomain = {
+        channel_id: channelDto.channel_id,
+        current_state: current_state,
+        short_channel_id: channelDto.short_channel_id,
+        node_alias: listNodes.find((node) => node.nodeid === channelDto.peer_id)?.alias,
+        alias: channelDto.alias,
+        satoshi_to_us: Math.floor((channelDto.to_us_msat || 0) / SATS_MSAT),
+        satoshi_to_them: Math.floor((channelDto.total_msat || 0) / SATS_MSAT),
+        satoshi_total: Math.floor(((channelDto.total_msat || 0) - (channelDto.to_us_msat || 0)) / SATS_MSAT),
+        connected: channelDto.peer_connected,
+        scratch_txid: channelDto.scratch_txid,
+        feerate: channelDto.feerate,
+        owner: channelDto.owner,
+        funding_txid: channelDto.funding_txid,
+        funding_outnum: channelDto.funding_outnum,
+        close_to_addr: channelDto.close_to_addr,
+        close_to: channelDto.close_to,
+        private: channelDto.private,
+        opener: channelDto.opener,
+        closer: channelDto.closer,
+        features: channelDto.features,
+        funding: channelDto.funding,
+        to_us_msat: channelDto.to_us_msat,
+        total_msat: channelDto.total_msat,
+        fee_base_msat: channelDto.fee_base_msat,
+        fee_proportional_millionths: channelDto.fee_proportional_millionths,
+        dust_limit_msat: channelDto.dust_limit_msat,
+        their_reserve_msat: channelDto.their_reserve_msat,
+        our_reserve_msat: channelDto.our_reserve_msat,
+        spendable_msat: channelDto.spendable_msat,
+        receivable_msat: channelDto.receivable_msat,
+        their_to_self_delay: channelDto.their_to_self_delay,
+        our_to_self_delay: channelDto.our_to_self_delay,
+        max_accepted_htlcs: channelDto.max_accepted_htlcs,
+        state_changes: channelDto.state_changes,
+        status: channelDto.status,
+        in_payments_offered: channelDto.in_payments_offered,
+        in_msatoshi_offered: channelDto.in_offered_msat,
+        in_payments_fulfilled: channelDto.in_payments_fulfilled,
+        in_msatoshi_fulfilled: channelDto.in_fulfilled_msat,
+        out_payments_offered: channelDto.out_payments_offered,
+        out_msatoshi_offered: channelDto.out_offered_msat,
+        out_payments_fulfilled: channelDto.out_payments_fulfilled,
+        out_msatoshi_fulfilled: channelDto.out_fulfilled_msat,
+        htlcs: channelDto.htlcs,
+      };
+
+      whichChannelArray.push(channelDomain);
+    };
   });
   aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'satoshi_total')
   return aggregatedChannels;
@@ -213,7 +260,7 @@ const AppContext = React.createContext<AppContextType>({
   nodeInfo: {isLoading: true, alias: '', version: ''},
   listFunds: {isLoading: true, channels: [], outputs: []},
   listPeers: {isLoading: true, peers: []},
-  listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
+  channels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
   listInvoices: {isLoading: true, invoices: []},
   listPayments: {isLoading: true, payments: []},
   listOffers: {isLoading: true, offers: []},
@@ -230,6 +277,7 @@ const AppContext = React.createContext<AppContextType>({
   setNodeInfo: (info: NodeInfo) => {},
   setListFunds: (fundsList: Fund) => {},
   setListPeers: (peersList: ListPeers) => {},
+  setChannels: (data: (ListPeerChannels | ListNodes)) => {},
   setListInvoices: (invoicesList: ListInvoices) => {},
   setListPayments: (paymentsList: ListPayments) => {},
   setListOffers: (offersList: ListOffers) => {},
@@ -248,7 +296,7 @@ const defaultAppState = {
   nodeInfo: {isLoading: true, alias: '', version: ''},
   listFunds: {isLoading: true, channels: [], outputs: []},
   listPeers: {isLoading: true, peers: []},
-  listChannels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
+  channels: {isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: []},
   listInvoices: {isLoading: true, invoices: []},
   listPayments: {isLoading: true, payments: []},
   listOffers: {isLoading: true, offers: []},
@@ -319,12 +367,18 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_PEERS:
-      let filteredChannels = aggregateChannels(action.payload.peers, state.nodeInfo.version);
       return {
         ...state,
-        listChannels: { ...filteredChannels, isLoading: false, error: action.payload.error },
         listPeers: action.payload
       };
+
+    case ApplicationActions.SET_CHANNELS:
+      let [listPeerChannels, listNodes] = action.payload.data;
+      let channelsDomain = aggregateChannelsUsingListPeerChannels(listPeerChannels.channels, listNodes.nodes);
+      return {
+        ...state,
+        channels: { ...channelsDomain, isLoading: false, error: action.payload.error }
+      }
 
     case ApplicationActions.SET_LIST_INVOICES:
       const sortedInvoices = action.payload.invoices?.sort((i1: Invoice, i2: Invoice) => {
@@ -430,6 +484,10 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_PEERS, payload: list });
   };
 
+  const setChannelsHandler = (data: (ListPeerChannels | ListNodes)) => {
+    dispatchApplicationAction({ type: ApplicationActions.SET_CHANNELS, payload: { data } });
+  };
+
   const setListInvoicesHandler = (list: ListInvoices) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_INVOICES, payload: list });
   };
@@ -461,7 +519,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     nodeInfo: applicationState.nodeInfo,
     listFunds: applicationState.listFunds,
     listPeers: applicationState.listPeers,
-    listChannels: applicationState.listChannels,
+    channels: applicationState.channels,
     listInvoices: applicationState.listInvoices,
     listPayments: applicationState.listPayments,
     listOffers: applicationState.listOffers,
@@ -478,6 +536,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     setNodeInfo: setNodeInfoHandler,
     setListFunds: setListFundsHandler,
     setListPeers: setListPeersHandler,
+    setChannels: setChannelsHandler,
     setListInvoices: setListInvoicesHandler,
     setListPayments: setListPaymentsHandler,
     setListOffers: setListOffersHandler,

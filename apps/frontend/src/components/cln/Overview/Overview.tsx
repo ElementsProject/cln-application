@@ -27,14 +27,14 @@ const Overview = () => {
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (appCtx.listChannels.activeChannels && appCtx.listChannels.activeChannels.length && appCtx.listChannels.activeChannels.length > 0
+    if (appCtx.channels.activeChannels && appCtx.channels.activeChannels.length && appCtx.channels.activeChannels.length > 0
       && countChannels.prev === 0) {
       countChannels.current = 0;
       countChannels.prev = 0;
-      const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
+      const animationChannels = animate(countChannels, appCtx.channels.activeChannels.length, { duration: COUNTUP_DURATION });
       return animationChannels.stop;
     }
-  }, [appCtx.listChannels.activeChannels, countChannels]);
+  }, [appCtx.channels.activeChannels, countChannels]);
 
   useEffect(() => {
     if (appCtx.listPeers.peers && appCtx.listPeers.peers.length && appCtx.listPeers.peers.length > 0
@@ -78,10 +78,10 @@ const Overview = () => {
                   <div>
                     <div className='text-light-white'>Active Channels</div>
                     <div className='fs-4 fw-bold text-dark-primary'>
-                      { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
+                      { appCtx.authStatus.isAuthenticated && appCtx.channels.isLoading ? 
                         <Spinner animation='grow' variant='primary' data-testid='overview-active-channels-spinner'/> : 
-                        appCtx.listChannels.error ? 
-                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-active-channels-error'>{appCtx.listChannels.error}</Alert> : 
+                        appCtx.channels.error ? 
+                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-active-channels-error'>{appCtx.channels.error}</Alert> : 
                           <motion.div data-testid='overview-active-channels'>{roundedChannels}</motion.div>
                       }
                     </div>

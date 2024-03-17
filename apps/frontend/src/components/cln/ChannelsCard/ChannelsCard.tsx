@@ -9,11 +9,11 @@ import Channels from '../Channels/Channels';
 import ChannelOpen from '../ChannelOpen/ChannelOpen';
 import ChannelDetails from '../ChannelDetails/ChannelDetails';
 import { CLEAR_STATUS_ALERT_DELAY, TRANSITION_DURATION } from '../../../utilities/constants';
-import { Channel } from '../../../types/lightning-wallet.type';
+import { ChannelDomain } from '../../../types/lightning-wallet.type';
 
 const ChannelsCard = () => {
   const [selChannelCard, setSelChannelCard] = useState('channels');
-  const [selChannel, setSelChannel] = useState<Channel | null>(null);
+  const [selChannel, setSelChannel] = useState<ChannelDomain | null>(null);
   const [newlyOpenedChannelId, setNewlyOpenedChannelId] = useState<string>('');
 
   const onCloseHandler = (channelId) => {

@@ -23,19 +23,19 @@ import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
 
 const Channels = (props) => {
   const appCtx = useContext(AppContext);
-  const allChannelsMerged = [...(appCtx.listChannels.activeChannels || []), ...(appCtx.listChannels.pendingChannels || []), ...(appCtx.listChannels.inactiveChannels || [])];
+  const allChannelsMerged = [...(appCtx.channels.activeChannels || []), ...(appCtx.channels.pendingChannels || []), ...(appCtx.channels.inactiveChannels || [])];
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
       <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
-        { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
+        { appCtx.authStatus.isAuthenticated && appCtx.channels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
-              <Spinner animation='grow' variant='primary' />
+              <Spinner animation='grow' variant='primary' data-testid='channels-spinner'/>
             </span> 
           :
-          appCtx.listChannels.error ? 
-            <Alert className='fs-8' variant='danger'>{appCtx.listChannels.error}</Alert> : 
+          appCtx.channels.error ? 
+            <Alert className='fs-8' variant='danger' data-testid='channels-error'>{appCtx.channels.error}</Alert> : 
             allChannelsMerged && allChannelsMerged.length && allChannelsMerged.length > 0 ?
               <PerfectScrollbar className='ps-show-always'>
                 <ListGroup as='ul' variant='flush' className='list-channels'>

@@ -26,7 +26,7 @@ describe('Overview component ', () => {
   })
 
   it('if channels are loading, show spinner', () => {
-    providerProps.listChannels.isLoading = true;
+    providerProps.channels.isLoading = true;
     renderWithMockContext(<Overview />, { providerProps });
     expect(screen.getByTestId('overview-active-channels-spinner'));
   })
@@ -39,8 +39,8 @@ describe('Overview component ', () => {
     expect(screen.getByTestId('overview-cln-remote-balances-error')).toBeInTheDocument();
   })
 
-  it('if listChannels error, show error', () => {
-    providerProps.listChannels.error = "error message!";
+  it('if channels error, show error', () => {
+    providerProps.channels.error = "error message!";
     renderWithMockContext(<Overview />, { providerProps });
     expect(screen.getByTestId('overview-active-channels-error')).toBeInTheDocument();
   })
