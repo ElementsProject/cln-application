@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { AppContext } from '../store/AppContext';
 import { ApplicationModes, Units } from './constants';
-import { Offer, LightningTransaction, Invoice, BkprTransaction, ChannelDomain } from '../types/lightning-wallet.type';
+import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel } from '../types/lightning-wallet.type';
 
 const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };
 
@@ -67,20 +67,18 @@ export const mockFirstOffer: Offer = {
   label: "MockOfferLabel"
 };
 
-export const mockSelectedChannel: ChannelDomain = {
+export const mockSelectedChannel: PeerChannel = {
+  peer_id: "mockPeerId",
+  peer_connected: true,
+  current_state: "ACTIVE",
+  state: "CHANNELD_NORMAL",
   channel_id: "1234567890abcdef",
-  current_state: "OPEN",
   short_channel_id: "123x456x789",
   node_alias: "MockNode",
   alias: {
     local: "LocalNodeAlias",
     remote: "RemoteNodeAlias",
   },
-  satoshi_to_us: 50000000,
-  satoshi_to_them: 50000000,
-  satoshi_total: 100000000,
-  state: "MockState",
-  connected: true,
   scratch_txid: "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456abcdef12",
   feerate: {
     perkw: 5000,
@@ -89,7 +87,6 @@ export const mockSelectedChannel: ChannelDomain = {
   owner: "MockOwner",
   funding_txid: "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456abcdef12",
   funding_outnum: 1,
-  close_to_addr: "mockAddr",
   close_to: "mockCloseTo",
   private: false,
   opener: "mockOpener",
@@ -101,9 +98,13 @@ export const mockSelectedChannel: ChannelDomain = {
     fee_paid_msat: "5000000000",
     fee_rcvd_msat: "5000000000"
   },
+  to_us_sat: 5000000000,
+  to_them_sat: 0,
+  total_sat: 10000000000,
   to_us_msat: 5000000000000,
+  to_them_msat: 0,
   total_msat: 10000000000000,
-  fee_base_msat: "1000",
+  fee_base_msat: 1000,
   fee_proportional_millionths: 10,
   dust_limit_msat: 546000,
   spendable_msat: 49000000000,
@@ -120,13 +121,13 @@ export const mockSelectedChannel: ChannelDomain = {
   }],
   status: ["CHANNELD_NORMAL:Reconnected, and reestablished."],
   in_payments_offered: 10,
-  in_msatoshi_offered: 5000000,
+  in_offered_msat: 5000000,
   in_payments_fulfilled: 5,
-  in_msatoshi_fulfilled: 2500000,
+  in_fulfilled_msat: 2500000,
   out_payments_offered: 10,
-  out_msatoshi_offered: 5000000,
+  out_offered_msat: 5000000,
   out_payments_fulfilled: 5,
-  out_msatoshi_fulfilled: 2500000,
+  out_fulfilled_msat: 2500000,
   htlcs: [{
     direction: "out",
     id: 1,
@@ -183,7 +184,7 @@ export const mockStoreData = {
     ],
     error: null
   },
-  channels: {
+  listChannels: {
     isLoading: false,
     activeChannels: [
       {

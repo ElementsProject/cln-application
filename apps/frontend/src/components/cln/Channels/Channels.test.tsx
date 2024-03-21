@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Channels from './Channels';
-import { getMockStoreData, mockSelectedChannel, renderWithMockContext } from '../../../utilities/test-utilities';
+import { getMockStoreData, renderWithMockContext } from '../../../utilities/test-utilities';
 
 describe('Channels component ', () => {
   let providerProps;
@@ -12,7 +12,7 @@ describe('Channels component ', () => {
   });
 
   it('if it is loading show the spinner', () => {
-    providerProps.channels.isLoading = true;
+    providerProps.listChannels.isLoading = true;
     renderWithMockContext(<Channels />, { providerProps });
     expect(screen.getByTestId('channels-spinner')).toBeInTheDocument();
   });
@@ -23,7 +23,7 @@ describe('Channels component ', () => {
   });
 
   it('if it has an error, show the error view', () => {
-    providerProps.channels.error = "error message";
+    providerProps.listChannels.error = "error message";
     renderWithMockContext(<Channels />, { providerProps });
     expect(screen.getByTestId('channels-error')).toBeInTheDocument();
   })
@@ -34,7 +34,7 @@ describe('Channels component ', () => {
   })
 
   it('if no channels found, show open channel text', () => {
-    providerProps.channels.activeChannels = [];
+    providerProps.listChannels.activeChannels = [];
     expect(screen.getByText("No channel found. Open channel to start!")).toBeInTheDocument();
   })
 

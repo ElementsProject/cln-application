@@ -32,14 +32,14 @@ describe('CLNTransactionsList component ', () => {
   })
 
   it('if there are no channels, show the text encouraging opening a channel', () => {
-    providerProps.channels.activeChannels = [];
+    providerProps.listChannels.activeChannels = [];
     providerProps.listLightningTransactions.clnTransactions = [];
     renderWithMockContext(<CLNTransactionsList />, { providerProps });
     expect(screen.getByText('No transaction found. Open channel to start!')).toBeInTheDocument();
   })
 
   it('if there are are active channels, show the text saying to use a channel', () => {
-    providerProps.channels.activeChannels = [mockSelectedChannel];
+    providerProps.listChannels.activeChannels = [mockSelectedChannel];
     providerProps.listLightningTransactions.clnTransactions = [];
     renderWithMockContext(<CLNTransactionsList />, { providerProps });
     expect(screen.getByText('No transaction found. Click send/receive to start!')).toBeInTheDocument();

@@ -26,7 +26,7 @@ describe('Overview component ', () => {
   })
 
   it('if channels are loading, show spinner', () => {
-    providerProps.channels.isLoading = true;
+    providerProps.listChannels.isLoading = true;
     renderWithMockContext(<Overview />, { providerProps });
     expect(screen.getByTestId('overview-active-channels-spinner'));
   })
@@ -40,7 +40,7 @@ describe('Overview component ', () => {
   })
 
   it('if channels error, show error', () => {
-    providerProps.channels.error = "error message!";
+    providerProps.listChannels.error = "error message!";
     renderWithMockContext(<Overview />, { providerProps });
     expect(screen.getByTestId('overview-active-channels-error')).toBeInTheDocument();
   })
