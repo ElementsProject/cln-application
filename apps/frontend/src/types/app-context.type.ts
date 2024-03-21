@@ -1,5 +1,5 @@
 import { ApplicationConfiguration, FiatConfig, ModalConfig, ToastConfig, WalletConnect, AuthResponse } from './app-config.type';
-import { Fund, ListInvoices, ListPayments, ListPeers, ListBitcoinTransactions, NodeInfo, WalletBalances, ListLightningTransactions, NodeFeeRate, ListOffers, ListPeerChannels, ChannelsDomain, ListNodes } from './lightning-wallet.type';
+import { Fund, ListInvoices, ListPayments, ListPeers, ListBitcoinTransactions, NodeInfo, WalletBalances, ListLightningTransactions, NodeFeeRate, ListOffers, ListPeerChannels, ListNodes } from './lightning-wallet.type';
 
 export type AppContextType = {
   authStatus: AuthResponse;
@@ -12,7 +12,7 @@ export type AppContextType = {
   nodeInfo: NodeInfo;
   listFunds: Fund;
   listPeers: ListPeers;
-  channels: ChannelsDomain;
+  listChannels: ListPeerChannels;
   listInvoices: ListInvoices;
   listPayments: ListPayments;
   listOffers: ListOffers;
@@ -29,7 +29,7 @@ export type AppContextType = {
   setNodeInfo: (newNodeInfo: NodeInfo) => void;
   setListFunds: (fundsList: Fund) => void;
   setListPeers: (peersList: ListPeers) => void;
-  setChannels: (data: (ListPeerChannels | ListNodes)) => void;
+  setListChannels: (data: (ListPeerChannels | ListNodes)) => void;
   setListInvoices: (invoicesList: ListInvoices) => void;
   setListPayments: (paymentsList: ListPayments) => void;
   setListOffers: (offersList: ListOffers) => void;
