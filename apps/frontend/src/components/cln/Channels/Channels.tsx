@@ -23,19 +23,19 @@ import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
 
 const Channels = (props) => {
   const appCtx = useContext(AppContext);
-  const allChannelsMerged = [...(appCtx.channels.activeChannels || []), ...(appCtx.channels.pendingChannels || []), ...(appCtx.channels.inactiveChannels || [])];
+  const allChannelsMerged = [...appCtx.listChannels.activeChannels, ...appCtx.listChannels.pendingChannels, ...appCtx.listChannels.inactiveChannels];
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
       <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
-        { appCtx.authStatus.isAuthenticated && appCtx.channels.isLoading ? 
+        { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
               <Spinner animation='grow' variant='primary' data-testid='channels-spinner'/>
             </span> 
           :
-          appCtx.channels.error ? 
-            <Alert className='fs-8' variant='danger' data-testid='channels-error'>{appCtx.channels.error}</Alert> : 
+          appCtx.listChannels.error ? 
+            <Alert className='fs-8' variant='danger' data-testid='channels-error'>{appCtx.listChannels.error}</Alert> : 
             allChannelsMerged && allChannelsMerged.length && allChannelsMerged.length > 0 ?
               <PerfectScrollbar className='ps-show-always'>
                 <ListGroup as='ul' variant='flush' className='list-channels'>
@@ -61,15 +61,15 @@ const Channels = (props) => {
                             </OverlayTrigger>
                           </div>
                           <ProgressBar>
-                            <ProgressBar variant='primary' now={(channel.satoshi_to_us > 1000000 || channel.satoshi_to_them > 1000000) ? (channel.satoshi_to_us / 1000) : channel.satoshi_to_us} key={1} />
-                            <ProgressBar variant='light' now={(channel.satoshi_to_us > 1000000 || channel.satoshi_to_them > 1000000) ? (channel.satoshi_to_them / 1000) : channel.satoshi_to_them} key={2} />
+                            <ProgressBar variant='primary' now={(channel.to_us_sat > 1000000 || channel.to_them_sat > 1000000) ? (channel.to_us_sat / 1000) : channel.to_us_sat} key={1} />
+                            <ProgressBar variant='light' now={(channel.to_us_sat > 1000000 || channel.to_them_sat > 1000000) ? (channel.to_them_sat / 1000) : channel.to_them_sat} key={2} />
                           </ProgressBar>
                           <Row className='text-light d-flex align-items-end justify-content-between'>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                              {formatCurrency(channel.satoshi_to_us, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                              {formatCurrency(channel.to_us_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
                             </Col>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                              {formatCurrency(channel.satoshi_to_them, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                              {formatCurrency(channel.to_them_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
                             </Col>
                           </Row>
                         </>

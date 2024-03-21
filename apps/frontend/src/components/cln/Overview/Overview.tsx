@@ -22,19 +22,22 @@ const Overview = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const countChannels: any = useMotionValue(0);
-  const roundedChannels: any = useTransform(countChannels, Math.round);
+  let roundedChannels: any = useTransform(countChannels, Math.round);
   const countPeers: any = useMotionValue(0);
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (appCtx.channels.activeChannels && appCtx.channels.activeChannels.length && appCtx.channels.activeChannels.length > 0
-      && countChannels.prev === 0) {
+    if (appCtx.listChannels.activeChannels.length > 0 && countChannels.prev === 0) {
       countChannels.current = 0;
       countChannels.prev = 0;
-      const animationChannels = animate(countChannels, appCtx.channels.activeChannels.length, { duration: COUNTUP_DURATION });
+      const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
+      return animationChannels.stop;
+    } else {
+      countChannels.current = appCtx.listChannels.activeChannels.length;
+      const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
       return animationChannels.stop;
     }
-  }, [appCtx.channels.activeChannels, countChannels]);
+  }, [appCtx.listChannels.activeChannels, countChannels]);
 
   useEffect(() => {
     if (appCtx.listPeers.peers && appCtx.listPeers.peers.length && appCtx.listPeers.peers.length > 0
@@ -78,10 +81,10 @@ const Overview = () => {
                   <div>
                     <div className='text-light-white'>Active Channels</div>
                     <div className='fs-4 fw-bold text-dark-primary'>
-                      { appCtx.authStatus.isAuthenticated && appCtx.channels.isLoading ? 
+                      { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
                         <Spinner animation='grow' variant='primary' data-testid='overview-active-channels-spinner'/> : 
-                        appCtx.channels.error ? 
-                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-active-channels-error'>{appCtx.channels.error}</Alert> : 
+                        appCtx.listChannels.error ? 
+                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-active-channels-error'>{appCtx.listChannels.error}</Alert> : 
                           <motion.div data-testid='overview-active-channels'>{roundedChannels}</motion.div>
                       }
                     </div>
