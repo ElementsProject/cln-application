@@ -5,6 +5,7 @@ import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { isCompatibleVersion } from '../utilities/data-formatters';
 
 let intervalID;
 let localAuthStatus: any = null;
@@ -75,16 +76,20 @@ const useHttp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFiatRate]);
 
-  const fetchData = useCallback(() => {
-    sendRequestToSetStore(appCtx.setNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
-    sendRequestToSetStore(appCtx.setListPeers, 'post', '/cln/call', { 'method': 'listpeers', 'params': [] });
-    sendRequestToSetStore(appCtx.setListInvoices, 'post', '/cln/call', { 'method': 'listinvoices', 'params': [] });
+  const setAfterNodeInfo = (nodeInfo: any) => {
     sendRequestToSetStore(
-      appCtx.setChannels,
+      appCtx.setListChannels,
       'post',
       '/cln/call',
-      { 'method': 'listpeerchannels', 'params': [] },
+      { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
       { 'method': 'listnodes', 'params': [] });
+      appCtx.setNodeInfo(nodeInfo);
+  };
+
+  const fetchData = useCallback(() => {
+    sendRequestToSetStore(setAfterNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
+    sendRequestToSetStore(appCtx.setListPeers, 'post', '/cln/call', { 'method': 'listpeers', 'params': [] });
+    sendRequestToSetStore(appCtx.setListInvoices, 'post', '/cln/call', { 'method': 'listinvoices', 'params': [] });
     sendRequestToSetStore(appCtx.setListPayments, 'post', '/cln/call', { 'method': 'listsendpays', 'params': [] });
     sendRequestToSetStore(appCtx.setListFunds, 'post', '/cln/call', { 'method': 'listfunds', 'params': [] });
     sendRequestToSetStore(appCtx.setListOffers, 'post', '/cln/call', { 'method': 'listoffers', 'params': [] });
@@ -112,11 +117,11 @@ const useHttp = () => {
         return res;
       }).catch(err => {
         logger.error(err);
-        return err;
+        throw err;
       });
     } catch (err: any) {
       logger.error(err);
-      return err;
+      throw err;
     }
   }, [fetchData]);
 
