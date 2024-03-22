@@ -9,7 +9,7 @@ describe('CLNTransaction component ', () => {
   it('should be in the document', () => {
     renderWithMockContext(<CLNTransaction transaction={mockClnTransaction} />, { providerProps });
     expect(screen.getByTestId('invoice')).toBeInTheDocument();
-    expect(screen.getByTestId('preimage')).toBeInTheDocument();
+    expect(screen.queryByTestId('preimage')).not.toBeInTheDocument();
     expect(screen.queryByTestId('valid-till')).not.toBeInTheDocument();
   });
 

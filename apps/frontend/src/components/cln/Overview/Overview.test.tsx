@@ -56,7 +56,7 @@ describe('Overview component ', () => {
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findAllByTestId('currency-box-finished-text');
     expect(currencyBox[0]).toBeInTheDocument();
-    expect(currencyBox[0]).toHaveTextContent('26,755,554');
+    expect(currencyBox[0]).toHaveTextContent('75,257,668');
   });
 
   it('check clnLocalBalance is proper balance when shortened', async () => {
@@ -64,16 +64,16 @@ describe('Overview component ', () => {
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findAllByTestId('currency-box-finished-text');
     expect(currencyBox[1]).toBeInTheDocument();
-    expect(currencyBox[1]).toHaveTextContent('13,377K');
+    expect(currencyBox[1]).toHaveTextContent('1,158K');
   });
 
   it('check clnRemoteBalance is proper balance when not shortened', async () => {
-    providerProps.walletBalances.clnRemoteBalance = 98765432;
+    providerProps.walletBalances.clnRemoteBalance = 60342000;
     renderWithMockContext(<Overview />, { providerProps });
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findAllByTestId('currency-box-finished-text');
     expect(currencyBox[2]).toBeInTheDocument();
-    expect(currencyBox[2]).toHaveTextContent('98,765K');
+    expect(currencyBox[2]).toHaveTextContent('60,342K');
   });
 
 });

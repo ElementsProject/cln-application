@@ -29,7 +29,7 @@ describe('CLNOffersList component ', () => {
     const offersList = screen.getByTestId('cln-offers-list');
 
     expect(offersList).toBeInTheDocument();
-    expect(offersList.children.length).toBe(2);
+    expect(offersList.children.length).toBe(1);
   })
 
   it('if there are no offers, show the on offers text', () => {

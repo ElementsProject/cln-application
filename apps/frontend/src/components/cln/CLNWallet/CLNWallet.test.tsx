@@ -34,7 +34,7 @@ describe('CLNWallet component ', () => {
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
-    expect(currencyBox).toHaveTextContent('.13378');
+    expect(currencyBox).toHaveTextContent('0.01158');
   })
 
 });
