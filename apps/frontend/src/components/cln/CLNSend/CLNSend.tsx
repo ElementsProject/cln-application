@@ -121,17 +121,17 @@ const CLNSend = (props) => {
             }
           } else {
             if (decodeRes && decodeRes.data) {
-              if (!decodeRes.data.msatoshi && !decodeRes.data.amount_msat) {
+              if (!decodeRes.data.amount_msat) {
                 setEmptyInvoice(true);
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
                   amount: ('Open Invoice')
                 });
               } else {
-                amountChangeHandler({target: {value: ((decodeRes.data.msatoshi || decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
+                amountChangeHandler({target: {value: ((decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
-                  amount: (formatCurrency((decodeRes.data.msatoshi || decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
                 });
               }
             }

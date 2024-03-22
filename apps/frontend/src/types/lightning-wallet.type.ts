@@ -21,7 +21,6 @@ export type NodeInfo = {
   version?: string;
   blockheight?: number;
   network?: string;
-  msatoshi_fees_collected?: number;
   fees_collected_msat?: string;
   'lightning-dir'?: string;
   warning_bitcoind_sync?: string;
@@ -201,8 +200,6 @@ export type Invoice = {
   description?: string;
   expires_at?: number;
   label?: string;
-  msatoshi?: number;
-  msatoshi_received?: number;
   amount_msat?: number;
   amount_received_msat?: number;
   local_offer_id?: string;
@@ -213,6 +210,10 @@ export type Invoice = {
   payment_preimage?: string;
   status?: string;
   created_index?: number;
+  // For backward compatibility: Start
+  msatoshi?: number;
+  msatoshi_received?: number;
+  // For backward compatibility: End
 };
 
 export type ListInvoices = {
@@ -230,8 +231,6 @@ export type Payment = {
   payment_hash?: string;
   status?: string;
   created_at?: number;
-  msatoshi?: number;
-  msatoshi_sent?: number;
   amount_msat?: number;
   amount_sent_msat?: number;
   destination?: string;
@@ -241,6 +240,10 @@ export type Payment = {
   bolt12?: string;
   payment_preimage?: string;
   erroronion?: string;
+  // For backward compatibility: Start
+  msatoshi?: number;
+  msatoshi_sent?: number;
+  // For backward compatibility: End
 }
 
 export type ListPayments = {
@@ -254,7 +257,6 @@ export type LightningTransaction = {
   // Both
   payment_hash?: string;
   status?: string;
-  msatoshi?: number;
   label?: string;
   bolt11?: string;
   description?: string;
@@ -262,12 +264,10 @@ export type LightningTransaction = {
   payment_preimage?: string;
   // Payment
   created_at?: number;
-  msatoshi_sent?: number;
   destination?: string;
   // Invoice
   created_index?: number;
   expires_at?: number;
-  msatoshi_received?: number;
   paid_at?: number;
   amount_msat?: number;
   amount_received_msat?: number;
