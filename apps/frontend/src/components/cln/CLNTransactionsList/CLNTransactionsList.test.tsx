@@ -28,7 +28,7 @@ describe('CLNTransactionsList component ', () => {
     renderWithMockContext(<CLNTransactionsList />, { providerProps });
     const offersList = screen.getByTestId('cln-transactions-list');
     expect(offersList).toBeInTheDocument();
-    expect(offersList.children.length).toBe(2);
+    expect(offersList.children.length).toBe(4);
   })
 
   it('if there are no channels, show the text encouraging opening a channel', () => {

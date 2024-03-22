@@ -72,11 +72,11 @@ export type StateChange = {
 };
 
 export type Funding = {
-  local_funds_msat?: string;
-  remote_funds_msat?: string;
-  pushed_msat?: string;
-  fee_paid_msat?: string;
-  fee_rcvd_msat?: string;
+  local_funds_msat?: number;
+  remote_funds_msat?: number;
+  pushed_msat?: number;
+  fee_paid_msat?: number;
+  fee_rcvd_msat?: number;
 };
 
 export type Alias = {
@@ -129,8 +129,11 @@ export type PeerChannel = {
   // Added for UI: End
   reestablished?: boolean;
   scratch_txid?: string;
+  last_tx_fee_msat?: number;
+  direction?: number;
+  close_to_addr?: string;
   channel_type?: ChannelType;
-  updates?: { local: any; remote: any; };
+  updates?: { local?: any; remote?: any; };
   ignore_fee_limits?: boolean;
   lost_state?: boolean;
   feerate?: ChannelFeeRate;
@@ -209,6 +212,7 @@ export type Invoice = {
   payment_hash?: string;
   payment_preimage?: string;
   status?: string;
+  created_index?: number;
 };
 
 export type ListInvoices = {
@@ -261,9 +265,12 @@ export type LightningTransaction = {
   msatoshi_sent?: number;
   destination?: string;
   // Invoice
+  created_index?: number;
   expires_at?: number;
   msatoshi_received?: number;
   paid_at?: number;
+  amount_msat?: number;
+  amount_received_msat?: number;
 }
 
 export type ListLightningTransactions = {

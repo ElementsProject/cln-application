@@ -30,7 +30,7 @@ describe('Channels component ', () => {
 
   it('alias should display in the document', () => {
     renderWithMockContext(<Channels />, { providerProps });
-    expect(screen.getByText("my_alias")).toBeInTheDocument();
+    expect(screen.getByText('LNDReg')).toBeInTheDocument();
   })
 
   it('if no channels found, show open channel text', () => {
