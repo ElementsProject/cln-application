@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useCallback, useContext } from 'react';
 import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { isCompatibleVersion } from '../utilities/data-formatters';
 
 let intervalID;
 let localAuthStatus: any = null;
@@ -41,29 +42,33 @@ const useHttp = () => {
     });
   }, [appCtx]);
 
-  const sendRequestToSetStore = useCallback((setStoreFunction: any, method: string, url: string, reqBody: any = null) => {
+  const sendRequestToSetStore = useCallback((setStoreFunction: any, method: string, url: string, ...reqBody: any[]) => {
     try {
-      axiosInstance(url, {method: method, data: reqBody}).then((response: any) => {
-        logger.info(response);
-        if(url === '/shared/config') {
-          getFiatRate(response.data.fiatUnit);
-        }
-        setStoreFunction({...response.data, ...{ isLoading: false, error: null }});
-      })
-      .catch(err => {
-        logger.error(err);
-        if(url === '/shared/config') {
-          getFiatRate('USD');
-        } else {
-          (err.code === 'ECONNABORTED') ?
-            setStoreFunction({ isLoading: false, error: 'Request timedout! Verify that CLN node is working!' }) :
-          (err.response && err.response.data) ?
-            setStoreFunction({ isLoading: false, error: err.response.data }) :
-            (!err.response && err.message) ?
-              setStoreFunction({ isLoading: false, error: err.message }) :
-              setStoreFunction({ isLoading: false, error: JSON.stringify(err) })
-        }
-      });
+      let requests: Promise<AxiosResponse<any, any>>[];
+
+      if (reqBody.length > 0) {
+        requests = reqBody.map((body: any) => axiosInstance(url, { method: method, data: body }));
+      } else {
+        requests = [axiosInstance(url, { method: method, data: reqBody})];
+      }
+
+      Promise.all(requests)
+        .then((responses: any[]) => {
+          logger.info(responses);
+          if (url === '/shared/config') {
+            getFiatRate(responses[0].data.fiatUnit); // shared/config will always only have 1 response
+          }
+
+          const combinedResponses = responses.map(response => ({ ...response.data, ...{ isLoading: false, error: null } }));
+
+          if (combinedResponses.length === 1) {
+            setStoreFunction({ ...responses[0].data, ...{ isLoading: false, error: null }});
+          } else if (combinedResponses.length > 1) {
+            setStoreFunction(responses.map(response => ({ ...response.data })));
+          } else {
+            //no-op
+          }
+        })
     } catch (err: any) {
       logger.error(err);
       setStoreFunction({ isLoading: false, error: err });
@@ -71,8 +76,18 @@ const useHttp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFiatRate]);
 
+  const setAfterNodeInfo = (nodeInfo: any) => {
+    sendRequestToSetStore(
+      appCtx.setListChannels,
+      'post',
+      '/cln/call',
+      { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
+      { 'method': 'listnodes', 'params': [] });
+      appCtx.setNodeInfo(nodeInfo);
+  };
+
   const fetchData = useCallback(() => {
-    sendRequestToSetStore(appCtx.setNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
+    sendRequestToSetStore(setAfterNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
     sendRequestToSetStore(appCtx.setListPeers, 'post', '/cln/call', { 'method': 'listpeers', 'params': [] });
     sendRequestToSetStore(appCtx.setListInvoices, 'post', '/cln/call', { 'method': 'listinvoices', 'params': [] });
     sendRequestToSetStore(appCtx.setListPayments, 'post', '/cln/call', { 'method': 'listsendpays', 'params': [] });
@@ -102,11 +117,11 @@ const useHttp = () => {
         return res;
       }).catch(err => {
         logger.error(err);
-        return err;
+        throw err;
       });
     } catch (err: any) {
       logger.error(err);
-      return err;
+      throw err;
     }
   }, [fetchData]);
 

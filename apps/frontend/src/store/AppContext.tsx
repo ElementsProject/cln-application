@@ -11,42 +11,43 @@ import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
-import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
+import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, ListPeerChannels, ListNodes, Node } from '../types/lightning-wallet.type';
 
-const aggregateChannels = (peers: Peer[], currentVersion: string) => {
+const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[], version: string) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
-  peers?.forEach((peer: Peer) => {
-    if (peer.channels && peer.channels.length > 0) {
-      peer.channels.map(channel => {
-        channel.connected = peer.connected || false;
-        channel.node_alias = peer.alias || peer.id?.substring(0,20) || '';
-        if (isCompatibleVersion(currentVersion, '23.02')) {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
-        } else {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || 0) - (channel.msatoshi_to_us || 0)) / SATS_MSAT);
-        }
-
-        if (channel.state === 'CHANNELD_NORMAL') {
-          if (channel.connected) {
-            channel.current_state = 'ACTIVE';
-            aggregatedChannels.activeChannels.push(channel);
-          } else {
-            channel.current_state = 'INACTIVE';
-            aggregatedChannels.inactiveChannels.push(channel);
-          }
-        } else {
-          channel.current_state = 'PENDING';
-          aggregatedChannels.pendingChannels.push(channel);
-        }
-        return aggregatedChannels;
-      });
+  if (!listPeerChannels || (!listPeerChannels.channels && !listPeerChannels.peers)) {
+    return aggregatedChannels;
+  }
+  if (!isCompatibleVersion((version || ''), '23.02') && listPeerChannels.peers) {
+    listPeerChannels.channels = [];
+    listPeerChannels.channels = listPeerChannels.peers.flatMap(peer => {
+      return peer.channels.map(channel => ({
+        ...channel,
+        peer_id: peer.id,
+        peer_connected: peer.connected
+      }));
+    });    
+  }
+  listPeerChannels.channels.forEach((peerChannel: any) => {
+    peerChannel.node_alias = listNodes.find((node) => node.nodeid === peerChannel.peer_id)?.alias || 'Unknown';
+    peerChannel.to_us_sat = Math.floor((peerChannel.to_us_msat || 0) / SATS_MSAT);
+    peerChannel.total_sat = Math.floor((peerChannel.total_msat || 0) / SATS_MSAT);
+    peerChannel.to_them_sat = Math.floor(((peerChannel.total_msat || 0) - (peerChannel.to_us_msat || 0)) / SATS_MSAT);
+    if (peerChannel.state === 'CHANNELD_NORMAL') {
+      if (peerChannel.peer_connected) {
+        peerChannel.current_state = 'ACTIVE';
+        aggregatedChannels.activeChannels.push(peerChannel);
+      } else {
+        peerChannel.current_state = 'INACTIVE';
+        aggregatedChannels.inactiveChannels.push(peerChannel);
+      }
+    } else {
+      peerChannel.current_state = 'PENDING';
+      aggregatedChannels.pendingChannels.push(peerChannel);
     }
+    return aggregatedChannels;
   });
-  aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'satoshi_total')
+  aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'total_msat')
   return aggregatedChannels;
 }
 
@@ -183,15 +184,16 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
   } else {
     return events.reduce((acc: any[], event, i) => {
       if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
-        if (isCompatibleVersion(currentVersion, '23.02')) {
+        if (isCompatibleVersion(currentVersion, '22.11')) {
           event.credit_msat = event.credit_msat || 0;
           event.debit_msat = event.debit_msat || 0;
         } else {
-          event.credit_msat = event.credit_msat && typeof event.credit_msat === 'string' ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : 0;
-          event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : 0;
+          event.credit_msat = event.credit_msat && typeof event.credit_msat === 'string' ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : (event.credit_msat || 0);
+          event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : (event.debit_msat || 0);
         }
         const lastTx = acc.length && acc.length > 0 ? acc[acc.length - 1] : { tag: '' };
         if (lastTx.tag === 'withdrawal' && event.tag === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
+          // Calculate the net amount from the last withdrawal and this deposit
           lastTx.debit_msat = (lastTx.debit_msat - +event.credit_msat);
         } else {
           acc.push(event);
@@ -230,6 +232,7 @@ const AppContext = React.createContext<AppContextType>({
   setNodeInfo: (info: NodeInfo) => {},
   setListFunds: (fundsList: Fund) => {},
   setListPeers: (peersList: ListPeers) => {},
+  setListChannels: (data: (ListPeerChannels | ListNodes)) => {},
   setListInvoices: (invoicesList: ListInvoices) => {},
   setListPayments: (paymentsList: ListPayments) => {},
   setListOffers: (offersList: ListOffers) => {},
@@ -319,12 +322,18 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_PEERS:
-      let filteredChannels = aggregateChannels(action.payload.peers, state.nodeInfo.version);
       return {
         ...state,
-        listChannels: { ...filteredChannels, isLoading: false, error: action.payload.error },
         listPeers: action.payload
       };
+
+    case ApplicationActions.SET_LIST_CHANNELS:
+      const [listPeerChannels, listNodes] = action.payload.data;
+      const aggrChannels = aggregatePeerChannels(listPeerChannels, listNodes.nodes, state.nodeInfo.version);
+      return {
+        ...state,
+        listChannels: { ...aggrChannels, isLoading: false, error: action.payload.error }
+      }
 
     case ApplicationActions.SET_LIST_INVOICES:
       const sortedInvoices = action.payload.invoices?.sort((i1: Invoice, i2: Invoice) => {
@@ -430,6 +439,10 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_PEERS, payload: list });
   };
 
+  const setListChannelsHandler = (data: (ListPeerChannels | ListNodes)) => {
+    dispatchApplicationAction({ type: ApplicationActions.SET_LIST_CHANNELS, payload: { data } });
+  };
+
   const setListInvoicesHandler = (list: ListInvoices) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_INVOICES, payload: list });
   };
@@ -478,6 +491,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     setNodeInfo: setNodeInfoHandler,
     setListFunds: setListFundsHandler,
     setListPeers: setListPeersHandler,
+    setListChannels: setListChannelsHandler,
     setListInvoices: setListInvoicesHandler,
     setListPayments: setListPaymentsHandler,
     setListOffers: setListOffersHandler,

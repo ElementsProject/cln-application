@@ -4,6 +4,9 @@ export type Address = {
   port?: number;
 };
 
+/**
+ * Node from getinfo.
+ */
 export type NodeInfo = {
   isLoading: boolean;
   id?: string;
@@ -25,6 +28,25 @@ export type NodeInfo = {
   our_features?: any;
   error?: any;
 };
+
+/**
+ * Node from ListNodes.
+ */
+export type Node = {
+  nodeid: string;
+  last_timestamp?: number;
+  alias?: string;
+  color?: string;
+  features?: string[];
+  addresses?: Address[];
+  option_will_fund?: LiquidityAd;
+}
+
+export type ListNodes = {
+  isLoading: boolean;
+  nodes: Node[];
+  error?: any;
+}
 
 export type ChannelFeeRate = {
   perkw?: number;
@@ -62,72 +84,6 @@ export type Alias = {
   remote?: string;
 };
 
-export type Channel = {
-  channel_id: string;
-  current_state: string;
-  short_channel_id: string;
-  node_alias: string;
-  alias: Alias;
-  satoshi_to_us: number;
-  satoshi_to_them: number;
-  satoshi_total: number;
-  state?: string;
-  connected?: boolean;
-  scratch_txid?: string;
-  feerate?: ChannelFeeRate;
-  owner?: string;
-  direction?: number;
-  funding_txid?: string;
-  funding_outnum?: number;
-  close_to_addr?: string;
-  close_to?: string;
-  private?: boolean;
-  opener?: string;
-  features?: string[];
-  funding?: Funding;
-  msatoshi_to_us?: number;
-  msatoshi_to_us_min?: number;
-  msatoshi_to_us_max?: number;
-  msatoshi_total?: number;
-  to_us_msat?: number;
-  total_msat?: number;
-  fee_base_msat?: string;
-  fee_proportional_millionths?: number;
-  dust_limit_satoshis?: number;
-  dust_limit_msat?: number;
-  max_htlc_value_in_flight_msat?: number;
-  their_channel_reserve_satoshis?: number;
-  our_channel_reserve_satoshis?: number;
-  spendable_msatoshi?: number;
-  receivable_msatoshi?: number;
-  spendable_msat?: number;
-  receivable_msat?: number;
-  htlc_minimum_msat?: number;
-  their_to_self_delay?: number;
-  our_to_self_delay?: number;
-  max_accepted_htlcs?: number;
-  state_changes?: StateChange[];
-  status?: string[];
-  last_tx_fee_msat?: string;
-  in_payments_offered?: number;
-  in_msatoshi_offered?: number;
-  in_payments_fulfilled?: number;
-  in_msatoshi_fulfilled?: number;
-  out_payments_offered?: number;
-  out_msatoshi_offered?: number;
-  out_payments_fulfilled?: number;
-  out_msatoshi_fulfilled?: number;
-  htlcs?: HTLC[];
-};
-
-export type ListChannels = {
-  isLoading: boolean;
-  activeChannels?: Channel[];
-  pendingChannels?: Channel[];
-  inactiveChannels?: Channel[];
-  error?: any;
-}
-
 export type LiquidityAd = {
   lease_fee_base_msat?: string;
   lease_fee_basis?: number;
@@ -147,12 +103,92 @@ export type Peer = {
   features?: string;
   addresses?: Address[];
   option_will_fund?: LiquidityAd;
-  channels?: Channel[];
 };
 
 export type ListPeers = {
   isLoading: boolean;
   peers?: Peer[];
+  error?: any;
+}
+
+export type ChannelType = {
+  bits?: number[];
+  names?: string[];
+}
+
+export type PeerChannel = {
+  peer_id: string;
+  peer_connected: boolean;
+  state: string;
+  // Added for UI: Start
+  current_state: string;
+  node_alias: string;
+  total_sat: number;
+  to_us_sat: number;
+  to_them_sat: number;
+  // Added for UI: End
+  reestablished?: boolean;
+  scratch_txid?: string;
+  channel_type?: ChannelType;
+  updates?: { local: any; remote: any; };
+  ignore_fee_limits?: boolean;
+  lost_state?: boolean;
+  feerate?: ChannelFeeRate;
+  owner?: string;
+  short_channel_id?: string;
+  channel_id?: string;
+  funding_txid?: string;
+  funding_outnum?: number;
+  initial_feerate?: string;
+  last_feerate?: string;
+  next_feerate?: string;
+  next_fee_step?: number;
+  inflight?: Inflight[];
+  close_to?: string;
+  private?: boolean;
+  opener?: string;
+  closer?: string;
+  features?: string[];
+  funding?: Funding;
+  total_msat?: number;
+  to_us_msat?: number;
+  to_them_msat?: number;
+  min_to_us_msat?: number;
+  max_to_us_msat?: number;
+  fee_base_msat?: number;
+  fee_proportional_millionths?: number;
+  dust_limit_msat?: number;
+  max_total_htlc_in_msat?: number;
+  their_reserve_msat?: number;
+  our_reserve_msat?: number;
+  spendable_msat?: number;
+  receivable_msat?: number;
+  minimum_htlc_in_msat?: number;
+  minimum_htlc_out_msat?: number;
+  maximum_htlc_out_msat?: number;
+  their_to_self_delay?: number;
+  our_to_self_delay?: number;
+  max_accepted_htlcs?: number;
+  alias?: Alias;
+  state_changes?: StateChange[];
+  status?: string[];
+  in_payments_offered?: number;
+  in_offered_msat?: number;
+  in_payments_fulfilled?: number;
+  in_fulfilled_msat?: number;
+  out_payments_offered?: number;
+  out_offered_msat?: number;
+  out_payments_fulfilled?: number;
+  out_fulfilled_msat?: number;
+  last_stable_connection?: number;
+  htlcs?: HTLC[];
+};
+
+export type ListPeerChannels = {
+  isLoading: boolean;
+  activeChannels: PeerChannel[];
+  pendingChannels: PeerChannel[];
+  inactiveChannels: PeerChannel[];
   error?: any;
 }
 
@@ -408,4 +444,14 @@ export type ListOffers = {
   isLoading: boolean;
   offers?: Offer[];
   error?: any;
+}
+
+export type Inflight = {
+  funding_txid: string;
+  funding_outnum: number;
+  feerate: string;
+  total_funding_msat: string;
+  splice_amount: number;
+  our_funding_msat: string;
+  scratch_txid?: string;
 }

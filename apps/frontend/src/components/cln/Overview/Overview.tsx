@@ -22,15 +22,18 @@ const Overview = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const countChannels: any = useMotionValue(0);
-  const roundedChannels: any = useTransform(countChannels, Math.round);
+  let roundedChannels: any = useTransform(countChannels, Math.round);
   const countPeers: any = useMotionValue(0);
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (appCtx.listChannels.activeChannels && appCtx.listChannels.activeChannels.length && appCtx.listChannels.activeChannels.length > 0
-      && countChannels.prev === 0) {
+    if (appCtx.listChannels.activeChannels.length > 0 && countChannels.prev === 0) {
       countChannels.current = 0;
       countChannels.prev = 0;
+      const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
+      return animationChannels.stop;
+    } else {
+      countChannels.current = appCtx.listChannels.activeChannels.length;
       const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
       return animationChannels.stop;
     }

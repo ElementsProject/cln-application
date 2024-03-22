@@ -83,6 +83,11 @@ export const copyTextToClipboard = (textToCopy: string | undefined) => {
   });
 }
 
+/**
+ * @param currentVersion The current version of this app.
+ * @param checkVersion The version to check against.
+ * @returns Returns whether the current version is equal to or higher than checkVersion.
+ */
 export const isCompatibleVersion = (currentVersion: string, checkVersion: string) => {
   if (currentVersion) {
     const versionsArr = currentVersion.trim()?.replace('v', '').split('-')[0].split('.') || [];

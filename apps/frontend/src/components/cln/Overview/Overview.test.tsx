@@ -39,7 +39,7 @@ describe('Overview component ', () => {
     expect(screen.getByTestId('overview-cln-remote-balances-error')).toBeInTheDocument();
   })
 
-  it('if listChannels error, show error', () => {
+  it('if channels error, show error', () => {
     providerProps.listChannels.error = "error message!";
     renderWithMockContext(<Overview />, { providerProps });
     expect(screen.getByTestId('overview-active-channels-error')).toBeInTheDocument();

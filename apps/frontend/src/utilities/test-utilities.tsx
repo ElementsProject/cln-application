@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { AppContext } from '../store/AppContext';
 import { ApplicationModes, Units } from './constants';
-import { Offer, Channel, LightningTransaction, Invoice, BkprTransaction } from '../types/lightning-wallet.type';
+import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel } from '../types/lightning-wallet.type';
 
 const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };
 
@@ -67,30 +67,26 @@ export const mockFirstOffer: Offer = {
   label: "MockOfferLabel"
 };
 
-export const mockSelectedChannel: Channel = {
+export const mockSelectedChannel: PeerChannel = {
+  peer_id: "mockPeerId",
+  peer_connected: true,
+  current_state: "ACTIVE",
+  state: "CHANNELD_NORMAL",
   channel_id: "1234567890abcdef",
-  current_state: "OPEN",
   short_channel_id: "123x456x789",
   node_alias: "MockNode",
   alias: {
     local: "LocalNodeAlias",
     remote: "RemoteNodeAlias",
   },
-  satoshi_to_us: 50000000,
-  satoshi_to_them: 50000000,
-  satoshi_total: 100000000,
-  state: "MockState",
-  connected: true,
   scratch_txid: "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456abcdef12",
   feerate: {
     perkw: 5000,
     perkb: 20000
   },
   owner: "MockOwner",
-  direction: 1,
   funding_txid: "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456abcdef12",
   funding_outnum: 1,
-  close_to_addr: "mockAddr",
   close_to: "mockCloseTo",
   private: false,
   opener: "mockOpener",
@@ -102,24 +98,17 @@ export const mockSelectedChannel: Channel = {
     fee_paid_msat: "5000000000",
     fee_rcvd_msat: "5000000000"
   },
-  msatoshi_to_us: 5000000000000,
-  msatoshi_to_us_min: 4000000000000,
-  msatoshi_to_us_max: 6000000000000,
-  msatoshi_total: 10000000000000,
+  to_us_sat: 5000000000,
+  to_them_sat: 0,
+  total_sat: 10000000000,
   to_us_msat: 5000000000000,
+  to_them_msat: 0,
   total_msat: 10000000000000,
-  fee_base_msat: "1000",
+  fee_base_msat: 1000,
   fee_proportional_millionths: 10,
-  dust_limit_satoshis: 546,
   dust_limit_msat: 546000,
-  max_htlc_value_in_flight_msat: 99000000,
-  their_channel_reserve_satoshis: 10000,
-  our_channel_reserve_satoshis: 10000,
-  spendable_msatoshi: 49000000,
-  receivable_msatoshi: 49000000,
   spendable_msat: 49000000000,
   receivable_msat: 49000000000,
-  htlc_minimum_msat: 1000,
   their_to_self_delay: 144,
   our_to_self_delay: 144,
   max_accepted_htlcs: 483,
@@ -131,15 +120,14 @@ export const mockSelectedChannel: Channel = {
     message: "Remote peer unresponsive"
   }],
   status: ["CHANNELD_NORMAL:Reconnected, and reestablished."],
-  last_tx_fee_msat: "1234",
   in_payments_offered: 10,
-  in_msatoshi_offered: 5000000,
+  in_offered_msat: 5000000,
   in_payments_fulfilled: 5,
-  in_msatoshi_fulfilled: 2500000,
+  in_fulfilled_msat: 2500000,
   out_payments_offered: 10,
-  out_msatoshi_offered: 5000000,
+  out_offered_msat: 5000000,
   out_payments_fulfilled: 5,
-  out_msatoshi_fulfilled: 2500000,
+  out_fulfilled_msat: 2500000,
   htlcs: [{
     direction: "out",
     id: 1,
@@ -211,6 +199,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias1",
           remote: "RemoteNodeAlias1",
         },
+        node_alias: "my_alias",
         feerate: {
           perkw: 5000,
           perkb: 20000
@@ -237,6 +226,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias2",
           remote: "RemoteNodeAlias2",
         },
+        node_alias: "my_alias2",
         feerate: {
           perkw: 4000,
           perkb: 18000
@@ -265,6 +255,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias3",
           remote: "RemoteNodeAlias3",
         },
+        node_alias: "my_alias3",
         feerate: {
           perkw: 3500,
           perkb: 15000
@@ -291,6 +282,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias4",
           remote: "RemoteNodeAlias4",
         },
+        node_alias: "my_alias4",
         feerate: {
           perkw: 3000,
           perkb: 12000
@@ -319,6 +311,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias5",
           remote: "RemoteNodeAlias5",
         },
+        node_alias: "my_alias5",
         feerate: {
           perkw: 2500,
           perkb: 10000
@@ -345,6 +338,7 @@ export const mockStoreData = {
           local: "LocalNodeAlias6",
           remote: "RemoteNodeAlias6",
         },
+        node_alias: "my_alias6",
         feerate: {
           perkw: 2000,
           perkb: 8000
@@ -486,9 +480,6 @@ export const mockStoreData = {
           }
         ],
         option_will_fund: {},
-        channels: [
-          // You can add Channel objects here
-        ],
       },
       {
         id: '0299fc0200a6e57e4933421a433284984390adc0cc32ac57fb104f2c9782c4ca86',
@@ -506,9 +497,6 @@ export const mockStoreData = {
           }
         ],
         option_will_fund: {},
-        channels: [
-          // You can add Channel objects here
-        ],
       },
     ],
     error: null,

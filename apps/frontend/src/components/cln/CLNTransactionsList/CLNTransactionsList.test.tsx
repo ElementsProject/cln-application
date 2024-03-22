@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import CLNTransactionsList from './CLNTransactionsList';
-import { renderWithMockContext, getMockStoreData } from '../../../utilities/test-utilities';
+import { renderWithMockContext, getMockStoreData, mockSelectedChannel } from '../../../utilities/test-utilities';
 
 describe('CLNTransactionsList component ', () => {
   let providerProps;
@@ -31,17 +31,18 @@ describe('CLNTransactionsList component ', () => {
     expect(offersList.children.length).toBe(2);
   })
 
-  it('if there are no channels, show the no offers text', () => {
-    providerProps.listLightningTransactions.clnTransactions = [];
-    renderWithMockContext(<CLNTransactionsList />, { providerProps });
-    expect(screen.getByText('No transaction found. Click send/receive to start!')).toBeInTheDocument();
-  })
-
-  it('if there are active channels, show the proper text', () => {
+  it('if there are no channels, show the text encouraging opening a channel', () => {
     providerProps.listChannels.activeChannels = [];
     providerProps.listLightningTransactions.clnTransactions = [];
     renderWithMockContext(<CLNTransactionsList />, { providerProps });
     expect(screen.getByText('No transaction found. Open channel to start!')).toBeInTheDocument();
+  })
+
+  it('if there are are active channels, show the text saying to use a channel', () => {
+    providerProps.listChannels.activeChannels = [mockSelectedChannel];
+    providerProps.listLightningTransactions.clnTransactions = [];
+    renderWithMockContext(<CLNTransactionsList />, { providerProps });
+    expect(screen.getByText('No transaction found. Click send/receive to start!')).toBeInTheDocument();
   })
 
 });
