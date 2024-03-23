@@ -89,12 +89,15 @@ export const copyTextToClipboard = (textToCopy: string | undefined) => {
  * @returns Returns whether the current version is equal to or higher than checkVersion.
  */
 export const isCompatibleVersion = (currentVersion: string, checkVersion: string) => {
+  if (!checkVersion || currentVersion === '')
+    return false;
   if (currentVersion) {
-    const versionsArr = currentVersion.trim()?.replace('v', '').split('-')[0].split('.') || [];
+    const versionsArr = currentVersion.trim()?.replace('v', '').split(/[rc]+/)[0].split('-')[0].split('.') || [];
     const checkVersionsArr = checkVersion.split('.');
     return (+versionsArr[0] > +checkVersionsArr[0]) ||
       (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] > +checkVersionsArr[1]) ||
-      (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] === +checkVersionsArr[1] && +versionsArr[2] >= +checkVersionsArr[2]);
+      (!!versionsArr[2] ? (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] === +checkVersionsArr[1] && +versionsArr[2] >= +checkVersionsArr[2]) :
+        (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] >= +checkVersionsArr[1]));
   }
   return false;
 }
