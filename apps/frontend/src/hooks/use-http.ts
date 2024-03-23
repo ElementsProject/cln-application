@@ -76,7 +76,7 @@ const useHttp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFiatRate]);
 
-  const setAfterNodeInfo = (nodeInfo: any) => {
+  const setAfterNodeInfo = useCallback((nodeInfo: any) => {
     sendRequestToSetStore(
       appCtx.setListChannels,
       'post',
@@ -84,7 +84,7 @@ const useHttp = () => {
       { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
       { 'method': 'listnodes', 'params': [] });
       appCtx.setNodeInfo(nodeInfo);
-  };
+  }, [appCtx, sendRequestToSetStore]);
 
   const fetchData = useCallback(() => {
     sendRequestToSetStore(setAfterNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
@@ -95,7 +95,7 @@ const useHttp = () => {
     sendRequestToSetStore(appCtx.setListOffers, 'post', '/cln/call', { 'method': 'listoffers', 'params': [] });
     sendRequestToSetStore(appCtx.setListBitcoinTransactions, 'post', '/cln/call', { 'method': 'bkpr-listaccountevents', 'params': [] });
     sendRequestToSetStore(appCtx.setFeeRate, 'post', '/cln/call', { 'method': 'feerates', 'params': ['perkb'] });
-  }, [appCtx, sendRequestToSetStore]);
+  }, [appCtx, sendRequestToSetStore, setAfterNodeInfo]);
 
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
     axiosInstance.post('/shared/config', updatedConfig)
