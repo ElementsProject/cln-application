@@ -7,6 +7,7 @@ import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { setSharedApplicationConfig, overrideSettingsWithEnvVariables } from '../shared/utils.js';
+import { sep } from 'path';
 
 class SharedController {
   getApplicationSettings(req: Request, res: Response, next: NextFunction) {
@@ -44,9 +45,13 @@ class SharedController {
   getWalletConnectSettings(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info('Getting Connection Settings');
+      const CERTS_PATH =
+        process.env.CORE_LIGHTNING_PATH + sep + process.env.APP_BITCOIN_NETWORK + sep;
       let macaroon = '';
+      let clientKey = '';
+      let clientCert = '';
+      let caCert = '';
       let packageData = '{ version: "0.0.4" }';
-
       if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
         logger.info(
           'Getting REST Access Macaroon from ' + process.env.APP_CORE_LIGHTNING_REST_CERT_DIR,
@@ -56,12 +61,36 @@ class SharedController {
       if (fs.existsSync('package.json')) {
         packageData = Buffer.from(fs.readFileSync('package.json')).toString();
       }
+      if (fs.existsSync(CERTS_PATH + 'client-key.pem')) {
+        clientKey = fs.readFileSync(CERTS_PATH + 'client-key.pem').toString();
+        clientKey = clientKey
+          .replace(/(\r\n|\n|\r)/gm, '')
+          .replace('-----BEGIN PRIVATE KEY-----', '')
+          .replace('-----END PRIVATE KEY-----', '');
+      }
+      if (fs.existsSync(CERTS_PATH + 'client.pem')) {
+        clientCert = fs.readFileSync(CERTS_PATH + 'client.pem').toString();
+        clientCert = clientCert
+          .replace(/(\r\n|\n|\r)/gm, '')
+          .replace('-----BEGIN CERTIFICATE-----', '')
+          .replace('-----END CERTIFICATE-----', '');
+      }
+      if (fs.existsSync(CERTS_PATH + 'ca.pem')) {
+        caCert = fs.readFileSync(CERTS_PATH + 'ca.pem').toString();
+        caCert = caCert
+          .replace(/(\r\n|\n|\r)/gm, '')
+          .replace('-----BEGIN CERTIFICATE-----', '')
+          .replace('-----END CERTIFICATE-----', '');
+      }
       const CONNECT_WALLET_SETTINGS = {
         LOCAL_HOST: process.env.LOCAL_HOST || '',
         DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
         TOR_HOST: process.env.APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE || '',
         WS_PORT: process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || '',
         GRPC_PORT: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || '',
+        CLIENT_KEY: clientKey,
+        CLIENT_CERT: clientCert,
+        CA_CERT: caCert,
         REST_PORT: process.env.APP_CORE_LIGHTNING_REST_PORT || '',
         REST_MACAROON: macaroon,
         CLN_NODE_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || '',
