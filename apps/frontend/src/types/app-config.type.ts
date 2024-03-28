@@ -1,8 +1,20 @@
 import { ApplicationModes, Units } from '../utilities/constants';
 
+export type ConnectWalletFields = {
+  port: { title: string; field: string; }; // REST, Websocket or gRPC
+  host: { title: string; field: string; };
+  macaroon: { title: string; field: string; }; // Or ClientKey
+  connectUrl: { title: string; field: string; };
+  clientCert: { title: string; field: string; };
+  caCert: { title: string; field: string; };
+}
+
 export type WalletConnect = {
   isLoading: boolean;
   GRPC_PORT?: string;
+  CLIENT_KEY?: string;
+  CLIENT_CERT?: string;
+  CA_CERT?: string;
   DEVICE_DOMAIN_NAME?: string;
   LOCAL_HOST?: string;
   REST_MACAROON?: string;
