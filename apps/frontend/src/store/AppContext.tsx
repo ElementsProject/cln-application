@@ -12,6 +12,8 @@ import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
 import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, ListPeerChannels, ListNodes, Node } from '../types/lightning-wallet.type';
+import { BalanceSheetResultSet as BalanceSheetResultSet } from '../types/lightning-bookkeeper.type';
+import { transformToBalanceSheet } from '../sql/bookkeeper-transform';
 
 const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[], version: string) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
@@ -257,7 +259,8 @@ const defaultAppState = {
   listOffers: {isLoading: true, offers: []},
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
-  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0}
+  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
+  balanceSheet: {isLoading: true, data: null}
 };
 
 const appReducer = (state, action) => {
