@@ -23,6 +23,9 @@ function Bookkeeper() {
                 <button tabIndex={1} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/cln')}>
                   Home<ActionSVG className='ms-3' />
                 </button>
+                <button tabIndex={1} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/bookkeeper/balancesheet')}>
+                  Balance Sheet<ActionSVG className='ms-3' />
+                </button>
               </Col>
             </Row>
           </Card.Body>

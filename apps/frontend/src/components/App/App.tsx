@@ -18,11 +18,27 @@ import LogoutComponent from '../modals/Logout/Logout';
 import SetPasswordComponent from '../modals/SetPassword/SetPassword';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
-import { EmptyHome } from '../ui/Loading/Loading';
+import Bookkeeper from '../bookkeeper/BkprRoot/BkprRoot';
+import CLNHome from '../cln/CLNHome/CLNHome';
+import BalanceSheetRoot from '../bookkeeper/BalanceSheet/BalanceSheetRoot';
 
-function App() {
-  const rootCtx = useContext(RootContext);
-  const clnCtx = useContext(CLNContext);
+export const rootRouteConfig = [
+  {
+    path: "/", Component: Root,
+    children: [
+      { path: "/", Component: () => <Navigate to="/home" replace /> },
+      { path: "home", Component: CLNHome },
+      { path: "bookkeeper", Component: Bookkeeper },
+      { path: "bookkeeper/balancesheet", Component: BalanceSheetRoot }
+
+    ]
+  },
+];
+
+const rootRouter = createBrowserRouter(rootRouteConfig);
+
+function Root() {
+  const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
 

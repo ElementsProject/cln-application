@@ -1,12 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
 import { useCallback, useContext } from 'react';
-import { API_BASE_URL, API_VERSION, ApplicationModes, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT, Units } from '../utilities/constants';
+import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT, TimeGranularity } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { RootContext } from '../store/RootContext';
 import { CLNContext } from '../store/CLNContext';
 import { ApplicationConfiguration, AuthResponse } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { isCompatibleVersion } from '../utilities/data-formatters';
+import { BalanceSheetSQL } from '../sql/bookkeeper-sql';
+import { transformToBalanceSheet } from '../sql/bookkeeper-transform';
 
 let intervalID;
 let localAuthStatus: AuthResponse = { isLoading: true, isAuthenticated: false, isValidPassword: false };
@@ -177,6 +179,11 @@ const useHttp = () => {
   const btcDeposit = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'newaddr', 'params': { 'addresstype': 'bech32' } });
   };
+  
+  const getBalanceSheet = (timeGranularity: TimeGranularity) => {
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] })
+      .then((response) => transformToBalanceSheet(response.data, timeGranularity));
+  };
 
   const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number | null) => {
     if (paymentType === PaymentType.KEYSEND) {
@@ -322,6 +329,7 @@ const useHttp = () => {
     clnReceiveInvoice,
     decodeInvoice,
     fetchInvoice,
+    getBalanceSheet,
     createInvoiceRune,
     userLogin,
     resetUserPassword,

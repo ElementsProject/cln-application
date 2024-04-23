@@ -121,6 +121,13 @@ export enum PaymentType {
   KEYSEND = 'Keysend'
 };
 
+export enum TimeGranularity {
+  HOURLY = "Hourly",
+  DAILY = "Daily",
+  WEEKLY = "Weekly",
+  MONTHLY = "Monthly",
+};
+
 export const APP_ANIMATION_DURATION = 2;
 export const TRANSITION_DURATION = 0.3;
 export const COUNTUP_DURATION = 1.5;
