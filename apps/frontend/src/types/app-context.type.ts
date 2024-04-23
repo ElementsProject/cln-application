@@ -1,4 +1,5 @@
 import { ApplicationConfiguration, FiatConfig, ModalConfig, ToastConfig, WalletConnect, AuthResponse } from './app-config.type';
+import { BalanceSheet, BalanceSheetResultSet } from './lightning-bookkeeper.type';
 import { Fund, ListInvoices, ListPayments, ListPeers, ListBitcoinTransactions, NodeInfo, WalletBalances, ListLightningTransactions, NodeFeeRate, ListOffers, ListPeerChannels, ListNodes } from './lightning-wallet.type';
 
 export type AppContextType = {
@@ -19,6 +20,7 @@ export type AppContextType = {
   listLightningTransactions: ListLightningTransactions;
   listBitcoinTransactions: ListBitcoinTransactions;
   walletBalances: WalletBalances;
+  balanceSheet: BalanceSheet;
   setAuthStatus: (newValue: AuthResponse) => void;
   setShowModals: (newShowModals: ModalConfig) => void;
   setShowToast: (newShowToast: ToastConfig) => void;
@@ -34,5 +36,6 @@ export type AppContextType = {
   setListPayments: (paymentsList: ListPayments) => void;
   setListOffers: (offersList: ListOffers) => void;
   setListBitcoinTransactions: (transactionsList: ListBitcoinTransactions) => void;
+  setBalanceSheet: (bkprIncomeResultSet: BalanceSheetResultSet) => void;
   clearStore: () => void;
 };

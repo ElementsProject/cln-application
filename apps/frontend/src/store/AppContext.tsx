@@ -12,6 +12,8 @@ import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
 import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, ListPeerChannels, ListNodes, Node } from '../types/lightning-wallet.type';
+import { BalanceSheetResultSet as BalanceSheetResultSet } from '../types/lightning-bookkeeper.type';
+import { transformToBalanceSheet } from '../sql/bookkeeper-transform';
 
 const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[], version: string) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
@@ -222,6 +224,7 @@ const AppContext = React.createContext<AppContextType>({
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
   walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
+  balanceSheet: {isLoading: true, accounts: []},
   setAuthStatus: (isAuth: AuthResponse) => {},
   setShowModals: (newShowModals: ModalConfig) => {}, 
   setShowToast: (newShowToast: ToastConfig) => {},
@@ -237,6 +240,7 @@ const AppContext = React.createContext<AppContextType>({
   setListPayments: (paymentsList: ListPayments) => {},
   setListOffers: (offersList: ListOffers) => {},
   setListBitcoinTransactions: (transactionsList: ListBitcoinTransactions) => {},
+  setBalanceSheet: (bkprIncomeResultSet: BalanceSheetResultSet) => {},
   clearStore: () => {}
 });
 
@@ -257,7 +261,8 @@ const defaultAppState = {
   listOffers: {isLoading: true, offers: []},
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
-  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0}
+  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
+  balanceSheet: {isLoading: true, data: null}
 };
 
 const appReducer = (state, action) => {
@@ -386,6 +391,13 @@ const appReducer = (state, action) => {
         listBitcoinTransactions: { isLoading: false, error: action.payload.error, btcTransactions: filteredTransactions },
       };
 
+    case ApplicationActions.SET_BALANCE_SHEET:
+      const balanceSheet = action.payload;
+      return {
+        ...state,
+        balanceSheet: { isLoading: false, error: action.payload.error, balanceSheet: balanceSheet },
+      };
+
     case ApplicationActions.CLEAR_CONTEXT:
       defaultAppState.appConfig = state.appConfig;
       return defaultAppState;
@@ -459,6 +471,12 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_BITCOIN_TRANSACTIONS, payload: list });
   };
 
+  const setBalanceSheetHandler = (balanceSheetResultSet: BalanceSheetResultSet) => {
+    console.log("Balance sheet result: " + JSON.stringify(balanceSheetResultSet));
+    const balanceSheet = transformToBalanceSheet(balanceSheetResultSet);    
+    dispatchApplicationAction({ type: ApplicationActions.SET_BALANCE_SHEET, payload: balanceSheet });
+  };
+
   const clearContextHandler = () => {
     dispatchApplicationAction({ type: ApplicationActions.CLEAR_CONTEXT });
   };
@@ -481,6 +499,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     listLightningTransactions: applicationState.listLightningTransactions,
     listBitcoinTransactions: applicationState.listBitcoinTransactions,
     walletBalances: applicationState.walletBalances,
+    balanceSheet: applicationState.balanceSheet,
     setAuthStatus: setAuthStatusHandler,
     setShowModals: setShowModalsHandler,
     setShowToast: setShowToastHandler,
@@ -496,6 +515,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     setListPayments: setListPaymentsHandler,
     setListOffers: setListOffersHandler,
     setListBitcoinTransactions: setListBitcoinTransactionsHandler,
+    setBalanceSheet: setBalanceSheetHandler,
     clearStore: clearContextHandler
   };
 

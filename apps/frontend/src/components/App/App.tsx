@@ -20,6 +20,7 @@ import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
 import Bookkeeper from '../bookkeeper/BkprRoot/BkprRoot';
 import CLNHome from '../cln/CLNHome/CLNHome';
+import BalanceSheetRoot from '../bookkeeper/BalanceSheet/BalanceSheetRoot';
 
 export const rootRouteConfig = [
   {
@@ -28,6 +29,8 @@ export const rootRouteConfig = [
       { path: "/", Component: () => <Navigate to="/home" replace /> },
       { path: "home", Component: CLNHome },
       { path: "bookkeeper", Component: Bookkeeper },
+      { path: "bookkeeper/balancesheet", Component: BalanceSheetRoot }
+
     ]
   },
 ];

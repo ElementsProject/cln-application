@@ -6,6 +6,7 @@ import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { isCompatibleVersion } from '../utilities/data-formatters';
+import { BalanceSheetSQL } from '../sql/bookkeeper-sql';
 
 let intervalID;
 let localAuthStatus: any = null;
@@ -95,6 +96,7 @@ const useHttp = () => {
     sendRequestToSetStore(appCtx.setListOffers, 'post', '/cln/call', { 'method': 'listoffers', 'params': [] });
     sendRequestToSetStore(appCtx.setListBitcoinTransactions, 'post', '/cln/call', { 'method': 'bkpr-listaccountevents', 'params': [] });
     sendRequestToSetStore(appCtx.setFeeRate, 'post', '/cln/call', { 'method': 'feerates', 'params': ['perkb'] });
+    sendRequestToSetStore(appCtx.setBalanceSheet, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] });
   }, [appCtx, sendRequestToSetStore, setAfterNodeInfo]);
 
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
