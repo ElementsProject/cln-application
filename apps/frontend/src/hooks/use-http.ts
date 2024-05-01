@@ -16,6 +16,12 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
+type Request = {
+  url: string,
+  method: string,
+  body?: any
+}
+
 const useHttp = () => {
   let appCtx = useContext(AppContext);
 
@@ -42,21 +48,23 @@ const useHttp = () => {
     });
   }, [appCtx]);
 
-  const sendRequestToSetStore = useCallback((setStoreFunction: any, method: string, url: string, ...reqBody: any[]) => {
+  const sendRequestToSetStore = useCallback((setStoreFunction: any, ...requests: Request[]) => {
     try {
-      let requests: Promise<AxiosResponse<any, any>>[];
+      let requestsPromise: Promise<AxiosResponse<any, any>>[];
 
-      if (reqBody.length > 0) {
-        requests = reqBody.map((body: any) => axiosInstance(url, { method: method, data: body }));
+      if (requests.length > 0) {
+        requestsPromise = requests.map((r: any) => axiosInstance(r.url, { method: r.method, data: r.body }));
       } else {
-        requests = [axiosInstance(url, { method: method, data: reqBody})];
+        requestsPromise = [axiosInstance(requests[0].url, { method: requests[0].method, data: requests[0].body})];
       }
 
-      Promise.all(requests)
+      Promise.all(requestsPromise)
         .then((responses: any[]) => {
           logger.info(responses);
-          if (url === '/shared/config') {
-            getFiatRate(responses[0].data.fiatUnit); // shared/config will always only have 1 response
+          for (let i = 0; i < requests.length; i++) {
+            if (requests[i].url === '/shared/config') {
+              getFiatRate(responses[0].data.fiatUnit); // shared/config will always only have 1 response
+            }
           }
 
           const combinedResponses = responses.map(response => ({ ...response.data, ...{ isLoading: false, error: null } }));
@@ -76,26 +84,41 @@ const useHttp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFiatRate]);
 
+  const getConnectWallet = useCallback(() => {
+    sendRequestToSetStore(
+      appCtx.setWalletConnect, 
+      { method: 'get', url: '/shared/connectwallet' }
+    );
+  }, [appCtx, sendRequestToSetStore]);
+
   const setAfterNodeInfo = useCallback((nodeInfo: any) => {
     sendRequestToSetStore(
       appCtx.setListChannels,
-      'post',
-      '/cln/call',
-      { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
-      { 'method': 'listnodes', 'params': [] });
-      appCtx.setNodeInfo(nodeInfo);
+      {
+        method: 'post',
+        url: '/cln/call',
+        body: { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
+      },
+      {
+        method: 'post',
+        url: '/cln/call',
+        body: { 'method': 'listnodes', 'params': [] }
+      }
+    );
+    appCtx.setNodeInfo(nodeInfo);
   }, [appCtx, sendRequestToSetStore]);
 
   const fetchData = useCallback(() => {
-    sendRequestToSetStore(setAfterNodeInfo, 'post', '/cln/call', { 'method': 'getinfo', 'params': [] });
-    sendRequestToSetStore(appCtx.setListPeers, 'post', '/cln/call', { 'method': 'listpeers', 'params': [] });
-    sendRequestToSetStore(appCtx.setListInvoices, 'post', '/cln/call', { 'method': 'listinvoices', 'params': [] });
-    sendRequestToSetStore(appCtx.setListPayments, 'post', '/cln/call', { 'method': 'listsendpays', 'params': [] });
-    sendRequestToSetStore(appCtx.setListFunds, 'post', '/cln/call', { 'method': 'listfunds', 'params': [] });
-    sendRequestToSetStore(appCtx.setListOffers, 'post', '/cln/call', { 'method': 'listoffers', 'params': [] });
-    sendRequestToSetStore(appCtx.setListBitcoinTransactions, 'post', '/cln/call', { 'method': 'bkpr-listaccountevents', 'params': [] });
-    sendRequestToSetStore(appCtx.setFeeRate, 'post', '/cln/call', { 'method': 'feerates', 'params': ['perkb'] });
-  }, [appCtx, sendRequestToSetStore, setAfterNodeInfo]);
+    sendRequestToSetStore(setAfterNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListPeers, { method: 'post', url: '/cln/call', body: { 'method': 'listpeers', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListInvoices, { method: 'post', url: '/cln/call', body: { 'method': 'listinvoices', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListPayments, { method: 'post', url: '/cln/call', body: { 'method': 'listsendpays', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListFunds, { method: 'post', url: '/cln/call', body: { 'method': 'listfunds', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListOffers, { method: 'post', url: '/cln/call', body: { 'method': 'listoffers', 'params': [] } });
+    sendRequestToSetStore(appCtx.setListBitcoinTransactions, { method: 'post', url: '/cln/call', body: { 'method': 'bkpr-listaccountevents', 'params': [] } });
+    sendRequestToSetStore(appCtx.setFeeRate, { method: 'post', url: '/cln/call', body: { 'method': 'feerates', 'params': ['perkb'] } });
+    getConnectWallet();
+  }, [appCtx, sendRequestToSetStore, setAfterNodeInfo, getConnectWallet]);
 
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
     axiosInstance.post('/shared/config', updatedConfig)
@@ -116,11 +139,9 @@ const useHttp = () => {
         if (flgRefreshData) { fetchData(); }
         return res;
       }).catch(err => {
-        logger.error(err);
         throw err;
       });
     } catch (err: any) {
-      logger.error(err);
       throw err;
     }
   }, [fetchData]);
@@ -167,6 +188,28 @@ const useHttp = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'fetchinvoice', 'params': { 'offer': offer, 'amount_msat': amount * SATS_MSAT } });
   };
 
+  const createInvoiceRune = () => {
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'createrune', 'params': { 'restrictions': [["method=invoice"], ["method=listinvoices"]] } })
+      .then(() => {
+        return saveInvoiceRune();
+      })
+      .then(() => {
+        return refreshConnectWalletData();
+      })
+      .catch((err) => {
+        console.error("Error creating or saving invoice rune: ", err);
+        throw err;
+      });
+  };
+
+  const saveInvoiceRune = () => {
+    return sendRequest(false, 'post', '/shared/saveinvoicerune');
+  }
+
+  const refreshConnectWalletData = () => {
+    return sendRequest(true, 'get', '/shared/connectwallet/');
+  }
+
   const setCSRFToken = () => {
     return new Promise((resolve, reject) => {
       try {
@@ -186,11 +229,7 @@ const useHttp = () => {
   };
 
   const getAppConfigurations = useCallback(() => {
-    sendRequestToSetStore(appCtx.setConfig, 'get', '/shared/config');
-  }, [appCtx, sendRequestToSetStore]);
-
-  const getConnectWallet = useCallback(() => {
-    sendRequestToSetStore(appCtx.setWalletConnect, 'get', '/shared/connectwallet');
+    sendRequestToSetStore(appCtx.setConfig, { method: 'get', url: '/shared/config' });
   }, [appCtx, sendRequestToSetStore]);
 
   const userLogin = (password: string) => {
@@ -262,6 +301,7 @@ const useHttp = () => {
     clnReceiveInvoice,
     decodeInvoice,
     fetchInvoice,
+    createInvoiceRune,
     userLogin,
     resetUserPassword,
     userLogout

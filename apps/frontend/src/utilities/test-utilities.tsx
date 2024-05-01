@@ -195,6 +195,7 @@ export const mockStoreData = {
     CLN_NODE_IP: "127.0.0.1",
     NODE_PUBKEY: "03a389b3a2f7aa6f9f4ccc19f2bd7a2eba83596699e86b715caaaa147fc37f3144",
     COMMANDO_RUNE: "mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j",
+    INVOICE_RUNE: "aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==",
     APP_VERSION: "0.0.5",
     isLoading: false,
     error: null,
