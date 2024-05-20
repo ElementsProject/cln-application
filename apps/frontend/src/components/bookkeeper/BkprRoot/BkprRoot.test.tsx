@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import Bookkeeper from './BkprRoot';
 
 jest.mock('react-router-dom', () => ({

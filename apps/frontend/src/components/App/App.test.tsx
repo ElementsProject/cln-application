@@ -2,6 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import App, { rootRouteConfig } from './App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { cleanup } from "@testing-library/react";
+import '@testing-library/jest-dom/extend-expect';
 
 jest.mock('../../services/logger.service', () => ({
   __esModule: true,
