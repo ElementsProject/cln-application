@@ -22,15 +22,18 @@ const Overview = () => {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const countChannels: any = useMotionValue(0);
-  const roundedChannels: any = useTransform(countChannels, Math.round);
+  let roundedChannels: any = useTransform(countChannels, Math.round);
   const countPeers: any = useMotionValue(0);
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (appCtx.listChannels.activeChannels && appCtx.listChannels.activeChannels.length && appCtx.listChannels.activeChannels.length > 0
-      && countChannels.prev === 0) {
+    if (appCtx.listChannels.activeChannels.length > 0 && countChannels.prev === 0) {
       countChannels.current = 0;
       countChannels.prev = 0;
+      const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
+      return animationChannels.stop;
+    } else {
+      countChannels.current = appCtx.listChannels.activeChannels.length;
       const animationChannels = animate(countChannels, appCtx.listChannels.activeChannels.length, { duration: COUNTUP_DURATION });
       return animationChannels.stop;
     }
@@ -52,12 +55,12 @@ const Overview = () => {
         <Card className='ps-2 bg-primary flex-grow-1 inner-box-shadow'>
           <Card.Body className='d-flex align-items-center'>
             <Row className='flex-fill'>
-              <Col xs={6} lg={8} xxl={6}>
-                <div className='fs-6 fw-bold'>Total Balance</div>
+              <Col xs={6} lg={8} xxl={6} data-testid='overview-total-balance-col'>
+                <div className='fs-6 fw-bold' data-testid='overview-total-balance-container'>Total Balance</div>
                 { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
-                  <Spinner animation='grow' variant='secondary' /> : 
+                  <Spinner animation='grow' variant='secondary' data-testid='overview-total-spinner'/> : 
                   appCtx.walletBalances.error ? 
-                    <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 
+                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-total-error'>{appCtx.walletBalances.error}</Alert> : 
                     <CurrencyBox value={(appCtx.walletBalances.btcSpendableBalance || 0) + (appCtx.walletBalances.clnLocalBalance || 0)} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold'></CurrencyBox>
                 }
               </Col>
@@ -79,10 +82,10 @@ const Overview = () => {
                     <div className='text-light-white'>Active Channels</div>
                     <div className='fs-4 fw-bold text-dark-primary'>
                       { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
-                        <Spinner animation='grow' variant='primary' /> : 
+                        <Spinner animation='grow' variant='primary' data-testid='overview-active-channels-spinner'/> : 
                         appCtx.listChannels.error ? 
-                          <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listChannels.error}</Alert> : 
-                          <motion.div>{roundedChannels}</motion.div>
+                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-active-channels-error'>{appCtx.listChannels.error}</Alert> : 
+                          <motion.div data-testid='overview-active-channels'>{roundedChannels}</motion.div>
                       }
                     </div>
                   </div>
@@ -95,10 +98,10 @@ const Overview = () => {
                     <div className='text-light-white'>Peers</div>
                     <div className='fs-4 fw-bold text-dark-primary'>
                     { appCtx.authStatus.isAuthenticated && appCtx.listPeers.isLoading ? 
-                      <Spinner animation='grow' variant='primary' /> : 
+                      <Spinner animation='grow' variant='primary' data-testid='overview-peers-spinner'/> : 
                       appCtx.listPeers.error ? 
-                        <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listPeers.error}</Alert> : 
-                        <motion.div>{roundedPeers}</motion.div>
+                        <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-peers-error'>{appCtx.listPeers.error}</Alert> : 
+                        <motion.div data-testid='overview-peers'>{roundedPeers}</motion.div>
                     }
                     </div>
                   </div>
@@ -111,18 +114,18 @@ const Overview = () => {
                     <div className='d-flex align-items-center justify-content-between w-100'>
                       <div className='text-light-white'>{(currentScreenSize === Breakpoints.MD || currentScreenSize === Breakpoints.LG) ? 'Max Send' : 'Maximum Send'}</div>
                       { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
-                          <Spinner animation='grow' variant='primary' /> : 
+                          <Spinner animation='grow' variant='primary' data-testid='overview-cln-local-balances-spinner'/> : 
                         appCtx.walletBalances.error ? 
-                          <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 
+                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-cln-local-balances-error'>{appCtx.walletBalances.error}</Alert> : 
                           <CurrencyBox value={appCtx.walletBalances.clnLocalBalance} shorten={true} rootClasses='d-inline-flex flex-row align-items-center' currencyClasses='fw-bold text-dark-primary' unitClasses='fw-bold ms-2 text-dark-primary'></CurrencyBox>
                       }
                     </div>
                     <div className='d-flex align-items-center justify-content-between'>
                       <div className='text-light-white'>{(currentScreenSize === Breakpoints.MD || currentScreenSize === Breakpoints.LG) ? 'Max Receive' : 'Maximum Receive'}</div>
                       { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
-                          <Spinner animation='grow' variant='primary' /> : 
+                          <Spinner animation='grow' variant='primary' data-testid='overview-cln-remote-balances-spinner'/> : 
                         appCtx.walletBalances.error ? 
-                          <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 
+                          <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='overview-cln-remote-balances-error'>{appCtx.walletBalances.error}</Alert> : 
                           <CurrencyBox value={appCtx.walletBalances.clnRemoteBalance} shorten={true} rootClasses='d-inline-flex flex-row align-items-center' currencyClasses='fw-bold text-dark-primary' unitClasses='fw-bold ms-2 text-dark-primary'></CurrencyBox>
                       }
                     </div>

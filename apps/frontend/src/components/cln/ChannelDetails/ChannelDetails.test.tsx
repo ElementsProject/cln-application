@@ -1,11 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import ChannelDetails from './ChannelDetails';
+import { renderWithMockContext, getMockStoreData, mockSelectedChannel } from '../../../utilities/test-utilities';
 
 describe('ChannelDetails component ', () => {
-  beforeEach(() => render(<ChannelDetails />));
+  let providerProps;
+  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData())));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    renderWithMockContext(<ChannelDetails selChannel={mockSelectedChannel} />, { providerProps });
+    expect(screen.getByTestId('channel-details')).toBeInTheDocument();
   });
 
 });

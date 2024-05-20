@@ -121,17 +121,17 @@ const CLNSend = (props) => {
             }
           } else {
             if (decodeRes && decodeRes.data) {
-              if (!decodeRes.data.msatoshi && !decodeRes.data.amount_msat) {
+              if (!decodeRes.data.amount_msat) {
                 setEmptyInvoice(true);
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
                   amount: ('Open Invoice')
                 });
               } else {
-                amountChangeHandler({target: {value: ((decodeRes.data.msatoshi || decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
+                amountChangeHandler({target: {value: ((decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
-                  amount: (formatCurrency((decodeRes.data.msatoshi || decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
                 });
               }
             }
@@ -207,7 +207,7 @@ const CLNSend = (props) => {
   };
 
   return (
-    <form onSubmit={CLNSendHandler} className='h-100'>
+    <form onSubmit={CLNSendHandler} className='h-100' data-testid='cln-send'>
       <Card className='h-100 d-flex align-items-stretch'>
         <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>

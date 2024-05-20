@@ -103,7 +103,7 @@ const ChannelDetails = (props) => {
   };
 
   return (
-    <form onSubmit={ChannelCloseHandler} className='h-100'>
+    <form onSubmit={ChannelCloseHandler} className='h-100' data-testid='channel-details'>
       <Card className='h-100 d-flex align-items-stretch'>
         <Card.Body className='text-dark d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
@@ -127,15 +127,15 @@ const ChannelDetails = (props) => {
                       </span>
                     </OverlayTrigger>
                     <ProgressBar>
-                      <ProgressBar variant='primary' now={(props.selChannel.satoshi_to_us > 1000000 || props.selChannel.satoshi_to_them > 1000000) ? (props.selChannel.satoshi_to_us / 1000) : props.selChannel.satoshi_to_us} key={1} />
-                      <ProgressBar variant='light' now={(props.selChannel.satoshi_to_us > 1000000 || props.selChannel.satoshi_to_them > 1000000) ? (props.selChannel.satoshi_to_them / 1000) : props.selChannel.satoshi_to_them} key={2} />
+                      <ProgressBar variant='primary' now={(props.selChannel.to_us_sat > 1000000 || props.selChannel.to_them_sat > 1000000) ? (props.selChannel.to_us_sat / 1000) : props.selChannel.to_us_sat} key={1} />
+                      <ProgressBar variant='light' now={(props.selChannel.to_us_sat > 1000000 || props.selChannel.to_them_sat > 1000000) ? (props.selChannel.to_them_sat / 1000) : props.selChannel.to_them_sat} key={2} />
                     </ProgressBar>
                     <Row className='text-light d-flex align-items-end justify-content-between'>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                        {formatCurrency(props.selChannel.satoshi_to_us, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                        {formatCurrency(props.selChannel.to_us_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
                       </Col>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                        {formatCurrency(props.selChannel.satoshi_to_them, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                        {formatCurrency(props.selChannel.to_them_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
                       </Col>
                     </Row>
                   </Col>
@@ -166,19 +166,19 @@ const ChannelDetails = (props) => {
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Dust Limit</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency((props.selChannel.dust_limit_satoshis || props.selChannel.dust_limit_msat), (props.selChannel.dust_limit_satoshis ? Units.SATS : Units.MSATS), appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.dust_limit_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Spendable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency((props.selChannel.spendable_msatoshi || props.selChannel.spendable_msat), Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.spendable_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Receivable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency((props.selChannel.receivable_msatoshi || props.selChannel.receivable_msat), Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.receivable_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>

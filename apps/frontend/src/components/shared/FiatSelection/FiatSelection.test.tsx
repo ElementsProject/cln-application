@@ -5,10 +5,7 @@ describe('FiatSelection component ', () => {
   beforeEach(() => render(<FiatSelection />));
 
   it('should be in the document', () => {
-    expect(screen.getByTestId('FiatSelection-context')).toBeInTheDocument();
+    expect(screen.getByTestId('fiat-selection')).toBeInTheDocument();
   });
 
-  it('should be in the document', () => {
-    expect(screen.getByTestId('FiatSelection-context')).toBeInTheDocument();
-  });
 });

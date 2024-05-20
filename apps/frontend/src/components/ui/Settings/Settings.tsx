@@ -18,7 +18,7 @@ const Settings = (props) => {
   logger.info('Screen Size Changed: ' + currentScreenSize);
 
   return (
-    <Dropdown autoClose={'outside'} className={!!(appCtx.nodeInfo.error || (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading)) ? 'settings-menu dropdown-disabled' : 'settings-menu'} >
+    <Dropdown autoClose={'outside'} className={!!(appCtx.nodeInfo.error || (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading)) ? 'settings-menu dropdown-disabled' : 'settings-menu'} data-testid='settings'>
       <Dropdown.Toggle variant={props.compact ? '' : 'primary'} disabled={!!(appCtx.nodeInfo.error || (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading))} className={props.compact ? 'd-flex align-items-center btn-rounded btn-compact btn-settings-menu' : 'd-flex align-items-center btn-rounded btn-settings-menu'}>
         <span className={props.compact ? '' : 'me-3'}>{props.compact ? '' : 'Settings'}</span>
         <SettingsSVG className={((!!appCtx.nodeInfo.error || (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading)) ? 'mt-1 svg-fill-disabled' : 'mt-1')} />

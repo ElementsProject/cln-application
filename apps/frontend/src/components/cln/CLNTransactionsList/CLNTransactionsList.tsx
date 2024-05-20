@@ -23,7 +23,7 @@ const TODAY = Math.floor(Date.now() / 1000);
 
 const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
   return (
-    <Row className='transaction-list-item d-flex justify-content-between align-items-center'>
+    <Row className='transaction-list-item d-flex justify-content-between align-items-center' data-testid='payment-header'>
       <Col xs={2}>
         <OutgoingArrowSVG className='me-1' txStatus={payment.status} />
       </Col>
@@ -34,7 +34,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
           </Col>
           <Col xs={5} className='ps-0 d-flex align-items-center justify-content-end fw-bold text-darker-blue'>
             { payment.status === 'complete' ?
-              '-' + (formatCurrency((payment.msatoshi_sent || payment.amount_sent_msat || 0), Units.MSATS, appConfig.unit, false, 0, 'string'))
+              '-' + (formatCurrency((payment.amount_sent_msat || 0), Units.MSATS, appConfig.unit, false, 0, 'string'))
             :
               0
             }
@@ -46,7 +46,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
             <DateBox dataValue={payment.created_at} dataType={'Created At'} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(payment.msatoshi_sent || payment.amount_sent_msat || 0)} fiatUnit={appConfig.fiatUnit} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(payment.amount_sent_msat || 0)} fiatUnit={appConfig.fiatUnit} fromUnit={Units.MSATS} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>
@@ -56,7 +56,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
 
 const InvoiceHeader = ({invoice, appConfig, fiatConfig}) => {
   return (
-    <Row className='transaction-list-item d-flex justify-content-between align-items-center'>
+    <Row className='transaction-list-item d-flex justify-content-between align-items-center' data-testid='invoice-header'>
       <Col xs={2}>
         <IncomingArrowSVG className='me-1' txStatus={invoice.status} />
       </Col>
@@ -67,9 +67,9 @@ const InvoiceHeader = ({invoice, appConfig, fiatConfig}) => {
           </Col>
           <Col xs={5} className='ps-0 d-flex align-items-center justify-content-end fw-bold text-darker-blue'>
             {invoice.paid_at ?
-              <span>{'+' + (formatCurrency((invoice.msatoshi_received || invoice.amount_received_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))}</span>
+              <span>{'+' + (formatCurrency((invoice.amount_received_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))}</span>
             :
-              (formatCurrency((invoice.msatoshi || invoice.amount_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))
+              (formatCurrency((invoice.amount_msat || 0), Units.MSATS, appConfig.unit, false, 8, 'string'))
             }
           </Col>
         </Row>
@@ -84,7 +84,7 @@ const InvoiceHeader = ({invoice, appConfig, fiatConfig}) => {
             <DateBox dataValue={invoice.paid_at ? invoice.paid_at : invoice.expires_at} dataType={''} showTooltip={false} />
           </Col>
           <Col xs={4} className='ps-0 fs-7 text-light d-flex align-items-center justify-content-end'>
-            <FiatBox value={(invoice.paid_at ? (invoice.msatoshi_received || invoice.amount_received_msat) : (invoice.msatoshi || invoice.amount_msat))} fromUnit={Units.MSATS} fiatUnit={appConfig.fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
+            <FiatBox value={(invoice.paid_at ? (invoice.amount_received_msat) : (invoice.amount_msat))} fromUnit={Units.MSATS} fiatUnit={appConfig.fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
           </Col>
         </Row>
       </Col>
@@ -129,17 +129,16 @@ export const CLNTransactionsList = () => {
   const appCtx = useContext(AppContext);
   const initExpansions = (appCtx.listLightningTransactions.clnTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
-
   return (
     appCtx.authStatus.isAuthenticated && appCtx.listLightningTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
-        <Spinner animation='grow' variant='primary' />
+        <Spinner animation='grow' variant='primary' data-testid='cln-transactions-list-spinner'/>
       </span> 
     : 
     appCtx.listLightningTransactions.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listLightningTransactions.error}</Alert> : 
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-transactions-list-error'>{appCtx.listLightningTransactions.error}</Alert> : 
       appCtx.listLightningTransactions?.clnTransactions && appCtx.listLightningTransactions?.clnTransactions.length && appCtx.listLightningTransactions?.clnTransactions.length > 0 ?
-        <div className='cln-transactions-list'>
+        <div className='cln-transactions-list' data-testid='cln-transactions-list'>
           { 
             appCtx.listLightningTransactions?.clnTransactions?.map((transaction, i) => (
               <CLNTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />
@@ -154,7 +153,7 @@ export const CLNTransactionsList = () => {
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
             }
             <Row className='text-center'>
-            { !(appCtx.listChannels?.activeChannels && appCtx.listChannels.activeChannels.length && appCtx.listChannels.activeChannels.length > 0) ? 
+            { (appCtx.listChannels.activeChannels.length > 0) ? 
               'No transaction found. Click send/receive to start!' : 
               'No transaction found. Open channel to start!'
             }

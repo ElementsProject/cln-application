@@ -22,7 +22,7 @@ const FiatSelection = (props) => {
 
   return (
     <>
-    <Dropdown className={props.className} onSelect={fiatChangeHandler}>
+    <Dropdown className={props.className} onSelect={fiatChangeHandler} data-testid='fiat-selection'>
       <Dropdown.Toggle variant='outline border-gray-300 d-flex align-items-center'>
         <Col xs={4}>
           { appCtx.fiatConfig.symbol ? 

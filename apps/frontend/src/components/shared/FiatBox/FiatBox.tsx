@@ -9,7 +9,7 @@ import { CurrencySVG } from '../../../svgs/Currency';
 
 const FiatBox = props => {
   return (
-    <span className={'d-flex align-items-center justify-content-start fiat-box-span ' + props.className}>
+    <span className={'d-flex align-items-center justify-content-start fiat-box-span ' + props.className} data-testid='fiat-box'>
       { props.symbol ?
         <FontAwesomeIcon icon={props.symbol} className={'fa-' + (props.iconSize || 'sm')} />
         :

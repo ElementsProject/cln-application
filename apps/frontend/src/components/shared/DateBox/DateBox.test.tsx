@@ -1,11 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import DateBox from './DateBox';
+import { mockInvoice } from '../../../utilities/test-utilities';
+import { convertIntoDateFormat } from '../../../utilities/data-formatters';
 
 describe('DateBox component ', () => {
-  beforeEach(() => render(<DateBox />));
 
-  it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+  it('format date', () => {
+    render(<DateBox dataValue={mockInvoice.expires_at} dataType={'Created At'} showTooltip={false} />);
+    const overlayTrigger = screen.getByTestId('overlay-trigger');
+    expect(overlayTrigger).toHaveTextContent(convertIntoDateFormat(mockInvoice.expires_at));
   });
 
 });
