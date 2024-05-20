@@ -41,7 +41,7 @@
       ```
 
   - ### Environment Variables
-      This application accepts & depeneds upon these variables to be passed through environment:
+      This application accepts & depends upon these variables to be passed through environment:
 
       ```
       - APP_CORE_LIGHTNING_IP: IP address of this application (cln-application) container (required)
@@ -52,7 +52,6 @@
       - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
       - APP_BITCOIN_NODE_IP: IP address of bitcoin node container (required)
       - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
-      - APP_CORE_LIGHTNING_REST_IP: IP address of the c-lightning-REST container (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_REST_PORT: c-lightning-REST server port (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for c-lightning-REST certificates (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
@@ -65,7 +64,7 @@
       - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       ```
 
-      Set these variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
       Important Note: Environment variables take precedence over config.json variables. Like `SINGLE_SIGN_ON` will take higher precedence over 
       `singleSignOn` from config.json.
 
@@ -98,7 +97,7 @@
         ```
 
   - ### Start The Application
-      - Setup envirnoment variables either via terminal OR by env.sh script OR by explicity loading varibles from .env files.
+      - Setup environment variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
       - Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
 
       ```

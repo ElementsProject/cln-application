@@ -1,11 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import ToggleSwitch from './ToggleSwitch';
+import { Units } from '../../../utilities/constants';
 
 describe('ToggleSwitch component ', () => {
-  beforeEach(() => render(<ToggleSwitch />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    render(<ToggleSwitch values={['SATS', 'BTC']} selValue={Units.SATS} storeSelector='appConfig' storeKey='unit'/>);
+
+    expect(screen.getByTestId('toggle-switch')).toBeInTheDocument();
   });
 
 });

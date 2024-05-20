@@ -21,7 +21,7 @@ const ToggleSwitch = (props) => {
   };
 
   return (
-    <div className={'fs-7 toggle ' + (props.className ? props.className : '')} data-isswitchon={isSwitchOn} onClick={changeValueHandler}>
+    <div className={'fs-7 toggle ' + (props.className ? props.className : '')} data-isswitchon={isSwitchOn} onClick={changeValueHandler} data-testid='toggle-switch'>
       <div className='toggle-bg-text px-2 d-flex flex-fill align-items-center justify-content-between'>
         <span className='text-center me-2'>{props.values[0]}</span>
         <span className='text-center ms-2'>{props.values[1]}</span>

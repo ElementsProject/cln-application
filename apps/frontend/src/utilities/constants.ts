@@ -77,6 +77,7 @@ export enum ApplicationActions {
   SET_NODE_INFO = 'SET_NODE_INFO',
   SET_LIST_FUNDS = 'SET_LIST_FUNDS',
   SET_LIST_PEERS = 'SET_LIST_PEERS',
+  SET_LIST_CHANNELS = 'SET_LIST_CHANNELS',
   SET_LIST_INVOICES = 'SET_LIST_INVOICES',
   SET_LIST_SEND_PAYS = 'SET_LIST_SEND_PAYS',
   SET_LIST_OFFERS = 'SET_LIST_OFFERS',
@@ -114,8 +115,8 @@ export enum PaymentType {
   KEYSEND = 'Keysend'
 };
 
+export const APP_ANIMATION_DURATION = 2;
 export const TRANSITION_DURATION = 0.3;
-export const THEME_TRANSITION_DURATION = 0.5;
 export const COUNTUP_DURATION = 1.5;
 export const ANIMATION_INITIAL_STATE = { opacity: 0, scale: 0.1 };
 export const ANIMATION_FINAL_STATE = { opacity: 1, scale: 1 };

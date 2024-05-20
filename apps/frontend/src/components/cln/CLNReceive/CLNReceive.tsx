@@ -136,7 +136,7 @@ const CLNReceive = (props) => {
   }
 
   return (
-    <form onSubmit={CLNReceiveHandler} className='h-100'>
+    <form onSubmit={CLNReceiveHandler} className='h-100' data-testid='cln-receive'>
       <Card className='h-100 d-flex align-items-stretch px-0'>
         <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>

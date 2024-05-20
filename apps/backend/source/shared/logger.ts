@@ -16,8 +16,8 @@ export const logConfiguration = {
         APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
           ? LogLevel.WARN
           : APP_CONSTANTS.APP_MODE === Environment.TESTING
-          ? LogLevel.DEBUG
-          : LogLevel.INFO,
+            ? LogLevel.DEBUG
+            : LogLevel.INFO,
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.timestamp(),
@@ -32,8 +32,8 @@ export const logConfiguration = {
         APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
           ? LogLevel.WARN
           : APP_CONSTANTS.APP_MODE === Environment.TESTING
-          ? LogLevel.DEBUG
-          : LogLevel.INFO,
+            ? LogLevel.DEBUG
+            : LogLevel.INFO,
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.timestamp(),

@@ -4,6 +4,9 @@ export type Address = {
   port?: number;
 };
 
+/**
+ * Node from getinfo.
+ */
 export type NodeInfo = {
   isLoading: boolean;
   id?: string;
@@ -18,13 +21,31 @@ export type NodeInfo = {
   version?: string;
   blockheight?: number;
   network?: string;
-  msatoshi_fees_collected?: number;
   fees_collected_msat?: string;
   'lightning-dir'?: string;
   warning_bitcoind_sync?: string;
   our_features?: any;
   error?: any;
 };
+
+/**
+ * Node from ListNodes.
+ */
+export type Node = {
+  nodeid: string;
+  last_timestamp?: number;
+  alias?: string;
+  color?: string;
+  features?: string[];
+  addresses?: Address[];
+  option_will_fund?: LiquidityAd;
+}
+
+export type ListNodes = {
+  isLoading: boolean;
+  nodes: Node[];
+  error?: any;
+}
 
 export type ChannelFeeRate = {
   perkw?: number;
@@ -50,83 +71,17 @@ export type StateChange = {
 };
 
 export type Funding = {
-  local_funds_msat?: string;
-  remote_funds_msat?: string;
-  pushed_msat?: string;
-  fee_paid_msat?: string;
-  fee_rcvd_msat?: string;
+  local_funds_msat?: number;
+  remote_funds_msat?: number;
+  pushed_msat?: number;
+  fee_paid_msat?: number;
+  fee_rcvd_msat?: number;
 };
 
 export type Alias = {
   local?: string;
   remote?: string;
 };
-
-export type Channel = {
-  channel_id: string;
-  current_state: string;
-  short_channel_id: string;
-  node_alias: string;
-  alias: Alias;
-  satoshi_to_us: number;
-  satoshi_to_them: number;
-  satoshi_total: number;
-  state?: string;
-  connected?: boolean;
-  scratch_txid?: string;
-  feerate?: ChannelFeeRate;
-  owner?: string;
-  direction?: number;
-  funding_txid?: string;
-  funding_outnum?: number;
-  close_to_addr?: string;
-  close_to?: string;
-  private?: boolean;
-  opener?: string;
-  features?: string[];
-  funding?: Funding;
-  msatoshi_to_us?: number;
-  msatoshi_to_us_min?: number;
-  msatoshi_to_us_max?: number;
-  msatoshi_total?: number;
-  to_us_msat?: number;
-  total_msat?: number;
-  fee_base_msat?: string;
-  fee_proportional_millionths?: number;
-  dust_limit_satoshis?: number;
-  dust_limit_msat?: number;
-  max_htlc_value_in_flight_msat?: number;
-  their_channel_reserve_satoshis?: number;
-  our_channel_reserve_satoshis?: number;
-  spendable_msatoshi?: number;
-  receivable_msatoshi?: number;
-  spendable_msat?: number;
-  receivable_msat?: number;
-  htlc_minimum_msat?: number;
-  their_to_self_delay?: number;
-  our_to_self_delay?: number;
-  max_accepted_htlcs?: number;
-  state_changes?: StateChange[];
-  status?: string[];
-  last_tx_fee_msat?: string;
-  in_payments_offered?: number;
-  in_msatoshi_offered?: number;
-  in_payments_fulfilled?: number;
-  in_msatoshi_fulfilled?: number;
-  out_payments_offered?: number;
-  out_msatoshi_offered?: number;
-  out_payments_fulfilled?: number;
-  out_msatoshi_fulfilled?: number;
-  htlcs?: HTLC[];
-};
-
-export type ListChannels = {
-  isLoading: boolean;
-  activeChannels?: Channel[];
-  pendingChannels?: Channel[];
-  inactiveChannels?: Channel[];
-  error?: any;
-}
 
 export type LiquidityAd = {
   lease_fee_base_msat?: string;
@@ -147,12 +102,95 @@ export type Peer = {
   features?: string;
   addresses?: Address[];
   option_will_fund?: LiquidityAd;
-  channels?: Channel[];
 };
 
 export type ListPeers = {
   isLoading: boolean;
   peers?: Peer[];
+  error?: any;
+}
+
+export type ChannelType = {
+  bits?: number[];
+  names?: string[];
+}
+
+export type PeerChannel = {
+  peer_id: string;
+  peer_connected: boolean;
+  state: string;
+  // Added for UI: Start
+  current_state: string;
+  node_alias: string;
+  total_sat: number;
+  to_us_sat: number;
+  to_them_sat: number;
+  // Added for UI: End
+  reestablished?: boolean;
+  scratch_txid?: string;
+  last_tx_fee_msat?: number;
+  direction?: number;
+  close_to_addr?: string;
+  channel_type?: ChannelType;
+  updates?: { local?: any; remote?: any; };
+  ignore_fee_limits?: boolean;
+  lost_state?: boolean;
+  feerate?: ChannelFeeRate;
+  owner?: string;
+  short_channel_id?: string;
+  channel_id?: string;
+  funding_txid?: string;
+  funding_outnum?: number;
+  initial_feerate?: string;
+  last_feerate?: string;
+  next_feerate?: string;
+  next_fee_step?: number;
+  inflight?: Inflight[];
+  close_to?: string;
+  private?: boolean;
+  opener?: string;
+  closer?: string;
+  features?: string[];
+  funding?: Funding;
+  total_msat?: number;
+  to_us_msat?: number;
+  to_them_msat?: number;
+  min_to_us_msat?: number;
+  max_to_us_msat?: number;
+  fee_base_msat?: number;
+  fee_proportional_millionths?: number;
+  dust_limit_msat?: number;
+  max_total_htlc_in_msat?: number;
+  their_reserve_msat?: number;
+  our_reserve_msat?: number;
+  spendable_msat?: number;
+  receivable_msat?: number;
+  minimum_htlc_in_msat?: number;
+  minimum_htlc_out_msat?: number;
+  maximum_htlc_out_msat?: number;
+  their_to_self_delay?: number;
+  our_to_self_delay?: number;
+  max_accepted_htlcs?: number;
+  alias?: Alias;
+  state_changes?: StateChange[];
+  status?: string[];
+  in_payments_offered?: number;
+  in_offered_msat?: number;
+  in_payments_fulfilled?: number;
+  in_fulfilled_msat?: number;
+  out_payments_offered?: number;
+  out_offered_msat?: number;
+  out_payments_fulfilled?: number;
+  out_fulfilled_msat?: number;
+  last_stable_connection?: number;
+  htlcs?: HTLC[];
+};
+
+export type ListPeerChannels = {
+  isLoading: boolean;
+  activeChannels: PeerChannel[];
+  pendingChannels: PeerChannel[];
+  inactiveChannels: PeerChannel[];
   error?: any;
 }
 
@@ -162,8 +200,6 @@ export type Invoice = {
   description?: string;
   expires_at?: number;
   label?: string;
-  msatoshi?: number;
-  msatoshi_received?: number;
   amount_msat?: number;
   amount_received_msat?: number;
   local_offer_id?: string;
@@ -173,6 +209,11 @@ export type Invoice = {
   payment_hash?: string;
   payment_preimage?: string;
   status?: string;
+  created_index?: number;
+  // For backward compatibility: Start
+  msatoshi?: number;
+  msatoshi_received?: number;
+  // For backward compatibility: End
 };
 
 export type ListInvoices = {
@@ -190,8 +231,6 @@ export type Payment = {
   payment_hash?: string;
   status?: string;
   created_at?: number;
-  msatoshi?: number;
-  msatoshi_sent?: number;
   amount_msat?: number;
   amount_sent_msat?: number;
   destination?: string;
@@ -201,6 +240,10 @@ export type Payment = {
   bolt12?: string;
   payment_preimage?: string;
   erroronion?: string;
+  // For backward compatibility: Start
+  msatoshi?: number;
+  msatoshi_sent?: number;
+  // For backward compatibility: End
 }
 
 export type ListPayments = {
@@ -214,7 +257,6 @@ export type LightningTransaction = {
   // Both
   payment_hash?: string;
   status?: string;
-  msatoshi?: number;
   label?: string;
   bolt11?: string;
   description?: string;
@@ -222,12 +264,13 @@ export type LightningTransaction = {
   payment_preimage?: string;
   // Payment
   created_at?: number;
-  msatoshi_sent?: number;
   destination?: string;
   // Invoice
+  created_index?: number;
   expires_at?: number;
-  msatoshi_received?: number;
   paid_at?: number;
+  amount_msat?: number;
+  amount_received_msat?: number;
 }
 
 export type ListLightningTransactions = {
@@ -408,4 +451,14 @@ export type ListOffers = {
   isLoading: boolean;
   offers?: Offer[];
   error?: any;
+}
+
+export type Inflight = {
+  funding_txid: string;
+  funding_outnum: number;
+  feerate: string;
+  total_funding_msat: string;
+  splice_amount: number;
+  our_funding_msat: string;
+  scratch_txid?: string;
 }

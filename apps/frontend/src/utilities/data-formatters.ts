@@ -1,6 +1,13 @@
 import copy from 'copy-to-clipboard';
 import { BTC_SATS, BTC_MSAT, SATS_MSAT, Units } from './constants';
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export const convertIntoDateFormat = (dataValue) => {
+  let newDate = new Date(dataValue * 1000);
+  return newDate.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[newDate.getMonth()] + ', ' + newDate.getHours().toString().padStart(2, '0') + ':' + newDate.getMinutes().toString().padStart(2, '0');
+}
+
 export const ConvertSatsToMSats = (num: number) => {
   return num * SATS_MSAT;
 };
@@ -76,13 +83,21 @@ export const copyTextToClipboard = (textToCopy: string | undefined) => {
   });
 }
 
+/**
+ * @param currentVersion The current version of this app.
+ * @param checkVersion The version to check against.
+ * @returns Returns whether the current version is equal to or higher than checkVersion.
+ */
 export const isCompatibleVersion = (currentVersion: string, checkVersion: string) => {
+  if (!checkVersion || currentVersion === '')
+    return false;
   if (currentVersion) {
-    const versionsArr = currentVersion.trim()?.replace('v', '').split('-')[0].split('.') || [];
+    const versionsArr = currentVersion.trim()?.replace('v', '').split(/[rc]+/)[0].split('-')[0].split('.') || [];
     const checkVersionsArr = checkVersion.split('.');
     return (+versionsArr[0] > +checkVersionsArr[0]) ||
       (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] > +checkVersionsArr[1]) ||
-      (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] === +checkVersionsArr[1] && +versionsArr[2] >= +checkVersionsArr[2]);
+      (!!versionsArr[2] ? (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] === +checkVersionsArr[1] && +versionsArr[2] >= +checkVersionsArr[2]) :
+        (+versionsArr[0] === +checkVersionsArr[0] && +versionsArr[1] >= +checkVersionsArr[1]));
   }
   return false;
 }

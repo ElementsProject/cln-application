@@ -5,7 +5,7 @@ describe('BTCWithdraw component ', () => {
   beforeEach(() => render(<BTCWithdraw />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('btc-withdraw')).toBeInTheDocument();
   });
 
 });

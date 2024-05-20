@@ -8,7 +8,7 @@ data/app/application-cln.log
 data/app-2/*
 application-cln.log
 .commando-env
-env.sh
 .commando
 data/app/config.json
 release
+env-local.sh

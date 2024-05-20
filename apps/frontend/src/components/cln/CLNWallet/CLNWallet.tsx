@@ -27,7 +27,7 @@ const CLNWallet = (props) => {
   const [selectedTab, setSelectedTab] = useState('transactions');
 
   return (
-    <Card className='h-100 d-flex align-items-stretch'>
+    <Card className='h-100 d-flex align-items-stretch' data-testid='cln-wallet'>
       <Card.Body className='d-flex align-items-stretch flex-column p-0'>
         <Card className='bg-primary wallet-card'>
           <Card.Body>
@@ -36,10 +36,10 @@ const CLNWallet = (props) => {
               <div>
                 <div className='fs-6 fw-bold'>Lightning Wallet</div>
                 { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
-                    <Spinner animation='grow' variant='secondary' /> : 
+                    <Spinner animation='grow' variant='secondary' data-testid='cln-wallet-spinner'/> : 
                   appCtx.walletBalances.error ? 
-                    <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 
-                    <CurrencyBox value={appCtx.walletBalances.clnLocalBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold'></CurrencyBox>
+                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-wallet-error'>{appCtx.walletBalances.error}</Alert> : 
+                    <CurrencyBox value={appCtx.walletBalances.clnLocalBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold' data-testid='cln-wallet-currency-box'></CurrencyBox>
                 }
               </div>
             </Col>
