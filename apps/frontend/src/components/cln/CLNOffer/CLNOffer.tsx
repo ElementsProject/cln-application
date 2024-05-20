@@ -16,7 +16,7 @@ const OfferDetail = ({offer, copyHandler}) => {
   return (
     <>
     {offer.bolt12 ?
-      <Row className='cln-offer-detail'>
+      <Row className='cln-offer-detail' data-testid='cln-offer-detail'>
         <Col xs={12} className='fs-7 text-light'>Bolt 12</Col>
         <Col xs={11} className='pe-1 fs-7 overflow-x-ellipsis'>{offer.bolt12}</Col>
         <Col xs={1} onClick={copyHandler} className='cln-offer-copy' id='Bolt12'><CopySVG id='Bolt12' showTooltip={true} /></Col>

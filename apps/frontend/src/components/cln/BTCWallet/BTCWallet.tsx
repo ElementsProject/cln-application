@@ -21,7 +21,7 @@ const BTCWallet = (props) => {
   const appCtx = useContext(AppContext);
 
   return (
-    <Card className='h-100 d-flex align-items-stretch'>
+    <Card className='h-100 d-flex align-items-stretch' data-testid="btc-wallet">
       <Card.Body className='d-flex align-items-stretch flex-column p-0'>
         <Card className='bg-primary wallet-card'>
           <Card.Body>
@@ -30,9 +30,9 @@ const BTCWallet = (props) => {
               <div>
                 <div className='fs-6 fw-bold'>Bitcoin Wallet</div>
                 { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
-                    <Spinner animation='grow' variant='secondary' /> : 
+                    <Spinner animation='grow' variant='secondary' data-testid="btc-wallet-spinner"/> : 
                   appCtx.walletBalances.error ? 
-                    <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.walletBalances.error}</Alert> : 
+                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid="btc-wallet-error">{appCtx.walletBalances.error}</Alert> : 
                     <CurrencyBox value={appCtx.walletBalances.btcSpendableBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold'></CurrencyBox>
                 }
                 </div>

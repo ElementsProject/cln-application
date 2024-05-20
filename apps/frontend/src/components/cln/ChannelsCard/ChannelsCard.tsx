@@ -9,11 +9,11 @@ import Channels from '../Channels/Channels';
 import ChannelOpen from '../ChannelOpen/ChannelOpen';
 import ChannelDetails from '../ChannelDetails/ChannelDetails';
 import { CLEAR_STATUS_ALERT_DELAY, TRANSITION_DURATION } from '../../../utilities/constants';
-import { Channel } from '../../../types/lightning-wallet.type';
+import { PeerChannel } from '../../../types/lightning-wallet.type';
 
 const ChannelsCard = () => {
   const [selChannelCard, setSelChannelCard] = useState('channels');
-  const [selChannel, setSelChannel] = useState<Channel | null>(null);
+  const [selChannel, setSelChannel] = useState<PeerChannel | null>(null);
   const [newlyOpenedChannelId, setNewlyOpenedChannelId] = useState<string>('');
 
   const onCloseHandler = (channelId) => {
@@ -25,7 +25,7 @@ const ChannelsCard = () => {
   }
 
   return (
-    <Card className='h-100 overflow-hidden inner-box-shadow'>
+    <Card className='h-100 overflow-hidden inner-box-shadow' data-testid='channels-card'>
       <AnimatePresence mode='wait'>
         <motion.div
           key={selChannelCard}

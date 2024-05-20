@@ -5,7 +5,7 @@ describe('FeerateRange component ', () => {
   beforeEach(() => render(<FeerateRange />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('fee-rate-container')).toBeInTheDocument();
   });
 
 });

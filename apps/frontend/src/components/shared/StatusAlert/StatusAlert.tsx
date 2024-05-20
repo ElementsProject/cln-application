@@ -35,7 +35,7 @@ const StatusAlert = props => {
         transition={{ ease: "easeOut", duration: 1 }}
       >
         <Col xs={1} className='d-flex align-items-start justify-content-start mt-1'>
-          {props.responseStatus === CallStatus.PENDING ? <Spinner className='me-2' variant='primary' size='sm' /> : <InformationSVG svgClassName='information-svg' className={props.responseStatus === CallStatus.ERROR ? 'fill-danger' : 'fill-success'} />}
+          {props.responseStatus === CallStatus.PENDING ? <Spinner className='me-2' variant='primary' size='sm' data-testid='status-pending-spinner'/> : <InformationSVG svgClassName='information-svg' className={props.responseStatus === CallStatus.ERROR ? 'fill-danger' : 'fill-success'} />}
         </Col>
         <Col xs={10} className='px-1 text-status'>{titleCase(props.responseMessage)}</Col>
         { props.responseStatus !== CallStatus.PENDING ?

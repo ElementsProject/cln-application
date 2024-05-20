@@ -11,42 +11,43 @@ import { isCompatibleVersion, sortDescByKey } from '../utilities/data-formatters
 import logger from '../services/logger.service';
 import { AppContextType } from '../types/app-context.type';
 import { ApplicationConfiguration, AuthResponse, FiatConfig, ModalConfig, ToastConfig, WalletConnect } from '../types/app-config.type';
-import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, Peer } from '../types/lightning-wallet.type';
+import { BkprTransaction, Fund, FundChannel, FundOutput, Invoice, ListBitcoinTransactions, ListInvoices, ListPayments, ListOffers, ListPeers, NodeFeeRate, NodeInfo, Payment, ListPeerChannels, ListNodes, Node } from '../types/lightning-wallet.type';
 
-const aggregateChannels = (peers: Peer[], currentVersion: string) => {
+const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[], version: string) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
-  peers?.forEach((peer: Peer) => {
-    if (peer.channels && peer.channels.length > 0) {
-      peer.channels.map(channel => {
-        channel.connected = peer.connected || false;
-        channel.node_alias = peer.alias || peer.id?.substring(0,20) || '';
-        if (isCompatibleVersion(currentVersion, '23.02')) {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || channel.to_us_msat || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || channel.total_msat || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || channel.total_msat || 0) - (channel.msatoshi_to_us || channel.to_us_msat || 0)) / SATS_MSAT);
-        } else {
-          channel.satoshi_to_us = Math.floor((channel.msatoshi_to_us || 0) / SATS_MSAT);
-          channel.satoshi_total = Math.floor((channel.msatoshi_total || 0) / SATS_MSAT);
-          channel.satoshi_to_them = Math.floor(((channel.msatoshi_total || 0) - (channel.msatoshi_to_us || 0)) / SATS_MSAT);
-        }
-
-        if (channel.state === 'CHANNELD_NORMAL') {
-          if (channel.connected) {
-            channel.current_state = 'ACTIVE';
-            aggregatedChannels.activeChannels.push(channel);
-          } else {
-            channel.current_state = 'INACTIVE';
-            aggregatedChannels.inactiveChannels.push(channel);
-          }
-        } else {
-          channel.current_state = 'PENDING';
-          aggregatedChannels.pendingChannels.push(channel);
-        }
-        return aggregatedChannels;
-      });
+  if (!listPeerChannels || (!listPeerChannels.channels && !listPeerChannels.peers)) {
+    return aggregatedChannels;
+  }
+  if (!isCompatibleVersion((version || ''), '23.02') && listPeerChannels.peers) {
+    listPeerChannels.channels = [];
+    listPeerChannels.channels = listPeerChannels.peers.flatMap(peer => {
+      return peer.channels.map(channel => ({
+        ...channel,
+        peer_id: peer.id,
+        peer_connected: peer.connected
+      }));
+    });    
+  }
+  listPeerChannels.channels.forEach((peerChannel: any) => {
+    peerChannel.node_alias = listNodes.find((node) => node.nodeid === peerChannel.peer_id)?.alias || 'Unknown';
+    peerChannel.to_us_sat = Math.floor((peerChannel.to_us_msat || 0) / SATS_MSAT);
+    peerChannel.total_sat = Math.floor((peerChannel.total_msat || 0) / SATS_MSAT);
+    peerChannel.to_them_sat = Math.floor(((peerChannel.total_msat || 0) - (peerChannel.to_us_msat || 0)) / SATS_MSAT);
+    if (peerChannel.state === 'CHANNELD_NORMAL') {
+      if (peerChannel.peer_connected) {
+        peerChannel.current_state = 'ACTIVE';
+        aggregatedChannels.activeChannels.push(peerChannel);
+      } else {
+        peerChannel.current_state = 'INACTIVE';
+        aggregatedChannels.inactiveChannels.push(peerChannel);
+      }
+    } else {
+      peerChannel.current_state = 'PENDING';
+      aggregatedChannels.pendingChannels.push(peerChannel);
     }
+    return aggregatedChannels;
   });
-  aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'satoshi_total')
+  aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'total_msat')
   return aggregatedChannels;
 }
 
@@ -63,8 +64,8 @@ const paymentReducer = (accumulator, currentPayment) => {
 
 const summaryReducer = (accumulator, mpp) => {
   if (mpp.status === 'complete') {
-    accumulator.msatoshi = accumulator.msatoshi + mpp.msatoshi;
-    accumulator.msatoshi_sent = accumulator.msatoshi_sent + mpp.msatoshi_sent;
+    accumulator.amount_msat = accumulator.amount_msat + mpp.amount_msat;
+    accumulator.amount_sent_msat = accumulator.amount_sent_msat + mpp.amount_sent_msat;
     accumulator.status = mpp.status;
   }
   if (mpp.bolt11 && !accumulator.bolt11) { accumulator.bolt11 = mpp.bolt11; }
@@ -87,10 +88,10 @@ const groupBy = (payments) => {
       temp.total_parts = 1;
       delete temp.partid;
     } else {
-      const paySummary = curr?.reduce(summaryReducer, { msatoshi: 0, msatoshi_sent: 0, status: (curr[0] && curr[0].status) ? curr[0].status : 'failed' });
+      const paySummary = curr?.reduce(summaryReducer, { amount_msat: 0, amount_sent_msat: 0, status: (curr[0] && curr[0].status) ? curr[0].status : 'failed' });
       temp = {
         is_group: true, is_expanded: false, total_parts: (curr.length ? curr.length : 0), status: paySummary.status, payment_hash: curr[0].payment_hash,
-        destination: curr[0].destination, msatoshi: paySummary.msatoshi, msatoshi_sent: paySummary.msatoshi_sent, created_at: curr[0].created_at,
+        destination: curr[0].destination, amount_msat: paySummary.amount_msat, amount_sent_msat: paySummary.amount_sent_msat, created_at: curr[0].created_at,
         mpps: curr
       };
       if (paySummary.bolt11) { temp.bolt11 = paySummary.bolt11; }
@@ -111,24 +112,24 @@ const mergeLightningTransactions = (invoices: Invoice[], payments: Payment[]) =>
   for (let i = 0, v = 0, p = 0; i < totalTransactionsLength; i++) {
     if (v === (invoices?.length || 0)) {
       payments.slice(p)?.map(payment => {
-        mergedTransactions.push({type: 'PAYMENT', payment_hash: payment.payment_hash, status: payment.status, msatoshi: (payment.msatoshi || payment.amount_msat), label: payment.label, bolt11: payment.bolt11, description: payment.description, bolt12: payment.bolt12, payment_preimage: payment.payment_preimage, created_at: payment.created_at, msatoshi_sent: (payment.msatoshi_sent || payment.amount_sent_msat), destination: payment.destination, expires_at: null, msatoshi_received: null, paid_at: null});
+        mergedTransactions.push({type: 'PAYMENT', payment_hash: payment.payment_hash, status: payment.status, amount_msat: (payment.amount_msat || payment.msatoshi), label: payment.label, bolt11: payment.bolt11, description: payment.description, bolt12: payment.bolt12, payment_preimage: payment.payment_preimage, created_at: payment.created_at, amount_sent_msat: (payment.amount_sent_msat || payment.msatoshi_sent), destination: payment.destination, expires_at: null, amount_received_msat: null, paid_at: null});
         return payment;
       })
       i = totalTransactionsLength;
     } else if (p === (payments?.length || 0)) {
       invoices.slice(v)?.map(invoice => {
         if (invoice.status !== 'expired') {
-          mergedTransactions.push({type: 'INVOICE', payment_hash: invoice.payment_hash, status: invoice.status, msatoshi: (invoice.msatoshi || invoice.amount_msat), label: invoice.label, bolt11: invoice.bolt11, description: invoice.description, bolt12: invoice.bolt12, payment_preimage: invoice.payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoice.expires_at, msatoshi_received: (invoice.msatoshi_received || invoice.amount_received_msat), paid_at: invoice.paid_at});
+          mergedTransactions.push({type: 'INVOICE', payment_hash: invoice.payment_hash, status: invoice.status, amount_msat: (invoice.amount_msat || invoice.msatoshi), label: invoice.label, bolt11: invoice.bolt11, description: invoice.description, bolt12: invoice.bolt12, payment_preimage: invoice.payment_preimage, created_at: null, amount_sent_msat: null, destination: null, expires_at: invoice.expires_at, amount_received_msat: (invoice.amount_received_msat || invoice.msatoshi_received), paid_at: invoice.paid_at});
         }
         return invoice;
       });
       i = totalTransactionsLength;
     } else if((payments[p].created_at || 0) >= (invoices[v].paid_at || invoices[v].expires_at || 0)) {
-      mergedTransactions.push({type: 'PAYMENT', payment_hash: payments[p].payment_hash, status: payments[p].status, msatoshi: (payments[p].msatoshi || payments[p].amount_msat), label: payments[p].label, bolt11: payments[p].bolt11, description: payments[p].description, bolt12: payments[p].bolt12, payment_preimage: payments[p].payment_preimage, created_at: payments[p].created_at, msatoshi_sent: (payments[p].msatoshi_sent || payments[p].amount_sent_msat), destination: payments[p].destination, expires_at: null, msatoshi_received: null, paid_at: null});
+      mergedTransactions.push({type: 'PAYMENT', payment_hash: payments[p].payment_hash, status: payments[p].status, amount_msat: (payments[p].amount_msat || payments[p].msatoshi), label: payments[p].label, bolt11: payments[p].bolt11, description: payments[p].description, bolt12: payments[p].bolt12, payment_preimage: payments[p].payment_preimage, created_at: payments[p].created_at, amount_sent_msat: (payments[p].amount_sent_msat || payments[p].msatoshi_sent), destination: payments[p].destination, expires_at: null, amount_received_msat: null, paid_at: null});
       p++;
     } else if((payments[p].created_at || 0) < (invoices[v].paid_at || invoices[v].expires_at || 0)) {
       if (invoices[v].status !== 'expired') {
-        mergedTransactions.push({type: 'INVOICE', payment_hash: invoices[v].payment_hash, status: invoices[v].status, msatoshi: (invoices[v].msatoshi || invoices[v].amount_msat), label: invoices[v].label, bolt11: invoices[v].bolt11, description: invoices[v].description, bolt12: invoices[v].bolt12, payment_preimage: invoices[v].payment_preimage, created_at: null, msatoshi_sent: null, destination: null, expires_at: invoices[v].expires_at, msatoshi_received: (invoices[v].msatoshi_received || invoices[v].amount_received_msat), paid_at: invoices[v].paid_at});
+        mergedTransactions.push({type: 'INVOICE', payment_hash: invoices[v].payment_hash, status: invoices[v].status, amount_msat: (invoices[v].amount_msat || invoices[v].msatoshi), label: invoices[v].label, bolt11: invoices[v].bolt11, description: invoices[v].description, bolt12: invoices[v].bolt12, payment_preimage: invoices[v].payment_preimage, created_at: null, amount_sent_msat: null, destination: null, expires_at: invoices[v].expires_at, amount_received_msat: (invoices[v].amount_received_msat || invoices[v].msatoshi_received), paid_at: invoices[v].paid_at});
       }
       v++;
     }
@@ -183,15 +184,16 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
   } else {
     return events.reduce((acc: any[], event, i) => {
       if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
-        if (isCompatibleVersion(currentVersion, '23.02')) {
+        if (isCompatibleVersion(currentVersion, '22.11')) {
           event.credit_msat = event.credit_msat || 0;
           event.debit_msat = event.debit_msat || 0;
         } else {
-          event.credit_msat = event.credit_msat && typeof event.credit_msat === 'string' ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : 0;
-          event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : 0;
+          event.credit_msat = event.credit_msat && typeof event.credit_msat === 'string' ? event.credit_msat.substring(0, (event.credit_msat.length - 4)) : (event.credit_msat || 0);
+          event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : (event.debit_msat || 0);
         }
         const lastTx = acc.length && acc.length > 0 ? acc[acc.length - 1] : { tag: '' };
         if (lastTx.tag === 'withdrawal' && event.tag === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
+          // Calculate the net amount from the last withdrawal and this deposit
           lastTx.debit_msat = (lastTx.debit_msat - +event.credit_msat);
         } else {
           acc.push(event);
@@ -230,6 +232,7 @@ const AppContext = React.createContext<AppContextType>({
   setNodeInfo: (info: NodeInfo) => {},
   setListFunds: (fundsList: Fund) => {},
   setListPeers: (peersList: ListPeers) => {},
+  setListChannels: (data: (ListPeerChannels | ListNodes)) => {},
   setListInvoices: (invoicesList: ListInvoices) => {},
   setListPayments: (paymentsList: ListPayments) => {},
   setListOffers: (offersList: ListOffers) => {},
@@ -319,12 +322,18 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_PEERS:
-      let filteredChannels = aggregateChannels(action.payload.peers, state.nodeInfo.version);
       return {
         ...state,
-        listChannels: { ...filteredChannels, isLoading: false, error: action.payload.error },
         listPeers: action.payload
       };
+
+    case ApplicationActions.SET_LIST_CHANNELS:
+      const [listPeerChannels, listNodes] = action.payload.data;
+      const aggrChannels = aggregatePeerChannels(listPeerChannels, listNodes.nodes, state.nodeInfo.version);
+      return {
+        ...state,
+        listChannels: { ...aggrChannels, isLoading: false, error: action.payload.error }
+      }
 
     case ApplicationActions.SET_LIST_INVOICES:
       const sortedInvoices = action.payload.invoices?.sort((i1: Invoice, i2: Invoice) => {
@@ -430,6 +439,10 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_PEERS, payload: list });
   };
 
+  const setListChannelsHandler = (data: (ListPeerChannels | ListNodes)) => {
+    dispatchApplicationAction({ type: ApplicationActions.SET_LIST_CHANNELS, payload: { data } });
+  };
+
   const setListInvoicesHandler = (list: ListInvoices) => {
     dispatchApplicationAction({ type: ApplicationActions.SET_LIST_INVOICES, payload: list });
   };
@@ -478,6 +491,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
     setNodeInfo: setNodeInfoHandler,
     setListFunds: setListFundsHandler,
     setListPeers: setListPeersHandler,
+    setListChannels: setListChannelsHandler,
     setListInvoices: setListInvoicesHandler,
     setListPayments: setListPaymentsHandler,
     setListOffers: setListOffersHandler,

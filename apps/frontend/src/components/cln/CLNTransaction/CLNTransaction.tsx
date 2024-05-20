@@ -18,12 +18,12 @@ const TODAY = Math.floor(Date.now() / 1000);
 const Payment = ({payment, copyHandler}) => {
   return (
     <>
-    {payment.msatoshi || payment.amount_msat ?        
+    {payment.amount_msat ?        
       <Row className='cln-transaction-detail'>
         <Col xs={12} className='fs-7 text-light'>Transaction Fee (mSats)</Col>
         <Col xs={11} className='fs-7 overflow-x-ellipsis'>
-          {payment.msatoshi_sent || payment.amount_sent_msat ? 
-            formatCurrency(((payment.msatoshi_sent || payment.amount_sent_msat) - (payment.msatoshi || payment.amount_msat)), Units.MSATS, Units.MSATS, false, 0, 'string')
+          {payment.amount_sent_msat ? 
+            formatCurrency((payment.amount_sent_msat - payment.amount_msat), Units.MSATS, Units.MSATS, false, 0, 'string')
           :
             0
           }
@@ -58,7 +58,7 @@ const Invoice = ({invoice, copyHandler}) => {
   return (
     <>
     {invoice.paid_at && invoice.expires_at && invoice.expires_at > TODAY ?
-      <Row className='cln-transaction-detail'>
+      <Row className='cln-transaction-detail' data-testid='valid-till'>
         <Col xs={12} className='fs-7 text-light'>Valid till</Col>
         <Col xs={11} className='fs-7 overflow-x-ellipsis'>
           <DateBox dataValue={invoice.expires_at} dataType={''} showTooltip={false} />
@@ -68,7 +68,7 @@ const Invoice = ({invoice, copyHandler}) => {
       <></>
     }
     {(invoice.bolt11 || invoice.bolt12) ?
-      <Row className='cln-transaction-detail'>
+      <Row className='cln-transaction-detail' data-testid='invoice'>
         <Col xs={12} className='fs-7 text-light'>Invoice</Col>
         <Col xs={11} className='pe-1 fs-7 overflow-x-ellipsis'>{invoice.bolt11 || invoice.bolt12}</Col>
         <Col xs={1} onClick={copyHandler} className='cln-transaction-copy'><CopySVG id='Invoice' showTooltip={true} /></Col>
@@ -77,7 +77,7 @@ const Invoice = ({invoice, copyHandler}) => {
       <></>
     }
     {invoice.payment_preimage ?
-      <Row className='cln-transaction-detail'>
+      <Row className='cln-transaction-detail' data-testid='preimage'>
         <Col xs={12} className='fs-7 text-light'>Preimage</Col>
         <Col xs={11} className='pe-1 fs-7 overflow-x-ellipsis'>{invoice.payment_preimage}</Col>
         <Col xs={1} onClick={copyHandler} className='cln-transaction-copy'><CopySVG id='Preimage' showTooltip={true} /></Col>

@@ -5,7 +5,7 @@ describe('FiatBox component ', () => {
   beforeEach(() => render(<FiatBox />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('fiat-box')).toBeInTheDocument();
   });
 
 });
