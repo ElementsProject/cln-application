@@ -7,12 +7,17 @@
     Run a Core Lightning application for your node. An official app by Blockstream. Powered by Core Lightning.
     <br />
     <br />
-    <a href="https://twitter.com/Blockstream">
-      <img src="https://img.shields.io/twitter/follow/blockstream?style=social" />
-    </a>
-    <a href="https://apps.umbrel.com/app/core-lightning" style="margin-left:10px">
-      <img src="https://apps.umbrel.com/badge-light.svg" width="101" height="21"/>
-    </a>
+    <div align="center">
+      <a href="https://twitter.com/Blockstream">
+        <img src="https://img.shields.io/twitter/follow/blockstream?style=social" style="height: 21px;"/>
+      </a>
+      <a href="https://marketplace.start9.com">
+        <img src="./.github/images/start9-badge-light.svg"/>
+      </a>
+      <a href="https://apps.umbrel.com/app/core-lightning">
+        <img src="./.github/images/umbrel-badge-light.svg" style="width: 130px;height: 21px;"/>
+      </a>
+    </div>
   </h3>
 </p>
 
@@ -52,7 +57,6 @@
       - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
       - APP_BITCOIN_NODE_IP: IP address of bitcoin node container (required)
       - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
-      - APP_CORE_LIGHTNING_REST_IP: IP address of the c-lightning-REST container (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_REST_PORT: c-lightning-REST server port (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for c-lightning-REST certificates (optional; for connect wallet screen)
       - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
@@ -105,8 +109,8 @@
         npm run start
       ```
 
-- ## Umbrel Store
-  - This application is also available on Umbrel App Store with one click install.
+- ## Stores/Marketplaces
+  - This application is also available on Umbrel App Store and Start9 OS with one click install.
 
 ---
 
