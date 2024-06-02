@@ -30,37 +30,39 @@
 - ## Standalone
   - ### Get latest release
       ```
-        wget https://github.com/ElementsProject/cln-application/archive/refs/tags/v0.0.1.tar.gz
-        tar -xzf v0.0.1.tar.gz
+      wget https://github.com/ElementsProject/cln-application/archive/refs/tags/v0.0.1.tar.gz
+      tar -xzf v0.0.1.tar.gz
       ```
 
   - ### Dependency Installation
       ```
-          cd cln-application-0.0.1
-          npm install --omit=dev
+      cd cln-application-0.0.1
+      npm install --omit=dev
       ```
 
   - ### Environment Variables
       This application accepts & depends upon these variables to be passed through environment:
 
       ```
-        - APP_CORE_LIGHTNING_IP: IP address of the core lightning container (required)
-        - APP_CORE_LIGHTNING_PORT: Port on which this application should be served (required)
-        - APP_CORE_LIGHTNING_DAEMON_IP: Core lightning daemon bind address (cln config bind-addr; required)
-        - APP_CORE_LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (cln config experimental-websocket-port; required)
-        - APP_CONFIG_DIR: Path for application's configuration file (config.json; required)
-        - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
-        - APP_CORE_LIGHTNING_REST_PORT: c-lightning-REST server port (optional; for connect wallet screen)
-        - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for c-lightning-REST certificates (optional; for connect wallet screen)
-        - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; required for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
-        - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
-        - APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
-        - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
-        - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
-        - APP_MODE: Mode for logging and other settings (optional; valid values: production/development/testing)
-        - SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
-        - APP_PROTOCOL: Protocol on which the application will be served (optional; valid values: http/https)
-        - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
+      - APP_CORE_LIGHTNING_IP: IP address of this application (cln-application) container (required)
+      - APP_CORE_LIGHTNING_PORT: Port on which this application should be served (required)
+      - APP_CORE_LIGHTNING_DAEMON_IP: IP address of Core lightning node container (required)
+      - APP_CORE_LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required; from cln's config.json; starting with `bind-addr=ws:`)
+      - APP_CONFIG_DIR: Path for cln-application's configuration file (required; config.json)
+      - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
+      - APP_BITCOIN_NODE_IP: IP address of bitcoin node container (required)
+      - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
+      - APP_CORE_LIGHTNING_REST_IP: IP address of the c-lightning-REST container (optional; for connect wallet screen)
+      - APP_CORE_LIGHTNING_REST_PORT: c-lightning-REST server port (optional; for connect wallet screen)
+      - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for c-lightning-REST certificates (optional; for connect wallet screen)
+      - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
+      - APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
+      - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
+      - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
+      - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: production)
+      - SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
+      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: http)
+      - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       ```
 
       Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
