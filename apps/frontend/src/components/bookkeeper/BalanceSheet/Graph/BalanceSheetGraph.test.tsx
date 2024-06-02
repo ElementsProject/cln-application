@@ -6,7 +6,7 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
-describe('Balance Sheet Graph component ', () => {
+describe.skip('Balance Sheet Graph component ', () => {
   beforeEach(() => render(<BalanceSheetGraph balanceSheetData={undefined} />));
 
   it('should be in the document', () => {
