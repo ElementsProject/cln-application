@@ -80,7 +80,7 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
       for (const accountName of accountNamesSet) {
         let accountCreditMsat = 0;
         let accountDebitMsat = 0;
-        let accountBalance = 0;
+        let accountBalanceMsat = 0;
 
         const eventsFromThisAccount = eventRows.filter(r => r[4] === accountName);
 
@@ -90,12 +90,13 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
             accountDebitMsat += row[3];
           });
 
-          accountBalance = accountCreditMsat - accountDebitMsat;
+          accountBalanceMsat = accountCreditMsat - accountDebitMsat;
+          let accountBalanceSat = accountBalanceMsat / 1000;
 
           interimAccounts.push({
             short_channel_id: eventsFromThisAccount[0][0] === null ? "wallet" : eventsFromThisAccount[0][0],
             remote_alias: eventsFromThisAccount[0][1],
-            balance: accountBalance,
+            balance: accountBalanceSat,
             account: accountName
           });
         }

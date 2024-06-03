@@ -27,12 +27,18 @@ function BalanceSheetTable({ balanceSheetData }) {
 
       const rows = table.append("tbody")
         .selectAll<HTMLElement, Account>("tr")
-        .data(balanceSheetData.periods[balanceSheetData.periods.length - 1].accounts)
+        .data(balanceSheetData.periods[balanceSheetData.periods.length - 1].accounts) // display the last period aka the most current balances.
         .enter().append("tr");
 
       headers.forEach((header) => {
         rows.append("td")
-          .text((account: any) => String(account[header]))
+          .text((row: any) => {
+            if (header === 'balance') {
+              return `${row[header].toFixed(3)} sats`; //format so msats are .000
+            } else {
+              return String(row[header])
+            }
+          })
           .style("border", "1px black solid")
           .style("padding", "5px")
           .on("mouseover", function () {
