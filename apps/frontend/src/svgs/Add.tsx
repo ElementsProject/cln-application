@@ -4,13 +4,12 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 export const AddSVG = props => {
   return (
     <OverlayTrigger
-      placement='auto'
-      delay={{ show: 250, hide: 250 }}
-      overlay={(props.showTooltip ? <Tooltip>{props.tooltipText || ''}</Tooltip> : <></>)}
+    placement='auto'
+    delay={{ show: 250, hide: 250 }}
+    overlay={(props.showTooltip ? <Tooltip>{props.tooltipText || ''}</Tooltip> : <></>)}
     >
-      <svg width='17' height='17' viewBox='0 0 17 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
-        <path d='M1 8.5H16' stroke='#9F9F9F' strokeWidth='1.3' strokeLinecap='round' strokeLinejoin='round' />
-        <path d='M8.5 1V16' stroke='#9F9F9F' strokeWidth='1.3' strokeLinecap='round' strokeLinejoin='round' />
+      <svg xmlns='http://www.w3.org/2000/svg' className={props.className} fill='none' viewBox='0 0 24 24' width='18' height='18'>
+        <path className='svg-add fill-light' fillRule='evenodd' d='M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z'/>
       </svg>
     </OverlayTrigger>
   );
