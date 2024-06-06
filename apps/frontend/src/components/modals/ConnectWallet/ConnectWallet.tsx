@@ -95,15 +95,14 @@ const ConnectWallet = () => {
   }
 
   const createInvoiceRuneHandler = () => {
-    console.error("createInvoiceRuneHandler called");
     setIsLoadingInvoiceRune(true);
     createInvoiceRune()
       .then(() => {
         appCtx.setShowToast({show: true, message: ('Created Invoice Rune Successfully!'), bg: 'success'});
       })
       .catch(err => {
-        console.error("Error Creating Invoice Rune: ", err);
-        appCtx.setShowToast({show: true, message: ('Error Creating Invoice Rune'), bg: 'danger'});
+        logger.error(err.message || JSON.stringify(err));
+        appCtx.setShowToast({show: true, message: (`Error Creating Invoice Rune: ${err.message || ''}`), bg: 'danger'});
       })
       .finally(() => {
         setIsLoadingInvoiceRune(false);
@@ -275,6 +274,7 @@ const ConnectWallet = () => {
                       onClick={invoiceRuneClickHandler}
                       id={connectValues.invoiceRune.title}
                       value={appCtx.walletConnect[connectValues.invoiceRune.field]}
+                      placeholder='Not Found'
                       aria-label={appCtx.walletConnect[connectValues.invoiceRune.field]}
                       disabled={isLoadingInvoiceRune}
                       aria-describedby='copy-addon-macaroon'
@@ -285,9 +285,9 @@ const ConnectWallet = () => {
                     <InputGroup.Text id={connectValues.invoiceRune.title} className='form-control-addon form-control-addon-right' onClick={!isLoadingInvoiceRune ? invoiceRuneClickHandler : undefined} data-testid='invoice-rune-button'>
                       { isLoadingInvoiceRune ? 
                         <span className='h-100 d-flex justify-content-center align-items-center'>
-                          <Spinner animation='grow' variant='primary' data-testid='invoice-rune-spinner'/>
+                          <Spinner className='me-1' variant='light' size='sm' data-testid='invoice-rune-spinner'/>
                         </span>
-                        : InvoiceRuneSvg && <InvoiceRuneSvg id={connectValues.invoiceRune.title} />
+                        : InvoiceRuneSvg && <InvoiceRuneSvg id={connectValues.invoiceRune.title} showTooltip={appCtx.walletConnect.INVOICE_RUNE === ''} tooltipText={'Create New Invoice Rune'} />
                       }
                     </InputGroup.Text>
                   </InputGroup>

@@ -197,7 +197,7 @@ const useHttp = () => {
         return refreshConnectWalletData();
       })
       .catch((err) => {
-        console.error("Error creating or saving invoice rune: ", err);
+        logger.error("Error creating or saving invoice rune: ", (err.message || JSON.stringify(err)));
         throw err;
       });
   };

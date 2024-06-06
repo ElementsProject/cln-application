@@ -8,11 +8,10 @@ export const AddSVG = props => {
     <OverlayTrigger
     placement='auto'
     delay={{ show: 250, hide: 250 }}
-    overlay={(props.showTooltip ? <Tooltip>{'Copy ' + (props.id || '')}</Tooltip> : <></>)}
+    overlay={(props.showTooltip ? <Tooltip>{props.tooltipText || ''}</Tooltip> : <></>)}
     >
-      <svg className={props.className} width='22' height='20' viewBox='0 0 22 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
-        <path className='stroke-light' d='M11 4V16' strokeWidth='1.3' strokeLinecap='round'/>
-        <path className='stroke-light' d='M4 10H18' strokeWidth='1.3' strokeLinecap='round'/>
+      <svg xmlns='http://www.w3.org/2000/svg' className={props.className} fill='none' viewBox='0 0 24 24' width='18' height='18'>
+        <path className='svg-add fill-light' fillRule='evenodd' d='M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z'/>
       </svg>
     </OverlayTrigger>
   );
