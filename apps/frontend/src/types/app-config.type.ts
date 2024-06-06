@@ -4,6 +4,7 @@ export type ConnectWalletFields = {
   port: { title: string; field: string; }; // REST, Websocket or gRPC
   host: { title: string; field: string; };
   macaroon: { title: string; field: string; }; // Or ClientKey
+  invoiceRune: { title: string; field: string; };
   connectUrl: { title: string; field: string; };
   clientCert: { title: string; field: string; };
   caCert: { title: string; field: string; };
@@ -25,6 +26,7 @@ export type WalletConnect = {
   WS_PORT?: string;
   NODE_PUBKEY?: string;
   COMMANDO_RUNE?: string;
+  INVOICE_RUNE?: string;
   APP_VERSION?: string;
   error?: any;
 }

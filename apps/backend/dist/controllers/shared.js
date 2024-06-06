@@ -6,6 +6,7 @@ import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { setSharedApplicationConfig, overrideSettingsWithEnvVariables } from '../shared/utils.js';
 import { sep } from 'path';
+import { LNMessage } from '../service/lightning.service.js';
 class SharedController {
     getApplicationSettings(req, res, next) {
         try {
@@ -72,6 +73,7 @@ class SharedController {
                     .replace('-----BEGIN CERTIFICATE-----', '')
                     .replace('-----END CERTIFICATE-----', '');
             }
+            LNMessage.refreshEnvVariables();
             const CONNECT_WALLET_SETTINGS = {
                 LOCAL_HOST: process.env.LOCAL_HOST || '',
                 DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
@@ -87,6 +89,7 @@ class SharedController {
                 NODE_PUBKEY: process.env.LIGHTNING_PUBKEY || '',
                 COMMANDO_RUNE: process.env.COMMANDO_RUNE,
                 APP_VERSION: JSON.parse(packageData).version || '',
+                INVOICE_RUNE: process.env.INVOICE_RUNE || '',
             };
             res.status(200).json(CONNECT_WALLET_SETTINGS);
         }
@@ -114,6 +117,25 @@ class SharedController {
                 .catch(err => {
                 return handleError(err, req, res, next);
             });
+        }
+        catch (error) {
+            handleError(error, req, res, next);
+        }
+    }
+    async saveInvoiceRune(req, res, next) {
+        try {
+            logger.info('Saving Invoice Rune');
+            const showRunes = await LNMessage.call('showrunes', []);
+            const invoiceRune = showRunes.runes.find(rune => rune.restrictions.some(restriction => restriction.alternatives.some(alternative => alternative.value === 'invoice')) &&
+                rune.restrictions.some(restriction => restriction.alternatives.some(alternative => alternative.value === 'listinvoices')));
+            if (invoiceRune && fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
+                const invoiceRuneString = `INVOICE_RUNE="${invoiceRune.rune}"\n`;
+                fs.appendFileSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION, invoiceRuneString, 'utf-8');
+                res.status(201).send();
+            }
+            else {
+                throw new Error('Invoice rune not found or .commando-env does not exist.');
+            }
         }
         catch (error) {
             handleError(error, req, res, next);
