@@ -123,7 +123,6 @@ describe('ConnectWallet component ', () => {
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[5];
     await act(async () => fireEvent.click(restNetworkItem));
-
     expect(screen.getByTestId('port')).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
     expect(screen.getByTestId('macaroon')).toHaveValue('ClientKey');
