@@ -17,7 +17,7 @@ function BalanceSheetGraph({ balanceSheetData }) {
 
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-      const formatTick = d3.format(',');
+      const formatTick = d3.format('');
 
       const svg = d3.select(d3Container.current)
         .append('svg')
