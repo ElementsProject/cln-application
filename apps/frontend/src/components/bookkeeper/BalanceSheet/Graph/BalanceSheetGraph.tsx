@@ -27,6 +27,7 @@ function BalanceSheetGraph({ balanceSheetData }) {
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
       const highestTotalBalanceAcrossPeriods = Math.max(...balanceSheetData.periods.map(p => p.totalBalanceAcrossAccounts));
+      const yDomainUpperBound = highestTotalBalanceAcrossPeriods + (highestTotalBalanceAcrossPeriods * 0.05); // Add 5% buffer
 
       const xScale = d3.scaleBand()
         .domain(balanceSheetData.periods.map(d => d.periodKey))
@@ -34,7 +35,7 @@ function BalanceSheetGraph({ balanceSheetData }) {
         .padding(0.1);
 
       const yScale = d3.scaleLinear()
-        .domain([0, highestTotalBalanceAcrossPeriods])
+        .domain([0, yDomainUpperBound])
         .range([innerHeight, 0]);
 
       const barWidth = xScale.bandwidth();
