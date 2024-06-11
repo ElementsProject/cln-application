@@ -1,8 +1,11 @@
 import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
+import './BalanceSheetGraph.scss'
+import { Period } from '../../../../types/lightning-bookkeeper.type';
 
 function BalanceSheetGraph({ balanceSheetData }) {
   const d3Container = useRef(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (d3Container.current && balanceSheetData.periods.length > 0) {
@@ -40,12 +43,26 @@ function BalanceSheetGraph({ balanceSheetData }) {
 
       const barWidth = xScale.bandwidth();
 
-      balanceSheetData.periods.forEach((period, periodIndex) => {
+      const tooltip = d3.select('body').selectAll('.balance-sheet-tooltip')
+      .data([null])
+      .join('div')
+      .attr('class', 'balance-sheet-tooltip')
+      .style('position', 'absolute')
+      .style('visibility', 'hidden')
+      .style('background', 'white')
+      .style('padding', '5px')
+      .style('border', '1px solid black')
+      .style('border-radius', '5px')
+      .style('pointer-events', 'none');
+
+      tooltipRef.current = tooltip.node() as HTMLDivElement;
+
+      balanceSheetData.periods.forEach((period: Period, periodIndex) => {
         let yOffset = innerHeight;
         period.accounts.forEach((account, accountIndex) => {
           const segmentHeight = Math.max(innerHeight - yScale(account.balance), minSegmentSize);
 
-          svg.append('rect')
+          const segment = svg.append('rect')
             .attr('x', xScale(period.periodKey)!)
             .attr('y', yOffset - segmentHeight)
             .attr('width', barWidth)
@@ -53,6 +70,27 @@ function BalanceSheetGraph({ balanceSheetData }) {
             .attr('fill', colorScale(accountIndex.toString()));
 
           yOffset -= segmentHeight;
+
+          segment
+            .on('mouseover', function (event, d: any) {
+              d3.select(tooltipRef.current)
+                .style('visibility', 'visible')
+                .text(`Short Channel ID: ${account.short_channel_id}
+                  Remote Alias: ${account.remote_alias}
+                  Balance: ${account.balance}
+                  Percentage: ${account.percentage}
+                  Account: ${account.account}`);
+            })
+            .on('mousemove', function (event) {
+              d3.select(tooltipRef.current)
+                .style('top', `${event.pageY}px`)
+                .style('left', `${event.pageX + 10}px`);
+            })
+            .on('mouseout', function () {
+              d3.select(tooltipRef.current)
+                .style('visibility', 'hidden');
+            });
+
         });
       });
 
