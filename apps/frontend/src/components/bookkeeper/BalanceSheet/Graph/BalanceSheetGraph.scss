@@ -1,3 +1,9 @@
+@import '../../../../styles/constants.scss';
+
 .balance-sheet-tooltip {
   white-space: pre-line;
+}
+
+rect:hover {
+  fill: bisque; //todo what is a good color for this?
 }
