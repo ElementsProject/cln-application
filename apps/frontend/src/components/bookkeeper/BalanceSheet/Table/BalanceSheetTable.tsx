@@ -28,7 +28,14 @@ function BalanceSheetTable({ balanceSheetData }) {
       const rows = table.append("tbody")
         .selectAll<HTMLElement, Account>("tr")
         .data(balanceSheetData.periods[balanceSheetData.periods.length - 1].accounts) // display the last period aka the most current balances.
-        .enter().append("tr");
+        .enter()
+        .append("tr")
+        .on("mouseover", function () {
+          d3.select(this).style("background-color", "#EBEFF9");
+        })
+        .on("mouseout", function () {
+          d3.select(this).style("background-color", "white");
+        });
 
       headers.forEach((header) => {
         rows.append("td")
@@ -40,13 +47,7 @@ function BalanceSheetTable({ balanceSheetData }) {
             }
           })
           .style("border", "1px black solid")
-          .style("padding", "5px")
-          .on("mouseover", function () {
-            d3.select(this).style("background-color", "#EBEFF9");
-          })
-          .on("mouseout", function () {
-            d3.select(this).style("background-color", "white");
-          });
+          .style("padding", "5px");
       });
     }
   }, [balanceSheetData]);
