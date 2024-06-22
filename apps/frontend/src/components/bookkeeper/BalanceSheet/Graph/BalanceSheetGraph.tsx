@@ -102,10 +102,21 @@ function BalanceSheetGraph({ balanceSheetData }) {
 
       const xAxis = d3.axisBottom(xScale);
 
-      const xAxisGroup = svg.append("g")
+      svg.append("g")
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${innerHeight})`)
+        .attr("clip-path", "url(#chart-area-clip")
         .call(xAxis.tickSizeOuter(0));
+
+      svg.append("defs").append("clipPath")
+        .attr("id", "chart-area-clip")
+        .append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", innerWidth)
+          .attr("height", innerHeight);
+      
+      barsGroup.attr("clip-path", "url(#chart-area-clip");
 
       svg.append("g")
         .call(d3.axisLeft(yScale).tickFormat(formatTick));
