@@ -26,8 +26,10 @@ function BalanceSheetGraph({ balanceSheetData }) {
         .attr("width", outerWidth)
         .attr("height", outerHeight)
         .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`)
-        .call(zoom);
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      d3.select(d3Container.current).call(zoom);
+
       const highestTotalBalanceAcrossPeriods = Math.max(...balanceSheetData.periods.map(p => p.totalBalanceAcrossAccounts));
       const yDomainUpperBound = highestTotalBalanceAcrossPeriods + (highestTotalBalanceAcrossPeriods * 0.05); // Add 5% buffer
 
