@@ -116,10 +116,12 @@ export enum PaymentType {
 };
 
 export enum TimeGranularity {
+  MINUTE = "Minutely",
   HOURLY = "Hourly",
   DAILY = "Daily",
   WEEKLY = "Weekly",
   MONTHLY = "Monthly",
+  YEARLY = "Yearly",
 };
 
 export const APP_ANIMATION_DURATION = 2;

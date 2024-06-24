@@ -13,12 +13,17 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
       const year = date.getFullYear();
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const day = date.getDate().toString().padStart(2, '0');
+      const hour = date.getHours().toString().padStart(2, '0');
+      const minute = date.getMinutes().toString().padStart(2, '0');
+
       let periodKey: string;
 
       switch (timeGranularity) {
+        case TimeGranularity.MINUTE:
+          periodKey = `${year}-${month}-${day} ${hour}:${minute}`;
+          break;
         case TimeGranularity.HOURLY:
-          const hours = date.getHours().toString().padStart(2, '0');
-          periodKey = `${year}-${month}-${day} ${hours}`;
+          periodKey = `${year}-${month}-${day} ${hour}`;
           break;
         case TimeGranularity.DAILY:
           periodKey = `${year}-${month}-${day}`;
@@ -29,6 +34,9 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
           break;
         case TimeGranularity.MONTHLY:
           periodKey = `${year}-${month}`;
+          break;
+        case TimeGranularity.YEARLY:
+          periodKey = `${year}`;
           break;
       }
       return periodKey;
