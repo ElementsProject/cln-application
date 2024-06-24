@@ -131,15 +131,15 @@ function BalanceSheetGraph({ balanceSheetData }) {
 
         function zoomed(event: d3.D3ZoomEvent<SVGGElement, unknown>) {
           const transform = event.transform;
+          const tempXScale = xScale.copy().range([0, innerWidth].map(d => transform.applyX(d)));
           
           periodGroups.attr("transform", (d: any) => 
-            `translate(${transform.applyX(xScale(d.periodKey)! + xScale.bandwidth() / 2)}, 0)`);
+            `translate(${tempXScale(d.periodKey)}, 0)`);
           
           periodGroups.selectAll("rect")
-            .attr("x", -xScale.bandwidth() / (2 * transform.k))
-            .attr("width", xScale.bandwidth() / transform.k);
+            .attr("x", 0)
+            .attr("width", tempXScale.bandwidth());
           
-          const tempXScale = xScale.copy().range([0, innerWidth].map(d => transform.applyX(d)));
           svg.select(".x-axis").call(xAxis.scale(tempXScale));
         }
       }
