@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import './BalanceSheetRoot.scss';
 import Card from 'react-bootstrap/Card';
@@ -18,7 +18,7 @@ const BalanceSheetRoot = (props) => {
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.DAILY);
   const { getBalanceSheet } = useHttp();
 
-  const fetchBalanceSheetData = async (timeGranularity: TimeGranularity) => {
+  const fetchBalanceSheetData = useCallback(async (timeGranularity: TimeGranularity) => {
     getBalanceSheet(timeGranularity)
       .then((response: BalanceSheet) => {
         setBalanceSheetData(response);
@@ -26,7 +26,8 @@ const BalanceSheetRoot = (props) => {
       .catch(err => {
         console.log("fetchBalanceSheet error " + JSON.stringify(err));
       });
-  };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const timeGranularityChangeHandler = (timeGranularity) => {
     setTimeGranularity(timeGranularity);
@@ -36,7 +37,7 @@ const BalanceSheetRoot = (props) => {
     if (appCtx.authStatus.isAuthenticated) {
       fetchBalanceSheetData(timeGranularity);
     }
-  }, [appCtx.authStatus.isAuthenticated, timeGranularity]);
+  }, [appCtx.authStatus.isAuthenticated, timeGranularity, fetchBalanceSheetData]);
 
   return (
     <div data-testid='balancesheet-container' >
