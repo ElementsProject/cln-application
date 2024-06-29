@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import './BalanceSheetRoot.scss';
 import Card from 'react-bootstrap/Card';
@@ -13,10 +13,18 @@ import TimeGranularitySelection from '../TimeGranularitySelection/TimeGranularit
 import { Col, Container } from 'react-bootstrap';
 
 const BalanceSheetRoot = (props) => {
-  const appCtx = useContext(AppContext); //todo use for units and stuff?  or get units from higher up the chain.
+  const appCtx = useContext(AppContext);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheet>({ isLoading: true, periods: [] }); //todo deal with loading
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.DAILY);
   const { getBalanceSheet } = useHttp();
+
+  const updateWidth = () => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.getBoundingClientRect().width);
+    }
+  };
 
   const fetchBalanceSheetData = useCallback(async (timeGranularity: TimeGranularity) => {
     getBalanceSheet(timeGranularity)
@@ -24,14 +32,20 @@ const BalanceSheetRoot = (props) => {
         setBalanceSheetData(response);
       })
       .catch(err => {
-        console.log("fetchBalanceSheet error " + JSON.stringify(err));
+        console.error("fetchBalanceSheet error " + JSON.stringify(err));
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const timeGranularityChangeHandler = (timeGranularity) => {
     setTimeGranularity(timeGranularity);
   };
+
+  useEffect(() => {
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   useEffect(() => {
     if (appCtx.authStatus.isAuthenticated) {
@@ -40,40 +54,38 @@ const BalanceSheetRoot = (props) => {
   }, [appCtx.authStatus.isAuthenticated, timeGranularity, fetchBalanceSheetData]);
 
   return (
-    <div data-testid='balancesheet-container' >
-      <Card className='d-flex align-items-stretch inner-box-shadow'>
-        <Card.Body className='text-dark d-flex align-items-stretch flex-column pt-4'>
-          <Card.Header className='p-0'>
-            <Container fluid>
-              <Row>
-                <Col xs={12}>
-                  <div className='fs-4 p-0 ps-3 fw-bold text-dark'>
-                    Balance Sheet
-                  </div>
-                </Col>
-                <Col xs={12} className='d-flex align-items-center'>
-                  <div className='ms-3 me-3 mt-4'>
-                    Time Granularity
-                  </div>
-                  <TimeGranularitySelection
-                    className='time-granularity-dropdown mt-4'
-                    timeGranularity={timeGranularity}
-                    onTimeGranularityChanged={timeGranularityChangeHandler} />
-                </Col>
-              </Row>
-            </Container>
-          </Card.Header>
-          <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
+    <div data-testid='balancesheet-container' ref={containerRef}>
+      <Card className='d-flex align-items-stretch overflow-hidden inner-box-shadow'>
+        <Card.Header className='p-0'>
+          <Container fluid>
             <Row>
-              <BalanceSheetGraph balanceSheetData={balanceSheetData} />
+              <Col xs={12}>
+                <div className='fs-4 p-0 ps-3 fw-bold'>
+                  Balance Sheet
+                </div>
+              </Col>
+              <Col xs={12} className='d-flex align-items-center'>
+                <div className='ms-3 me-3 mt-4'>
+                  Time Granularity
+                </div>
+                <TimeGranularitySelection
+                  className='time-granularity-dropdown mt-4'
+                  timeGranularity={timeGranularity}
+                  onTimeGranularityChanged={timeGranularityChangeHandler} />
+              </Col>
             </Row>
-            <Row>
-              <BalanceSheetTable balanceSheetData={balanceSheetData} />
-            </Row>
-          </Card.Body>
-          <Card.Footer className='d-flex justify-content-center'>
-          </Card.Footer>
+          </Container>
+        </Card.Header>
+        <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
+          <Row>
+            <BalanceSheetGraph balanceSheetData={balanceSheetData} width={containerWidth} />
+          </Row>
+          <Row>
+            <BalanceSheetTable balanceSheetData={balanceSheetData} />
+          </Row>
         </Card.Body>
+        <Card.Footer className='d-flex justify-content-center'>
+        </Card.Footer>
       </Card>
     </div>
   );

@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import './BalanceSheetGraph.scss'
 
-function BalanceSheetGraph({ balanceSheetData }) {
+function BalanceSheetGraph({ balanceSheetData, width }) {
   const d3Container = useRef(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -10,7 +10,7 @@ function BalanceSheetGraph({ balanceSheetData }) {
     if (d3Container.current && balanceSheetData.periods.length > 0) {
       d3.select(d3Container.current).selectAll("*").remove();
 
-      const outerWidth = 960;
+      const outerWidth = width;
       const outerHeight = 500;
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
       const innerWidth = outerWidth - margin.left - margin.right;
@@ -144,7 +144,7 @@ function BalanceSheetGraph({ balanceSheetData }) {
         }
       }
     }
-  }, [balanceSheetData]);
+  }, [balanceSheetData, width]);
 
   return (
     <div ref={d3Container} />
