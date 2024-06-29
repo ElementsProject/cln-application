@@ -7,7 +7,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe.skip('Balance Sheet Graph component ', () => {
-  beforeEach(() => render(<BalanceSheetGraph balanceSheetData={undefined} />));
+  beforeEach(() => render(<BalanceSheetGraph balanceSheetData={undefined} width={900} />));
 
   it('should be in the document', () => {
     expect(screen.getByTestId('balancesheetgraph-container')).not.toBeEmptyDOMElement()
