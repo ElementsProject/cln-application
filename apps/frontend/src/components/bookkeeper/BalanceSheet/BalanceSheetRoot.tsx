@@ -55,37 +55,35 @@ const BalanceSheetRoot = (props) => {
 
   return (
     <div data-testid='balancesheet-container' ref={containerRef}>
-      <Card className='d-flex align-items-stretch overflow-hidden inner-box-shadow'>
-        <Card.Header className='p-0'>
+      <Card className='d-flex align-items-stretch inner-box-shadow'>
+        <Card.Header className='p-2'>
           <Container fluid>
             <Row>
-              <Col xs={12}>
-                <div className='fs-4 p-0 ps-3 fw-bold'>
+              <Col md={2}>
+                <div className='fs-4 p-0 ps-3 mt-2 fw-bold'>
                   Balance Sheet
                 </div>
               </Col>
-              <Col xs={12} className='d-flex align-items-center'>
-                <div className='ms-3 me-3 mt-4'>
+              <Col md={3} className='d-flex align-items-center'>
+                <div className='ms-3 me-3 mt-2'>
                   Time Granularity
                 </div>
                 <TimeGranularitySelection
-                  className='time-granularity-dropdown mt-4'
+                  className='time-granularity-dropdown mt-2'
                   timeGranularity={timeGranularity}
                   onTimeGranularityChanged={timeGranularityChangeHandler} />
               </Col>
             </Row>
           </Container>
         </Card.Header>
-        <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
+        <Card.Body className='pb-4 d-flex flex-column align-items-center'>
           <Row>
             <BalanceSheetGraph balanceSheetData={balanceSheetData} width={containerWidth} />
           </Row>
-          <Row>
+          <Row className='w-100 overflow-x-auto'>
             <BalanceSheetTable balanceSheetData={balanceSheetData} />
           </Row>
         </Card.Body>
-        <Card.Footer className='d-flex justify-content-center'>
-        </Card.Footer>
       </Card>
     </div>
   );
