@@ -11,7 +11,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       d3.select(d3Container.current).selectAll("*").remove();
 
       const outerWidth = width;
-      const outerHeight = 325;
+      const outerHeight = 300;
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
