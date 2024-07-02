@@ -9,7 +9,11 @@ function BalanceSheetTable({ balanceSheetData }) {
     if (d3Container.current && balanceSheetData.periods.length > 0) {
       d3.select(d3Container.current).selectAll('*').remove();
 
-      const table = d3.select(d3Container.current).append('table')
+      const tableBodyDiv = d3.select(d3Container.current).append("div")
+      .style("height", "300px")
+      .style("overflow-y", "auto");
+
+      const table = tableBodyDiv.append('table')
         .style("border-collapse", "collapse")
         .style("border", "2px black solid");
 
