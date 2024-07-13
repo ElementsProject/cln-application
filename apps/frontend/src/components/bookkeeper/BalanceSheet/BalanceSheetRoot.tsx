@@ -8,7 +8,7 @@ import { AppContext } from '../../../store/AppContext';
 import BalanceSheetTable from './Table/BalanceSheetTable';
 import useHttp from '../../../hooks/use-http';
 import { TimeGranularity } from '../../../utilities/constants';
-import { BalanceSheet } from '../../../types/lightning-bookkeeper.type';
+import { BalanceSheet } from '../../../types/lightning-balancesheet.type';
 import TimeGranularitySelection from '../TimeGranularitySelection/TimeGranularitySelection';
 import { Col, Container } from 'react-bootstrap';
 
@@ -16,7 +16,7 @@ const BalanceSheetRoot = (props) => {
   const appCtx = useContext(AppContext);
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheet>({ isLoading: true, periods: [] }); //todo deal with loading
+  const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheet>({ periods: [] }); //todo deal with loading
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.DAILY);
   const { getBalanceSheet } = useHttp();
 
