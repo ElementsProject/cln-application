@@ -1,62 +1,30 @@
-import { Account, BalanceSheet, BalanceSheetResultSet, BalanceSheetRow, Period } from "../types/lightning-bookkeeper.type";
+import { Account, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, Period, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
 import { TimeGranularity } from "../utilities/constants";
 import moment from "moment";
 
-export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, timeGranularity: TimeGranularity): BalanceSheet {
+export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSet, timeGranularity: TimeGranularity): BalanceSheet {
   let returnPeriods: Period[] = [];
 
-  if (sqlResultSet.rows.length > 0) {
+  if (rawSqlResultSet.rows.length > 0) {
     const eventsGroupedByPeriodMap: Map<string, BalanceSheetRow[]> = new Map();
 
-    const getPeriodKey = (timestamp: number): string => {
-      const date = new Date(timestamp * 1000);
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const day = date.getDate().toString().padStart(2, '0');
-      const hour = date.getHours().toString().padStart(2, '0');
-      const minute = date.getMinutes().toString().padStart(2, '0');
-
-      let periodKey: string;
-
-      switch (timeGranularity) {
-        case TimeGranularity.MINUTE:
-          periodKey = `${year}-${month}-${day} ${hour}:${minute}`;
-          break;
-        case TimeGranularity.HOURLY:
-          periodKey = `${year}-${month}-${day} ${hour}`;
-          break;
-        case TimeGranularity.DAILY:
-          periodKey = `${year}-${month}-${day}`;
-          break;
-        case TimeGranularity.WEEKLY:
-          const startOfWeek = moment(date).startOf('isoWeek');
-          periodKey = startOfWeek.format("YYYY-MM-DD");
-          break;
-        case TimeGranularity.MONTHLY:
-          periodKey = `${year}-${month}`;
-          break;
-        case TimeGranularity.YEARLY:
-          periodKey = `${year}`;
-          break;
-      }
-      return periodKey;
-    };
+    const sqlResultSet = convertRawToBalanceSheetResultSet(rawSqlResultSet);
 
     const earliestTimestamp: number = sqlResultSet.rows.reduce((previousRow, currentRow) =>
-      previousRow[5] < currentRow[5] ? previousRow : currentRow)[5];
+      previousRow.timestamp < currentRow.timestamp ? previousRow : currentRow).timestamp;
     const currentTimestamp: number = Math.floor(Date.now() / 1000);
 
     let periodKey: string;
     const allPeriodKeys: string[] = [];
     for (let ts = earliestTimestamp; ts <= currentTimestamp; ts += 3600) { //todo change unit incrementation based on TimeGranularity
-      periodKey = getPeriodKey(ts);
+      periodKey = getPeriodKey(ts, timeGranularity);
       allPeriodKeys.push(periodKey);
     }
 
     allPeriodKeys.forEach(key => eventsGroupedByPeriodMap.set(key, []));
 
     for (let row of sqlResultSet.rows) {
-      const periodKey = getPeriodKey(row[5]);
+      const periodKey = getPeriodKey(row.timestamp, timeGranularity);
       if (!eventsGroupedByPeriodMap.has(periodKey)) {
         eventsGroupedByPeriodMap.set(periodKey, []);
       }
@@ -64,7 +32,7 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
     }
 
     const sortedPeriodKeys = Array.from(eventsGroupedByPeriodMap.keys()).sort((a, b) => a.localeCompare(b));    
-    const accountNamesSet: Set<string> = new Set(sqlResultSet.rows.map(row => row[4]));
+    const accountNamesSet: Set<string> = new Set(sqlResultSet.rows.map(row => row.account));
 
     for (let i = 0; i < sortedPeriodKeys.length; i++) {
       let eventRows: BalanceSheetRow[] = [];
@@ -90,20 +58,20 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
         let accountDebitMsat = 0;
         let accountBalanceMsat = 0;
 
-        const eventsFromThisAccount = eventRows.filter(r => r[4] === accountName);
+        const eventsFromThisAccount = eventRows.filter(r => r.account === accountName);
 
         if (eventsFromThisAccount.length > 0) {
           eventsFromThisAccount.forEach(row => {
-            accountCreditMsat += row[2];
-            accountDebitMsat += row[3];
+            accountCreditMsat += row.creditMsat;
+            accountDebitMsat += row.debitMsat;
           });
 
           accountBalanceMsat = accountCreditMsat - accountDebitMsat;
           let accountBalanceSat = accountBalanceMsat / 1000;
 
           interimAccounts.push({
-            short_channel_id: eventsFromThisAccount[0][0] === null ? "wallet" : eventsFromThisAccount[0][0],
-            remote_alias: eventsFromThisAccount[0][1],
+            short_channel_id: eventsFromThisAccount[0].shortChannelId === null ? "wallet" : eventsFromThisAccount[0].shortChannelId,
+            remote_alias: eventsFromThisAccount[0].remoteAlias === null? "n/a" : eventsFromThisAccount[0].remoteAlias,
             balance: accountBalanceSat,
             account: accountName
           });
@@ -133,10 +101,43 @@ export function transformToBalanceSheet(sqlResultSet: BalanceSheetResultSet, tim
   }
 
   return {
-    isLoading: sqlResultSet.isLoading,
     periods: returnPeriods
   };
 }
+
+function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): string {
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hour = date.getHours().toString().padStart(2, '0');
+  const minute = date.getMinutes().toString().padStart(2, '0');
+
+  let periodKey: string;
+
+  switch (timeGranularity) {
+    case TimeGranularity.MINUTE:
+      periodKey = `${year}-${month}-${day} ${hour}:${minute}`;
+      break;
+    case TimeGranularity.HOURLY:
+      periodKey = `${year}-${month}-${day} ${hour}`;
+      break;
+    case TimeGranularity.DAILY:
+      periodKey = `${year}-${month}-${day}`;
+      break;
+    case TimeGranularity.WEEKLY:
+      const startOfWeek = moment(date).startOf('isoWeek');
+      periodKey = startOfWeek.format("YYYY-MM-DD");
+      break;
+    case TimeGranularity.MONTHLY:
+      periodKey = `${year}-${month}`;
+      break;
+    case TimeGranularity.YEARLY:
+      periodKey = `${year}`;
+      break;
+  }
+  return periodKey;
+};
 
 type InterimAccountRepresentation = {
   short_channel_id: string,
