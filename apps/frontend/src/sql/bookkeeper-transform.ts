@@ -1,48 +1,53 @@
 import { Account, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, Period, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
-import { TimeGranularity } from "../utilities/constants";
+import { secondsForTimeGranularity, TimeGranularity } from "../utilities/constants";
 import moment from "moment";
 
 export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSet, timeGranularity: TimeGranularity): BalanceSheet {
   let returnPeriods: Period[] = [];
 
   if (rawSqlResultSet.rows.length > 0) {
-    const eventsGroupedByPeriodMap: Map<string, BalanceSheetRow[]> = new Map();
+    const periodKeyToBalanceSheetRowMap: Map<string, BalanceSheetRow[]> = new Map();
 
     const sqlResultSet = convertRawToBalanceSheetResultSet(rawSqlResultSet);
 
     const earliestTimestamp: number = sqlResultSet.rows.reduce((previousRow, currentRow) =>
-      previousRow.timestamp < currentRow.timestamp ? previousRow : currentRow).timestamp;
+      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow).timestampUnix;
     const currentTimestamp: number = Math.floor(Date.now() / 1000);
 
+    //Calculate all time periods from first db entry to today
     let periodKey: string;
     const allPeriodKeys: string[] = [];
-    for (let ts = earliestTimestamp; ts <= currentTimestamp; ts += 3600) { //todo change unit incrementation based on TimeGranularity
+    const incrementSeconds = secondsForTimeGranularity(timeGranularity);
+    for (let ts = earliestTimestamp; ts <= currentTimestamp; ts += incrementSeconds) {
       periodKey = getPeriodKey(ts, timeGranularity);
       allPeriodKeys.push(periodKey);
     }
 
-    allPeriodKeys.forEach(key => eventsGroupedByPeriodMap.set(key, []));
+    allPeriodKeys.forEach(key => periodKeyToBalanceSheetRowMap.set(key, []));
 
+    //Associate account event db rows to periods
     for (let row of sqlResultSet.rows) {
-      const periodKey = getPeriodKey(row.timestamp, timeGranularity);
-      if (!eventsGroupedByPeriodMap.has(periodKey)) {
-        eventsGroupedByPeriodMap.set(periodKey, []);
+      const periodKey = getPeriodKey(row.timestampUnix, timeGranularity);
+      if (!periodKeyToBalanceSheetRowMap.has(periodKey)) {
+        periodKeyToBalanceSheetRowMap.set(periodKey, []);
       }
-      eventsGroupedByPeriodMap.get(periodKey)!.push(row);
+      periodKeyToBalanceSheetRowMap.get(periodKey)!.push(row);
     }
 
-    const sortedPeriodKeys = Array.from(eventsGroupedByPeriodMap.keys()).sort((a, b) => a.localeCompare(b));    
+    const sortedPeriodKeys = Array.from(periodKeyToBalanceSheetRowMap.keys()).sort((a, b) => a.localeCompare(b));
     const accountNamesSet: Set<string> = new Set(sqlResultSet.rows.map(row => row.account));
 
+    //Generate each Period and add to return list
     for (let i = 0; i < sortedPeriodKeys.length; i++) {
       let eventRows: BalanceSheetRow[] = [];
-      let thisPeriodRows = eventsGroupedByPeriodMap.get(sortedPeriodKeys[i]);
+      let thisPeriodRows = periodKeyToBalanceSheetRowMap.get(sortedPeriodKeys[i]);
       if (thisPeriodRows && thisPeriodRows.length > 0) {
         eventRows.push(...thisPeriodRows);
       }
+      //A Period also contains all previous Periods' events, we add them here
       if (i > 0) {
         for (let c = 0; c < i; c++) {
-          let prevRow = eventsGroupedByPeriodMap.get(sortedPeriodKeys[c]);
+          let prevRow = periodKeyToBalanceSheetRowMap.get(sortedPeriodKeys[c]);
           if (prevRow) {
             eventRows.push(...prevRow);
           }

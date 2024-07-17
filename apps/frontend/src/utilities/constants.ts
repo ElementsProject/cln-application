@@ -124,6 +124,21 @@ export enum TimeGranularity {
   YEARLY = "Yearly",
 };
 
+export const secondsForTimeGranularity = (timeGranularity: TimeGranularity): number => {
+  switch (timeGranularity) {
+    case TimeGranularity.MINUTE:
+      return 60;
+    case TimeGranularity.HOURLY:
+      return 3600;
+    case TimeGranularity.DAILY:
+      return 86400;
+    case TimeGranularity.WEEKLY:
+    case TimeGranularity.MONTHLY:
+    case TimeGranularity.YEARLY:
+    return 86400;
+  }
+}
+
 export const APP_ANIMATION_DURATION = 2;
 export const TRANSITION_DURATION = 0.3;
 export const COUNTUP_DURATION = 1.5;
