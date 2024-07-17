@@ -33,7 +33,7 @@ export type BalanceSheetRow = {
   creditMsat: number,
   debitMsat: number,
   account: string,
-  timestamp: number
+  timestampUnix: number
 };
 
 export const convertRawToBalanceSheetResultSet = (raw: RawBalanceSheetResultSet): BalanceSheetResultSet => {
@@ -48,7 +48,7 @@ export const mapToBalanceSheetRow = (row: (string | null | number)[]): BalanceSh
   creditMsat: row[2] as number,
   debitMsat: row[3] as number,
   account: row[4] as string,
-  timestamp: row[5] as number
+  timestampUnix: row[5] as number
 });
 
 export type RawBalanceSheetResultSet = {
