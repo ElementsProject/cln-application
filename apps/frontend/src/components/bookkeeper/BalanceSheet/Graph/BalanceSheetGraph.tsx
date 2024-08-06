@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-import './BalanceSheetGraph.scss'
+import './BalanceSheetGraph.scss';
 
 function BalanceSheetGraph({ balanceSheetData, width }) {
   const d3Container = useRef(null);

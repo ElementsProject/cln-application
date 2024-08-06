@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { useEffect, useRef } from "react";
-import { Account } from "../../../../types/lightning-balancesheet.type";
+import { BalanceSheetAccount } from "../../../../types/lightning-balancesheet.type";
 
 function BalanceSheetTable({ balanceSheetData }) {
   const d3Container = useRef(null);
@@ -30,7 +30,7 @@ function BalanceSheetTable({ balanceSheetData }) {
         .style("text-transform", "uppercase");
 
       const rows = table.append("tbody")
-        .selectAll<HTMLElement, Account>("tr")
+        .selectAll<HTMLElement, BalanceSheetAccount>("tr")
         .data(balanceSheetData.periods[balanceSheetData.periods.length - 1].accounts) // display the last period aka the most current balances.
         .enter()
         .append("tr")

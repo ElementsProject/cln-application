@@ -1,9 +1,17 @@
-import { Account, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, Period, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
+import { BalanceSheetAccount, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, BalanceSheetPeriod, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
+import { convertRawToSatsFlowResultSet, RawSatsFlowResultSet, SatsFlow, SatsFlowEvent, SatsFlowPeriod, SatsFlowRow, TagGroup } from "../types/lightning-satsflow.type";
 import { secondsForTimeGranularity, TimeGranularity } from "../utilities/constants";
 import moment from "moment";
 
 export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSet, timeGranularity: TimeGranularity): BalanceSheet {
-  let returnPeriods: Period[] = [];
+  type InterimAccountRepresentation = {
+    short_channel_id: string,
+    remote_alias: string,
+    balance: number,
+    account: string,
+  };
+
+  let returnPeriods: BalanceSheetPeriod[] = [];
 
   if (rawSqlResultSet.rows.length > 0) {
     const periodKeyToBalanceSheetRowMap: Map<string, BalanceSheetRow[]> = new Map();
@@ -55,7 +63,7 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
       }
 
       let interimAccounts: InterimAccountRepresentation[] = [];
-      let finalizedAccounts: Account[] = [];
+      let finalizedAccounts: BalanceSheetAccount[] = [];
       let totalBalanceAcrossAccounts = 0;
 
       for (const accountName of accountNamesSet) {
@@ -94,7 +102,7 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
         account: a.account
       }));
 
-      const period: Period = {
+      const period: BalanceSheetPeriod = {
         periodKey: sortedPeriodKeys[i],
         accounts: finalizedAccounts,
         totalBalanceAcrossAccounts: totalBalanceAcrossAccounts
@@ -108,6 +116,132 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
   return {
     periods: returnPeriods
   };
+}
+
+export function transformToSatsFlow(rawSqlResultSet: RawSatsFlowResultSet, timeGranularity: TimeGranularity): SatsFlow {
+  let returnPeriods: SatsFlowPeriod[] = [];
+
+  if (rawSqlResultSet.rows.length > 0) {
+    const periodKeyToSatsFlowRowMap: Map<string, SatsFlowRow[]> = new Map();
+    const sqlResultSet = convertRawToSatsFlowResultSet(rawSqlResultSet);
+    const earliestTimestamp: number = sqlResultSet.rows.reduce((previousRow, currentRow) =>
+      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow).timestampUnix;
+    const currentTimestamp: number = Math.floor(Date.now() / 1000);
+    
+    //Calculate all time periods from first db entry to today
+    let periodKey: string;
+    const allPeriodKeys: string[] = [];
+    const incrementSeconds = secondsForTimeGranularity(timeGranularity);
+    for (let ts = earliestTimestamp; ts <= currentTimestamp; ts += incrementSeconds) {
+      periodKey = getPeriodKey(ts, timeGranularity);
+      allPeriodKeys.push(periodKey);
+    }
+
+    allPeriodKeys.forEach(key => periodKeyToSatsFlowRowMap.set(key, []));
+
+    //Associate income event db rows to periods
+    for (let row of sqlResultSet.rows) {
+      const periodKey = getPeriodKey(row.timestampUnix, timeGranularity);
+      if (!periodKeyToSatsFlowRowMap.has(periodKey)) {
+        periodKeyToSatsFlowRowMap.set(periodKey, []);
+      }
+      periodKeyToSatsFlowRowMap.get(periodKey)!.push(row);
+    }
+
+    const sortedPeriodKeys = Array.from(periodKeyToSatsFlowRowMap.keys()).sort((a, b) => a.localeCompare(b));
+
+    //Generate each Period and add to return list
+    for (let i = 0; i < sortedPeriodKeys.length; i++) {
+      let eventRows: SatsFlowRow[] = periodKeyToSatsFlowRowMap.get(sortedPeriodKeys[i])!;
+
+      let events: SatsFlowEvent[] = [];
+
+      //Calculate event inflow and convert to sats
+      for (let e of eventRows) {
+        let creditSat = e.creditMsat / 1000;
+        let debitSat = e.debitMsat / 1000;
+        let totalNetInflowSat = creditSat - debitSat;
+        events.push({
+          netInflowSat: totalNetInflowSat,
+          account: e.account,
+          tag: e.tag,
+          creditSat: creditSat,
+          debitSat: debitSat,
+          currency: e.currency,
+          timestampUnix: e.timestampUnix,
+          description: e.description,
+          outpoint: e.outpoint,
+          txid: e.txid,
+          paymentId: e.paymentId,
+        });
+      }
+
+      let periodTotalNetInflowSat = 0;
+      let periodCreditsSat = 0;
+      let periodDebitsSat = 0;
+      let periodVolumeSat = 0;
+
+      //Calculate tag and period stats
+      //Group events into respective tags
+      const tagGroups: TagGroup[] = events.reduce((acc: TagGroup[], event: SatsFlowEvent) => {
+        const tagGroup = acc.find(g => g.tag === event.tag)!;
+        if (tagGroup) {
+          tagGroup.events.push(event);
+          tagGroup.tagNetInflowSat += event.netInflowSat;
+          tagGroup.tagTotalCreditsSat += event.creditSat;
+          tagGroup.tagTotalDebitsSat += event.debitSat;
+          tagGroup.tagTotalVolumeSat += event.creditSat + event.debitSat;
+          periodTotalNetInflowSat += event.netInflowSat;
+          periodCreditsSat += event.creditSat;
+          periodDebitsSat += event.debitSat;
+          periodVolumeSat += event.creditSat + event.debitSat;
+        } else {
+          acc.push({
+            tag: getTag(event),
+            events: [event],
+            tagNetInflowSat: event.netInflowSat,
+            tagTotalCreditsSat: event.creditSat,
+            tagTotalDebitsSat: event.debitSat,
+            tagTotalVolumeSat: event.creditSat + event.debitSat,
+          });
+        }
+        return acc;
+      }, []);
+
+      //Sort tag net inflows to accommodate drawing of bars.
+      //First negative inflows sorted from 0 to -Infinity.
+      //Then positive inflows sorted from 0 to +Infinity.
+      //e.g: -1, -5, -10, 1, 4, 20
+      tagGroups.sort((a, b) => {
+        if (a.tagNetInflowSat < 0 && b.tagNetInflowSat < 0) {
+          return b.tagNetInflowSat - a.tagNetInflowSat;
+        }
+        if (a.tagNetInflowSat >= 0 && b.tagNetInflowSat >= 0) {
+          return a.tagNetInflowSat - b.tagNetInflowSat;
+        }
+        return a.tagNetInflowSat < 0 ? -1 : 1;
+      });
+
+      for (let i = 0; i < tagGroups.length; i++) {
+        console.log("tagGroups " + tagGroups[i].tag + " " + tagGroups[i].tagNetInflowSat);
+      }
+
+      const period: SatsFlowPeriod = {
+        periodKey: sortedPeriodKeys[i],
+        tagGroups: tagGroups,
+        totalNetInflowSat: periodTotalNetInflowSat,
+        totalCreditsSat: periodCreditsSat,
+        totalDebitsSat: periodDebitsSat,
+        totalVolumeSat: periodVolumeSat,
+      };
+
+      returnPeriods.push(period);
+    }
+  }
+  
+  return {
+    periods: returnPeriods
+  }
 }
 
 function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): string {
@@ -144,9 +278,20 @@ function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): stri
   return periodKey;
 };
 
-type InterimAccountRepresentation = {
-  short_channel_id: string,
-  remote_alias: string,
-  balance: number,
-  account: string,
+/**
+ * Process tags as needed.
+ * 
+ * @param event - The event to process the tag for.
+ */
+function getTag(event: SatsFlowEvent): string {
+  switch (event.tag) {
+    case "invoice":
+      if (event.netInflowSat >= 0) {
+        return "received_invoice";
+      } else {
+        return "paid_invoice"
+      }
+    default:
+      return event.tag;
+  }
 }

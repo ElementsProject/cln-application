@@ -9,3 +9,16 @@ export const BalanceSheetSQL =
     "LEFT JOIN peerchannels ON upper(bkpr_accountevents.account)=hex(peerchannels.channel_id) " + 
     "LEFT JOIN nodes ON peerchannels.peer_id=nodes.nodeid " + 
   "WHERE type != 'onchain_fee' AND bkpr_accountevents.account != 'external';";
+
+export const SatsFlowSQL =
+  "SELECT account, " +
+    "tag, " +
+    "credit_msat, " +
+    "debit_msat, " +
+    "currency, " +
+    "timestamp, " +
+    "description, " +
+    "outpoint, " +
+    "txid, " +
+    "payment_id " +
+  "FROM bkpr_income;";
