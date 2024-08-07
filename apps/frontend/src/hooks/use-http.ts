@@ -185,9 +185,9 @@ const useHttp = () => {
       .then((response) => transformToBalanceSheet(response.data, timeGranularity));
   };
 
-  const getSatsFlow = (timeGranularity: TimeGranularity) => {
+  const getSatsFlow = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean) => {
     return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [SatsFlowSQL] })
-      .then((response) => transformToSatsFlow(response.data, timeGranularity));
+      .then((response) => transformToSatsFlow(response.data, timeGranularity, hideZeroActivityPeriods));
   };
 
   const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number | null) => {

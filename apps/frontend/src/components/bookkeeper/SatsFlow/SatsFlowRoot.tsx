@@ -13,6 +13,7 @@ const SatsFlowRoot = (props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [satsFlowData, setSatsFlowData] = useState<SatsFlow>({ periods: [] });
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.DAILY);
+  const [hideZeroActivityPeriods, setHideZeroActivityPeriods] = useState<boolean>(true);
   const { getSatsFlow } = useHttp();
 
   const updateWidth = () => {
@@ -21,8 +22,8 @@ const SatsFlowRoot = (props) => {
     }
   };
 
-  const fetchSatsFlowData = useCallback(async (timeGranularity: TimeGranularity) => {
-    getSatsFlow(timeGranularity)
+  const fetchSatsFlowData = useCallback(async (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean) => {
+    getSatsFlow(timeGranularity, hideZeroActivityPeriods)
       .then((response: SatsFlow) => {
         setSatsFlowData(response);
         console.log("satsFlowData: " + JSON.stringify(response));
@@ -37,6 +38,10 @@ const SatsFlowRoot = (props) => {
     setTimeGranularity(timeGranularity);
   };
 
+  const hideZeroActivityPeriodsChangeHandler = (event) => {
+    setHideZeroActivityPeriods(event.target.checked);
+  };
+
   useEffect(() => {
     updateWidth();
     window.addEventListener('resize', updateWidth);
@@ -45,9 +50,9 @@ const SatsFlowRoot = (props) => {
 
   useEffect(() => {
     if (appCtx.authStatus.isAuthenticated) {
-      fetchSatsFlowData(timeGranularity);
+      fetchSatsFlowData(timeGranularity, hideZeroActivityPeriods);
     }
-  }, [appCtx.authStatus.isAuthenticated, timeGranularity, fetchSatsFlowData]);
+  }, [appCtx.authStatus.isAuthenticated, timeGranularity, hideZeroActivityPeriods, fetchSatsFlowData]);
 
   return (
     <div data-testid='satsflow-container' ref={containerRef}>
@@ -61,13 +66,22 @@ const SatsFlowRoot = (props) => {
                 </div>
               </Col>
               <Col md={3} className='d-flex align-items-center'>
-                <div className='ms-3 me-3 mt-2'>
-                  Time Granularity
-                </div>
                 <TimeGranularitySelection
                   className='time-granularity-dropdown mt-2'
                   timeGranularity={timeGranularity}
                   onTimeGranularityChanged={timeGranularityChangeHandler} />
+                <div className='ms-3 me-3 mt-2 d-flex align-items-center'>
+                  <input
+                    type="checkbox"
+                    id="hideZeroActivityCheckbox"
+                    name="hideZeroActivity"
+                    checked={hideZeroActivityPeriods}
+                    onChange={hideZeroActivityPeriodsChangeHandler}
+                  />
+                  <label htmlFor="hideZeroActivityCheckbox" className='ms-2'>
+                    Hide Zero Activity
+                  </label>
+                </div>
               </Col>
             </Row>
           </Container>

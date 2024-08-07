@@ -118,16 +118,21 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
   };
 }
 
-export function transformToSatsFlow(rawSqlResultSet: RawSatsFlowResultSet, timeGranularity: TimeGranularity): SatsFlow {
+export function transformToSatsFlow(
+  rawSqlResultSet: RawSatsFlowResultSet,
+  timeGranularity: TimeGranularity,
+  hideZeroActivityPeriods: boolean
+): SatsFlow {
   let returnPeriods: SatsFlowPeriod[] = [];
 
   if (rawSqlResultSet.rows.length > 0) {
     const periodKeyToSatsFlowRowMap: Map<string, SatsFlowRow[]> = new Map();
     const sqlResultSet = convertRawToSatsFlowResultSet(rawSqlResultSet);
     const earliestTimestamp: number = sqlResultSet.rows.reduce((previousRow, currentRow) =>
-      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow).timestampUnix;
+      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow,
+    ).timestampUnix;
     const currentTimestamp: number = Math.floor(Date.now() / 1000);
-    
+
     //Calculate all time periods from first db entry to today
     let periodKey: string;
     const allPeriodKeys: string[] = [];
@@ -148,11 +153,17 @@ export function transformToSatsFlow(rawSqlResultSet: RawSatsFlowResultSet, timeG
       periodKeyToSatsFlowRowMap.get(periodKey)!.push(row);
     }
 
-    const sortedPeriodKeys = Array.from(periodKeyToSatsFlowRowMap.keys()).sort((a, b) => a.localeCompare(b));
+    const sortedPeriodKeys = Array.from(periodKeyToSatsFlowRowMap.keys()).sort((a, b) =>
+      a.localeCompare(b),
+    );
 
     //Generate each Period and add to return list
     for (let i = 0; i < sortedPeriodKeys.length; i++) {
       let eventRows: SatsFlowRow[] = periodKeyToSatsFlowRowMap.get(sortedPeriodKeys[i])!;
+
+      if (hideZeroActivityPeriods && eventRows.length === 0) {
+        continue;
+      }
 
       let events: SatsFlowEvent[] = [];
 
@@ -222,10 +233,6 @@ export function transformToSatsFlow(rawSqlResultSet: RawSatsFlowResultSet, timeG
         return a.tagNetInflowSat < 0 ? -1 : 1;
       });
 
-      for (let i = 0; i < tagGroups.length; i++) {
-        console.log("tagGroups " + tagGroups[i].tag + " " + tagGroups[i].tagNetInflowSat);
-      }
-
       const period: SatsFlowPeriod = {
         periodKey: sortedPeriodKeys[i],
         tagGroups: tagGroups,
@@ -238,10 +245,10 @@ export function transformToSatsFlow(rawSqlResultSet: RawSatsFlowResultSet, timeG
       returnPeriods.push(period);
     }
   }
-  
+
   return {
-    periods: returnPeriods
-  }
+    periods: returnPeriods,
+  };
 }
 
 function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): string {
