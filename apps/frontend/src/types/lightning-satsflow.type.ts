@@ -5,17 +5,17 @@ export type SatsFlow = {
 /**
  * @property {string} periodKey - The period of time this {@link SatsFlowPeriod} represents, such as the day of 2024-07-11.
  * @property {TagGroup[]} tagGroups - A grouping of events by a shared tag.  Sorted by inflow.
- * @property {number} totalNetInflowSat - The total net inflow for this period.  If negative, it is an outflow.
- * @property {number} totalCreditsSat - The total sum of credits in sats in this period.
- * @property {number} totalDebitsSat - The total sum of debits in sats in this period.
- * @property {number} totalVolumeSat - The total volume of sats in this period, aka the absolute value of credits + debits.
+ * @property {number} inflowSat - The positive inflows for this period.  The total sum of credits in this period.
+ * @property {number} outflowSat - The negative inflows for this period.  The total sum of debits in this period.
+ * @property {number} netInflowSat - The total net inflow for this period.  If negative, it is an outflow.
+ * @property {number} volumeSat - The total volume of sats in this period, aka the absolute value of credits + debits.
  */
 export type SatsFlowPeriod = {
   periodKey: string,
   tagGroups: TagGroup[],
-  totalNetInflowSat: number,
-  totalCreditsSat: number,
-  totalDebitsSat: number,
+  inflowSat: number,
+  outflowSat: number,
+  netInflowSat: number,
   totalVolumeSat: number
 };
 
@@ -24,18 +24,18 @@ export type SatsFlowPeriod = {
  * 
  * @property {SatsFlowEvent[]} events - The events that make up this tag.
  * @property {string} tag - The name these events were tagged with, such as 'deposit'.
- * @property {number} tagNetInflowSat - The total inflow or outflow of sats in this group of events.  
- * @property {number} tagTotalCreditsSat - The total sum of credits in sats in this group of events.
- * @property {number} tagTotalDebitsSat - The total sum of credits in sats in this group of events.
- * @property {number} tagTotalVolumeSat - The total movement of sats among these events, aka the absolute value of credits + debits.
+ * @property {number} netInflowSat - The total inflow or outflow of sats in this group of events.  
+ * @property {number} creditSat - The total sum of credits in sats in this group of events.
+ * @property {number} debitSat - The total sum of credits in sats in this group of events.
+ * @property {number} volumeSat - The total movement of sats among these events, aka the absolute value of credits + debits.
  */
 export type TagGroup = {
   events: SatsFlowEvent[],
   tag: string,
-  tagNetInflowSat: number,
-  tagTotalCreditsSat: number,
-  tagTotalDebitsSat: number,
-  tagTotalVolumeSat: number
+  netInflowSat: number,
+  creditSat: number,
+  debitSat: number,
+  volumeSat: number
 };
 
 /**

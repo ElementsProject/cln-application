@@ -187,9 +187,9 @@ export function transformToSatsFlow(
         });
       }
 
-      let periodTotalNetInflowSat = 0;
-      let periodCreditsSat = 0;
-      let periodDebitsSat = 0;
+      let periodInflowSat = 0;
+      let periodOutflowSat = 0;
+      let periodNetInflowSat = 0;
       let periodVolumeSat = 0;
 
       //Calculate tag and period stats
@@ -198,23 +198,27 @@ export function transformToSatsFlow(
         const tagGroup = acc.find(g => g.tag === event.tag)!;
         if (tagGroup) {
           tagGroup.events.push(event);
-          tagGroup.tagNetInflowSat += event.netInflowSat;
-          tagGroup.tagTotalCreditsSat += event.creditSat;
-          tagGroup.tagTotalDebitsSat += event.debitSat;
-          tagGroup.tagTotalVolumeSat += event.creditSat + event.debitSat;
-          periodTotalNetInflowSat += event.netInflowSat;
-          periodCreditsSat += event.creditSat;
-          periodDebitsSat += event.debitSat;
+          tagGroup.netInflowSat += event.netInflowSat;
+          tagGroup.creditSat += event.creditSat;
+          tagGroup.debitSat += event.debitSat;
+          tagGroup.volumeSat += event.creditSat + event.debitSat;
+          periodNetInflowSat += event.netInflowSat;
+          periodInflowSat += event.creditSat;
+          periodOutflowSat += event.debitSat;
           periodVolumeSat += event.creditSat + event.debitSat;
         } else {
           acc.push({
             tag: getTag(event),
             events: [event],
-            tagNetInflowSat: event.netInflowSat,
-            tagTotalCreditsSat: event.creditSat,
-            tagTotalDebitsSat: event.debitSat,
-            tagTotalVolumeSat: event.creditSat + event.debitSat,
+            netInflowSat: event.netInflowSat,
+            creditSat: event.creditSat,
+            debitSat: event.debitSat,
+            volumeSat: event.creditSat + event.debitSat,
           });
+          periodNetInflowSat += event.netInflowSat;
+          periodInflowSat += event.creditSat;
+          periodOutflowSat += event.debitSat;
+          periodVolumeSat += event.creditSat + event.debitSat;
         }
         return acc;
       }, []);
@@ -224,21 +228,21 @@ export function transformToSatsFlow(
       //Then positive inflows sorted from 0 to +Infinity.
       //e.g: -1, -5, -10, 1, 4, 20
       tagGroups.sort((a, b) => {
-        if (a.tagNetInflowSat < 0 && b.tagNetInflowSat < 0) {
-          return b.tagNetInflowSat - a.tagNetInflowSat;
+        if (a.netInflowSat < 0 && b.netInflowSat < 0) {
+          return b.netInflowSat - a.netInflowSat;
         }
-        if (a.tagNetInflowSat >= 0 && b.tagNetInflowSat >= 0) {
-          return a.tagNetInflowSat - b.tagNetInflowSat;
+        if (a.netInflowSat >= 0 && b.netInflowSat >= 0) {
+          return a.netInflowSat - b.netInflowSat;
         }
-        return a.tagNetInflowSat < 0 ? -1 : 1;
+        return a.netInflowSat < 0 ? -1 : 1;
       });
 
       const period: SatsFlowPeriod = {
         periodKey: sortedPeriodKeys[i],
         tagGroups: tagGroups,
-        totalNetInflowSat: periodTotalNetInflowSat,
-        totalCreditsSat: periodCreditsSat,
-        totalDebitsSat: periodDebitsSat,
+        inflowSat: periodInflowSat,
+        outflowSat: periodOutflowSat,
+        netInflowSat: periodNetInflowSat,
         totalVolumeSat: periodVolumeSat,
       };
 

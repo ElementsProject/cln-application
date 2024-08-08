@@ -29,7 +29,7 @@ const SatsFlowRoot = (props) => {
         console.log("satsFlowData: " + JSON.stringify(response));
       })
       .catch(err => {
-        console.error("fetchSatsFlow error" + JSON.stringify(err));
+        console.error("fetchSatsFlow error" + err);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

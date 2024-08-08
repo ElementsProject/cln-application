@@ -17,21 +17,21 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
 
-      const { highestTagNetInflowSat, lowestTagNetInflowSat } = findHighestAndLowestNetInflow(satsFlowData);
+      const { maxInflowSat, maxOutflowSat } = findMaxInflowAndOutflow(satsFlowData);
 
       const negativeColorScale = d3.scaleLinear<string>()
-        .domain([0, lowestTagNetInflowSat])
+        .domain([0, -maxOutflowSat])
         .range(["#ff474c", "#8b0000"]);
 
       const positiveColorScale = d3.scaleLinear<string>()
-        .domain([0, highestTagNetInflowSat])
+        .domain([0, maxInflowSat])
         .range(["#90ee90", "#008000"]);
 
-      function getColor(value) {
-        if (value >= 0) {
-          return positiveColorScale(value);
+      function getColor(netInflow: number) {
+        if (netInflow >= 0) {
+          return positiveColorScale(netInflow);
         } else {
-          return negativeColorScale(value)
+          return negativeColorScale(netInflow);
         }
       }
 
@@ -46,9 +46,9 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
 
       d3.select(d3Container.current).call(zoom);
 
-      const yDomainUpperBound = highestTagNetInflowSat + (highestTagNetInflowSat * 0.05); // Add 5% buffer
-      const yDomainLowerBound = lowestTagNetInflowSat;
-      
+      const yDomainUpperBound = maxInflowSat;
+      const yDomainLowerBound = -maxOutflowSat;
+
       const xScale = d3.scaleBand()
         .domain(satsFlowData.periods.map(d => d.periodKey))
         .range([0, innerWidth])
@@ -91,9 +91,9 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
           .enter()
           .append("rect")
           .attr("x", 0)
-          .attr("y", (d: any) => {
-            const barHeight = Math.abs(yScale(d.tagNetInflowSat) - yScale(0));
-            if (d.tagNetInflowSat < 0) {
+          .attr("y", (d: TagGroup) => {
+            const barHeight = Math.abs(yScale(d.netInflowSat) - yScale(0));
+            if (d.netInflowSat < 0) {
               //For negative values start at yOffsetNegative and move down
               const y = yOffsetNegative;
               yOffsetNegative += barHeight;
@@ -105,17 +105,19 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             }
           })
           .attr("width", xScale.bandwidth())
-          .attr("height", (d: any) => Math.abs(yScale(0) - yScale(d.tagNetInflowSat)))
-          .attr("fill", (d, i) => getColor(d.tagNetInflowSat));
-        
+          .attr("height", (d: TagGroup) => Math.abs(yScale(0) - yScale(d.netInflowSat)))
+          .attr("fill", (d, i) => getColor(d.netInflowSat));
+
         rects.on("mouseover", function (event, tagGroup: TagGroup) {
           d3.select(tooltipRef.current)
             .style("visibility", "visible")
-            .text(`Event Tag: ${tagGroup.tag}
-                           Net Inflow: ${tagGroup.tagNetInflowSat}
-                           Credits: ${tagGroup.tagTotalCreditsSat}
-                           Debits: ${tagGroup.tagTotalDebitsSat}
-                           Volume: ${tagGroup.tagTotalVolumeSat}`);
+            .text(
+              `Event Tag: ${tagGroup.tag}
+               Net Inflow: ${tagGroup.netInflowSat}
+               Credits: ${tagGroup.creditSat}
+               Debits: ${tagGroup.debitSat}
+               Volume: ${tagGroup.volumeSat}`
+            );
         })
           .on("mousemove", function (event) {
             d3.select(tooltipRef.current)
@@ -129,7 +131,6 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       });
 
       const xAxis = d3.axisBottom(xScale);
-      
       const xAxisYPosition = yScale(0);
 
       svg.append("g")
@@ -166,10 +167,24 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
 
       svg.append("g")
         .call(d3.axisLeft(yScale)
-        .tickSizeInner(0)
-        .tickSizeOuter(0)
-        .tickFormat(formatTick)
-      );
+          .tickSizeInner(0)
+          .tickSizeOuter(0)
+          .tickFormat(formatTick)
+        );
+
+      const lineGenerator = d3.line<SatsFlowPeriod>()
+        .x((d: SatsFlowPeriod) => xScale(d.periodKey)! + xScale.bandwidth() / 2)
+        .y((d: SatsFlowPeriod) => yScale(d.netInflowSat))
+        .curve(d3.curveMonotoneX);
+
+      svg.append("path")
+        .datum(satsFlowData.periods)
+        .attr("class", "line")
+        .attr("fill", "none")
+        .attr("stroke", "#E1BA2D")
+        .attr("stroke-width", 5)
+        .attr("stroke-linecap", "round")
+        .attr("d", lineGenerator);
 
       function zoom(svg) {
         svg.call(d3.zoom()
@@ -181,7 +196,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
           const transform = event.transform;
           const tempXScale = xScale.copy().range([0, innerWidth].map(d => transform.applyX(d)));
 
-          periodGroups.attr("transform", (d: any) =>
+          periodGroups.attr("transform", (d: SatsFlowPeriod) =>
             `translate(${tempXScale(d.periodKey)}, 0)`);
 
           periodGroups.selectAll("rect")
@@ -194,7 +209,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
                 .tickSizeInner(0)
                 .tickSizeOuter(0)
                 .tickFormat(() => '')
-          );
+            );
         }
       }
     }
@@ -205,34 +220,26 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
 };
 
 /**
- * Return the highest and lowest {@link TagGroup} net inflow values that exist in the dataset.
+ * Return the max inflow and outflow across all time periods.
  * 
- * @param satsFlowData 
- * @returns Returns an object with the highest and lowest net inflow values found.
+ * @param satsFlowData - The dataset to check.
+ * @returns Returns an object with the max inflow and outflow found.
  */
-function findHighestAndLowestNetInflow(satsFlowData) {
-  let highestTagNetInflowSat = -Infinity;
-  let lowestTagNetInflowSat = Infinity;
+function findMaxInflowAndOutflow(satsFlowData) {
+  let maxInflowSat = 0;
+  let maxOutflowSat = 0;
 
   satsFlowData.periods.forEach(period => {
-    period.tagGroups.forEach(tagGroup => {
-      if (tagGroup.tagNetInflowSat > highestTagNetInflowSat) {
-        highestTagNetInflowSat = tagGroup.tagNetInflowSat;
-      }
-      if (tagGroup.tagNetInflowSat < lowestTagNetInflowSat) {
-        lowestTagNetInflowSat = tagGroup.tagNetInflowSat;
-      }
-    });
+    if (period.inflowSat > maxInflowSat) {
+      maxInflowSat = period.inflowSat;
+    }
+
+    if (period.outflowSat > maxOutflowSat) {
+      maxOutflowSat = period.outflowSat;
+    }
   });
 
-  if (highestTagNetInflowSat === -Infinity) {
-    highestTagNetInflowSat = 0;
-  }
-  if (lowestTagNetInflowSat === Infinity) {
-    lowestTagNetInflowSat = 0;
-  }
-
-  return { highestTagNetInflowSat, lowestTagNetInflowSat };
+  return { maxInflowSat, maxOutflowSat };
 }
 
 export default SatsFlowGraph;
