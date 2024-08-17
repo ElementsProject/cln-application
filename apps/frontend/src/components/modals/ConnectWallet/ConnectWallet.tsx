@@ -157,7 +157,7 @@ const ConnectWallet = () => {
   let InvoiceRuneSvg;
 
   if (selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') {
-    if (appCtx.walletConnect.INVOICE_RUNE !== '') {
+    if (appCtx.walletConnect.INVOICE_RUNE && appCtx.walletConnect.INVOICE_RUNE !== '') {
       invoiceRuneClickHandler = copyHandler;
       InvoiceRuneSvg = CopySVG;
     } else {
