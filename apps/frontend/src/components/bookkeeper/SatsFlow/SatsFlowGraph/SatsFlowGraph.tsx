@@ -35,8 +35,6 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
         }
       }
 
-      const formatTick = d => `${d} sats`;
-
       const svg = d3.select(d3Container.current)
         .append("svg")
         .attr("width", outerWidth)
@@ -54,8 +52,10 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
         .range([0, innerWidth])
         .padding(0.1);
 
+      const yScalePadding = Math.max(yDomainUpperBound, Math.abs(yDomainLowerBound)) * 0.05;
+
       const yScale = d3.scaleLinear()
-        .domain([yDomainLowerBound, yDomainUpperBound])
+        .domain([yDomainLowerBound - yScalePadding, yDomainUpperBound + yScalePadding])
         .range([innerHeight, 0]);
 
       const tooltip = d3.select("body").selectAll(".sats-flow-tooltip")
@@ -133,10 +133,9 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const xAxis = d3.axisBottom(xScale);
       const xAxisYPosition = yScale(0);
 
-      svg.append("g")
+      const xAxisGroup = svg.append("g")
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${xAxisYPosition})`)
-        .attr("clip-path", "url(#chart-area-clip")
         .call(
           d3.axisBottom(xScale)
             .tickSizeOuter(0)
@@ -144,7 +143,8 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             .tickFormat(() => '')
         );
 
-      svg.append("g")
+      //labels are rendered on a separate x axis at the bottom of the chart
+      const xAxisLabelsGroup = svg.append("g")
         .attr("class", "x-axis-labels")
         .attr("transform", `translate(0,${innerHeight})`)
         .call(
@@ -153,6 +153,33 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             .tickSize(0)
         );
 
+      svg.selectAll(".x-axis-labels .domain").remove();
+
+      //set up y axis
+      const yAxisTickFormat = d => `${d3.format(",")(d)}`;
+      svg.append("g")
+        .call(d3.axisLeft(yScale)
+          .tickSizeInner(0)
+          .tickSizeOuter(0)
+          .tickFormat(yAxisTickFormat)
+        );
+
+      const lineGenerator = d3.line<SatsFlowPeriod>()
+        .x((d: SatsFlowPeriod) => xScale(d.periodKey)! + xScale.bandwidth() / 2)
+        .y((d: SatsFlowPeriod) => yScale(d.netInflowSat))
+        .curve(d3.curveMonotoneX);
+
+      const lineSvg = svg.append("path")
+        .datum(satsFlowData.periods)
+        .attr("class", "line")
+        .attr("fill", "none")
+        .attr("stroke", "#E1BA2D")
+        .attr("stroke-width", 5)
+        .attr("stroke-linecap", "round")
+        .attr("d", lineGenerator)
+        .attr("clip-path", "url(#chart-area-clip");
+
+      //define clip area
       svg.append("defs").append("clipPath")
         .attr("id", "chart-area-clip")
         .append("rect")
@@ -161,30 +188,10 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
         .attr("width", innerWidth)
         .attr("height", innerHeight);
 
-      svg.selectAll(".x-axis-labels .domain").remove();
-
       barsGroup.attr("clip-path", "url(#chart-area-clip");
-
-      svg.append("g")
-        .call(d3.axisLeft(yScale)
-          .tickSizeInner(0)
-          .tickSizeOuter(0)
-          .tickFormat(formatTick)
-        );
-
-      const lineGenerator = d3.line<SatsFlowPeriod>()
-        .x((d: SatsFlowPeriod) => xScale(d.periodKey)! + xScale.bandwidth() / 2)
-        .y((d: SatsFlowPeriod) => yScale(d.netInflowSat))
-        .curve(d3.curveMonotoneX);
-
-      svg.append("path")
-        .datum(satsFlowData.periods)
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "#E1BA2D")
-        .attr("stroke-width", 5)
-        .attr("stroke-linecap", "round")
-        .attr("d", lineGenerator);
+      xAxisGroup.attr("clip-path", "url(#chart-area-clip")
+      xAxisLabelsGroup.attr("clip-path", "url(#chart-area-clip")
+      lineSvg.attr("clip-path", "url(#chart-area-clip");
 
       function zoom(svg) {
         svg.call(d3.zoom()
@@ -203,13 +210,32 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             .attr("x", 0)
             .attr("width", tempXScale.bandwidth());
 
-          svg.select(".x-axis")
+          xAxisGroup
             .call(
               xAxis.scale(tempXScale)
                 .tickSizeInner(0)
                 .tickSizeOuter(0)
                 .tickFormat(() => '')
             );
+
+          xAxisLabelsGroup
+            .call(
+              xAxis.scale(tempXScale)
+                .tickSizeOuter(0)
+                .tickSize(0)
+                .tickFormat((d) => d)
+            );
+
+          svg.selectAll(".x-axis-labels .domain").remove();
+
+          const lineGenerator = d3.line<SatsFlowPeriod>()
+            .x(d => tempXScale(d.periodKey)! + tempXScale.bandwidth() / 2)
+            .y(d => yScale(d.netInflowSat))
+            .curve(d3.curveMonotoneX);
+
+          //rerender the line
+          svg.select(".line")
+            .attr("d", lineGenerator(satsFlowData.periods));
         }
       }
     }
