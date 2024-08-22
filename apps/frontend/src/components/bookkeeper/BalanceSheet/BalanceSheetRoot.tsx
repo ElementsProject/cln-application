@@ -17,7 +17,7 @@ const BalanceSheetRoot = (props) => {
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheet>({ periods: [] }); //todo deal with loading
-  const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.DAILY);
+  const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.MONTHLY);
   const { getBalanceSheet } = useHttp();
 
   const updateWidth = () => {
