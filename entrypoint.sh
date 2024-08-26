@@ -14,12 +14,12 @@ getinfo_request() {
 EOF
 }
 
-commando_rune_request() {
+createrune_request() {
   cat <<EOF
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "method": "commando-rune",
+  "method": "createrune",
   "params": [null, [["For Application#"]]]
 }
 EOF
@@ -40,11 +40,11 @@ generate_new_rune() {
   COUNTER=0
   RUNE=""
   while { [ "$RUNE" = "" ] || [ "$RUNE" = "null" ]; } && [ $COUNTER -lt 10 ]; do
-    # Send 'commando-rune' request
+    # Send 'createrune' request
     echo "Generating rune attempt: $COUNTER"
     COUNTER=$((COUNTER+1))
 
-    RUNE_RESPONSE=$( (echo "$(commando_rune_request)"; sleep 2) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
+    RUNE_RESPONSE=$( (echo "$(createrune_request)"; sleep 2) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
 
     RUNE=$(echo "$RUNE_RESPONSE" | jq -r '.result.rune')
     UNIQUE_ID=$(echo "$RUNE_RESPONSE" | jq -r '.result.unique_id')
