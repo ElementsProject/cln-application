@@ -12,10 +12,12 @@ Development
 
 Releasing and packaging on Github
 ----------------------------------
-* Go to repo's `Releases` page and draft a new release.
+* Merge the `Release-<x.y.z>` branch into `main` branch.
+* Set VERSION env `VERSION=v<x.y.z>`.
+* Tag the commit with `git tag -a -s ${VERSION} -m ${VERSION} && git push --tags`.
+* Go to repo's `Releases` page and draft a new release from above tag.
 * Prepare release notes with the help of milestone, issues and PRs. Add them on the release page.
 * Signing the release:
-	** `VERSION=vx.y.z`
 	** `mkdir -p ./release & git archive --format zip --output ./release/cln-application-${VERSION}.zip main`
 	** `cd release`
 	** `sha256sum cln* > SHA256SUMS`
