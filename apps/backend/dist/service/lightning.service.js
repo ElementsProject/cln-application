@@ -4,17 +4,14 @@ import Lnmessage from 'lnmessage';
 import { LightningError } from '../models/errors.js';
 import { HttpStatusCode, APP_CONSTANTS, LN_MESSAGE_CONFIG } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
+import { readFileSync } from 'fs';
 export class LightningService {
     lnMessage = null;
     constructor() {
         try {
             logger.info('Getting Commando Rune');
             if (fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
-                const DATA_SPLIT = (Buffer.from(fs.readFileSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)).toString() || '\n').split('\n');
-                process.env.LIGHTNING_PUBKEY = DATA_SPLIT[0].substring(18, DATA_SPLIT[0].length - 1);
-                process.env.COMMANDO_RUNE = DATA_SPLIT[1].substring(16, DATA_SPLIT[1].length - 1);
-                LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.LIGHTNING_PUBKEY;
-                APP_CONSTANTS.COMMANDO_RUNE = process.env.COMMANDO_RUNE;
+                this.refreshEnvVariables();
                 logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
                 this.lnMessage = new Lnmessage(LN_MESSAGE_CONFIG);
                 this.lnMessage.connect();
@@ -53,5 +50,32 @@ export class LightningService {
             }
         });
     };
+    refreshEnvVariables() {
+        const envVars = this.parseEnvFile(APP_CONSTANTS.COMMANDO_ENV_LOCATION);
+        process.env.LIGHTNING_PUBKEY = envVars.LIGHTNING_PUBKEY;
+        process.env.COMMANDO_RUNE = envVars.LIGHTNING_RUNE;
+        process.env.INVOICE_RUNE = envVars.INVOICE_RUNE !== undefined ? envVars.INVOICE_RUNE : '';
+        LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.LIGHTNING_PUBKEY;
+        APP_CONSTANTS.COMMANDO_RUNE = process.env.COMMANDO_RUNE;
+    }
+    parseEnvFile(filePath) {
+        try {
+            const content = readFileSync(filePath, 'utf8');
+            const lines = content.split('\n');
+            const envVars = {};
+            for (let line of lines) {
+                line = line.trim();
+                if (line && line.indexOf('=') !== -1 && !line.startsWith('#')) {
+                    const [key, ...value] = line.split('=');
+                    envVars[key] = value.join('=').replace(/(^"|"$)/g, '');
+                }
+            }
+            return envVars;
+        }
+        catch (err) {
+            logger.error('Error reading .commando-env file:', err);
+            return {};
+        }
+    }
 }
 export const LNMessage = new LightningService();

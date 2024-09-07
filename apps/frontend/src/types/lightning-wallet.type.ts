@@ -445,6 +445,7 @@ export type Offer = {
   single_use?: boolean;
   used?: boolean;
   label?: string;
+  valid?: boolean;
 }
 
 export type ListOffers = {
@@ -461,4 +462,11 @@ export type Inflight = {
   splice_amount: number;
   our_funding_msat: string;
   scratch_txid?: string;
+}
+
+export type Rune = {
+  rune: string;
+  unique_id: string;
+  restrictions?: any[];
+  restrictions_as_english?: string;
 }

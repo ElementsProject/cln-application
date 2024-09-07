@@ -1,5 +1,3 @@
-import React from 'react';
-
 import './ConnectWallet.scss';
 import { useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,14 +16,19 @@ import { CloseSVG } from '../../../svgs/Close';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
 import { ConnectWalletFields } from '../../../types/app-config.type';
 import logger from '../../../services/logger.service';
+import useHttp from '../../../hooks/use-http';
+import { AddSVG } from '../../../svgs/Add';
+import { Spinner } from 'react-bootstrap';
 
 const ConnectWallet = () => {
   const appCtx = useContext(AppContext);
+  const { createInvoiceRune } = useHttp();
   const [networkTypes, setNetworkTypes] = useState<string[]>(['LN Message', 'LN Message (Tor)']);
   const [selNetwork, setSelNetwork] = useState('LN Message');
   const [connectUrl, setConnectUrl] = useState('');
-  const initialConnectValues: ConnectWalletFields = { port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } };
+  const initialConnectValues: ConnectWalletFields = { port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } };
   const [connectValues, setConnectValues] = useState(initialConnectValues);
+  const [isLoadingInvoiceRune, setIsLoadingInvoiceRune] = useState(false);
 
   useEffect(() => {
     let newNetworkTypes: string[] = ['LN Message', 'LN Message (Tor)'];
@@ -44,7 +47,7 @@ const ConnectWallet = () => {
     setNetworkTypes(newNetworkTypes);
     if (selNetwork === 'LN Message') {
       setConnectUrl('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE);
-    }
+    }    
   }, [appCtx, selNetwork]);
 
   const copyHandler = (event) => {
@@ -63,10 +66,13 @@ const ConnectWallet = () => {
         textToCopy = (selNetwork.includes('(Tor)') ? appCtx.walletConnect.TOR_HOST : appCtx.walletConnect.LOCAL_HOST) || '';
         break;
       case 'Rune':
-          textToCopy = appCtx.walletConnect.COMMANDO_RUNE || '';
-          break;
+        textToCopy = appCtx.walletConnect.COMMANDO_RUNE || '';
+        break;
       case 'Macaroon':
         textToCopy = appCtx.walletConnect.REST_MACAROON || '';
+        break;
+      case 'Invoice Rune':
+        textToCopy = appCtx.walletConnect.INVOICE_RUNE || '';
         break;
       case 'Client Key':
         textToCopy = appCtx.walletConnect.CLIENT_KEY || '';
@@ -88,6 +94,21 @@ const ConnectWallet = () => {
     });
   }
 
+  const createInvoiceRuneHandler = () => {
+    setIsLoadingInvoiceRune(true);
+    createInvoiceRune()
+      .then(() => {
+        appCtx.setShowToast({show: true, message: ('Created Invoice Rune Successfully!'), bg: 'success'});
+      })
+      .catch(err => {
+        logger.error(err.message || JSON.stringify(err));
+        appCtx.setShowToast({show: true, message: (`Error Creating Invoice Rune: ${err.message || ''}`), bg: 'danger'});
+      })
+      .finally(() => {
+        setIsLoadingInvoiceRune(false);
+      });
+  }
+
   const closeHandler = () => {
     appCtx.setShowModals({...appCtx.showModals, connectWalletModal: false});
   }
@@ -96,39 +117,52 @@ const ConnectWallet = () => {
     setSelNetwork(event.target.id);
     switch (event.target.id) {
       case 'LN Message':
-        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
+        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
         setConnectUrl('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE);
         break;
 
       case 'LN Message (Tor)':
-        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
+        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
         setConnectUrl('ln-message://' + appCtx.walletConnect.TOR_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE);
         break;
 
       case 'REST':
-        setConnectValues({ port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'CLN Host', field: 'LOCAL_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, connectUrl: { title: 'REST URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
+        setConnectValues({ port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'CLN Host', field: 'LOCAL_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'REST URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
         setConnectUrl('c-lightning-rest://' + appCtx.walletConnect.LOCAL_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
         break;
 
       case 'REST (Tor)':
-        setConnectValues({ port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'CLN Host', field: 'TOR_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, connectUrl: { title: 'REST URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
+        setConnectValues({ port: { title: 'REST Port', field: 'REST_PORT' }, host: { title: 'CLN Host', field: 'TOR_HOST' }, macaroon: { title: 'Macaroon', field: 'REST_MACAROON' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'REST URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
         setConnectUrl('c-lightning-rest://' + appCtx.walletConnect.TOR_HOST + ':' + appCtx.walletConnect.REST_PORT + '?macaroon=' + appCtx.walletConnect.REST_MACAROON + '&protocol=http');
         break;
   
       case 'gRPC':
-        setConnectValues({ port: { title: 'gRPC Port', field: 'GRPC_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Client Key', field: 'CLIENT_KEY' }, connectUrl: { title: 'gRPC URL', field: '' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' } });
+        setConnectValues({ port: { title: 'gRPC Port', field: 'GRPC_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Client Key', field: 'CLIENT_KEY' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'gRPC URL', field: '' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' } });
         setConnectUrl('cln-grpc://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.GRPC_PORT + '?clientkey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT);
         break;
   
       case 'gRPC (Tor)':
-        setConnectValues({ port: { title: 'gRPC Port', field: 'GRPC_PORT' }, host: { title: 'CLN Host', field: 'TOR_DOMAIN_NAME' }, macaroon: { title: 'Client Key', field: 'CLIENT_KEY' }, connectUrl: { title: 'gRPC URL', field: '' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' } });
+        setConnectValues({ port: { title: 'gRPC Port', field: 'GRPC_PORT' }, host: { title: 'CLN Host', field: 'TOR_DOMAIN_NAME' }, macaroon: { title: 'Client Key', field: 'CLIENT_KEY' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'gRPC URL', field: '' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' } });
         setConnectUrl('cln-grpc://' + appCtx.walletConnect.TOR_DOMAIN_NAME + ':' + appCtx.walletConnect.GRPC_PORT + '?clientkey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT);
         break;
 
       default:
-        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
+        setConnectValues({ port: { title: 'Websocket Port', field: 'WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, macaroon: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' }, clientCert: { title: 'Client Cert', field: '' }, caCert: { title: 'CA Cert', field: '' } });
         setConnectUrl('ln-message://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE);
         break;
+    }
+  }
+
+  let invoiceRuneClickHandler;
+  let InvoiceRuneSvg;
+
+  if (selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') {
+    if (appCtx.walletConnect.INVOICE_RUNE && appCtx.walletConnect.INVOICE_RUNE !== '') {
+      invoiceRuneClickHandler = copyHandler;
+      InvoiceRuneSvg = CopySVG;
+    } else {
+      invoiceRuneClickHandler = createInvoiceRuneHandler;
+      InvoiceRuneSvg = AddSVG;
     }
   }
 
@@ -231,6 +265,36 @@ const ConnectWallet = () => {
               </InputGroup>
             </Col>
           </Row>
+          { (selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') && (
+              <Row className='d-flex align-items-start justify-content-center'>
+                <Col xs={12}>
+                  <Form.Label className='text-light'>{connectValues.invoiceRune.title}</Form.Label>
+                  <InputGroup className='mb-3'>
+                    <Form.Control
+                      onClick={invoiceRuneClickHandler}
+                      id={connectValues.invoiceRune.title}
+                      value={appCtx.walletConnect[connectValues.invoiceRune.field]}
+                      placeholder='Not Found'
+                      aria-label={appCtx.walletConnect[connectValues.invoiceRune.field]}
+                      disabled={isLoadingInvoiceRune}
+                      aria-describedby='copy-addon-macaroon'
+                      className='form-control-left'
+                      data-testid='invoice-rune'
+                      readOnly
+                    />
+                    <InputGroup.Text id={connectValues.invoiceRune.title} className='form-control-addon form-control-addon-right' onClick={!isLoadingInvoiceRune ? invoiceRuneClickHandler : undefined} data-testid='invoice-rune-button'>
+                      { isLoadingInvoiceRune ? 
+                        <span className='h-100 d-flex justify-content-center align-items-center'>
+                          <Spinner className='me-1' variant='light' size='sm' data-testid='invoice-rune-spinner'/>
+                        </span>
+                        : InvoiceRuneSvg && <InvoiceRuneSvg id={connectValues.invoiceRune.title} showTooltip={appCtx.walletConnect.INVOICE_RUNE === ''} tooltipText={'Create New Invoice Rune'} />
+                      }
+                    </InputGroup.Text>
+                  </InputGroup>
+                </Col>
+              </Row>
+            )
+          }
           { selNetwork === 'gRPC' || selNetwork === 'gRPC (Tor)' ?
               <Row className='d-flex align-items-start justify-content-center'>
                 <Col xs={12}>

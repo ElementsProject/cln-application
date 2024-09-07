@@ -481,6 +481,10 @@ label.form-label {
       &:hover {
         svg path {
           stroke: darken($primary, 10%);
+          &.svg-add {
+            stroke: none;
+            fill: darken($primary, 10%);
+          }
         }
       }
       & .btn-addon-close {

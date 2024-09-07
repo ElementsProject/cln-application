@@ -15,6 +15,12 @@ export const SATS_MSAT = 1000;
 
 export type LogLevel = 'info' | 'warn' | 'error';
 
+export enum InputType {
+  ORIGINAL = 'original',
+  LOWERCASE = 'lowercase',
+  UPPERCASE = 'uppercase',
+}
+
 export enum NumberTypes {
   COMMON = 'COMMON',
   CURRENCY = 'CURRENCY'

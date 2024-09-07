@@ -14,7 +14,7 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { formatCurrency, isCompatibleVersion } from '../../../utilities/data-formatters';
-import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT, Units } from '../../../utilities/constants';
+import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT, Units, InputType } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
@@ -43,7 +43,7 @@ const CLNSend = (props) => {
     valueChangeHandler: invoiceChangeHandler,
     inputBlurHandler: invoiceBlurHandler,
     reset: resetInvoice,
-  } = useInput(isValidInvoice);
+  } = useInput(isValidInvoice, InputType.LOWERCASE);
   const {
     value: amountValue,
     isValid: amountIsValid,
@@ -234,6 +234,7 @@ const CLNSend = (props) => {
                     <Form.Control
                       tabIndex={4}
                       id='invoice'
+                      data-testid='address-input'
                       type='text'
                       placeholder={paymentType === PaymentType.KEYSEND ? 'Pubkey' : paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}
                       aria-label='invoice'
@@ -266,6 +267,7 @@ const CLNSend = (props) => {
                       <Form.Control
                         tabIndex={5}
                         id='amount'
+                        data-testid='amount-input'
                         type='number'
                         placeholder='Amount (Sats)'
                         aria-label='amount'
