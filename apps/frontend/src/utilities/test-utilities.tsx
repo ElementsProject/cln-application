@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { AppContext } from '../store/AppContext';
 import { ApplicationModes, Units } from './constants';
-import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel } from '../types/lightning-wallet.type';
+import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel, Rune } from '../types/lightning-wallet.type';
 
 export const getMockStoreData = (replaceKey?: string, replaceValue?: any) => {
   if (replaceKey && replaceKey !== '' && !!replaceValue) {
@@ -15,6 +15,11 @@ export const renderWithMockContext = (ui, { providerProps, ...renderOptions }) =
     <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
     renderOptions
   );
+};
+
+export const mockInvoiceRune: Rune = {
+  rune: "aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==",
+  unique_id: "1"
 };
 
 export const mockInvoice: Invoice = {
@@ -33,7 +38,8 @@ export const mockOffer: Offer = {
   active: true,
   single_use: false,
   bolt12: "lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q",
-  used: true
+  used: true,
+  valid: true,
 };
 
 export const mockClnTransaction: LightningTransaction = {

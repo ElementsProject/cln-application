@@ -234,6 +234,7 @@ const CLNSend = (props) => {
                     <Form.Control
                       tabIndex={4}
                       id='invoice'
+                      data-testid='address-input'
                       type='text'
                       placeholder={paymentType === PaymentType.KEYSEND ? 'Pubkey' : paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}
                       aria-label='invoice'
@@ -266,6 +267,7 @@ const CLNSend = (props) => {
                       <Form.Control
                         tabIndex={5}
                         id='amount'
+                        data-testid='amount-input'
                         type='number'
                         placeholder='Amount (Sats)'
                         aria-label='amount'

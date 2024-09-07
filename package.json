@@ -7,6 +7,7 @@
   "scripts": {
     "frontend:dev": "npm run start -w cln-application-frontend",
     "frontend:build": "npm run build -w cln-application-frontend",
+    "frontend:test": "npm run test -w cln-application-frontend",
     "backend:build": "npm run build -w cln-application-backend",
     "backend:serve": "npm run serve -w cln-application-backend",
     "backend:watch": "npm run watch -w cln-application-backend",
