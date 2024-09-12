@@ -13,7 +13,7 @@ function Bookkeeper() {
         <Card.Body className='text-dark d-flex align-items-stretch flex-column pt-4'>
           <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
             <div className='fs-4 p-0 ps-3 fw-bold text-dark'>
-              Bookeeper
+              Bookkeeper
             </div>
           </Card.Header>
           <Card.Body className='pb-0 px-1 d-flex flex-column align-items-start justify-content-between'>
@@ -28,6 +28,9 @@ function Bookkeeper() {
                 </button>
                 <button tabIndex={2} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/bookkeeper/satsflow')}>
                   Sats Flow<ActionSVG className='ms-3' />
+                </button>
+                <button tabIndex={2} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/bookkeeper/volume')}>
+                  Volume<ActionSVG className='ms-3' />
                 </button>
               </Col>
             </Row>

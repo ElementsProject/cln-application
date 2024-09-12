@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import './App.scss';
 import { useContext, useEffect } from 'react';
@@ -22,6 +22,7 @@ import Bookkeeper from '../bookkeeper/BkprRoot/BkprRoot';
 import CLNHome from '../cln/CLNHome/CLNHome';
 import BalanceSheetRoot from '../bookkeeper/BalanceSheet/BalanceSheetRoot';
 import SatsFlowRoot from '../bookkeeper/SatsFlow/SatsFlowRoot';
+import VolumeRoot from '../bookkeeper/Volume/VolumeRoot';
 
 export const rootRouteConfig = [
   {
@@ -31,7 +32,8 @@ export const rootRouteConfig = [
       { path: "home", Component: CLNHome },
       { path: "bookkeeper", Component: Bookkeeper },
       { path: "bookkeeper/balancesheet", Component: BalanceSheetRoot },
-      { path: "bookkeeper/satsflow", Component: SatsFlowRoot }
+      { path: "bookkeeper/satsflow", Component: SatsFlowRoot },
+      { path: "bookkeeper/volume", Component: VolumeRoot }
     ]
   },
 ];

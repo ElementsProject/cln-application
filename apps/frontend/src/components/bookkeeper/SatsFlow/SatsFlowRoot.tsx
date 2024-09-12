@@ -26,7 +26,6 @@ const SatsFlowRoot = (props) => {
     getSatsFlow(timeGranularity, hideZeroActivityPeriods)
       .then((response: SatsFlow) => {
         setSatsFlowData(response);
-        console.log("satsFlowData: " + JSON.stringify(response));
       })
       .catch(err => {
         console.error("fetchSatsFlow error" + err);
@@ -96,7 +95,7 @@ const SatsFlowRoot = (props) => {
         </Card.Body>
       </Card>
     </div>
-  )
+  );
 
 };
 

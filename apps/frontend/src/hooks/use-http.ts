@@ -7,8 +7,8 @@ import { CLNContext } from '../store/CLNContext';
 import { ApplicationConfiguration, AuthResponse } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { isCompatibleVersion } from '../utilities/data-formatters';
-import { BalanceSheetSQL, SatsFlowSQL } from '../sql/bookkeeper-sql';
-import { transformToBalanceSheet, transformToSatsFlow } from '../sql/bookkeeper-transform';
+import { BalanceSheetSQL, SatsFlowSQL, VolumeSQL } from '../sql/bookkeeper-sql';
+import { transformToBalanceSheet, transformToSatsFlow, transformToVolumeData } from '../sql/bookkeeper-transform';
 
 let intervalID;
 let localAuthStatus: AuthResponse = { isLoading: true, isAuthenticated: false, isValidPassword: false };
@@ -190,6 +190,11 @@ const useHttp = () => {
       .then((response) => transformToSatsFlow(response.data, timeGranularity, hideZeroActivityPeriods));
   };
 
+  const getVolumeData = () => {
+    return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [VolumeSQL] })
+      .then((response) => transformToVolumeData(response.data));
+  };
+
   const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number | null) => {
     if (paymentType === PaymentType.KEYSEND) {
       return sendRequest(true, 'post', '/cln/call', { 'method': 'keysend', 'params': { 'destination': invoice, 'amount_msat': amount } });
@@ -337,6 +342,7 @@ const useHttp = () => {
     createInvoiceRune,
     getBalanceSheet,
     getSatsFlow,
+    getVolumeData,
     userLogin,
     resetUserPassword,
     userLogout

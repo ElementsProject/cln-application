@@ -50,7 +50,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const xScale = d3.scaleBand()
         .domain(satsFlowData.periods.map(d => d.periodKey))
         .range([0, innerWidth])
-        .padding(0.1);
+        .padding(0.5);
 
       const yScalePadding = Math.max(yDomainUpperBound, Math.abs(yDomainLowerBound)) * 0.05;
 
@@ -90,6 +90,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
           .data(period.tagGroups)
           .enter()
           .append("rect")
+          .attr("class", "bar")
           .attr("x", 0)
           .attr("y", (d: TagGroup) => {
             const barHeight = Math.abs(yScale(d.netInflowSat) - yScale(0));

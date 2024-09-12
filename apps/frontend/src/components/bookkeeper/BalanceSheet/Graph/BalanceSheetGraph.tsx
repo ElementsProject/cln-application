@@ -36,7 +36,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const xScale = d3.scaleBand()
         .domain(balanceSheetData.periods.map(d => d.periodKey))
         .range([0, innerWidth])
-        .padding(0.1);
+        .padding(0.5);
 
       const yScale = d3.scaleLinear()
         .domain([0, yDomainUpperBound])
@@ -73,6 +73,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
           .data(period.accounts)
           .enter()
           .append("rect")
+          .attr("class", "bar")
             .attr("x", 0)
             .attr("y", (d: any) => {
               yOffset -= Math.max(innerHeight - yScale(d.balance), minSegmentSize);

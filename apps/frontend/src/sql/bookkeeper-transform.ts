@@ -1,5 +1,6 @@
 import { BalanceSheetAccount, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, BalanceSheetPeriod, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
 import { convertRawToSatsFlowResultSet, RawSatsFlowResultSet, SatsFlow, SatsFlowEvent, SatsFlowPeriod, SatsFlowRow, TagGroup } from "../types/lightning-satsflow.type";
+import { convertRawToVolumeResultSet, Forward, RawVolumeResultSet, VolumeData } from "../types/lightning-volume.type";
 import { secondsForTimeGranularity, TimeGranularity } from "../utilities/constants";
 import moment from "moment";
 
@@ -116,7 +117,7 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
   return {
     periods: returnPeriods
   };
-}
+};
 
 export function transformToSatsFlow(
   rawSqlResultSet: RawSatsFlowResultSet,
@@ -251,9 +252,41 @@ export function transformToSatsFlow(
   }
 
   return {
-    periods: returnPeriods,
+    periods: returnPeriods
   };
-}
+};
+
+export function transformToVolumeData(rawSqlResultSet: RawVolumeResultSet): VolumeData {
+  let returnForwards: Forward[] = [];
+  let totalOutboundSat = 0;
+  let totalFeeSat = 0;
+
+  if (rawSqlResultSet.rows.length > 0) {
+    const sqlResultSet = convertRawToVolumeResultSet(rawSqlResultSet);
+
+    sqlResultSet.rows.forEach(forward => {
+      returnForwards.push({
+        inboundChannelSCID: forward.inChannelSCID,
+        inboundPeerId: forward.inChannelPeerId,
+        inboundPeerAlias: forward.inChannelPeerAlias,
+        inboundSat: forward.inMsat / 1000,
+        outboundChannelSCID: forward.outChannelSCID,
+        outboundPeerId: forward.outChannelPeerId,
+        outboundPeerAlias: forward.outChannelPeerAlias,
+        outboundSat: forward.outMsat / 1000,
+        feeSat: forward.feeMsat / 1000,
+      });
+      totalOutboundSat += forward.outMsat / 1000;
+      totalFeeSat += forward.feeMsat / 1000;
+    });
+  }
+
+  return {
+    forwards: returnForwards,
+    totalOutboundSat: totalOutboundSat,
+    totalFeeSat: totalFeeSat
+  };
+};
 
 function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): string {
   const date = new Date(timestamp * 1000);
@@ -305,4 +338,4 @@ function getTag(event: SatsFlowEvent): string {
     default:
       return event.tag;
   }
-}
+};
