@@ -35,6 +35,8 @@ const Header = (props) => {
     rootCtx.setShowModals({ ...rootCtx.showModals, logoutModal: true });
   }
 
+  console.log("header " + window.location.pathname);
+
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
       <Row className='header mb-5 mx-1' data-testid='header'>
@@ -43,7 +45,7 @@ const Header = (props) => {
             <motion.img
               key='cln-logo'
               alt='Core Lightning Logo'
-              src={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
+              src={appCtx.appConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
               className='header-info-logo me-3 rounded float-start'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -113,7 +115,7 @@ const Header = (props) => {
   return (
     <Row className='header mb-4 mx-1' data-testid='header'>
       <Col xs={12} lg={8} data-testid='header-info'>
-        <Image src={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
+        <Image src={appCtx.appConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
         <Row className='header-info-text mt-3'>
           {(currentScreenSize !== Breakpoints.MD) ?
             <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
