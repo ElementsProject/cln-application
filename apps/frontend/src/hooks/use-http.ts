@@ -1,11 +1,13 @@
 import axios, { AxiosResponse } from 'axios';
 import { useCallback, useContext } from 'react';
-import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
+import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT, TimeGranularity } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
 import { ApplicationConfiguration } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { isCompatibleVersion } from '../utilities/data-formatters';
+import { BalanceSheetSQL, SatsFlowSQL, VolumeSQL } from '../sql/bookkeeper-sql';
+import { transformToBalanceSheet, transformToSatsFlow, transformToVolumeData } from '../sql/bookkeeper-transform';
 
 let intervalID;
 let localAuthStatus: any = null;
@@ -161,6 +163,21 @@ const useHttp = () => {
   const btcDeposit = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'newaddr', 'params': { 'addresstype': 'bech32' } });
   };
+  
+  const getBalanceSheet = (timeGranularity: TimeGranularity) => {
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] })
+      .then((response) => transformToBalanceSheet(response.data, timeGranularity));
+  };
+
+  const getSatsFlow = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean) => {
+    return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [SatsFlowSQL] })
+      .then((response) => transformToSatsFlow(response.data, timeGranularity, hideZeroActivityPeriods));
+  };
+
+  const getVolumeData = () => {
+    return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [VolumeSQL] })
+      .then((response) => transformToVolumeData(response.data));
+  };
 
   const clnSendPayment = (paymentType: PaymentType, invoice: string, amount: number | null) => {
     if (paymentType === PaymentType.KEYSEND) {
@@ -205,6 +222,10 @@ const useHttp = () => {
   const saveInvoiceRune = () => {
     return sendRequest(false, 'post', '/shared/saveinvoicerune');
   }
+
+  const executeSql = (query: string) => {
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [ query ] });
+  };
 
   const refreshConnectWalletData = () => {
     return sendRequest(true, 'get', '/shared/connectwallet/');
@@ -302,6 +323,10 @@ const useHttp = () => {
     decodeInvoice,
     fetchInvoice,
     createInvoiceRune,
+    getBalanceSheet,
+    getSatsFlow,
+    getVolumeData,
+    executeSql,
     userLogin,
     resetUserPassword,
     userLogout

@@ -1,0 +1,88 @@
+@import '../../../styles/constants.scss';
+
+.time-granularity-dropdown.dropdown {
+  & .svg-curr-symbol {
+    margin-top: 3px;
+  }
+  & .dropdown-menu {
+    & .dropdown-item {
+      & .svg-currency {
+        fill: $dark;
+      }
+      &:hover {
+        & .svg-currency {
+          fill: $primary;
+        }
+        color: $primary;
+      }
+    }
+    & .time-granularity-scroller {
+      max-height: 200px;
+      height: 200px;
+    }
+  }
+  & button.dropdown-toggle {
+    width: 5rem;
+    border-radius: 0.5rem;
+    &::after {
+      color: $dark;
+      display: inline-block;
+      margin-left: 0.255em;
+      content: '';
+      border-top: 0.3em solid;
+      border-right: 0.3em solid transparent;
+      border-bottom: 0;
+      border-left: 0.3em solid transparent;
+    }
+    & .svg-currency {
+      fill: $dark;
+    }
+    & .dropdown-toggle-text {
+      width: 2.2rem;
+      font-size: 12px;
+      display: inline-flex;
+    }
+    &:hover,
+    &.btn:first-child:active,
+    &.btn.show {
+      background-color: transparent;
+      border-color: $gray-400;
+      box-shadow: none;
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .time-granularity-dropdown.dropdown {
+    & .dropdown-menu {
+      & .dropdown-item {
+        & .svg-currency {
+          fill: $white;
+        }
+        &:hover {
+          & .svg-currency {
+            fill: $primary;
+          }
+          color: $primary;
+        }
+      }
+    }
+    & button.dropdown-toggle {
+      &::after {
+        color: $white;
+      }
+      & .svg-currency {
+        fill: $white;
+      }
+      & .dropdown-toggle-text {
+        color: $white;
+      }
+      &:hover,
+      &.btn:first-child:active,
+      &.btn.show {
+        border-color: $gray-200;
+        color: $primary;
+      }
+    }
+  }
+}

@@ -257,7 +257,8 @@ const defaultAppState = {
   listOffers: {isLoading: true, offers: []},
   listLightningTransactions: {isLoading: true, clnTransactions: []},
   listBitcoinTransactions: {isLoading: true, btcTransactions: []},
-  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0}
+  walletBalances: {isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0},
+  balanceSheet: {isLoading: true, data: null}
 };
 
 const appReducer = (state, action) => {
