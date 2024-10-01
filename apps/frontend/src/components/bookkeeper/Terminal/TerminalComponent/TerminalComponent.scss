@@ -1,0 +1,28 @@
+@import '../../../../styles/constants.scss';
+
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-input {
+  border: none;
+  border-bottom: 1px solid lightgray;
+  outline: none;
+
+  &:focus {
+    border-bottom-color: $primary;
+  }
+}
+
+.terminal-output {
+  background-color: #000;
+  color: #0f0;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-family: monospace;
+  min-height: 350px;
+  max-height: 350px;
+  border-radius: $border-radius;
+  scroll-behavior: smooth;
+}

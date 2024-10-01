@@ -19,7 +19,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
 
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-      const formatTick = d => `${d} sats`;
+      const yAxisTickFormat = d => `${d3.format(",")(d)}`;
 
       const svg = d3.select(d3Container.current)
         .append("svg")
@@ -122,7 +122,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       barsGroup.attr("clip-path", "url(#chart-area-clip");
 
       svg.append("g")
-        .call(d3.axisLeft(yScale).tickFormat(formatTick));
+        .call(d3.axisLeft(yScale).tickFormat(yAxisTickFormat));
 
       function zoom(svg) {
         svg.call(d3.zoom()

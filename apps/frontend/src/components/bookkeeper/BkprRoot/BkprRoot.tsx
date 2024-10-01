@@ -31,6 +31,9 @@ function Bookkeeper() {
                 </button>
                 <button tabIndex={2} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/bookkeeper/volume')}>
                   Volume<ActionSVG className='ms-3' />
+                </button>                
+                <button tabIndex={3} type='submit' className='mt-5 btn-rounded bg-primary' onClick={() => navigate('/bookkeeper/terminal')}>
+                  Terminal<ActionSVG className='ms-3' />
                 </button>
               </Col>
             </Row>

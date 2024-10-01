@@ -25,7 +25,7 @@ function BalanceSheetTable({ balanceSheetData }) {
         .text(function (d) { return d; })
         .style("border", "1px black solid")
         .style("padding", "5px")
-        .style("background-color", "lightgray")
+        .style("background-color", "#CCA103")
         .style("font-weight", "bold")
         .style("text-transform", "uppercase");
 

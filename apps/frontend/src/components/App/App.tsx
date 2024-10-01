@@ -23,6 +23,7 @@ import CLNHome from '../cln/CLNHome/CLNHome';
 import BalanceSheetRoot from '../bookkeeper/BalanceSheet/BalanceSheetRoot';
 import SatsFlowRoot from '../bookkeeper/SatsFlow/SatsFlowRoot';
 import VolumeRoot from '../bookkeeper/Volume/VolumeRoot';
+import Terminal from '../bookkeeper/Terminal/TerminalRoot';
 
 export const rootRouteConfig = [
   {
@@ -33,7 +34,8 @@ export const rootRouteConfig = [
       { path: "bookkeeper", Component: Bookkeeper },
       { path: "bookkeeper/balancesheet", Component: BalanceSheetRoot },
       { path: "bookkeeper/satsflow", Component: SatsFlowRoot },
-      { path: "bookkeeper/volume", Component: VolumeRoot }
+      { path: "bookkeeper/volume", Component: VolumeRoot },
+      { path: "bookkeeper/terminal", Component: Terminal }
     ]
   },
 ];
