@@ -6,16 +6,15 @@ function BalanceSheetTable({ balanceSheetData }) {
   const d3Container = useRef(null);
 
   useEffect(() => {
+    d3.select(d3Container.current).selectAll("*").remove();
     if (d3Container.current && balanceSheetData.periods.length > 0) {
-      d3.select(d3Container.current).selectAll('*').remove();
-
       const tableBodyDiv = d3.select(d3Container.current).append("div")
       .style("height", "300px")
       .style("overflow-y", "auto");
 
       const table = tableBodyDiv.append('table')
         .style("border-collapse", "collapse")
-        .style("border", "2px black solid");
+        .style("border", "1px black solid");
 
       const headers = Object.keys(balanceSheetData.periods[balanceSheetData.periods.length - 1].accounts[0]);
       table.append("thead").append("tr")
@@ -53,6 +52,8 @@ function BalanceSheetTable({ balanceSheetData }) {
           .style("border", "1px black solid")
           .style("padding", "5px");
       });
+    } else {
+      //no data, leave table blank.
     }
   }, [balanceSheetData]);
 

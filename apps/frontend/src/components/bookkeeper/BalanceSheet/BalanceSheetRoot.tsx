@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import './BalanceSheetRoot.scss';
+import 'react-datepicker/dist/react-datepicker.css';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import BalanceSheetGraph from './Graph/BalanceSheetGraph';
@@ -11,6 +12,7 @@ import { TimeGranularity } from '../../../utilities/constants';
 import { BalanceSheet } from '../../../types/lightning-balancesheet.type';
 import TimeGranularitySelection from '../TimeGranularitySelection/TimeGranularitySelection';
 import { Col, Container } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
 
 const BalanceSheetRoot = (props) => {
   const appCtx = useContext(AppContext);
@@ -18,6 +20,8 @@ const BalanceSheetRoot = (props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheet>({ periods: [] }); //todo deal with loading
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.MONTHLY);
+  const [rangeStart, setRangeStart] = useState<Date|undefined>(undefined);
+  const [rangeEnd, setRangeEnd] = useState<Date|undefined>(undefined);
   const { getBalanceSheet } = useHttp();
 
   const updateWidth = () => {
@@ -26,8 +30,18 @@ const BalanceSheetRoot = (props) => {
     }
   };
 
-  const fetchBalanceSheetData = useCallback(async (timeGranularity: TimeGranularity) => {
-    getBalanceSheet(timeGranularity)
+  const fetchBalanceSheetData = useCallback(async (timeGranularity: TimeGranularity, startDate?: Date, endDate?: Date) => {
+    let startTimestamp = 1
+    let endTimestamp = Math.floor(new Date().getTime());
+
+    if (startDate != null) {
+      startTimestamp = Math.floor(startDate.getTime() / 1000);
+    }
+    if (endDate != null) {
+      endTimestamp = Math.floor(endDate.getTime() / 1000);
+    }
+
+    getBalanceSheet(timeGranularity, startTimestamp, endTimestamp)
       .then((response: BalanceSheet) => {
         setBalanceSheetData(response);
       })
@@ -49,9 +63,9 @@ const BalanceSheetRoot = (props) => {
 
   useEffect(() => {
     if (appCtx.authStatus.isAuthenticated) {
-      fetchBalanceSheetData(timeGranularity);
+      fetchBalanceSheetData(timeGranularity, rangeStart, rangeEnd);
     }
-  }, [appCtx.authStatus.isAuthenticated, timeGranularity, fetchBalanceSheetData]);
+  }, [appCtx.authStatus.isAuthenticated, timeGranularity, rangeStart, rangeEnd, fetchBalanceSheetData]);
 
   return (
     <div data-testid='balancesheet-container' ref={containerRef}>
@@ -72,6 +86,12 @@ const BalanceSheetRoot = (props) => {
                   className='time-granularity-dropdown mt-2'
                   timeGranularity={timeGranularity}
                   onTimeGranularityChanged={timeGranularityChangeHandler} />
+              </Col>
+              <Col md={3} className='d-flex align-items-center'>
+                <DatePicker className='outline border-gray-300' selected={rangeStart} onChange={(date) => setRangeStart(date ?? undefined)} placeholderText='Starts' />
+              </Col>
+              <Col md={3} className='d-flex align-items-center'>
+                <DatePicker className='outline border-gray-300' selected={rangeEnd} onChange={(date) => setRangeEnd(date ?? undefined)} placeholderText='Ends' />
               </Col>
             </Row>
           </Container>

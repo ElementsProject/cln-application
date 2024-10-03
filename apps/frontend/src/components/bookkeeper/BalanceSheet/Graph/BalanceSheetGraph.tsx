@@ -7,9 +7,8 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    d3.select(d3Container.current).selectAll("*").remove();
     if (d3Container.current && balanceSheetData.periods.length > 0) {
-      d3.select(d3Container.current).selectAll("*").remove();
-
       const outerWidth = width;
       const outerHeight = 300;
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
@@ -122,7 +121,10 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       barsGroup.attr("clip-path", "url(#chart-area-clip");
 
       svg.append("g")
-        .call(d3.axisLeft(yScale).tickFormat(yAxisTickFormat));
+        .call(d3.axisLeft(yScale)
+          .tickSizeInner(0)
+          .tickSizeOuter(0)
+          .tickFormat(yAxisTickFormat));
 
       function zoom(svg) {
         svg.call(d3.zoom()
@@ -144,6 +146,8 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
           svg.select(".x-axis").call(xAxis.scale(tempXScale));
         }
       }
+    } else {
+      d3.select(d3Container.current).append("text").text("No data");
     }
   }, [balanceSheetData, width]);
 

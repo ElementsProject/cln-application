@@ -35,8 +35,6 @@ const Header = (props) => {
     rootCtx.setShowModals({ ...rootCtx.showModals, logoutModal: true });
   }
 
-  console.log("header " + window.location.pathname);
-
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
       <Row className='header mb-5 mx-1' data-testid='header'>

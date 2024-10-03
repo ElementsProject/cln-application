@@ -180,8 +180,15 @@ const useHttp = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'newaddr', 'params': { 'addresstype': 'bech32' } });
   };
   
-  const getBalanceSheet = (timeGranularity: TimeGranularity) => {
-    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] })
+  /**
+   * Gets Balance Sheet data.
+   * @param timeGranularity - Group data by this time granularity.
+   * @param startTimestamp - If specified, the starting range for the data.
+   * @param endTimestamp - The ending range for the data.
+   * @returns Returns balance data grouped in periods of the specified time granularity.
+   */
+  const getBalanceSheet = (timeGranularity: TimeGranularity, startTimestamp: number, endTimestamp:number) => {
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL(startTimestamp, endTimestamp)] })
       .then((response) => transformToBalanceSheet(response.data, timeGranularity));
   };
 
