@@ -88,10 +88,10 @@ const BalanceSheetRoot = (props) => {
                   onTimeGranularityChanged={timeGranularityChangeHandler} />
               </Col>
               <Col md={3} className='d-flex align-items-center'>
-                <DatePicker className='outline border-gray-300' selected={rangeStart} onChange={(date) => setRangeStart(date ?? undefined)} placeholderText='Starts' />
+                <DatePicker className='outline border-gray-300 datepicker' selected={rangeStart} onChange={(date) => setRangeStart(date ?? undefined)} placeholderText='Starts' style={{borderRadius: '80px'}}/>
               </Col>
               <Col md={3} className='d-flex align-items-center'>
-                <DatePicker className='outline border-gray-300' selected={rangeEnd} onChange={(date) => setRangeEnd(date ?? undefined)} placeholderText='Ends' />
+                <DatePicker className='outline border-gray-300 datepicker' selected={rangeEnd} onChange={(date) => setRangeEnd(date ?? undefined)} placeholderText='Ends' />
               </Col>
             </Row>
           </Container>

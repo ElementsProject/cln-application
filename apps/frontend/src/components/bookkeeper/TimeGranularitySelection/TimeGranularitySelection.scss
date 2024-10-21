@@ -1,87 +1,70 @@
 @import '../../../styles/constants.scss';
 
 .time-granularity-dropdown.dropdown {
-  & .svg-curr-symbol {
-    margin-top: 3px;
-  }
-  & .dropdown-menu {
-    & .dropdown-item {
-      & .svg-currency {
-        fill: $dark;
-      }
-      &:hover {
-        & .svg-currency {
-          fill: $primary;
-        }
-        color: $primary;
-      }
-    }
-    & .time-granularity-scroller {
-      max-height: 200px;
-      height: 200px;
-    }
-  }
   & button.dropdown-toggle {
-    width: 5rem;
-    border-radius: 0.5rem;
+    width: 5.5rem;
+    border-radius: 8px;
+    border-color: $border-color;
+    background-color: transparent;
     &::after {
-      color: $dark;
-      display: inline-block;
-      margin-left: 0.255em;
-      content: '';
-      border-top: 0.3em solid;
-      border-right: 0.3em solid transparent;
-      border-bottom: 0;
-      border-left: 0.3em solid transparent;
-    }
-    & .svg-currency {
-      fill: $dark;
+      display: none;
     }
     & .dropdown-toggle-text {
-      width: 2.2rem;
+      font-weight: 700;
       font-size: 12px;
+      line-height: 24px;
       display: inline-flex;
     }
-    &:hover,
     &.btn:first-child:active,
     &.btn.show {
       background-color: transparent;
-      border-color: $gray-400;
       box-shadow: none;
+    }
+  }
+
+  .dropdown-menu {
+    .dropdown-item {
+      &:hover {
+        color: $primary;
+      }
     }
   }
 }
 
 @include color-mode(dark) {
   .time-granularity-dropdown.dropdown {
-    & .dropdown-menu {
-      & .dropdown-item {
-        & .svg-currency {
-          fill: $white;
-        }
-        &:hover {
-          & .svg-currency {
-            fill: $primary;
-          }
-          color: $primary;
-        }
-      }
-    }
     & button.dropdown-toggle {
+      width: 5.5rem;
+      border-radius: 8px;
+      border-color: #121215;
+      background-color: #303032;
+      background-image: none;
+      border-style: solid;
+      box-shadow: none;
       &::after {
-        color: $white;
-      }
-      & .svg-currency {
-        fill: $white;
+        display: none;
       }
       & .dropdown-toggle-text {
-        color: $white;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 24px;
+        color: #b7bbc2;
+        display: inline-flex;
       }
-      &:hover,
       &.btn:first-child:active,
       &.btn.show {
-        border-color: $gray-200;
-        color: $primary;
+        border-color: #121215;
+        box-shadow: none;
+      }
+    }
+
+    .dropdown-menu {
+      border-color: #121215;
+      .dropdown-item {
+        color: #b7bbc2;
+        &:hover {
+          color: $primary;
+        }
       }
     }
   }

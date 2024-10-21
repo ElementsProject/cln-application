@@ -1,8 +1,8 @@
-import { useContext } from "react"
-import { AppContext } from "../../../store/AppContext"
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Col, Dropdown } from "react-bootstrap";
 import { TimeGranularity } from "../../../utilities/constants";
+import './TimeGranularitySelection.scss'
+import { DropdownIcon } from '../../../svgs/DropdownIcon';
 
 const TimeGranularitySelection = (props) => {
    const onTimeGranularityChanged = (timeGranularity) => {
@@ -12,10 +12,11 @@ const TimeGranularitySelection = (props) => {
   return (
     <>
       <Dropdown className={props.className} onSelect={onTimeGranularityChanged} data-testid='time-granularity-selection'>
-        <Dropdown.Toggle variant='outline border-gray-300 d-flex align-items-center'>
+        <Dropdown.Toggle variant='outline d-flex align-items-center gap-1'>
           <Col>
-            {props.timeGranularity}
+            <span className='dropdown-toggle-text'>{props.timeGranularity}</span>
           </Col>
+          <DropdownIcon />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <PerfectScrollbar className='ps-show-always'>
