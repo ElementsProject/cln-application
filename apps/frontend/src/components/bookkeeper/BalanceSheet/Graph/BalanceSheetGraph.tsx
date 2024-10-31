@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
+import { format } from 'd3-format';
 import './BalanceSheetGraph.scss';
 
 function BalanceSheetGraph({ balanceSheetData, width }) {
@@ -15,6 +16,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
       const minSegmentSize = 0;
+      const formatBalance = format(',.3f');
 
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -44,14 +46,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const tooltip = d3.select("body").selectAll(".balance-sheet-tooltip")
       .data([null])
       .join("div")
-      .attr("class", "balance-sheet-tooltip")
-      .style("position", "absolute")
-      .style("visibility", "hidden")
-      .style("background", "white")
-      .style("padding", "5px")
-      .style("border", "1px solid black")
-      .style("border-radius", "5px")
-      .style("pointer-events", "none");
+      .attr("class", "balance-sheet-tooltip");
 
       tooltipRef.current = tooltip.node() as HTMLDivElement;
 
@@ -87,7 +82,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
                 .style("visibility", "visible")
                 .text(`Short Channel ID: ${account.short_channel_id}
                        Remote Alias: ${account.remote_alias}
-                       Balance: ${account.balance}
+                       Balance: ${formatBalance(account.balance)}
                        Percentage: ${account.percentage}
                        Account: ${account.account}`);
             })

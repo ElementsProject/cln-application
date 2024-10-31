@@ -1,0 +1,73 @@
+@import '../../../styles/constants.scss';
+
+.react-datepicker__tab-loop {
+  position: absolute;
+}
+
+.datepicker-input-container {
+  width: $picker-width;
+  border-radius: $picker-border-radius;
+  border: 1px solid;
+  border-color: $border-color;
+  background-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 1px 1px rgba(0, 0, 0, 0.075);
+  transition: box-shadow 0.15s ease-in-out;
+
+  &:active {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .datepicker-input {
+    cursor: pointer;
+    width: $picker-width;
+    background-color: transparent;
+    border: none;
+    color: #3a4247;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 24px;
+    padding-left: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    display: inline-flex;
+
+    &::placeholder {
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 24px;
+      color: inherit;
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  .dropdown-icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}
+
+@include color-mode(dark) {
+  .datepicker-input-container {
+    border-color: #121215;
+    background-color: #303032;
+    box-shadow: none;
+  }
+
+  .datepicker-input {
+    color: #3a4247;
+
+    &::placeholder {
+      color: #b7bbc2;
+    }
+  }
+}

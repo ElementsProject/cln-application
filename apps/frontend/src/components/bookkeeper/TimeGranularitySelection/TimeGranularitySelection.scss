@@ -2,10 +2,11 @@
 
 .time-granularity-dropdown.dropdown {
   & button.dropdown-toggle {
-    width: 5.5rem;
-    border-radius: 8px;
+    width: $picker-width;
+    border-radius: $picker-border-radius;
     border-color: $border-color;
-    background-color: transparent;
+    background-color: none;
+    background-image: none;
     &::after {
       display: none;
     }
@@ -14,11 +15,6 @@
       font-size: 12px;
       line-height: 24px;
       display: inline-flex;
-    }
-    &.btn:first-child:active,
-    &.btn.show {
-      background-color: transparent;
-      box-shadow: none;
     }
   }
 
@@ -34,24 +30,12 @@
 @include color-mode(dark) {
   .time-granularity-dropdown.dropdown {
     & button.dropdown-toggle {
-      width: 5.5rem;
-      border-radius: 8px;
-      border-color: #121215;
-      background-color: #303032;
-      background-image: none;
-      border-style: solid;
+      border-color: $picker-border-color-dark;
+      background-color: $picker-background-color-dark;
       box-shadow: none;
-      &::after {
-        display: none;
-      }
       & .dropdown-toggle-text {
-        font-weight: 700;
-        font-size: 12px;
-        line-height: 24px;
         color: #b7bbc2;
-        display: inline-flex;
       }
-      &.btn:first-child:active,
       &.btn.show {
         border-color: #121215;
         box-shadow: none;

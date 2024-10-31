@@ -1,0 +1,93 @@
+@import '../../../styles/constants.scss';
+
+.react-datepicker-popper {
+  .react-datepicker {
+    border-color: $border-color;
+
+    &__header {
+      background-color: transparent;
+      border-bottom-color: $border-color;
+    }
+
+    &__navigation {
+      &-icon::before {
+        border-color: currentColor;
+      }
+
+      &:hover *::before {
+        border-color: $primary;
+      }
+    }
+
+    &__day {
+      &:hover {
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+      }
+
+      &--selected {
+        background-color: $primary;
+        color: white;
+
+        &:hover {
+          background-color: darken($primary, 5%);
+        }
+      }
+
+      &--keyboard-selected {
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+      }
+    }
+
+    &__current-month,
+    &__day-name {
+      color: inherit;
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .react-datepicker-popper {
+    .react-datepicker {
+      background-color: $picker-background-color-dark;
+      border-color: $picker-border-color-dark;
+
+      &__header {
+        background-color: $picker-background-color-dark;
+        border-bottom-color: $picker-border-color-dark;
+      }
+
+      &__current-month,
+      &__day-name,
+      &__day {
+        color: $light-dark;
+      }
+
+      &__day {
+        &:hover {
+          background-color: rgba($primary, 0.1);
+          color: $primary;
+        }
+
+        &--selected {
+          background-color: $primary;
+          color: $white;
+
+          &:hover {
+            background-color: darken($primary, 5%);
+          }
+        }
+
+        &--keyboard-selected {
+          background-color: rgba($primary, 0.1);
+          color: $primary;
+        }
+      }
+
+      &__navigation-icon::before {
+        border-color: $light-dark;
+      }
+    }
+  }
+}

@@ -1,0 +1,73 @@
+@import '../../../../styles/constants.scss';
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid $border-color;
+  border-radius: $table-border-radius;
+}
+
+th {
+  background-color: $secondary;
+  border-color: $border-color;
+  border-style: solid;
+  border-width: 0 0 1px 0;
+}
+
+th:not(:last-child) {
+  border-right-width: 1px;
+}
+
+th:first-of-type {
+  border-top-left-radius: $table-border-radius;
+}
+
+th:last-of-type {
+  border-top-right-radius: $table-border-radius;
+}
+
+td {
+  border-color: $border-color;
+  border-style: solid;
+  border-width: 0 0 0 0;
+}
+
+td:not(:last-child) {
+  border-right-width: 1px;
+}
+
+tr:not(:last-child) td {
+  border-bottom-width: 1px;
+}
+
+tr:last-of-type td:first-of-type {
+  border-bottom-left-radius: $table-border-radius;
+}
+
+tr:last-of-type td:last-of-type {
+  border-bottom-right-radius: $table-border-radius;
+}
+
+tr:hover {
+  background-color: $body-bg-light;
+}
+
+@include color-mode(dark) {
+  table {
+    border: 1px solid $table-border-color-dark;
+    border-radius: $table-border-radius;
+  }
+
+  th {
+    background-color: $table-header-background-color-dark;
+    border-color: $table-border-color-dark;
+  }
+
+  td {
+    border-color: $table-border-color-dark;
+  }
+
+  tr:hover {
+    background-color: $body-bg-dark;
+  }
+}
