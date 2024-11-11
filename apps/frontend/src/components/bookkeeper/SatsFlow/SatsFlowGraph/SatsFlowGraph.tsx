@@ -111,7 +111,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             .style("visibility", "visible")
             .text(
               `Event Tag: ${tagGroup.tag}
-               Net Inflow: ${tagGroup.netInflowSat}
+               Net Inflow: ${formatSats(tagGroup.netInflowSat)}
                Credits: ${formatSats(tagGroup.creditSat)}
                Debits: ${formatSats(tagGroup.debitSat)}
                Volume: ${formatSats(tagGroup.volumeSat)}`
