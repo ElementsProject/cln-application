@@ -114,7 +114,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
                Net Inflow: ${tagGroup.netInflowSat}
                Credits: ${formatSats(tagGroup.creditSat)}
                Debits: ${formatSats(tagGroup.debitSat)}
-               Volume: ${tagGroup.volumeSat}`
+               Volume: ${formatSats(tagGroup.volumeSat)}`
             );
         })
           .on("mousemove", function (event) {

@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { format } from 'd3-format';
 import { useRef, useEffect } from "react";
 import './VolumeGraph.scss';
 import { Forward, VolumeData } from "../../../../types/lightning-volume.type";
@@ -19,6 +20,7 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
       const centerX = (outerWidth - (margin.left + margin.right + barWidth)) / 2;
       const centerY = margin.top;
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      const formatSats = format(',.3f');
       let cumulativeHeight = 10;
 
       const yScale = d3.scaleLinear()
@@ -107,12 +109,12 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
                 `Inbound SCID: ${d.inboundChannelSCID}
                  Inbound PeerId: ${d.inboundPeerId}
                  Inbound PeerAlias: ${d.inboundPeerAlias}
-                 Inbound Sats: ${d.inboundSat}
+                 Inbound Sats: ${formatSats(d.inboundSat)}
                  Outbound SCID: ${d.outboundChannelSCID}
                  Outbound PeerId: ${d.outboundPeerId}
                  Outbound PeerAlias: ${d.outboundPeerAlias}
-                 Outbound Sats: ${d.outboundSat}
-                 Routing Profit Sats: ${d.feeSat}`
+                 Outbound Sats: ${formatSats(d.outboundSat)}
+                 Routing Profit Sats: ${formatSats(d.feeSat)}`
               );
           })
           .on("mousemove", function (event) {
