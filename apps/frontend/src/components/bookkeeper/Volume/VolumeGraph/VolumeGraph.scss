@@ -2,8 +2,42 @@
 
 .volume-tooltip {
   white-space: pre-line;
+  position: absolute;
+  visibility: hidden;
+  background: $body-bg-light;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: $table-border-radius;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.volume-header {
+  font-family: $font-family-base;
+  fill: $body-color
+}
+
+.volume-text {
+  fill: $body-color;
+  font-weight: bold;
+  text-anchor: middle;
+  font-family: $font-family-base;
 }
 
 .bar:hover {
   fill-opacity: 0.7;
+}
+
+@include color-mode(dark) {
+  .volume-tooltip {
+    background: $body-bg-dark;
+  }
+
+  .volume-header {
+    fill: $body-color-dark;
+  }
+
+  .volume-text {
+    fill: $body-color-dark;
+  }
 }

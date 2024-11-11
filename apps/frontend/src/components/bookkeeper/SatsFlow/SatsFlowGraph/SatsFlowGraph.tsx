@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { format } from 'd3-format';
 import { useRef, useEffect } from "react";
 import './SatsFlowGraph.scss';
 import { SatsFlow, SatsFlowPeriod, TagGroup } from "../../../../types/lightning-satsflow.type";
@@ -16,6 +17,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
+      const formatSats = format(',.3f');
 
       const { maxInflowSat, maxOutflowSat } = findMaxInflowAndOutflow(satsFlowData);
 
@@ -61,14 +63,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const tooltip = d3.select("body").selectAll(".sats-flow-tooltip")
         .data([null])
         .join("div")
-        .attr("class", "sats-flow-tooltip")
-        .style("position", "absolute")
-        .style("visibility", "hidden")
-        .style("background", "white")
-        .style("padding", "5px")
-        .style("border", "1px solid black")
-        .style("border-radius", "5px")
-        .style("pointer-events", "none");
+        .attr("class", "sats-flow-tooltip");
 
       tooltipRef.current = tooltip.node() as HTMLDivElement;
 
@@ -93,7 +88,9 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
           .attr("class", "bar")
           .attr("x", 0)
           .attr("y", (d: TagGroup) => {
-            const barHeight = Math.abs(yScale(d.netInflowSat) - yScale(0));
+            let barHeight = Math.abs(yScale(d.netInflowSat) - yScale(0));
+            console.log("barHeight = " + barHeight + " " + d.netInflowSat);
+            //min barHeight should be 1.
             if (d.netInflowSat < 0) {
               //For negative values start at yOffsetNegative and move down
               const y = yOffsetNegative;
@@ -115,8 +112,8 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
             .text(
               `Event Tag: ${tagGroup.tag}
                Net Inflow: ${tagGroup.netInflowSat}
-               Credits: ${tagGroup.creditSat}
-               Debits: ${tagGroup.debitSat}
+               Credits: ${formatSats(tagGroup.creditSat)}
+               Debits: ${formatSats(tagGroup.debitSat)}
                Volume: ${tagGroup.volumeSat}`
             );
         })

@@ -14,9 +14,6 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
       const outerWidth = width;
       const outerHeight = 500;
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
-      const innerWidth = outerWidth - margin.left - margin.right;
-      const innerHeight = outerHeight - margin.top - margin.bottom;
-      const barHeight = 20;
       const barWidth = width * 0.50;
       const barPadding = 5;
       const centerX = (outerWidth - (margin.left + margin.right + barWidth)) / 2;
@@ -31,14 +28,7 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
       const tooltip = d3.select("body").selectAll(".volume-tooltip")
         .data([null])
         .join("div")
-        .attr("class", "volume-tooltip")
-        .style("position", "absolute")
-        .style("visibility", "hidden")
-        .style("background", "white")
-        .style("padding", "5px")
-        .style("border", "1px solid black")
-        .style("border-radius", "5px")
-        .style("pointer-events", "none");
+        .attr("class", "volume-tooltip");
 
       tooltipRef.current = tooltip.node() as HTMLDivElement;
 
@@ -70,16 +60,14 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
 
       //static labels
       g.append("text")
+        .attr("class", "volume-text")
         .attr("x", maxInboundSCIDTextWidth / 2)
         .attr("y", 0)
-        .attr("text-anchor", "middle")
-        .style("font-weight", "bold")
         .text("Inbound");
       g.append("text")
+        .attr("class", "volume-text")
         .attr("x", maxInboundSCIDTextWidth / 2 + barWidth + maxOutboundSCIDTextWidth  + 20)
         .attr("y", 0)
-        .attr("text-anchor", "middle")
-        .style("font-weight", "bold")
         .text("Outbound");
 
       const groups = g.selectAll<SVGGElement, [string, Map<string, number>]>("g")
@@ -97,6 +85,7 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
         const row = d3.select(this);
 
         const incomingSCIDText = row.append("text")
+          .attr("class", "volume-header")
           .attr("x", 0)
           .attr("y", yScale(d.outboundSat) / 2)
           .attr("dy", ".35em")
@@ -137,6 +126,7 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
           });
 
         const outgoingSCIDText = row.append("text")
+          .attr("class", "volume-header")
           .attr("x", incomingTextWidth + 10 + barWidth + 10)
           .attr("y", yScale(d.outboundSat) / 2)
           .attr("dy", ".35em")

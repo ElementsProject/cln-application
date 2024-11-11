@@ -2,8 +2,22 @@
 
 .sats-flow-tooltip {
   white-space: pre-line;
+  position: absolute;
+  visibility: hidden;
+  background: $body-bg-light;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: none;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bar:hover {
   fill-opacity: 0.7;
+}
+
+@include color-mode(dark) {
+  .sats-flow-tooltip {
+    background: $body-bg-dark;
+  }
 }
