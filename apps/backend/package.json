@@ -20,6 +20,7 @@
     "express-winston": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "lnmessage": "^0.2.6",
+    "protobufjs": "^7.4.0",
     "ts-node": "^10.9.1",
     "winston": "^3.11.0"
   },

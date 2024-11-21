@@ -1,14 +1,8 @@
 .vscode
 node_modules
-data/bitcoin/*
-data/lightningd/*
-data/lightningd-2/*
-data/c-lightning-rest/*
-data/app/application-cln.log
-data/app-2/*
+data
 application-cln.log
 .commando-env
 .commando
-data/app/config.json
 release
 env-local.sh
