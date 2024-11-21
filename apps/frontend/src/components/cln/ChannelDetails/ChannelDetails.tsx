@@ -91,9 +91,10 @@ const ChannelDetails = (props) => {
         }
       })
       .catch(err => {
-        logger.error(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
+        console.warn(err);
+        logger.error(err.response?.data || err.message || JSON.stringify(err));
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
+        setResponseMessage(err.response?.data || err.message || JSON.stringify(err));
         delayedClearStatusAlert();
       });
     } else {
@@ -113,7 +114,7 @@ const ChannelDetails = (props) => {
               <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
             </Card.Header>
             <Card.Body className='pt-1 pb-0 px-1 d-flex flex-column align-items-stretch justify-content-between channel-scroll-container'>
-              <PerfectScrollbar className='ps-show-always' options={{suppressScrollX:true}}>
+              <PerfectScrollbar options={{suppressScrollX:true}}>
                 <Row className='d-flex align-items-start justify-content-start'>
                   <Col className='me-3'>
                     <OverlayTrigger
@@ -122,7 +123,7 @@ const ChannelDetails = (props) => {
                       overlay={<Tooltip>{titleCase(props.selChannel.current_state)}</Tooltip>}
                       >
                       <span className='d-flex align-items-center justify-content-start fw-bold'>
-                        <div className={'d-inline-block mx-1 dot ' + (props.selChannel.current_state === 'ACTIVE' ? 'bg-success' : props.selChannel.current_state === 'PENDING' ? 'bg-warning' : 'bg-danger')}></div>
+                        <div className={'d-inline-block mx-1 dot ' + (props.selChannel.current_state?.toLowerCase() === 'active' ? 'bg-success' : props.selChannel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>
                         {props.selChannel.node_alias}
                       </span>
                     </OverlayTrigger>

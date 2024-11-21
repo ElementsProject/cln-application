@@ -33,7 +33,7 @@ const PaymentHeader = ({payment, appConfig, fiatConfig}) => {
             <span className='text-dark fw-bold overflow-x-ellipsis'>{payment.description || payment.payment_hash}</span>
           </Col>
           <Col xs={5} className='ps-0 d-flex align-items-center justify-content-end fw-bold text-darker-blue'>
-            { payment.status === 'complete' ?
+            { payment.status?.toLowerCase() === 'complete' ?
               '-' + (formatCurrency((payment.amount_sent_msat || 0), Units.MSATS, appConfig.unit, false, 0, 'string'))
             :
               0
@@ -101,7 +101,7 @@ const CLNTransactionsAccordion = ({ i, expanded, setExpanded, initExpansions, tr
         animate={{ backgroundColor: ((appConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => { initExpansions[i]=!expanded[i]; return setExpanded(initExpansions); }}>
-        {transaction.type === 'PAYMENT' ? <PaymentHeader payment={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> : <InvoiceHeader invoice={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> }
+        {transaction.type?.toLowerCase() === 'payment' ? <PaymentHeader payment={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> : <InvoiceHeader invoice={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> }
       </motion.div>
       <AnimatePresence initial={false}>
         {expanded[i] && (
