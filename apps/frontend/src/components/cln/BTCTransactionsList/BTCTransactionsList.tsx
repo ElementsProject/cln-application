@@ -84,7 +84,7 @@ const BTCTransactionsAccordion = ({ i, expanded, setExpanded, initExpansions, tr
         animate={{ backgroundColor: ((appConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => { initExpansions[i]=!expanded[i]; return setExpanded(initExpansions); }}>
-        {transaction?.tag === 'withdrawal' ? <WithdrawHeader withdraw={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> : <DepositHeader deposit={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> }
+        {transaction?.tag?.toLowerCase() === 'withdrawal' ? <WithdrawHeader withdraw={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> : <DepositHeader deposit={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> }
       </motion.div>
       <AnimatePresence initial={false}>
         {expanded[i] && (

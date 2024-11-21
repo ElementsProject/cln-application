@@ -121,7 +121,7 @@ const CLNTransaction = (props) => {
         transition={{ duration: TRANSITION_DURATION }}
         className='cln-transaction-placeholder pb-2'
       >
-        {props.transaction.type === 'PAYMENT' ? 
+        {props.transaction.type?.toLowerCase() === 'payment' ? 
           <Payment payment={props.transaction} copyHandler={copyHandler} />
         :
           <Invoice invoice={props.transaction} copyHandler={copyHandler} />

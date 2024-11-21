@@ -40,9 +40,9 @@ const BTCDeposit = (props) => {
       }
     })
     .catch(err => {
-      logger.error(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
+      logger.error(err.response?.data || err.message || JSON.stringify(err));
       setResponseStatus(CallStatus.ERROR);
-      setResponseMessage(err.response && err.response.data ? err.response.data : err.message ? err.message : JSON.stringify(err));
+      setResponseMessage(err.response?.data || err.message || JSON.stringify(err));
       delayedClearStatusAlert();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

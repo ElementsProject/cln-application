@@ -36,7 +36,7 @@ const FiatSelection = (props) => {
         </Col>
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <PerfectScrollbar className='ps-show-always'>
+        <PerfectScrollbar>
           <div className='fiat-dropdown-scroller fs-7'>
           {FIAT_CURRENCIES.map((fiat, i) => 
             <Dropdown.Item className='d-flex justify-content-between align-items-center' as='div' eventKey={fiat.currency} key={i}>

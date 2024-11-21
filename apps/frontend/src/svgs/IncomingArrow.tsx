@@ -9,7 +9,7 @@ export const IncomingArrowSVG = props => {
     <OverlayTrigger
       placement='auto'
       delay={{ show: 250, hide: 250 }}
-      overlay={(props.txStatus === 'used' || props.txStatus === 'unused') ? <Tooltip>{titleCase(props.txStatus)}</Tooltip> : (props.txStatus === 'deposit') ? <></> : <Tooltip>{props.txStatus === 'paid' ? 'Received' : titleCase(props.txStatus)}</Tooltip>}
+      overlay={(props.txStatus?.toLowerCase() === 'used' || props.txStatus?.toLowerCase() === 'unused') ? <Tooltip>{titleCase(props.txStatus)}</Tooltip> : (props.txStatus?.toLowerCase() === 'deposit') ? <></> : <Tooltip>{props.txStatus?.toLowerCase() === 'paid' ? 'Received' : titleCase(props.txStatus)}</Tooltip>}
       >
       <svg
         className={props.className}
@@ -22,7 +22,7 @@ export const IncomingArrowSVG = props => {
         <circle cx='21' cy='21' r='21' className='fill-body-bg' />
         <path
           d='M13.3891 13L12 14.3891L25.6265 28.0156H13.1245V30H29V14.1245H27.0156V26.6265L13.3891 13Z'
-          className={(props.txStatus === 'deposit' || props.txStatus === 'paid') ? 'fill-success' : 'fill-light'}
+          className={(props.txStatus?.toLowerCase() === 'deposit' || props.txStatus?.toLowerCase() === 'paid') ? 'fill-success' : 'fill-light'}
         />
       </svg>
     </OverlayTrigger>
