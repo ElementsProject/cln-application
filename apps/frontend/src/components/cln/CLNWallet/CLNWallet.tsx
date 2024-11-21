@@ -69,7 +69,7 @@ const CLNWallet = (props) => {
                   <Nav.Link eventKey='offers'><span>Offers</span></Nav.Link>
                 </Nav.Item>
               </Nav>
-              <PerfectScrollbar className='ps-show-always'>
+              <PerfectScrollbar>
                 <AnimatePresence mode='wait'>
                   <motion.div
                     key={selectedTab}

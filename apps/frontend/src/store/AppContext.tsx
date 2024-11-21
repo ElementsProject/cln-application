@@ -33,7 +33,7 @@ const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[], version
     peerChannel.to_us_sat = Math.floor((peerChannel.to_us_msat || 0) / SATS_MSAT);
     peerChannel.total_sat = Math.floor((peerChannel.total_msat || 0) / SATS_MSAT);
     peerChannel.to_them_sat = Math.floor(((peerChannel.total_msat || 0) - (peerChannel.to_us_msat || 0)) / SATS_MSAT);
-    if (peerChannel.state === 'CHANNELD_NORMAL') {
+    if (peerChannel.state?.toLowerCase() === 'channeld_normal') {
       if (peerChannel.peer_connected) {
         peerChannel.current_state = 'ACTIVE';
         aggregatedChannels.activeChannels.push(peerChannel);
@@ -63,7 +63,7 @@ const paymentReducer = (accumulator, currentPayment) => {
 };
 
 const summaryReducer = (accumulator, mpp) => {
-  if (mpp.status === 'complete') {
+  if (mpp.status?.toLowerCase() === 'complete') {
     accumulator.amount_msat = accumulator.amount_msat + mpp.amount_msat;
     accumulator.amount_sent_msat = accumulator.amount_sent_msat + mpp.amount_sent_msat;
     accumulator.status = mpp.status;
@@ -149,22 +149,22 @@ const calculateBalances = (listFunds: Fund) => {
     error: null
   };
   listFunds.channels?.map((channel: FundChannel) => {
-    if(channel.state === 'CHANNELD_NORMAL' && channel.connected) {
+    if(channel.state?.toLowerCase() === 'channeld_normal' && channel.connected) {
       walletBalances.clnLocalBalance = walletBalances.clnLocalBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
       walletBalances.clnRemoteBalance = walletBalances.clnRemoteBalance + (((channel.channel_total_sat || ((channel.amount_msat || 0) / SATS_MSAT) || 0) - (channel.channel_sat || ((channel.our_amount_msat || 0) / SATS_MSAT)) || 0));
     }
-    else if(channel.state === 'CHANNELD_NORMAL' && !channel.connected) {
+    else if(channel.state?.toLowerCase() === 'channeld_normal' && !channel.connected) {
       walletBalances.clnInactiveBalance = walletBalances.clnInactiveBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
     }
-    else if(channel.state === 'CHANNELD_AWAITING_LOCKIN') {
+    else if(channel.state?.toLowerCase() === 'channeld_awaiting_lockin') {
       walletBalances.clnPendingBalance = walletBalances.clnPendingBalance + (channel.channel_sat || (channel.our_amount_msat || 0) / SATS_MSAT);
     }
     return walletBalances;
   });
   listFunds.outputs?.map((output: FundOutput) => {
-    if(output.status === 'confirmed') {
+    if(output.status?.toLowerCase() === 'confirmed') {
       walletBalances.btcSpendableBalance = walletBalances.btcSpendableBalance + (output.value || ((output.amount_msat || 0) / SATS_MSAT) || 0);
-    } else if(output.status === 'unconfirmed') {
+    } else if(output.status?.toLowerCase() === 'unconfirmed') {
       walletBalances.btcReservedBalance = walletBalances.btcReservedBalance + (output.value || ((output.amount_msat || 0) / SATS_MSAT) || 0);
     }
     return walletBalances;
@@ -183,7 +183,7 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
     return [];
   } else {
     return events.reduce((acc: any[], event, i) => {
-      if (event.account === 'wallet' && (event.tag === 'deposit' || event.tag === 'withdrawal')) {
+      if (event.account?.toLowerCase() === 'wallet' && (event.tag?.toLowerCase() === 'deposit' || event.tag?.toLowerCase() === 'withdrawal')) {
         if (isCompatibleVersion(currentVersion, '22.11')) {
           event.credit_msat = event.credit_msat || 0;
           event.debit_msat = event.debit_msat || 0;
@@ -192,7 +192,7 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
           event.debit_msat = event.debit_msat && typeof event.debit_msat === 'string' ? event.debit_msat.substring(0, (event.debit_msat.length - 4)) : (event.debit_msat || 0);
         }
         const lastTx = acc.length && acc.length > 0 ? acc[acc.length - 1] : { tag: '' };
-        if (lastTx.tag === 'withdrawal' && event.tag === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
+        if (lastTx.tag?.toLowerCase() === 'withdrawal' && event.tag?.toLowerCase() === 'deposit' && lastTx.timestamp === event.timestamp && event.outpoint?.includes(lastTx.txid)) {
           // Calculate the net amount from the last withdrawal and this deposit
           lastTx.debit_msat = (lastTx.debit_msat - +event.credit_msat);
         } else {

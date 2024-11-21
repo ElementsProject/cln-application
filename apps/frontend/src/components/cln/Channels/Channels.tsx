@@ -37,7 +37,7 @@ const Channels = (props) => {
           appCtx.listChannels.error ? 
             <Alert className='fs-8' variant='danger' data-testid='channels-error'>{appCtx.listChannels.error}</Alert> : 
             allChannelsMerged && allChannelsMerged.length && allChannelsMerged.length > 0 ?
-              <PerfectScrollbar className='ps-show-always'>
+              <PerfectScrollbar>
                 <ListGroup as='ul' variant='flush' className='list-channels'>
                   {allChannelsMerged.map((channel, idx) => (
                     <motion.li
@@ -55,7 +55,7 @@ const Channels = (props) => {
                               overlay={<Tooltip>{titleCase(channel.current_state)}</Tooltip>}
                               >
                               <span>
-                                <div className={'d-inline-block mx-1 dot ' + (channel.current_state === 'ACTIVE' ? 'bg-success' : channel.current_state === 'PENDING' ? 'bg-warning' : 'bg-danger')}></div>
+                                <div className={'d-inline-block mx-1 dot ' + (channel.current_state?.toLowerCase() === 'active' ? 'bg-success' : channel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>
                                 {channel.node_alias}
                               </span>
                             </OverlayTrigger>

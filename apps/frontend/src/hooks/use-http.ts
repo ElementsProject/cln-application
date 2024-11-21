@@ -44,7 +44,7 @@ const useHttp = () => {
       const foundCurrency = FIAT_CURRENCIES.find(curr => curr.currency === fiatUnit);
       appCtx.setFiatConfig({ ...response.data, isLoading: false, symbol: (foundCurrency ? foundCurrency.symbol : faDollarSign), error: null });
     }).catch(err => {
-      appCtx.setFiatConfig({ isLoading: false, symbol: faDollarSign, rate: 1, venue: '', error: err.response && err.response.data ? err.response.data : ''});
+      appCtx.setFiatConfig({ isLoading: false, symbol: faDollarSign, rate: 1, venue: '', error: err.response?.data || ''});
     });
   }, [appCtx]);
 
@@ -100,26 +100,26 @@ const useHttp = () => {
       {
         method: 'post',
         url: '/cln/call',
-        body: { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': [] },
+        body: { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': {} },
       },
       {
         method: 'post',
         url: '/cln/call',
-        body: { 'method': 'listnodes', 'params': [] }
+        body: { 'method': 'listnodes', 'params': {} }
       }
     );
     appCtx.setNodeInfo(nodeInfo);
   }, [appCtx, sendRequestToSetStore]);
 
   const fetchData = useCallback(() => {
-    sendRequestToSetStore(setAfterNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListPeers, { method: 'post', url: '/cln/call', body: { 'method': 'listpeers', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListInvoices, { method: 'post', url: '/cln/call', body: { 'method': 'listinvoices', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListPayments, { method: 'post', url: '/cln/call', body: { 'method': 'listsendpays', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListFunds, { method: 'post', url: '/cln/call', body: { 'method': 'listfunds', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListOffers, { method: 'post', url: '/cln/call', body: { 'method': 'listoffers', 'params': [] } });
-    sendRequestToSetStore(appCtx.setListBitcoinTransactions, { method: 'post', url: '/cln/call', body: { 'method': 'bkpr-listaccountevents', 'params': [] } });
-    sendRequestToSetStore(appCtx.setFeeRate, { method: 'post', url: '/cln/call', body: { 'method': 'feerates', 'params': ['perkb'] } });
+    sendRequestToSetStore(setAfterNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListPeers, { method: 'post', url: '/cln/call', body: { 'method': 'listpeers', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListInvoices, { method: 'post', url: '/cln/call', body: { 'method': 'listinvoices', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListPayments, { method: 'post', url: '/cln/call', body: { 'method': 'listsendpays', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListFunds, { method: 'post', url: '/cln/call', body: { 'method': 'listfunds', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListOffers, { method: 'post', url: '/cln/call', body: { 'method': 'listoffers', 'params': {} } });
+    sendRequestToSetStore(appCtx.setListBitcoinTransactions, { method: 'post', url: '/cln/call', body: { 'method': 'bkpr-listaccountevents', 'params': {} } });
+    sendRequestToSetStore(appCtx.setFeeRate, { method: 'post', url: '/cln/call', body: { 'method': 'feerates', 'params': {style: 'perkb'} } });
     getConnectWallet();
   }, [appCtx, sendRequestToSetStore, setAfterNodeInfo, getConnectWallet]);
 
@@ -184,7 +184,7 @@ const useHttp = () => {
   };
 
   const decodeInvoice = (invoice: string) => {
-    return sendRequest(false, 'post', '/cln/call', { 'method': 'decode', 'params': [ invoice ] });
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'decode', 'params': { 'string': invoice } });
   };
 
   const fetchInvoice = (offer: string, amount: number) => {
