@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import handleError from '../shared/error-handler.js';
-import { LNMessage, LightningService } from '../service/lightning.service.js';
+import { CLNService, LightningService } from '../service/lightning.service.js';
 import { logger } from '../shared/logger.js';
-import { LightningError } from '../models/errors.js';
-import { HttpStatusCode } from '../shared/consts.js';
+import { AppConnect, APP_CONSTANTS } from '../shared/consts.js';
 
-const lnMessage: LightningService = LNMessage;
+const clnService: LightningService = CLNService;
 
 class LightningController {
   callMethod(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info('Calling method: ' + req.body.method);
-      lnMessage
+      clnService
         .call(req.body.method, req.body.params)
         .then((commandRes: any) => {
           logger.info(
@@ -20,9 +19,13 @@ class LightningController {
               ': ' +
               JSON.stringify(commandRes),
           );
-          if (req.body.method && req.body.method === 'listpeers') {
+          if (
+            APP_CONSTANTS.APP_CONNECT == AppConnect.COMMANDO &&
+            req.body.method &&
+            req.body.method === 'listpeers'
+          ) {
             // Filter out ln message pubkey from peers list
-            const lnmPubkey = lnMessage.getLNMsgPubkey();
+            const lnmPubkey = clnService.getLNMsgPubkey();
             commandRes.peers = commandRes.peers.filter((peer: any) => peer.id !== lnmPubkey);
             res.status(200).json(commandRes);
           } else {

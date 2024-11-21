@@ -1,21 +1,24 @@
 import handleError from '../shared/error-handler.js';
-import { LNMessage } from '../service/lightning.service.js';
+import { CLNService } from '../service/lightning.service.js';
 import { logger } from '../shared/logger.js';
-const lnMessage = LNMessage;
+import { AppConnect, APP_CONSTANTS } from '../shared/consts.js';
+const clnService = CLNService;
 class LightningController {
     callMethod(req, res, next) {
         try {
             logger.info('Calling method: ' + req.body.method);
-            lnMessage
+            clnService
                 .call(req.body.method, req.body.params)
                 .then((commandRes) => {
                 logger.info('Controller received response for ' +
                     req.body.method +
                     ': ' +
                     JSON.stringify(commandRes));
-                if (req.body.method && req.body.method === 'listpeers') {
+                if (APP_CONSTANTS.APP_CONNECT == AppConnect.COMMANDO &&
+                    req.body.method &&
+                    req.body.method === 'listpeers') {
                     // Filter out ln message pubkey from peers list
-                    const lnmPubkey = lnMessage.getLNMsgPubkey();
+                    const lnmPubkey = clnService.getLNMsgPubkey();
                     commandRes.peers = commandRes.peers.filter((peer) => peer.id !== lnmPubkey);
                     res.status(200).json(commandRes);
                 }
