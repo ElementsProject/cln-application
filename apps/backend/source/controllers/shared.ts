@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import { join } from 'path';
 import { Request, Response, NextFunction } from 'express';
+
 import {
   APP_CONSTANTS,
   DEFAULT_CONFIG,
@@ -60,11 +61,10 @@ class SharedController {
       let clientCert = '';
       let caCert = '';
       let packageData = '{ version: "0.0.4" }';
-      if (fs.existsSync(APP_CONSTANTS.MACAROON_PATH)) {
-        logger.info(
-          'Getting REST Access Macaroon from ' + process.env.APP_CORE_LIGHTNING_REST_CERT_DIR,
-        );
-        macaroon = Buffer.from(fs.readFileSync(APP_CONSTANTS.MACAROON_PATH)).toString('hex');
+      let macaroonFile = join(APP_CONSTANTS.CERT_PATH || '.', 'access.macaroon');
+      if (fs.existsSync(macaroonFile)) {
+        logger.info('Getting REST Access Macaroon from ' + APP_CONSTANTS.CERT_PATH);
+        macaroon = Buffer.from(fs.readFileSync(macaroonFile)).toString('hex');
       }
       if (fs.existsSync('package.json')) {
         packageData = Buffer.from(fs.readFileSync('package.json')).toString();

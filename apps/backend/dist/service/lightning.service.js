@@ -1,8 +1,11 @@
 import * as fs from 'fs';
 import * as crypto from 'crypto';
+import { join } from 'path';
+import https from 'https';
+import axios, { AxiosHeaders } from 'axios';
 import Lnmessage from 'lnmessage';
 import { LightningError } from '../models/errors.js';
-import { HttpStatusCode, APP_CONSTANTS, LN_MESSAGE_CONFIG } from '../shared/consts.js';
+import { HttpStatusCode, APP_CONSTANTS, AppConnect, LN_MESSAGE_CONFIG, REST_CONFIG, } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import { readFileSync } from 'fs';
 export class LightningService {
@@ -12,9 +15,16 @@ export class LightningService {
             logger.info('Getting Commando Rune');
             if (fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
                 this.refreshEnvVariables();
-                logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
-                this.clnService = new Lnmessage(LN_MESSAGE_CONFIG);
-                this.clnService.connect();
+                switch (APP_CONSTANTS.APP_CONNECT) {
+                    case AppConnect.REST:
+                        logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
+                        break;
+                    default:
+                        logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
+                        this.clnService = new Lnmessage(LN_MESSAGE_CONFIG);
+                        this.clnService.connect();
+                        break;
+                }
             }
         }
         catch (error) {
@@ -26,29 +36,63 @@ export class LightningService {
         return this.clnService.publicKey;
     };
     call = async (method, methodParams) => {
-        return this.clnService
-            .commando({
-            method: method,
-            params: methodParams,
-            rune: APP_CONSTANTS.COMMANDO_RUNE,
-            reqId: crypto.randomBytes(8).toString('hex'),
-            reqIdPrefix: 'clnapp',
-        })
-            .then((commandRes) => {
-            logger.info('Commando response for ' + method + ': ' + JSON.stringify(commandRes));
-            return Promise.resolve(commandRes);
-        })
-            .catch((err) => {
-            logger.error('Commando lightning error from ' + method + ' command');
-            if (typeof err === 'string') {
-                logger.error(err);
-                throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
-            }
-            else {
-                logger.error(JSON.stringify(err));
-                throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
-            }
-        });
+        switch (APP_CONSTANTS.APP_CONNECT) {
+            case AppConnect.REST:
+                const headers = new AxiosHeaders();
+                headers.set('rune', APP_CONSTANTS.COMMANDO_RUNE);
+                let axiosConfig = {
+                    baseURL: REST_CONFIG.url + '/v1/',
+                    headers,
+                };
+                if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https') {
+                    const caCert = fs.readFileSync(join(APP_CONSTANTS.CERT_PATH || '.', 'ca.pem'));
+                    const httpsAgent = new https.Agent({
+                        ca: caCert,
+                    });
+                    axiosConfig.httpsAgent = httpsAgent;
+                }
+                return axios
+                    .post(method, methodParams, axiosConfig)
+                    .then((commandRes) => {
+                    logger.info('REST response for ' + method + ': ' + JSON.stringify(commandRes.data));
+                    return Promise.resolve(commandRes.data);
+                })
+                    .catch((err) => {
+                    logger.error('REST lightning error from ' + method + ' command');
+                    if (typeof err === 'string') {
+                        logger.error(err);
+                        throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
+                    }
+                    else {
+                        logger.error(JSON.stringify(err));
+                        throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
+                    }
+                });
+            default:
+                return this.clnService
+                    .commando({
+                    method: method,
+                    params: methodParams,
+                    rune: APP_CONSTANTS.COMMANDO_RUNE,
+                    reqId: crypto.randomBytes(8).toString('hex'),
+                    reqIdPrefix: 'clnapp',
+                })
+                    .then((commandRes) => {
+                    logger.info('Commando response for ' + method + ': ' + JSON.stringify(commandRes));
+                    return Promise.resolve(commandRes);
+                })
+                    .catch((err) => {
+                    logger.error('Commando lightning error from ' + method + ' command');
+                    if (typeof err === 'string') {
+                        logger.error(err);
+                        throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
+                    }
+                    else {
+                        logger.error(JSON.stringify(err));
+                        throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
+                    }
+                });
+        }
     };
     refreshEnvVariables() {
         const envVars = this.parseEnvFile(APP_CONSTANTS.COMMANDO_ENV_LOCATION);
