@@ -63,12 +63,12 @@
       - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       - APP_BITCOIN_NODE_IP: IP address of bitcoin node container (required)
       - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
-      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: commando)
-      - APP_CORE_LIGHTNING_REST_PROTOCOL: Protocol on which cln-rest is served (valid values: http/https, default: https)
-      - APP_CORE_LIGHTNING_REST_PORT: c-lightning-REST server port (optional; for connect wallet screen)
-      - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for c-lightning-REST certificates (optional; for connect wallet screen)
+      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: COMMANDO)
+      - APP_CORE_LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)
+      - APP_CORE_LIGHTNING_REST_PORT: REST server port (optional; for connect wallet screen)
+      - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for certificates (optional; required if APP_CORE_LIGHTNING_REST_PROTOCOL is https)
       - APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
-      - APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: https)
+      - APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: http)
       - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
       ```
 
