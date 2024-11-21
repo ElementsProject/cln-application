@@ -1,6 +1,7 @@
 import handleError from '../shared/error-handler.js';
 import { CLNService } from '../service/lightning.service.js';
 import { logger } from '../shared/logger.js';
+import { AppConnect, APP_CONSTANTS } from '../shared/consts.js';
 const clnService = CLNService;
 class LightningController {
     callMethod(req, res, next) {
@@ -13,7 +14,9 @@ class LightningController {
                     req.body.method +
                     ': ' +
                     JSON.stringify(commandRes));
-                if (req.body.method && req.body.method === 'listpeers') {
+                if (APP_CONSTANTS.APP_CONNECT == AppConnect.COMMANDO &&
+                    req.body.method &&
+                    req.body.method === 'listpeers') {
                     // Filter out ln message pubkey from peers list
                     const lnmPubkey = clnService.getLNMsgPubkey();
                     commandRes.peers = commandRes.peers.filter((peer) => peer.id !== lnmPubkey);
