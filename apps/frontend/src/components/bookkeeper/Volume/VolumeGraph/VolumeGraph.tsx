@@ -95,7 +95,8 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
 
         const incomingTextWidth = incomingSCIDText.node()?.getBBox().width!;
 
-        const rect = row.append("rect")
+        //volume bar
+        row.append("rect")
           .attr("class", "bar")
           .attr("x", incomingTextWidth + 10)
           .attr("y", 0)
@@ -127,7 +128,8 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
               .style("visibility", "hidden")
           });
 
-        const outgoingSCIDText = row.append("text")
+        //outgoingSCIDText
+        row.append("text")
           .attr("class", "volume-header")
           .attr("x", incomingTextWidth + 10 + barWidth + 10)
           .attr("y", yScale(d.outboundSat) / 2)
