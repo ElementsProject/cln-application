@@ -20,7 +20,7 @@ const DatepickerInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
         readOnly
         className="datepicker-input"
       />
-      <DropdownIcon className="dropdown-icon"/>
+      {!value && <DropdownIcon className="dropdown-icon" />}
     </div>
   ),
 );

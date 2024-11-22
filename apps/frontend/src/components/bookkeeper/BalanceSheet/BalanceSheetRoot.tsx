@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import './BalanceSheetRoot.scss';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,7 +11,7 @@ import useHttp from '../../../hooks/use-http';
 import { TimeGranularity } from '../../../utilities/constants';
 import { BalanceSheet } from '../../../types/lightning-balancesheet.type';
 import TimeGranularitySelection from '../TimeGranularitySelection/TimeGranularitySelection';
-import { Col, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import DatepickerInput from '../DatepickerInput/DatepickerInput';
 
@@ -50,8 +50,8 @@ const BalanceSheetRoot = () => {
         .catch(err => {
           console.error('fetchBalanceSheet error ' + JSON.stringify(err));
         });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
