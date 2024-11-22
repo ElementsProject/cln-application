@@ -23,6 +23,7 @@ const BalanceSheetRoot = () => {
   const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>(TimeGranularity.MONTHLY);
   const [rangeStart, setRangeStart] = useState<Date | undefined>(undefined);
   const [rangeEnd, setRangeEnd] = useState<Date | undefined>(undefined);
+  const [hideZeroActivityPeriods, setHideZeroActivityPeriods] = useState<boolean>(true);
   const { getBalanceSheet } = useHttp();
 
   const updateWidth = () => {
@@ -32,7 +33,7 @@ const BalanceSheetRoot = () => {
   };
 
   const fetchBalanceSheetData = useCallback(
-    async (timeGranularity: TimeGranularity, startDate?: Date, endDate?: Date) => {
+    async (timeGranularity: TimeGranularity, hideZeroActivityPeriods: Boolean, startDate?: Date, endDate?: Date) => {
       let startTimestamp = 1;
       let endTimestamp = Math.floor(new Date().getTime());
 
@@ -43,7 +44,7 @@ const BalanceSheetRoot = () => {
         endTimestamp = Math.floor(endDate.getTime() / 1000);
       }
 
-      getBalanceSheet(timeGranularity, startTimestamp, endTimestamp)
+      getBalanceSheet(timeGranularity, hideZeroActivityPeriods, startTimestamp, endTimestamp)
         .then((response: BalanceSheet) => {
           setBalanceSheetData(response);
         })
@@ -59,6 +60,10 @@ const BalanceSheetRoot = () => {
     setTimeGranularity(timeGranularity);
   };
 
+  const hideZeroActivityPeriodsChangeHandler = (event) => {
+    setHideZeroActivityPeriods(event.target.checked);
+  };
+
   useEffect(() => {
     updateWidth();
     window.addEventListener('resize', updateWidth);
@@ -67,7 +72,7 @@ const BalanceSheetRoot = () => {
 
   useEffect(() => {
     if (appCtx.authStatus.isAuthenticated) {
-      fetchBalanceSheetData(timeGranularity, rangeStart, rangeEnd);
+      fetchBalanceSheetData(timeGranularity, hideZeroActivityPeriods, rangeStart, rangeEnd);
     }
   }, [
     appCtx.authStatus.isAuthenticated,
@@ -75,6 +80,7 @@ const BalanceSheetRoot = () => {
     rangeStart,
     rangeEnd,
     fetchBalanceSheetData,
+    hideZeroActivityPeriods,
   ]);
 
   return (
@@ -104,6 +110,18 @@ const BalanceSheetRoot = () => {
                 onChange={date => setRangeEnd(date ?? undefined)}
                 placeholderText="Ends"
               />
+              <div className="ms-3 me-3 mt-2 d-flex align-items-center">
+                <input
+                  type="checkbox"
+                  id="hideZeroActivityCheckbox"
+                  name="hideZeroActivity"
+                  checked={hideZeroActivityPeriods}
+                  onChange={hideZeroActivityPeriodsChangeHandler}
+                />
+                <label htmlFor="hideZeroActivityCheckbox" className="ms-2">
+                  Hide Zero Activity
+                </label>
+              </div>
             </div>
           </Container>
         </Card.Header>

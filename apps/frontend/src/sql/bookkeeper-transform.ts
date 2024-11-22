@@ -1,15 +1,39 @@
-import { BalanceSheetAccount, BalanceSheet, BalanceSheetRow, convertRawToBalanceSheetResultSet, BalanceSheetPeriod, RawBalanceSheetResultSet } from "../types/lightning-balancesheet.type";
-import { convertRawToSatsFlowResultSet, RawSatsFlowResultSet, SatsFlow, SatsFlowEvent, SatsFlowPeriod, SatsFlowRow, TagGroup } from "../types/lightning-satsflow.type";
-import { convertRawToVolumeResultSet, Forward, RawVolumeResultSet, VolumeData } from "../types/lightning-volume.type";
-import { secondsForTimeGranularity, TimeGranularity } from "../utilities/constants";
-import moment from "moment";
+import {
+  BalanceSheetAccount,
+  BalanceSheet,
+  BalanceSheetRow,
+  convertRawToBalanceSheetResultSet,
+  BalanceSheetPeriod,
+  RawBalanceSheetResultSet,
+} from '../types/lightning-balancesheet.type';
+import {
+  convertRawToSatsFlowResultSet,
+  RawSatsFlowResultSet,
+  SatsFlow,
+  SatsFlowEvent,
+  SatsFlowPeriod,
+  SatsFlowRow,
+  TagGroup,
+} from '../types/lightning-satsflow.type';
+import {
+  convertRawToVolumeResultSet,
+  Forward,
+  RawVolumeResultSet,
+  VolumeData,
+} from '../types/lightning-volume.type';
+import { secondsForTimeGranularity, TimeGranularity } from '../utilities/constants';
+import moment from 'moment';
 
-export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSet, timeGranularity: TimeGranularity): BalanceSheet {
+export function transformToBalanceSheet(
+  rawSqlResultSet: RawBalanceSheetResultSet,
+  timeGranularity: TimeGranularity,
+  hideZeroActivityPeriods: Boolean,
+): BalanceSheet {
   type InterimAccountRepresentation = {
-    short_channel_id: string,
-    remote_alias: string,
-    balance: number,
-    account: string,
+    short_channel_id: string;
+    remote_alias: string;
+    balance: number;
+    account: string;
   };
 
   let returnPeriods: BalanceSheetPeriod[] = [];
@@ -20,7 +44,8 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
     const sqlResultSet = convertRawToBalanceSheetResultSet(rawSqlResultSet);
 
     const earliestTimestamp: number = sqlResultSet.rows.reduce((previousRow, currentRow) =>
-      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow).timestampUnix;
+      previousRow.timestampUnix < currentRow.timestampUnix ? previousRow : currentRow,
+    ).timestampUnix;
     const currentTimestamp: number = Math.floor(Date.now() / 1000);
 
     //Calculate all time periods from first db entry to today
@@ -43,7 +68,9 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
       periodKeyToBalanceSheetRowMap.get(periodKey)!.push(row);
     }
 
-    const sortedPeriodKeys = Array.from(periodKeyToBalanceSheetRowMap.keys()).sort((a, b) => a.localeCompare(b));
+    const sortedPeriodKeys = Array.from(periodKeyToBalanceSheetRowMap.keys()).sort((a, b) =>
+      a.localeCompare(b),
+    );
     const accountNamesSet: Set<string> = new Set(sqlResultSet.rows.map(row => row.account));
 
     //Generate each Period and add to return list
@@ -52,6 +79,8 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
       let thisPeriodRows = periodKeyToBalanceSheetRowMap.get(sortedPeriodKeys[i]);
       if (thisPeriodRows && thisPeriodRows.length > 0) {
         eventRows.push(...thisPeriodRows);
+      } else if (hideZeroActivityPeriods) {
+        continue;
       }
       //A Period also contains all previous Periods' events, we add them here
       if (i > 0) {
@@ -84,45 +113,52 @@ export function transformToBalanceSheet(rawSqlResultSet: RawBalanceSheetResultSe
           let accountBalanceSat = accountBalanceMsat / 1000;
 
           interimAccounts.push({
-            short_channel_id: eventsFromThisAccount[0].shortChannelId === null ? "wallet" : eventsFromThisAccount[0].shortChannelId,
-            remote_alias: eventsFromThisAccount[0].remoteAlias === null? "n/a" : eventsFromThisAccount[0].remoteAlias,
+            short_channel_id:
+              eventsFromThisAccount[0].shortChannelId === null
+                ? 'wallet'
+                : eventsFromThisAccount[0].shortChannelId,
+            remote_alias:
+              eventsFromThisAccount[0].remoteAlias === null
+                ? 'n/a'
+                : eventsFromThisAccount[0].remoteAlias,
             balance: accountBalanceSat,
-            account: accountName
+            account: accountName,
           });
         }
       }
 
       interimAccounts.forEach(a => {
-        totalBalanceAcrossAccounts += a.balance
+        totalBalanceAcrossAccounts += a.balance;
       });
-      interimAccounts.forEach(a => finalizedAccounts.push({
-        short_channel_id: a.short_channel_id,
-        remote_alias: a.remote_alias,
-        balance: a.balance,
-        percentage: ((a.balance / totalBalanceAcrossAccounts) * 100).toFixed(2) + "%",
-        account: a.account
-      }));
+      interimAccounts.forEach(a =>
+        finalizedAccounts.push({
+          short_channel_id: a.short_channel_id,
+          remote_alias: a.remote_alias,
+          balance: a.balance,
+          percentage: ((a.balance / totalBalanceAcrossAccounts) * 100).toFixed(2) + '%',
+          account: a.account,
+        }),
+      );
 
       const period: BalanceSheetPeriod = {
         periodKey: sortedPeriodKeys[i],
         accounts: finalizedAccounts,
-        totalBalanceAcrossAccounts: totalBalanceAcrossAccounts
+        totalBalanceAcrossAccounts: totalBalanceAcrossAccounts,
       };
 
       returnPeriods.push(period);
     }
-
   }
 
   return {
-    periods: returnPeriods
+    periods: returnPeriods,
   };
-};
+}
 
 export function transformToSatsFlow(
   rawSqlResultSet: RawSatsFlowResultSet,
   timeGranularity: TimeGranularity,
-  hideZeroActivityPeriods: boolean
+  hideZeroActivityPeriods: boolean,
 ): SatsFlow {
   let returnPeriods: SatsFlowPeriod[] = [];
 
@@ -252,9 +288,9 @@ export function transformToSatsFlow(
   }
 
   return {
-    periods: returnPeriods
+    periods: returnPeriods,
   };
-};
+}
 
 export function transformToVolumeData(rawSqlResultSet: RawVolumeResultSet): VolumeData {
   let returnForwards: Forward[] = [];
@@ -284,10 +320,19 @@ export function transformToVolumeData(rawSqlResultSet: RawVolumeResultSet): Volu
   return {
     forwards: returnForwards,
     totalOutboundSat: totalOutboundSat,
-    totalFeeSat: totalFeeSat
+    totalFeeSat: totalFeeSat,
   };
-};
+}
 
+/**
+ * Calculates a unique key for a given timestamp using its date time information along with
+ * the selected TimeGranularity.  A periodKey can be used to group events that occur
+ * at a similar time.  Such as all events that occurred this past Monday, or in the last hour.
+ *
+ * @param timestamp - The timestamp to get a period key for.
+ * @param timeGranularity - The TimeGranularity to use for formatting the period key.
+ * @returns Returns a unique key for a period.
+ */
 function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): string {
   const date = new Date(timestamp * 1000);
   const year = date.getFullYear();
@@ -310,7 +355,7 @@ function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): stri
       break;
     case TimeGranularity.WEEKLY:
       const startOfWeek = moment(date).startOf('isoWeek');
-      periodKey = startOfWeek.format("YYYY-MM-DD");
+      periodKey = startOfWeek.format('YYYY-MM-DD');
       break;
     case TimeGranularity.MONTHLY:
       periodKey = `${year}-${month}`;
@@ -320,22 +365,38 @@ function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): stri
       break;
   }
   return periodKey;
-};
+}
 
 /**
  * Process tags as needed.
- * 
+ *
  * @param event - The event to process the tag for.
+ *
+ * @returns Returns a tag after any further analysis.
  */
 function getTag(event: SatsFlowEvent): string {
   switch (event.tag) {
-    case "invoice":
+    case 'invoice':
       if (event.netInflowSat >= 0) {
-        return "received_invoice";
+        return 'received_invoice';
       } else {
-        return "paid_invoice"
+        return 'paid_invoice';
       }
     default:
       return event.tag;
   }
-};
+}
+
+/**
+ * Compare BalanceSheetRow[] objects.
+ *
+ * @param rowA - The first set of rows to compare.
+ * @param rowB - The second set of rows to compare.
+ * @returns Returns true if both lists of rows are equal.
+ */
+function areBalanceSheetRowsEqual(rowsA: BalanceSheetRow[], rowsB: BalanceSheetRow[]): boolean {
+  if (!rowsA || !rowsB || rowsA.length !== rowsB.length) {
+    return false;
+  }
+  return rowsA.every((row, index) => JSON.stringify(row) === JSON.stringify(rowsB[index]));
+}
