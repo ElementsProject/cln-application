@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import * as d3 from 'd3';
 import { format } from 'd3-format';
 import './BalanceSheetGraph.scss';
@@ -7,9 +7,14 @@ import { BALANCE_FORMAT } from '../../../../utilities/constants';
 function BalanceSheetGraph({ balanceSheetData, width }) {
   const d3Container = useRef(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const formatBalance = useMemo(() => format(BALANCE_FORMAT), []);
 
   useEffect(() => {
     d3.select(d3Container.current).selectAll("*").remove();
+    if (tooltipRef.current) {
+      d3.select(tooltipRef.current).style('visibility', 'hidden');
+    }
+
     if (d3Container.current && balanceSheetData.periods.length > 0) {
       const outerWidth = width;
       const outerHeight = 300;
@@ -17,7 +22,6 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
       const minSegmentSize = 0;
-      const formatBalance = format(BALANCE_FORMAT);
 
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 

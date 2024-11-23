@@ -188,8 +188,8 @@ const useHttp = () => {
    * @returns Returns balance data grouped in periods of the specified time granularity.
    */
   const getBalanceSheet = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: Boolean, startTimestamp: number, endTimestamp:number) => {
-    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL(startTimestamp, endTimestamp)] })
-      .then((response) => transformToBalanceSheet(response.data, timeGranularity, hideZeroActivityPeriods));
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] })
+      .then((response) => transformToBalanceSheet(response.data, timeGranularity, hideZeroActivityPeriods, startTimestamp, endTimestamp));
   };
 
   const getSatsFlow = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean) => {

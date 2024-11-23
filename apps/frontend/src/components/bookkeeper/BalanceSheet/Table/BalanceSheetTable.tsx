@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { BalanceSheetAccount } from "../../../../types/lightning-balancesheet.type";
 import { format } from 'd3-format';
 import './BalanceSheetTable.scss';
@@ -7,7 +7,7 @@ import { BALANCE_FORMAT } from '../../../../utilities/constants';
 
 function BalanceSheetTable({ balanceSheetData }) {
   const d3Container = useRef(null);
-  const formatBalance = format(BALANCE_FORMAT);
+  const formatBalance = useMemo(() => format(BALANCE_FORMAT), []);
 
   useEffect(() => {
     d3.select(d3Container.current).selectAll('*').remove();

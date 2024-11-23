@@ -24,10 +24,26 @@ import {
 import { secondsForTimeGranularity, TimeGranularity } from '../utilities/constants';
 import moment from 'moment';
 
+/**
+ * We need to perform date range adjustments after all rows have processed, because in order to calculate
+ * a balance at any given time we need all events prior to that time.  This means we can't do this in 
+ * the SQL query.
+ * 
+ * @param rawSqlResultSet - The raw result set we need to process.
+ * @param timeGranularity - The manner of grouping results.
+ * @param hideZeroActivityPeriods - Whether to hide periods that have no change from the previous period.
+ * @param startTimestamp - The timestamp marking the start of the data range to include. 
+ *                         Only data recorded at or after this time will be included.
+ * @param endTimestamp - The timestamp marking the end of the data range to include. 
+ *                       Data recorded after this time will be excluded.
+ * @returns Returns the data that should be displayed.
+ */
 export function transformToBalanceSheet(
   rawSqlResultSet: RawBalanceSheetResultSet,
   timeGranularity: TimeGranularity,
   hideZeroActivityPeriods: Boolean,
+  startTimestamp: number,
+  endTimestamp: number,
 ): BalanceSheet {
   type InterimAccountRepresentation = {
     short_channel_id: string;
@@ -150,8 +166,14 @@ export function transformToBalanceSheet(
     }
   }
 
+  //After all periods have been generated is when we can filter for the timestamp range
+  const filteredReturnPeriods = returnPeriods.filter(period => {
+    const periodTimestamp = getTimestampFromPeriodKey(period.periodKey, timeGranularity);
+    return periodTimestamp >= startTimestamp && periodTimestamp <= endTimestamp;
+  });
+
   return {
-    periods: returnPeriods,
+    periods: filteredReturnPeriods,
   };
 }
 
@@ -365,6 +387,55 @@ function getPeriodKey(timestamp: number, timeGranularity: TimeGranularity): stri
       break;
   }
   return periodKey;
+}
+
+/**
+ * Converts a period key back into a timestamp based on the provided TimeGranularity.
+ * This is the reverse of the `getPeriodKey` function, providing the timestamp for the start of the period.
+ *
+ * @param periodKey - The period key to convert to a timestamp.
+ * @param timeGranularity - The TimeGranularity used to group the events.
+ * @returns The starting timestamp for the given period key.
+ */
+function getTimestampFromPeriodKey(periodKey: string, timeGranularity: TimeGranularity): number {
+  let timestamp: number;
+
+  switch (timeGranularity) {
+    case TimeGranularity.MINUTE: {
+      const date = moment(periodKey, 'YYYY-MM-DD HH:mm');
+      timestamp = date.startOf('minute').unix();
+      break;
+    }
+    case TimeGranularity.HOURLY: {
+      const date = moment(periodKey, 'YYYY-MM-DD HH');
+      timestamp = date.startOf('hour').unix();
+      break;
+    }
+    case TimeGranularity.DAILY: {
+      const date = moment(periodKey, 'YYYY-MM-DD');
+      timestamp = date.startOf('day').unix();
+      break;
+    }
+    case TimeGranularity.WEEKLY: {
+      const date = moment(periodKey, 'YYYY-MM-DD');
+      timestamp = date.startOf('isoWeek').unix();
+      break;
+    }
+    case TimeGranularity.MONTHLY: {
+      const date = moment(periodKey, 'YYYY-MM');
+      timestamp = date.startOf('month').unix();
+      break;
+    }
+    case TimeGranularity.YEARLY: {
+      const date = moment(periodKey, 'YYYY');
+      timestamp = date.startOf('year').unix();
+      break;
+    }
+    default:
+      throw new Error('Unsupported TimeGranularity');
+  }
+
+  return timestamp;
 }
 
 /**
