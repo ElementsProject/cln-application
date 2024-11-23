@@ -84,7 +84,8 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
                        Remote Alias: ${account.remote_alias}
                        Balance: ${formatBalance(account.balance)}
                        Percentage: ${account.percentage}
-                       Account: ${account.account}`);
+                       Account: ${account.account}
+                       Total Period Balance: ${formatBalance(period.totalBalanceAcrossAccounts)}`);
             })
             .on("mousemove", function(event) {
               d3.select(tooltipRef.current)
