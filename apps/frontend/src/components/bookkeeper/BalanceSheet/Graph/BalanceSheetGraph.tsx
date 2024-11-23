@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { format } from 'd3-format';
 import './BalanceSheetGraph.scss';
+import { BALANCE_FORMAT } from '../../../../utilities/constants';
 
 function BalanceSheetGraph({ balanceSheetData, width }) {
   const d3Container = useRef(null);
@@ -16,7 +17,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
       const minSegmentSize = 0;
-      const formatBalance = format(',.3f');
+      const formatBalance = format(BALANCE_FORMAT);
 
       const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 

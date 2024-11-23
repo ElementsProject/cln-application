@@ -41,6 +41,8 @@ export const CURRENCY_UNITS = ['SATS', 'BTC'];
 
 export const CURRENCY_UNIT_FORMATS = { Sats: '1.0-0', BTC: '1.6-6', OTHER: '1.2-2' };
 
+export const BALANCE_FORMAT = ',.3f';
+
 export const FIAT_CURRENCIES = [
 	{ currency:	'USD', symbol: faDollarSign },
 	{ currency:	'AUD', symbol: faDollarSign },
