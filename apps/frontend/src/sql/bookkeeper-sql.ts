@@ -8,10 +8,10 @@ export const BalanceSheetSQL =
   "FROM bkpr_accountevents " + 
     "LEFT JOIN peerchannels ON upper(bkpr_accountevents.account)=hex(peerchannels.channel_id) " + 
     "LEFT JOIN nodes ON peerchannels.peer_id=nodes.nodeid " + 
-  "WHERE bkpr_accountevents.type != 'onchain_fee' "+
+  "WHERE bkpr_accountevents.type != 'onchain_fee' " +
     "AND bkpr_accountevents.account != 'external';";
 
-export const SatsFlowSQL =
+export const SatsFlowSQL = (startTimestamp: number, endTimestamp: number): string =>
   "SELECT account, " +
     "tag, " +
     "credit_msat, " +
@@ -22,7 +22,8 @@ export const SatsFlowSQL =
     "outpoint, " +
     "txid, " +
     "payment_id " +
-  "FROM bkpr_income;";
+  "FROM bkpr_income " +
+  "WHERE bkpr_income.timestamp BETWEEN " + startTimestamp + " AND " + endTimestamp + ";";
 
   export const VolumeSQL =
     "SELECT in_channel, " +
