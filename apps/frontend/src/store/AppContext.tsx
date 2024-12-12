@@ -328,7 +328,7 @@ const appReducer = (state, action) => {
       };
 
     case ApplicationActions.SET_LIST_CHANNELS:
-      const [listPeerChannels, listNodes] = action.payload.data;
+      const [listPeerChannels, listNodes ] = action.payload?.data && action.payload?.data.length > 0 ? action.payload?.data : [{ channels: [], peers: [] }, { nodes: []}];
       const aggrChannels = aggregatePeerChannels(listPeerChannels, listNodes.nodes, state.nodeInfo.version);
       return {
         ...state,

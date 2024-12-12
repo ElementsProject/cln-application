@@ -63,7 +63,7 @@ const useHttp = () => {
           logger.info(responses);
           for (let i = 0; i < requests.length; i++) {
             if (requests[i].url === '/shared/config') {
-              getFiatRate(responses[0].data.fiatUnit); // shared/config will always only have 1 response
+              getFiatRate(responses[0].data.fiatUnit); // shared/config will always have one response only
             }
           }
 
@@ -76,10 +76,13 @@ const useHttp = () => {
           } else {
             //no-op
           }
+        }).catch((err: any) => {
+          logger.error(err);
+          setStoreFunction({ isLoading: false, error: err?.response?.data || err });
         })
     } catch (err: any) {
       logger.error(err);
-      setStoreFunction({ isLoading: false, error: err });
+      setStoreFunction({ isLoading: false, error: err?.response?.data || err });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getFiatRate]);
