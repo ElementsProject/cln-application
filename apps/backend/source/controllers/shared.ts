@@ -8,7 +8,7 @@ import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { setSharedApplicationConfig, overrideSettingsWithEnvVariables } from '../shared/utils.js';
 import { sep } from 'path';
-import { LNMessage } from '../service/lightning.service.js';
+import { CLNService } from '../service/lightning.service.js';
 import { ShowRunes } from '../models/showrunes.type.js';
 
 class SharedController {
@@ -84,7 +84,7 @@ class SharedController {
           .replace('-----BEGIN CERTIFICATE-----', '')
           .replace('-----END CERTIFICATE-----', '');
       }
-      LNMessage.refreshEnvVariables();
+      CLNService.refreshEnvVariables();
       const CONNECT_WALLET_SETTINGS = {
         LOCAL_HOST: process.env.LOCAL_HOST || '',
         DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
@@ -117,9 +117,9 @@ class SharedController {
       return axios
         .get(FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency)
         .then((response: any) => {
-          logger.info('Fiat Response: ' + JSON.stringify(response.data));
-          if (response.data.rate) {
-            return res.status(200).json({ venue: FIAT_VENUE, rate: response.data.rate });
+          logger.info('Fiat Response: ' + JSON.stringify(response?.data));
+          if (response.data?.rate) {
+            return res.status(200).json({ venue: FIAT_VENUE, rate: response.data?.rate });
           } else {
             return handleError(new APIError('Price Not Found', 'Price Not Found'), req, res, next);
           }
@@ -135,7 +135,7 @@ class SharedController {
   async saveInvoiceRune(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info('Saving Invoice Rune');
-      const showRunes: ShowRunes = await LNMessage.call('showrunes', []);
+      const showRunes: ShowRunes = await CLNService.call('showrunes', []);
       const invoiceRune = showRunes.runes.find(
         rune =>
           rune.restrictions.some(restriction =>
