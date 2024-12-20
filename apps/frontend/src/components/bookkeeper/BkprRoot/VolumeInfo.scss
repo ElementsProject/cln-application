@@ -1,0 +1,11 @@
+@import '../../../styles/constants.scss';
+
+.best-channel {
+  color: $positive-value;
+  line-break: anywhere;
+}
+
+.worst-channel {
+  color: $worst-channel;
+  line-break: anywhere;
+}
