@@ -30,15 +30,15 @@ function Bookkeeper() {
                     Track channel and wallet balances over time.
                     <div className="mt-5 d-flex flex-column align-items-start">
                       <span className="fs-1 fw-bold text-primary">4</span>
-                      <span className="fs-6 text-secondary">Total Number of Channels</span>
+                      <span className="fs-6 text-dark">Total Number of Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
                       <span className="fs-1 fw-bold text-primary">4,000,000</span>
-                      <span className="fs-6 text-secondary">Total Balance in Channels</span>
+                      <span className="fs-6 text-dark">Total Balance in Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
                       <span className="fs-1 fw-bold text-primary">4</span>
-                      <span className="fs-6 text-secondary">Total Balance in Wallet</span>
+                      <span className="fs-6 text-dark">Total Balance in Wallet</span>
                     </div>
                   </Card.Body>
                   <Card.Footer className="mt-5 mb-3 d-flex justify-content-end">
