@@ -457,17 +457,3 @@ function getTag(event: SatsFlowEvent): string {
       return event.tag;
   }
 }
-
-/**
- * Compare BalanceSheetRow[] objects.
- *
- * @param rowA - The first set of rows to compare.
- * @param rowB - The second set of rows to compare.
- * @returns Returns true if both lists of rows are equal.
- */
-function areBalanceSheetRowsEqual(rowsA: BalanceSheetRow[], rowsB: BalanceSheetRow[]): boolean {
-  if (!rowsA || !rowsB || rowsA.length !== rowsB.length) {
-    return false;
-  }
-  return rowsA.every((row, index) => JSON.stringify(row) === JSON.stringify(rowsB[index]));
-}

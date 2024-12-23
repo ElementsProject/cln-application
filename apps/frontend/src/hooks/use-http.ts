@@ -9,6 +9,7 @@ import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { isCompatibleVersion } from '../utilities/data-formatters';
 import { BalanceSheetSQL, SatsFlowSQL, VolumeSQL } from '../sql/bookkeeper-sql';
 import { transformToBalanceSheet, transformToSatsFlow, transformToVolumeData } from '../sql/bookkeeper-transform';
+import { BookkeeperLandingData } from '../types/lightning-bookkeeper-landing.type';
 
 let intervalID;
 let localAuthStatus: AuthResponse = { isLoading: true, isAuthenticated: false, isValidPassword: false };
@@ -179,26 +180,93 @@ const useHttp = () => {
   const btcDeposit = () => {
     return sendRequest(false, 'post', '/cln/call', { 'method': 'newaddr', 'params': { 'addresstype': 'bech32' } });
   };
+
+  const getBookkeeperLanding = async (): Promise<BookkeeperLandingData> => {
+    const balanceSheetData = await getBalanceSheet(TimeGranularity.MONTHLY, true, undefined, new Date());
+    const satsFlowData = await getSatsFlow(TimeGranularity.MONTHLY, true, undefined, new Date());
+    const volumeData = await getVolumeData();
+
+    const latestBalanceSheetPeriod = balanceSheetData.periods[balanceSheetData.periods.length - 1];
+    const balanceInWallet = latestBalanceSheetPeriod.accounts.filter(() => "wallet")[0].balance;
+    const balanceInChannels = latestBalanceSheetPeriod.accounts
+      .filter(account => account.account !== "wallet")
+      .reduce((sum, account) => sum + account.balance, 0);
+    const numberOfChannels = latestBalanceSheetPeriod.accounts
+      .filter(account => account.account !== "wallet")
+      .reduce((sum) => sum + 1, 0);
+      
+    const latestSatsFlowPeriod = satsFlowData.periods[satsFlowData.periods.length - 1];
+    const inflowsThisMonth = latestSatsFlowPeriod.inflowSat;
+    const outflowsThisMonth = latestSatsFlowPeriod.outflowSat;
+
+
+    return {
+      balanceSheetSummary: {
+        balanceInWallet: balanceInWallet,
+        balanceInChannels: balanceInChannels,
+        numberOfChannels: numberOfChannels,
+      },
+      satsFlowSummary: {
+        inflows: inflowsThisMonth,
+        outflows: outflowsThisMonth,
+      },
+      volumeSummary: {
+        mostTrafficChannel: "best",
+        leastTrafficChannel: "worst",
+      }
+    };
+  };
   
   /**
    * Gets Balance Sheet data.
    * @param timeGranularity - Group data by this time granularity.
-   * @param startTimestamp - If specified, the starting range for the data.
-   * @param endTimestamp - The ending range for the data.
+   * @param hideZeroActivityPeriods - Hide bars where balance did not change.
+   * @param startTimestamp - The starting range for the data if specified, else uses beginning.
+   * @param endTimestamp - The ending range for the data if specified, else uses now.
    * @returns Returns balance data grouped in periods of the specified time granularity.
    */
-  const getBalanceSheet = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: Boolean, startTimestamp: number, endTimestamp: number) => {
+  const getBalanceSheet = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: Boolean, startDate?: Date, endDate?: Date) => {
+    let startTimestamp = 1;
+    let endTimestamp = Math.floor(new Date().getTime());
+
+    if (startDate != null) {
+      startTimestamp = Math.floor(startDate.getTime() / 1000);
+    }
+    if (endDate != null) {
+      endTimestamp = Math.floor(endDate.getTime() / 1000);
+    }
     return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [BalanceSheetSQL] })
       .then((response) => transformToBalanceSheet(response.data, timeGranularity, hideZeroActivityPeriods, startTimestamp, endTimestamp));
   };
 
-  const getSatsFlow = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean, startTimestamp: number, endTimestamp: number) => {
-    return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [SatsFlowSQL(startTimestamp, endTimestamp)] })
+  /**
+   * Gets Sats Flow data.
+   * @param timeGranularity - Group data by this time granularity.
+   * @param hideZeroActivityPeriods - Hide bars where balance did not change.
+   * @param startTimestamp - The starting range for the data if specified, else uses beginning.
+   * @param endTimestamp - The ending range for the data, else uses now.
+   * @returns Returns sats flow data grouped in periods of the specified time granularity.
+   */
+  const getSatsFlow = (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean, startDate?: Date, endDate?: Date) => {
+    let startTimestamp = 1;
+    let endTimestamp = Math.floor(new Date().getTime());
+    
+    if (startDate != null) {
+      startTimestamp = Math.floor(startDate.getTime() / 1000);
+    }
+    if (endDate != null) {
+      endTimestamp = Math.floor(endDate.getTime() / 1000);
+    }
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [SatsFlowSQL(startTimestamp, endTimestamp)] })
       .then((response) => transformToSatsFlow(response.data, timeGranularity, hideZeroActivityPeriods));
   };
 
+  /**
+   * Gets Volume Chart data.
+   * @returns Returns balance data grouped in periods of the specified time granularity.
+   */
   const getVolumeData = () => {
-    return sendRequest(false, 'post', 'cln/call', { 'method': 'sql', 'params': [VolumeSQL] })
+    return sendRequest(false, 'post', '/cln/call', { 'method': 'sql', 'params': [VolumeSQL] })
       .then((response) => transformToVolumeData(response.data));
   };
 
@@ -351,6 +419,7 @@ const useHttp = () => {
     decodeInvoice,
     fetchInvoice,
     createInvoiceRune,
+    getBookkeeperLanding,
     getBalanceSheet,
     getSatsFlow,
     getVolumeData,

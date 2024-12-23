@@ -27,17 +27,7 @@ const SatsFlowRoot = (props) => {
   };
 
   const fetchSatsFlowData = useCallback(async (timeGranularity: TimeGranularity, hideZeroActivityPeriods: boolean, startDate?: Date, endDate?: Date) => {
-    let startTimestamp = 1;
-    let endTimestamp = Math.floor(new Date().getTime());
-
-    if (startDate != null) {
-      startTimestamp = Math.floor(startDate.getTime() / 1000);
-    }
-    if (endDate != null) {
-      endTimestamp = Math.floor(endDate.getTime() / 1000);
-    }
-
-    getSatsFlow(timeGranularity, hideZeroActivityPeriods, startTimestamp, endTimestamp)
+    getSatsFlow(timeGranularity, hideZeroActivityPeriods, startDate, endDate)
       .then((response: SatsFlow) => {
         setSatsFlowData(response);
       })

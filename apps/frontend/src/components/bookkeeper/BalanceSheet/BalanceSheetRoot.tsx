@@ -34,17 +34,7 @@ const BalanceSheetRoot = () => {
 
   const fetchBalanceSheetData = useCallback(
     async (timeGranularity: TimeGranularity, hideZeroActivityPeriods: Boolean, startDate?: Date, endDate?: Date) => {
-      let startTimestamp = 1;
-      let endTimestamp = Math.floor(new Date().getTime());
-
-      if (startDate != null) {
-        startTimestamp = Math.floor(startDate.getTime() / 1000);
-      }
-      if (endDate != null) {
-        endTimestamp = Math.floor(endDate.getTime() / 1000);
-      }
-
-      getBalanceSheet(timeGranularity, hideZeroActivityPeriods, startTimestamp, endTimestamp)
+      getBalanceSheet(timeGranularity, hideZeroActivityPeriods, startDate, endDate)
         .then((response: BalanceSheet) => {
           setBalanceSheetData(response);
         })

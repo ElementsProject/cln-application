@@ -1,12 +1,14 @@
 import * as d3 from "d3";
 import { format } from 'd3-format';
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import './SatsFlowGraph.scss';
 import { SatsFlow, SatsFlowPeriod, TagGroup } from "../../../../types/lightning-satsflow.type";
+import { BALANCE_FORMAT } from '../../../../utilities/constants';
 
 function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width: number }) {
   const d3Container = useRef(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const formatSats = useMemo(() => format(BALANCE_FORMAT), []);
 
   useEffect(() => {
     if (d3Container.current && satsFlowData.periods.length > 0) {
@@ -17,7 +19,6 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       const margin = { top: 10, right: 30, bottom: 30, left: 100 };
       const innerWidth = outerWidth - margin.left - margin.right;
       const innerHeight = outerHeight - margin.top - margin.bottom;
-      const formatSats = format(',.3f');
 
       const { maxInflowSat, maxOutflowSat } = findMaxInflowAndOutflow(satsFlowData);
 
@@ -114,7 +115,11 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
                Net Inflow: ${formatSats(tagGroup.netInflowSat)}
                Credits: ${formatSats(tagGroup.creditSat)}
                Debits: ${formatSats(tagGroup.debitSat)}
-               Volume: ${formatSats(tagGroup.volumeSat)}`
+               Volume: ${formatSats(tagGroup.volumeSat)}
+               Period Inflow: ${formatSats(period.inflowSat)}
+               Period Outflow: ${formatSats(period.outflowSat)}
+               Period Net Inflow: ${formatSats(period.netInflowSat)}
+               Period Volume: ${formatSats(period.totalVolumeSat)}`
             );
         })
           .on("mousemove", function (event) {

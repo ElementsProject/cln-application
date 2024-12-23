@@ -8,15 +8,46 @@ import { SatsFlowSVG } from '../../../svgs/SatsFlow';
 import { VolumeChartSVG } from '../../../svgs/VolumeChart';
 import SatsFlowInfo from './SatsFlowInfo';
 import VolumeInfo from './VolumeInfo';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import useHttp from '../../../hooks/use-http';
+import { AppContext } from '../../../store/AppContext';
+import { BookkeeperLandingData } from '../../../types/lightning-bookkeeper-landing.type';
+import { BALANCE_FORMAT } from '../../../utilities/constants';
+import { format } from 'd3';
 
-function Bookkeeper() {
+const Bookkeeper = () => {
+  const appCtx = useContext(AppContext);
   const navigate = useNavigate();
+  const [bookkeeperLandingData, setBookkeeperLandingData] = useState<BookkeeperLandingData>();
+  const { getBookkeeperLanding } = useHttp();
+  const formatBalance = useMemo(() => format(BALANCE_FORMAT), []);
+
+  const fetchBookkeeperLandingData = useCallback(
+    async () => {
+    getBookkeeperLanding()
+      .then((response: BookkeeperLandingData) => {
+        setBookkeeperLandingData(response);
+      })
+      .catch(err => {
+        console.error("fetchBookkeeperLandingData error" + err);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  useEffect(() => {
+    if (appCtx.authStatus.isAuthenticated) {
+      fetchBookkeeperLandingData();
+    }
+  }, [appCtx.authStatus.isAuthenticated, fetchBookkeeperLandingData]);
+
   return (
     <div data-testid="bookkeeper-container">
       <div className="fs-4 p-0 ps-3 fw-bold text-dark">Bookkeeper Dashboard</div>
       <Container fluid className="">
         <Row className="">
-          <Col md={5} xs={12} className="">
+          <Col lg={5} md={12} xs={12} className="">
             <Card className="mt-4 pt-4 px-4 inner-box-shadow">
               <div className="d-flex align-items-start">
                 <BalanceSheetSVG className="me-3" />
@@ -29,15 +60,15 @@ function Bookkeeper() {
                   <Card.Body className="px-0 pt-0">
                     Track channel and wallet balances over time.
                     <div className="mt-5 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">4</span>
+                      <span className="fs-1 fw-bold text-primary">{bookkeeperLandingData?.balanceSheetSummary.numberOfChannels}</span>
                       <span className="fs-6 text-dark">Total Number of Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">4,000,000</span>
+                      <span className="fs-1 fw-bold text-primary">{formatBalance(bookkeeperLandingData?.balanceSheetSummary.balanceInChannels || 0)}</span>
                       <span className="fs-6 text-dark">Total Balance in Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">4</span>
+                      <span className="fs-1 fw-bold text-primary">{formatBalance(bookkeeperLandingData?.balanceSheetSummary.balanceInWallet || 0)}</span>
                       <span className="fs-6 text-dark">Total Balance in Wallet</span>
                     </div>
                   </Card.Body>
@@ -56,7 +87,7 @@ function Bookkeeper() {
               </div>
             </Card>
           </Col>
-          <Col md={6} xs={12} className="ms-md-4 ms-xs-0 px-4 mt-4 d-flex flex-column">
+          <Col lg={6} md={12} xs={12} className="ms-lg-4 ms-xs-0 px-4 mt-4 d-flex flex-column">
             <Row>
               <Card className="pt-4 px-4 inner-box-shadow">
                 <div className="d-flex align-items-start">
@@ -70,11 +101,19 @@ function Bookkeeper() {
                     <Card.Body className="px-0 pt-0">
                       Track inflows and outflow events over time.
                       <Row className="g-3 flex-wrap">
-                        <Col xs={12} md={12} lg={12} xl={6} className="d-flex flex-column align-items-start">
-                          <SatsFlowInfo label={'Inflow this month'} value={-90000000000} />
+                        <Col
+                          lg={12}
+                          xl={6}
+                          className="d-flex flex-column align-items-start"
+                        >
+                          <SatsFlowInfo label={'Inflow this month'} value={bookkeeperLandingData?.satsFlowSummary.inflows || 0} />
                         </Col>
-                        <Col xs={12} md={12} lg={12} xl={6} className="d-flex flex-column align-items-start">
-                          <SatsFlowInfo label={'Outflow this month'} value={4000000000} />
+                        <Col
+                          lg={12}
+                          xl={6}
+                          className="d-flex flex-column align-items-start"
+                        >
+                          <SatsFlowInfo label={'Outflow this month'} value={-(bookkeeperLandingData?.satsFlowSummary.outflows || 0)} />
                         </Col>
                       </Row>
                     </Card.Body>
@@ -106,12 +145,8 @@ function Bookkeeper() {
                     <Card.Body className="px-0 pt-0">
                       Track channel routing performance.
                       <VolumeInfo
-                        bestRoutingChannel={
-                          '41b2aeea3791fcd38d9d1e0183075868808fad06092b3224e91b8b16a4ec3a6b'
-                        }
-                        worstRoutingChannel={
-                          '41b2aeea3791fcd38d9d1e0183075868808fad06092b3224e91b8b16a4ec3a6b'
-                        }
+                        bestRoutingChannel={bookkeeperLandingData?.volumeSummary.mostTrafficChannel}
+                        worstRoutingChannel={bookkeeperLandingData?.volumeSummary.leastTrafficChannel}
                       />
                     </Card.Body>
                     <Card.Footer className="mt-3 mb-3 d-flex justify-content-end">
@@ -119,7 +154,7 @@ function Bookkeeper() {
                         tabIndex={1}
                         type="submit"
                         className="btn-rounded bg-primary"
-                        onClick={() => navigate('/bookkeeper/satsflow')}
+                        onClick={() => navigate('/bookkeeper/volume')}
                       >
                         View More
                         <ActionSVG className="ms-3" />
@@ -134,6 +169,6 @@ function Bookkeeper() {
       </Container>
     </div>
   );
-}
+};
 
 export default Bookkeeper;

@@ -3,8 +3,8 @@ import React from 'react';
 import './VolumeInfo.scss';
 
 interface VolumeInfoProps {
-  bestRoutingChannel: string;
-  worstRoutingChannel: string;
+  bestRoutingChannel?: string;
+  worstRoutingChannel?: string;
 }
 
 const VolumeInfo: React.FC<VolumeInfoProps> = ({ bestRoutingChannel, worstRoutingChannel }) => {
