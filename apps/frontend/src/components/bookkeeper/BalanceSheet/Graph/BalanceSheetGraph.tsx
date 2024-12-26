@@ -23,7 +23,9 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       const innerHeight = outerHeight - margin.top - margin.bottom;
       const minSegmentSize = 0;
 
-      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      const customColors = ['#C47806', '#DFB316', '#038730'];
+      const combinedColors = [...customColors, ...d3.schemeSet3.slice(customColors.length)];
+      const colorScale = d3.scaleOrdinal(combinedColors);
 
       const yAxisTickFormat = d => `${d3.format(",")(d)}`;
 

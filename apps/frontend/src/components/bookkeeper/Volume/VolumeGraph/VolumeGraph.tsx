@@ -19,8 +19,9 @@ function VolumeGraph({ volumeData, width }: { volumeData: VolumeData, width: num
       const barPadding = 5;
       const centerX = (outerWidth - (margin.left + margin.right + barWidth)) / 2;
       const centerY = margin.top;
-      const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-      const formatSats = format(',.3f');
+      const customColors = ['#C47806', '#DFB316', '#038730'];
+      const combinedColors = [...customColors, ...d3.schemeSet3.slice(customColors.length)];
+      const colorScale = d3.scaleOrdinal(combinedColors);      const formatSats = format(',.3f');
       let cumulativeHeight = 10;
 
       const yScale = d3.scaleLinear()
