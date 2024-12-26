@@ -16,7 +16,7 @@ export type SatsFlowSummary = {
 };
 
 export type VolumeSummary = {
-  mostTrafficChannel: string;
-  leastTrafficChannel: string;
+  mostTrafficRoute: string;
+  leastTrafficRoute: string;
 }
 

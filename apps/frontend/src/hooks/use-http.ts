@@ -198,7 +198,38 @@ const useHttp = () => {
     const latestSatsFlowPeriod = satsFlowData.periods[satsFlowData.periods.length - 1];
     const inflowsThisMonth = latestSatsFlowPeriod.inflowSat;
     const outflowsThisMonth = latestSatsFlowPeriod.outflowSat;
+    
+    let highestFee = 0;
+    let highestForwardIndex: number | undefined = undefined;
+    for (let i = 0; i < volumeData.forwards.length; i++) {
+      if (volumeData.forwards[i].feeSat > highestFee) {
+        highestFee = volumeData.forwards[i].feeSat;
+        highestForwardIndex = i;
+      } else {
+        continue;
+      }
+    }
 
+    let lowestFee = Number.MAX_VALUE;
+    let lowestForwardIndex: number | undefined = undefined;
+    for (let i = 0; i < volumeData.forwards.length; i++) {
+      if (volumeData.forwards[i].feeSat < lowestFee) {
+        lowestFee = volumeData.forwards[i].feeSat;
+        lowestForwardIndex = i;
+      } else {
+        continue;
+      }
+    }
+
+    let mostTrafficRoute = "";
+    if (highestForwardIndex != null) {
+      mostTrafficRoute = `${volumeData.forwards[highestForwardIndex].inboundChannelSCID} -> ${volumeData.forwards[highestForwardIndex].outboundChannelSCID}`;
+    }
+
+    let worstTrafficRoute = "";
+    if (lowestForwardIndex != null) {
+      worstTrafficRoute = `${volumeData.forwards[lowestForwardIndex].outboundChannelSCID} -> ${volumeData.forwards[lowestForwardIndex].outboundChannelSCID}`;
+    }
 
     return {
       balanceSheetSummary: {
@@ -211,8 +242,8 @@ const useHttp = () => {
         outflows: outflowsThisMonth,
       },
       volumeSummary: {
-        mostTrafficChannel: "best",
-        leastTrafficChannel: "worst",
+        mostTrafficRoute: mostTrafficRoute,
+        leastTrafficRoute: worstTrafficRoute,
       }
     };
   };

@@ -143,10 +143,10 @@ const Bookkeeper = () => {
                     </Card.Header>
 
                     <Card.Body className="px-0 pt-0">
-                      Track channel routing performance.
+                      Track route performance.
                       <VolumeInfo
-                        bestRoutingChannel={bookkeeperLandingData?.volumeSummary.mostTrafficChannel}
-                        worstRoutingChannel={bookkeeperLandingData?.volumeSummary.leastTrafficChannel}
+                        bestRoute={bookkeeperLandingData?.volumeSummary.mostTrafficRoute}
+                        worstRoute={bookkeeperLandingData?.volumeSummary.leastTrafficRoute}
                       />
                     </Card.Body>
                     <Card.Footer className="mt-3 mb-3 d-flex justify-content-end">

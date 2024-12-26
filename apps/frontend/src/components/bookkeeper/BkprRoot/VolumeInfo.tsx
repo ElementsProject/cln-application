@@ -3,20 +3,20 @@ import React from 'react';
 import './VolumeInfo.scss';
 
 interface VolumeInfoProps {
-  bestRoutingChannel?: string;
-  worstRoutingChannel?: string;
+  bestRoute?: string;
+  worstRoute?: string;
 }
 
-const VolumeInfo: React.FC<VolumeInfoProps> = ({ bestRoutingChannel, worstRoutingChannel }) => {
+const VolumeInfo: React.FC<VolumeInfoProps> = ({ bestRoute, worstRoute }) => {
   return (
     <>
       <div className="mt-3 d-flex flex-column align-items-start">
-        <span className="fs-7 text-dark">Channel w/Most Traffic</span>
-        <span className={`mt-1 fs-7 fw-bold best-channel`}>{bestRoutingChannel}</span>
+        <span className="fs-7 text-dark">Route w/Most Traffic</span>
+        <span className={`mt-1 fs-7 fw-bold best-channel`}>{bestRoute}</span>
       </div>
       <div className="mt-3 d-flex flex-column align-items-start">
-        <span className="fs-7 text-dark">Channel w/Least Traffic</span>
-        <span className={`mt-1 fs-7 fw-bold worst-channel`}>{worstRoutingChannel}</span>
+        <span className="fs-7 text-dark">Route w/Least Traffic</span>
+        <span className={`mt-1 fs-7 fw-bold worst-channel`}>{worstRoute}</span>
       </div>
     </>
   );
