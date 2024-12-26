@@ -228,7 +228,7 @@ const useHttp = () => {
 
     let worstTrafficRoute = "";
     if (lowestForwardIndex != null) {
-      worstTrafficRoute = `${volumeData.forwards[lowestForwardIndex].outboundChannelSCID} -> ${volumeData.forwards[lowestForwardIndex].outboundChannelSCID}`;
+      worstTrafficRoute = `${volumeData.forwards[lowestForwardIndex].inboundChannelSCID} -> ${volumeData.forwards[lowestForwardIndex].outboundChannelSCID}`;
     }
 
     return {

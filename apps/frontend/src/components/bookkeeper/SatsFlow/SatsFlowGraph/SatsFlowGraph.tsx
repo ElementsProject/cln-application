@@ -90,7 +90,6 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
           .attr("x", 0)
           .attr("y", (d: TagGroup) => {
             let barHeight = Math.abs(yScale(d.netInflowSat) - yScale(0));
-            console.log("barHeight = " + barHeight + " " + d.netInflowSat);
             //min barHeight should be 1.
             if (d.netInflowSat < 0) {
               //For negative values start at yOffsetNegative and move down
