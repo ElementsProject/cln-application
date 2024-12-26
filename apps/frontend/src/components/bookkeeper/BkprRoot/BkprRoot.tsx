@@ -44,7 +44,17 @@ const Bookkeeper = () => {
 
   return (
     <div data-testid="bookkeeper-container">
-      <div className="fs-4 p-0 ps-3 fw-bold text-dark">Bookkeeper Dashboard</div>
+      <div className="fs-4 p-0 ps-3 d-flex fw-bold text-dark">
+        Bookkeeper Dashboard
+        <button
+          tabIndex={0}
+          type="submit"
+          className="btn-rounded bg-primary fs-6 ms-3"
+          onClick={() => navigate('/bookkeeper/terminal')}
+        >
+          Terminal
+        </button>
+      </div>
       <Container fluid className="">
         <Row className="">
           <Col lg={5} md={12} xs={12} className="">
@@ -60,15 +70,25 @@ const Bookkeeper = () => {
                   <Card.Body className="px-0 pt-0">
                     Track channel and wallet balances over time.
                     <div className="mt-5 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">{bookkeeperLandingData?.balanceSheetSummary.numberOfChannels}</span>
+                      <span className="fs-1 fw-bold text-primary">
+                        {bookkeeperLandingData?.balanceSheetSummary.numberOfChannels}
+                      </span>
                       <span className="fs-6 text-dark">Total Number of Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">{formatBalance(bookkeeperLandingData?.balanceSheetSummary.balanceInChannels || 0)}</span>
+                      <span className="fs-1 fw-bold text-primary">
+                        {formatBalance(
+                          bookkeeperLandingData?.balanceSheetSummary.balanceInChannels || 0,
+                        )}
+                      </span>
                       <span className="fs-6 text-dark">Total Balance in Channels</span>
                     </div>
                     <div className="mt-3 d-flex flex-column align-items-start">
-                      <span className="fs-1 fw-bold text-primary">{formatBalance(bookkeeperLandingData?.balanceSheetSummary.balanceInWallet || 0)}</span>
+                      <span className="fs-1 fw-bold text-primary">
+                        {formatBalance(
+                          bookkeeperLandingData?.balanceSheetSummary.balanceInWallet || 0,
+                        )}
+                      </span>
                       <span className="fs-6 text-dark">Total Balance in Wallet</span>
                     </div>
                   </Card.Body>
@@ -101,19 +121,17 @@ const Bookkeeper = () => {
                     <Card.Body className="px-0 pt-0">
                       Track inflows and outflow events over time.
                       <Row className="g-3 flex-wrap">
-                        <Col
-                          lg={12}
-                          xl={6}
-                          className="d-flex flex-column align-items-start"
-                        >
-                          <SatsFlowInfo label={'Inflow this month'} value={bookkeeperLandingData?.satsFlowSummary.inflows || 0} />
+                        <Col lg={12} xl={6} className="d-flex flex-column align-items-start">
+                          <SatsFlowInfo
+                            label={'Inflow this month'}
+                            value={bookkeeperLandingData?.satsFlowSummary.inflows || 0}
+                          />
                         </Col>
-                        <Col
-                          lg={12}
-                          xl={6}
-                          className="d-flex flex-column align-items-start"
-                        >
-                          <SatsFlowInfo label={'Outflow this month'} value={-(bookkeeperLandingData?.satsFlowSummary.outflows || 0)} />
+                        <Col lg={12} xl={6} className="d-flex flex-column align-items-start">
+                          <SatsFlowInfo
+                            label={'Outflow this month'}
+                            value={-(bookkeeperLandingData?.satsFlowSummary.outflows || 0)}
+                          />
                         </Col>
                       </Row>
                     </Card.Body>
