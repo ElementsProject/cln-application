@@ -242,7 +242,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
         }
       }
     }
-  }, [satsFlowData, width]);
+  }, [satsFlowData, width, formatSats]);
   return (
     <div ref={d3Container} />
   );

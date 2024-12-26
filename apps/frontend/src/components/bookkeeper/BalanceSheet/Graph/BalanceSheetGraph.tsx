@@ -150,7 +150,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
     } else {
       d3.select(d3Container.current).append("text").text("No data");
     }
-  }, [balanceSheetData, width]);
+  }, [balanceSheetData, width, formatBalance]);
 
   return (
     <div ref={d3Container} />

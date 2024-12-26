@@ -1,5 +1,3 @@
-import React, { Component } from 'react';
-
 import './App.scss';
 import { useContext, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
