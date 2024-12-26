@@ -29,12 +29,12 @@ export const SatsFlowSQL = (startTimestamp: number, endTimestamp: number): strin
     "SELECT in_channel, " +
       "(SELECT peer_id FROM peerchannels WHERE peerchannels.short_channel_id=in_channel) AS in_channel_peerid, " +
       "(SELECT nodes.alias FROM nodes WHERE nodes.nodeid=(SELECT peer_id FROM peerchannels WHERE peerchannels.short_channel_id=in_channel)) AS in_channel_peer_alias, " +
-      "in_msat, " +
+      "SUM(in_msat), " +
       "out_channel, " +
       "(SELECT peer_id FROM peerchannels WHERE peerchannels.short_channel_id=out_channel) AS out_channel_peerid, " +
       "(SELECT nodes.alias FROM nodes WHERE nodes.nodeid=(SELECT peer_id FROM peerchannels WHERE peerchannels.short_channel_id=out_channel)) AS out_channel_peer_alias, " +
-      "out_msat, " +
-      "fee_msat " +
+      "SUM(out_msat), " +
+      "SUM(fee_msat) " +
     "FROM forwards " +
     "WHERE forwards.status='settled' " +
     "GROUP BY in_channel, out_channel;";
