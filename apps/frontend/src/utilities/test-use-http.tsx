@@ -1,4 +1,4 @@
-import { mockInvoiceRune, mockInvoice, mockOffer, mockRootStoreData } from '../utilities/test-utilities';
+import { mockInvoiceRune, mockStoreData, mockInvoice, mockOffer, mockBookkeeperLanding } from '../utilities/test-utilities';
 
 const useHttp = () => {
   const mockData = {
@@ -19,6 +19,11 @@ const useHttp = () => {
     decodeInvoice: jest.fn((input) => Promise.resolve({data: (input.startsWith('lnb') ? mockInvoice : input.startsWith('lno') ? mockOffer : 'invalid')})),
     fetchInvoice: jest.fn(() => Promise.resolve()),
     createInvoiceRune: jest.fn(() => new Promise((resolve) => setTimeout(() => resolve(mockInvoiceRune), 1000))),
+    getBookkeeperLanding: jest.fn(() => Promise.resolve(mockBookkeeperLanding)),
+    getBalanceSheet: jest.fn(() => Promise.resolve()),
+    getSatsFlow: jest.fn(() => Promise.resolve()),
+    getVolumeData: jest.fn(() => Promise.resolve()),
+    executeSql: jest.fn(() => Promise.resolve()),
     userLogin: jest.fn(() => Promise.resolve()),
     resetUserPassword: jest.fn(() => Promise.resolve()),
     userLogout: jest.fn(() => Promise.resolve()),

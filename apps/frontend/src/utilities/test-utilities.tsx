@@ -2,14 +2,10 @@ import { render } from '@testing-library/react';
 import { RootContext } from '../store/RootContext';
 import { ApplicationModes, Units } from './constants';
 import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel, Rune } from '../types/lightning-wallet.type';
-import { CLNContext } from '../store/CLNContext';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { Suspense } from 'react';
-import { Loading } from '../components/ui/Loading/Loading';
-import AuthWrapper from '../components/ui/AuthWrapper/AuthWrapper';
-import CLNHome from '../components/cln/CLNHome/CLNHome';
-import Bookkeeper from '../components/bookkeeper/BkprRoot/BkprRoot';
-import App from '../components/App/App';
+import { BookkeeperLandingData } from '../types/lightning-bookkeeper-landing.type';
+import { SatsFlow } from '../types/lightning-satsflow.type';
+import { BalanceSheet } from '../types/lightning-balancesheet.type';
+import { VolumeData } from '../types/lightning-volume.type';
 
 const routeComponentMap = {
   '/': <App />,
@@ -17,62 +13,13 @@ const routeComponentMap = {
   '/cln/bookkeeper': <Bookkeeper />,
 };
 
-export const getMockRootStoreData = (replaceKey?: string, replaceValue?: any) => {
-  if (replaceKey && replaceKey !== '' && !!replaceValue) {
-    mockRootStoreData[replaceKey] = replaceValue;
-  }
-  return mockRootStoreData;
-};
-
-export const getMockCLNStoreData = (replaceKey?: string, replaceValue?: any) => {
-  if (replaceKey && replaceKey !== '' && !!replaceValue) {
-    mockCLNStoreData[replaceKey] = replaceValue;
-  }
-  return mockCLNStoreData;
-};
-
-export const renderWithMockRootContext = (providerRootProps, ui: any | null = null, initialRoute = '/') => {
-  return render(
-    <RootContext.Provider value={providerRootProps}>
-      <AuthWrapper>
-          <MemoryRouter initialEntries={[initialRoute]}>
-            <Routes>
-              <Route
-                path='/*'
-                element={
-                  <Suspense fallback={<Loading />}>
-                    {ui ? ui : routeComponentMap[initialRoute]}
-                  </Suspense>
-                }
-              />
-            </Routes>
-          </MemoryRouter>
-      </AuthWrapper>
-    </RootContext.Provider>
+export const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
+  const rendered = render(
+    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
+    renderOptions
   );
-};
 
-export const renderWithMockCLNContext = (providerRootProps, providerCLNProps, ui: any | null = null, initialRoute = '/cln') => {
-  return render(
-    <RootContext.Provider value={providerRootProps}>
-      <AuthWrapper>
-        <CLNContext.Provider value={providerCLNProps}>
-          <MemoryRouter initialEntries={[initialRoute]}>
-            <Routes>
-              <Route
-                path='/cln/*'
-                element={
-                  <Suspense fallback={<Loading />}>
-                    {ui ? ui : routeComponentMap[initialRoute]}
-                  </Suspense>
-                }
-              />
-            </Routes>
-          </MemoryRouter>
-        </CLNContext.Provider>
-      </AuthWrapper>
-    </RootContext.Provider>
-  );
+  return { ...rendered };
 };
 
 export const mockInvoiceRune: Rune = {
@@ -89,6 +36,205 @@ export const mockInvoice: Invoice = {
   description: "Movie Ticket",
   expires_at: 1711748563,
   created_index: 3
+};
+
+export const mockBookkeeperLanding: BookkeeperLandingData = {
+  balanceSheetSummary: {
+    numberOfChannels: 5,
+    balanceInChannels: 100000,
+    balanceInWallet: 50000,
+  },
+  satsFlowSummary: {
+    inflows: 2000,
+    outflows: 1000,
+  },
+  volumeSummary: {
+    mostTrafficRoute: 'route1',
+    leastTrafficRoute: 'route2',
+  },
+};
+
+export const mockBalanceSheetData: BalanceSheet = {
+  periods: [
+    {
+      periodKey: '2024-12-01',
+      accounts: [
+        {
+          short_channel_id: '12345x12345x1',
+          remote_alias: 'Wallet 1',
+          balance: 500000,
+          percentage: '50%',
+          account: 'onchain_wallet',
+        },
+        {
+          short_channel_id: '67890x67890x2',
+          remote_alias: 'Channel 1',
+          balance: 300000,
+          percentage: '30%',
+          account: 'channel_1',
+        },
+        {
+          short_channel_id: '54321x54321x3',
+          remote_alias: 'Channel 2',
+          balance: 200000,
+          percentage: '20%',
+          account: 'channel_2',
+        },
+      ],
+      totalBalanceAcrossAccounts: 1000000,
+    },
+    {
+      periodKey: '2024-11-01',
+      accounts: [
+        {
+          short_channel_id: '11223x11223x1',
+          remote_alias: 'Wallet 2',
+          balance: 600000,
+          percentage: '60%',
+          account: 'onchain_wallet',
+        },
+        {
+          short_channel_id: '44556x44556x2',
+          remote_alias: 'Channel 3',
+          balance: 400000,
+          percentage: '40%',
+          account: 'channel_3',
+        },
+      ],
+      totalBalanceAcrossAccounts: 1000000,
+    },
+  ],
+};
+
+export const mockSatsFlowData: SatsFlow = {
+  periods: [
+    {
+      periodKey: '2024-12-01',
+      tagGroups: [
+        {
+          events: [
+            {
+              netInflowSat: 1000,
+              account: 'onchain_wallet',
+              tag: 'deposit',
+              creditSat: 1000,
+              debitSat: 0,
+              currency: 'BTC',
+              timestampUnix: 1698796800,
+              description: 'Deposit from external wallet',
+              outpoint: 'txid1234',
+              txid: 'txid1234',
+              paymentId: 'paymentId1234',
+            },
+            {
+              netInflowSat: -200,
+              account: 'channel_1',
+              tag: 'channel_fee',
+              creditSat: 0,
+              debitSat: 200,
+              currency: 'BTC',
+              timestampUnix: 1698797400,
+              description: 'Channel fee for route1',
+              outpoint: 'txid5678',
+              txid: 'txid5678',
+              paymentId: 'paymentId5678',
+            },
+          ],
+          tag: 'deposit',
+          netInflowSat: 800,
+          creditSat: 1000,
+          debitSat: 200,
+          volumeSat: 1200,
+        },
+        {
+          events: [
+            {
+              netInflowSat: 500,
+              account: 'onchain_wallet',
+              tag: 'payment_received',
+              creditSat: 500,
+              debitSat: 0,
+              currency: 'BTC',
+              timestampUnix: 1698798000,
+              description: 'Payment received from user X',
+              outpoint: 'txid91011',
+              txid: 'txid91011',
+              paymentId: 'paymentId91011',
+            },
+          ],
+          tag: 'payment_received',
+          netInflowSat: 500,
+          creditSat: 500,
+          debitSat: 0,
+          volumeSat: 500,
+        },
+      ],
+      inflowSat: 1500,
+      outflowSat: 200,
+      netInflowSat: 1300,
+      totalVolumeSat: 1700,
+    },
+    {
+      periodKey: '2024-11-01',
+      tagGroups: [
+        {
+          events: [
+            {
+              netInflowSat: 1200,
+              account: 'onchain_wallet',
+              tag: 'deposit',
+              creditSat: 1200,
+              debitSat: 0,
+              currency: 'BTC',
+              timestampUnix: 1696204800,
+              description: 'Deposit from external wallet',
+              outpoint: 'txid1234',
+              txid: 'txid1234',
+              paymentId: 'paymentId1234',
+            },
+          ],
+          tag: 'deposit',
+          netInflowSat: 1200,
+          creditSat: 1200,
+          debitSat: 0,
+          volumeSat: 1200,
+        },
+      ],
+      inflowSat: 1200,
+      outflowSat: 0,
+      netInflowSat: 1200,
+      totalVolumeSat: 1200,
+    },
+  ],
+};
+
+export const mockVolumeData: VolumeData = {
+  forwards: [
+    {
+      inboundChannelSCID: '705x1x0',
+      inboundPeerId: '03e1da3aa6c14f4e6fac78582d5afbb66c14414ca753d1aa14357d66675e594da3',
+      inboundPeerAlias: 'WRONGANALYST-11rc1-1199-g9d88ce3',
+      inboundSat: 332918.432,
+      outboundChannelSCID: '907x1x0',
+      outboundPeerId: '031c5439381eae94ca4a343f67999b8c3ee7fcf3ea2648ee1ffe763c8527dbccd9',
+      outboundPeerAlias: 'BLUEFEED-v23.11rc1-1199-g9d88ce3',
+      outboundSat: 332915.1,
+      feeSat: 3.332,
+    },
+    {
+      inboundChannelSCID: '907x1x0',
+      inboundPeerId: '031c5439381eae94ca4a343f67999b8c3ee7fcf3ea2648ee1ffe763c8527dbccd9',
+      inboundPeerAlias: 'BLUEFEED-v23.11rc1-1199-g9d88ce3',
+      inboundSat: 1231.244,
+      outboundChannelSCID: '705x1x0',
+      outboundPeerId: '03e1da3aa6c14f4e6fac78582d5afbb66c14414ca753d1aa14357d66675e594da3',
+      outboundPeerAlias: 'WRONGANALYST-11rc1-1199-g9d88ce3',
+      outboundSat: 1231.231,
+      feeSat: 0.013,
+    },
+  ],
+  totalOutboundSat: 334146.331,
+  totalFeeSat: 3.3449999999999998,
 };
 
 export const mockOffer: Offer = {

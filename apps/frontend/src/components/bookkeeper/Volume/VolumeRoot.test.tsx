@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import SatsFlowRoot from './SatsFlowRoot';
+import VolumeRoot from './VolumeRoot';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -7,9 +7,9 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('Sats Flow component ', () => {
-  beforeEach(() => render(<SatsFlowRoot />));
+  beforeEach(() => render(<VolumeRoot />));
 
   it('should be in the document', () => {
-    expect(screen.getByTestId('satsflow-container')).not.toBeEmptyDOMElement();
+    expect(screen.getByTestId('volume-container')).not.toBeEmptyDOMElement();
   });
 });

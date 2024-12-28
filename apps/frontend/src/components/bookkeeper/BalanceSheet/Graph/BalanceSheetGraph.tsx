@@ -124,6 +124,7 @@ function BalanceSheetGraph({ balanceSheetData, width }) {
       barsGroup.attr("clip-path", "url(#chart-area-clip");
 
       svg.append("g")
+        .attr("class", "y-axis")
         .call(d3.axisLeft(yScale)
           .tickSizeInner(0)
           .tickSizeOuter(0)

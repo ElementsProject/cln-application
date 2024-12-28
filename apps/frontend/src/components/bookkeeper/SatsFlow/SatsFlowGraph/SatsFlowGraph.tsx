@@ -160,6 +160,7 @@ function SatsFlowGraph({ satsFlowData, width }: { satsFlowData: SatsFlow, width:
       //set up y axis
       const yAxisTickFormat = d => `${d3.format(",")(d)}`;
       svg.append("g")
+        .attr("class", "y-axis")
         .call(d3.axisLeft(yScale)
           .tickSizeInner(0)
           .tickSizeOuter(0)

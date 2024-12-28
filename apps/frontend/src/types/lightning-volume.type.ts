@@ -16,7 +16,6 @@ export type Forward = {
   feeSat: number
 };
 
-
 export type VolumeResultSet = {
   rows: VolumeRow[]
 };

@@ -43,7 +43,7 @@ function TerminalComponent() {
   }, [output]);
 
   return (
-    <div className='terminal-container max-w-4xl mx-auto overflow-auto'>
+    <div className='terminal-container max-w-4xl mx-auto overflow-auto' data-testid='terminal-container'>
       <pre className='terminal-output overflow-auto whitespace-pre-wrap' ref={outputRef}>
         {output}
       </pre>
