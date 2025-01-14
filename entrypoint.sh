@@ -14,12 +14,12 @@ getinfo_request() {
 EOF
 }
 
-createrune_request() {
+commando_rune_request() {
   cat <<EOF
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "method": "createrune",
+  "method": "commando-rune",
   "params": [null, [["For Application#"]]]
 }
 EOF
@@ -40,11 +40,11 @@ generate_new_rune() {
   COUNTER=0
   RUNE=""
   while { [ "$RUNE" = "" ] || [ "$RUNE" = "null" ]; } && [ $COUNTER -lt 10 ]; do
-    # Send 'createrune' request
+    # Send 'commando-rune' request
     echo "Generating rune attempt: $COUNTER"
     COUNTER=$((COUNTER+1))
 
-    RUNE_RESPONSE=$( (echo "$(createrune_request)"; sleep 2) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
+    RUNE_RESPONSE=$( (echo "$(commando_rune_request)"; sleep 2) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
 
     RUNE=$(echo "$RUNE_RESPONSE" | jq -r '.result.rune')
     UNIQUE_ID=$(echo "$RUNE_RESPONSE" | jq -r '.result.unique_id')
@@ -90,18 +90,34 @@ done
 LIGHTNING_PUBKEY="$(jq -n "$GETINFO_RESPONSE" | jq -r '.result.id')"
 echo "$LIGHTNING_PUBKEY"
 
-# Compare existing pubkey with current
+# Check if the existing rune is blacklisted
+is_blacklisted=false
+if [ "$EXISTING_RUNE" != "" ] && [ "$EXISTING_RUNE" != "LIGHTNING_RUNE=\"\"" ] && [ "$EXISTING_RUNE" != "LIGHTNING_RUNE=\"null\"" ]; then
+  EXISTING_RUNE_VALUE=$(echo "$EXISTING_RUNE" | sed 's/LIGHTNING_RUNE="//' | sed 's/"//')
+  echo "Checking if rune is blacklisted: $EXISTING_RUNE_VALUE"
+
+  RUNES_RESPONSE=$(lightning-cli showrunes)
+  echo "RUNES_RESPONSE: $RUNES_RESPONSE"
+
+  is_blacklisted=$(echo "$RUNES_RESPONSE" | jq -r ".runes[] | select(.rune == \"$EXISTING_RUNE_VALUE\") | .blacklisted")
+  is_blacklisted=${is_blacklisted:-false}
+
+  echo "Is Blacklisted: $is_blacklisted"
+fi
+
+# Compare existing pubkey with current and check if rune is blacklisted
 if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" ] ||
   [ "$EXISTING_RUNE" = "" ] || 
   [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"\"" ] ||
-  [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"null\"" ]; then
-  # Pubkey changed or missing rune; rewrite new data on the file.
-  echo "Pubkey mismatched or missing rune; Rewriting the data."
+  [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"null\"" ] ||
+  [ "$is_blacklisted" = "true" ]; then
+  # Pubkey mismatched, rune missing, or blacklisted; rewrite new data on the file.
+  echo "Pubkey mismatched, missing rune, or blacklisted rune; Rewriting the data."
   cat /dev/null > "$COMMANDO_CONFIG"
   echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> "$COMMANDO_CONFIG"
   generate_new_rune
 else
-  echo "Pubkey matches with existing pubkey."
+  echo "Pubkey matches with existing pubkey and rune is valid."
 fi
 
 exec "$@"
