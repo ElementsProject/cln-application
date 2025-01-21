@@ -5,7 +5,8 @@ import https from 'https';
 import axios, { AxiosHeaders } from 'axios';
 import Lnmessage from 'lnmessage';
 import { LightningError } from '../models/errors.js';
-import { HttpStatusCode, APP_CONSTANTS, AppConnect, LN_MESSAGE_CONFIG, REST_CONFIG, } from '../shared/consts.js';
+import { GRPCService } from './grpc.service.js';
+import { HttpStatusCode, APP_CONSTANTS, AppConnect, LN_MESSAGE_CONFIG, REST_CONFIG, GRPC_CONFIG, } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import { readFileSync } from 'fs';
 export class LightningService {
@@ -18,6 +19,10 @@ export class LightningService {
                 switch (APP_CONSTANTS.APP_CONNECT) {
                     case AppConnect.REST:
                         logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
+                        break;
+                    case AppConnect.GRPC:
+                        logger.info('GRPC connecting with config: ' + JSON.stringify(GRPC_CONFIG));
+                        this.clnService = new GRPCService(GRPC_CONFIG);
                         break;
                     default:
                         logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
@@ -68,6 +73,17 @@ export class LightningService {
                         throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
                     }
                 });
+            case AppConnect.GRPC:
+                return this.clnService
+                    .callMethod(method, methodParams)
+                    .then((gRPCRes) => {
+                    logger.info('gRPC response for ' + method + ': ' + JSON.stringify(gRPCRes));
+                    return Promise.resolve(gRPCRes);
+                })
+                    .catch((err) => {
+                    logger.error('gRPC lightning error from ' + method + ' command');
+                    throw err;
+                });
             default:
                 return this.clnService
                     .commando({
@@ -100,7 +116,9 @@ export class LightningService {
         process.env.COMMANDO_RUNE = envVars.LIGHTNING_RUNE;
         process.env.INVOICE_RUNE = envVars.INVOICE_RUNE !== undefined ? envVars.INVOICE_RUNE : '';
         APP_CONSTANTS.COMMANDO_RUNE = process.env.COMMANDO_RUNE;
+        APP_CONSTANTS.NODE_PUBKEY = process.env.LIGHTNING_PUBKEY;
         LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.LIGHTNING_PUBKEY;
+        GRPC_CONFIG.pubkey = process.env.LIGHTNING_PUBKEY;
     }
     parseEnvFile(filePath) {
         try {
