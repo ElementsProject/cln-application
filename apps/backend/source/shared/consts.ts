@@ -10,6 +10,7 @@ export enum Environment {
 export enum AppConnect {
   COMMANDO = 'COMMANDO',
   REST = 'REST',
+  GRPC = 'GRPC',
 }
 
 export enum HttpStatusCode {
@@ -33,6 +34,7 @@ export const SECRET_KEY = crypto.randomBytes(64).toString('hex');
 
 export const APP_CONSTANTS = {
   COMMANDO_RUNE: '',
+  NODE_PUBKEY: '',
   COMMANDO_ENV_LOCATION: process.env.COMMANDO_CONFIG || './.commando-env',
   APP_MODE: process.env.APP_MODE || Environment.PRODUCTION,
   CERT_PATH: process.env.APP_CORE_LIGHTNING_REST_CERT_DIR,
@@ -43,6 +45,8 @@ export const APP_CONSTANTS = {
   LIGHTNING_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || 5001),
   LIGHTNING_REST_PROTOCOL: process.env.APP_CORE_LIGHTNING_REST_PROTOCOL || 'https',
   LIGHTNING_REST_PORT: +(process.env.APP_CORE_LIGHTNING_REST_PORT || 3010),
+  LIGHTNING_GRPC_PROTOCOL: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL || 'http',
+  LIGHTNING_GRPC_PORT: +(process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || 9736),
 };
 
 export const DEFAULT_CONFIG = {
@@ -67,6 +71,19 @@ export const LN_MESSAGE_CONFIG = {
     warn: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.warn,
     error: console.error,
   },
+};
+
+export const GRPC_CONFIG = {
+  pubkey: APP_CONSTANTS.NODE_PUBKEY,
+  protocol: APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL,
+  ip: APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP,
+  port: APP_CONSTANTS.LIGHTNING_GRPC_PORT,
+  url:
+    APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL +
+    '://' +
+    APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP +
+    ':' +
+    APP_CONSTANTS.LIGHTNING_GRPC_PORT,
 };
 
 export const REST_CONFIG = {
