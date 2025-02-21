@@ -17,7 +17,7 @@ class AuthController {
                 return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
             }
             else {
-                const err = new AuthError(vpRes, vpRes, HttpStatusCode.UNAUTHORIZED, vpRes);
+                const err = new AuthError(HttpStatusCode.UNAUTHORIZED, vpRes);
                 handleError(err, req, res, next);
             }
         }
@@ -65,7 +65,7 @@ class AuthController {
                         }
                     }
                     else {
-                        return new AuthError('Incorrect current password', 'Incorrect current password', HttpStatusCode.UNAUTHORIZED, 'Incorrect current password');
+                        return new AuthError(HttpStatusCode.UNAUTHORIZED, 'Incorrect current password');
                     }
                 }
                 catch (error) {
@@ -73,7 +73,7 @@ class AuthController {
                 }
             }
             else {
-                throw new AuthError('Config file does not exist', 'Config file does not exist', HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
+                throw new AuthError(HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
             }
         }
         catch (error) {
