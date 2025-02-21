@@ -1,41 +1,42 @@
 import { HttpStatusCode } from '../shared/consts.js';
 export class BaseError extends Error {
+    code;
     message;
-    error;
-    statusCode;
-    name;
-    constructor(message, error, statusCode, name) {
+    constructor(code, message) {
         super(message);
         Object.setPrototypeOf(this, new.target.prototype);
+        this.code = code;
         this.message = message;
-        this.error = error;
-        this.statusCode = statusCode;
-        this.name = name;
         Error.captureStackTrace(this);
     }
 }
 export class APIError extends BaseError {
-    constructor(message = 'Unknown API Server Error', error = 'Unknown API Server Error', statusCode = HttpStatusCode.INTERNAL_SERVER, name = 'API Error') {
-        super(message, error, statusCode, name);
+    constructor(code = HttpStatusCode.INTERNAL_SERVER, message = 'Unknown API Server Error') {
+        super(code, message);
     }
 }
 export class BitcoindError extends BaseError {
-    constructor(message = 'Unknown Bitcoin API Error', error = 'Unknown Bitcoin API Error', statusCode = HttpStatusCode.BITCOIN_SERVER, name = 'Bitcoin API Error') {
-        super(message, error, statusCode, name);
+    constructor(code = HttpStatusCode.BITCOIN_SERVER, message = 'Unknown Bitcoin API Error') {
+        super(code, message);
     }
 }
 export class LightningError extends BaseError {
-    constructor(message = 'Unknown Core Lightning API Error', error = 'Unkwown Core Lightning API Error', statusCode = HttpStatusCode.LIGHTNING_SERVER, name = 'Core Lightning API Error') {
-        super(message, error, statusCode, name);
+    constructor(code = HttpStatusCode.LIGHTNING_SERVER, message = 'Unknown Core Lightning API Error') {
+        super(code, message);
     }
 }
 export class ValidationError extends BaseError {
-    constructor(message = 'Unknown Validation Error', error = 'Unknown Validation Error', statusCode = HttpStatusCode.INVALID_DATA, name = 'Validation Error') {
-        super(message, error, statusCode, name);
+    constructor(code = HttpStatusCode.INVALID_DATA, message = 'Unknown Validation Error') {
+        super(code, message);
     }
 }
 export class AuthError extends BaseError {
-    constructor(message = 'Unknown Authentication Error', error = 'Unkwown Authentication Error', statusCode = HttpStatusCode.UNAUTHORIZED, name = 'Authentication Error') {
-        super(message, error, statusCode, name);
+    constructor(code = HttpStatusCode.UNAUTHORIZED, message = 'Unknown Authentication Error') {
+        super(code, message);
+    }
+}
+export class GRPCError extends BaseError {
+    constructor(code = HttpStatusCode.GRPC_UNKNOWN, message = 'Unknown gRPC Error') {
+        super(code, message);
     }
 }

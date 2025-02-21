@@ -27,6 +27,7 @@ export var HttpStatusCode;
     HttpStatusCode[HttpStatusCode["INTERNAL_SERVER"] = 500] = "INTERNAL_SERVER";
     HttpStatusCode[HttpStatusCode["BITCOIN_SERVER"] = 520] = "BITCOIN_SERVER";
     HttpStatusCode[HttpStatusCode["LIGHTNING_SERVER"] = 521] = "LIGHTNING_SERVER";
+    HttpStatusCode[HttpStatusCode["GRPC_UNKNOWN"] = 552] = "GRPC_UNKNOWN";
 })(HttpStatusCode || (HttpStatusCode = {}));
 export const SECRET_KEY = crypto.randomBytes(64).toString('hex');
 export const APP_CONSTANTS = {

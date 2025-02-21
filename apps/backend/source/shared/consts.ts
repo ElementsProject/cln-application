@@ -27,6 +27,7 @@ export enum HttpStatusCode {
   INTERNAL_SERVER = 500,
   BITCOIN_SERVER = 520,
   LIGHTNING_SERVER = 521,
+  GRPC_UNKNOWN = 552,
 }
 
 export const SECRET_KEY = crypto.randomBytes(64).toString('hex');

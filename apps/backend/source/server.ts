@@ -84,18 +84,6 @@ const throwApiError = (err: any) => {
   switch (err.code) {
     case 'EACCES':
       return new APIError(
-        APP_PROTOCOL +
-          '://' +
-          APP_CORE_LIGHTNING_IP +
-          ':' +
-          LIGHTNING_PORT +
-          ' requires elevated privileges',
-        APP_PROTOCOL +
-          '://' +
-          APP_CORE_LIGHTNING_IP +
-          ':' +
-          LIGHTNING_PORT +
-          ' requires elevated privileges',
         HttpStatusCode.ACCESS_DENIED,
         APP_PROTOCOL +
           '://' +
@@ -106,32 +94,15 @@ const throwApiError = (err: any) => {
       );
     case 'EADDRINUSE':
       return new APIError(
-        APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT + ' is already in use',
-        APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT + ' is already in use',
         HttpStatusCode.ADDR_IN_USE,
         APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT + ' is already in use',
       );
     case 'ECONNREFUSED':
-      return new APIError(
-        'Server is down/locked',
-        'Server is down/locked',
-        HttpStatusCode.UNAUTHORIZED,
-        'Server is down/locked',
-      );
+      return new APIError(HttpStatusCode.UNAUTHORIZED, 'Server is down/locked');
     case 'EBADCSRFTOKEN':
-      return new APIError(
-        'Invalid CSRF token. Form tempered.',
-        'Invalid CSRF token. Form tempered.',
-        HttpStatusCode.BAD_CSRF_TOKEN,
-        'Invalid CSRF token. Form tempered.',
-      );
+      return new APIError(HttpStatusCode.BAD_CSRF_TOKEN, 'Invalid CSRF token. Form tempered.');
     default:
-      return new APIError(
-        'Default: ' + JSON.stringify(err),
-        'Default: ' + JSON.stringify(err),
-        400,
-        'Default: ' + JSON.stringify(err),
-      );
+      return new APIError(400, 'Default: ' + JSON.stringify(err));
   }
 };
 
