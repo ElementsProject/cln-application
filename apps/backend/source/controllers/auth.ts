@@ -24,7 +24,7 @@ class AuthController {
         res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 24 });
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
       } else {
-        const err = new AuthError(vpRes, vpRes, HttpStatusCode.UNAUTHORIZED, vpRes);
+        const err = new AuthError(HttpStatusCode.UNAUTHORIZED, vpRes);
         handleError(err, req, res, next);
       }
     } catch (error: any) {
@@ -73,23 +73,13 @@ class AuthController {
               handleError(error, req, res, next);
             }
           } else {
-            return new AuthError(
-              'Incorrect current password',
-              'Incorrect current password',
-              HttpStatusCode.UNAUTHORIZED,
-              'Incorrect current password',
-            );
+            return new AuthError(HttpStatusCode.UNAUTHORIZED, 'Incorrect current password');
           }
         } catch (error: any) {
           handleError(error, req, res, next);
         }
       } else {
-        throw new AuthError(
-          'Config file does not exist',
-          'Config file does not exist',
-          HttpStatusCode.UNAUTHORIZED,
-          'Config file does not exist',
-        );
+        throw new AuthError(HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
       }
     } catch (error: any) {
       handleError(error, req, res, next);

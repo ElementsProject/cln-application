@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as fs from 'fs';
-import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES } from '../shared/consts.js';
+import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES, HttpStatusCode, } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
@@ -111,7 +111,7 @@ class SharedController {
                     return res.status(200).json({ venue: FIAT_VENUE, rate: response.data?.rate });
                 }
                 else {
-                    return handleError(new APIError('Price Not Found', 'Price Not Found'), req, res, next);
+                    return handleError(new APIError(HttpStatusCode.NOT_FOUND, 'Price Not Found'), req, res, next);
                 }
             })
                 .catch(err => {
