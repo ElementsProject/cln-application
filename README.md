@@ -40,10 +40,11 @@
       ```
 
   - ### Dependency Installation
-      ```
-      cd cln-application-0.0.1
-      npm install --omit=dev
-      ```
+
+    ```
+    cd cln-application-0.0.1
+    npm install --force --omit=dev
+    ```
 
   - ### Environment Variables
       This application accepts & depends upon these variables to be passed through environment:
