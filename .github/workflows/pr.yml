@@ -1,0 +1,16 @@
+name: Build and test Pull Request
+
+on:
+  pull_request:
+
+jobs:
+  run-build:
+    uses: ./.github/workflows/build-reusable.yml
+
+  test:
+    runs-on: ubuntu-22.04
+    needs: run-build
+    steps:
+      - name: Run unit tests
+        run: npm run frontend:test
+

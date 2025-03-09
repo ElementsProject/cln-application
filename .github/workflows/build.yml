@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: false
+        type: string
+        default: '18.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "Project Version: $VERSION"
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-npm-packages
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install NPM dependencies
+        if: steps.cache-npm-packages.outputs.cache-hit != 'true'
+        run: npm clean-install
+
+      - name: Cache build frontend
+        uses: actions/cache@v3
+        id: cache-build-frontend
+        with:
+          path: apps/frontend
+          key: ${{ runner.os }}-frontend-${{ github.sha }}
+
+      - name: Run build production application
+        run: npm run frontend:build
+
+      - name: Cache build backend
+        uses: actions/cache@v3
+        id: cache-build-backend
+        with:
+          path: apps/backend
+          key: ${{ runner.os }}-backend-${{ github.sha }}
+
+      - name: Run build backend server
+        run: npm run backend:build
