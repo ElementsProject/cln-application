@@ -1,0 +1,38 @@
+name: Unit tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+  
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "Project Version: $VERSION"
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-npm-packages
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install NPM dependencies
+        if: steps.cache-npm-packages.outputs.cache-hit != 'true'
+        run: npm clean-install
+
+      - name: Run frontend unit tests
+        run: npm run frontend:test
+
