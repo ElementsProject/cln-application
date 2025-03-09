@@ -1,16 +1,9 @@
-name: Artifact
+name: Build
 
 on:
-  release:
-    types: [released]
   pull_request:
-    types: [closed]
-    branches: [ master ]
   workflow_dispatch:
-
-env:
-  CI: false
-
+  
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -19,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -59,32 +52,3 @@ jobs:
 
       - name: Run build backend server
         run: npm run backend:build
-
-  deploy:
-    runs-on: ubuntu-22.04
-    needs: build
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
-      - name: Cache build frontend
-        uses: actions/cache@v3
-        id: cache-build-frontend
-        with:
-          path: apps/frontend
-          key: ${{ runner.os }}-frontend-${{ github.sha }}
-
-      - name: Cache build backend
-        uses: actions/cache@v3
-        id: cache-build-backend
-        with:
-          path: apps/backend
-          key: ${{ runner.os }}-backend-${{ github.sha }}
-
-      - name: Compress files
-        run: tar -czf /tmp/clnapp.tar.gz apps/frontend/build apps/backend/dist package.json package-lock.json
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clnapp-build$VERSION
-          path: /tmp/clnapp.tar.gz
