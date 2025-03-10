@@ -8,13 +8,15 @@
     "frontend:dev": "npm run start -w cln-application-frontend",
     "frontend:build": "npm run build -w cln-application-frontend",
     "frontend:test": "npm run test -w cln-application-frontend",
+    "frontend:lint": "npm run lint -w cln-application-frontend",
     "backend:build": "npm run build -w cln-application-backend",
     "backend:serve": "npm run serve -w cln-application-backend",
     "backend:watch": "npm run watch -w cln-application-backend",
+    "backend:lint": "npm run lint -w cln-application-backend",
     "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
     "start": "npm run serve -w cln-application-backend",
-    "format": "prettier --write ."
+    "lint": "npm run backend:lint && npm run frontend:lint"
   },
   "keywords": [
     "cln application",
