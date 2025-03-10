@@ -4,7 +4,7 @@ services:
   bitcoind:
     image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
     command:
-      - -${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - -${BITCOIN_NETWORK}
       - -fallbackfee=0.0002
       - -rpcbind=0.0.0.0
       - -rpcallowip=0.0.0.0/0
@@ -14,44 +14,44 @@ services:
       - ${PWD}/data/bitcoin:/root/.bitcoin
     networks:
       networkcln:
-        ipv4_address: ${APP_BITCOIN_NODE_IP}
+        ipv4_address: ${BITCOIN_NODE_IP}
 
   lightningd:
     image: lncm/clightning:v22.11.1@sha256:e9939341ca6736566e0499db5a339b25140d6e77fb16ab202c217112f0df9b77
     command:
-      - --bitcoin-rpcconnect=${APP_BITCOIN_NODE_IP}
+      - --bitcoin-rpcconnect=${BITCOIN_NODE_IP}
       - --bitcoin-rpcuser=${APP_BITCOIN_RPC_USER}
       - --bitcoin-rpcpassword=${APP_BITCOIN_RPC_PASS}
-      - --bind-addr=${APP_CORE_LIGHTNING_DAEMON_IP}:9735
-      - --network=${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - --bind-addr=${LIGHTNING_IP}:9735
+      - --network=${BITCOIN_NETWORK}
       - --database-upgrade=true
-      # - --grpc-port=${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
-      - --experimental-websocket-port=${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
+      # - --grpc-port=${LIGHTNING_GRPC_PORT}
+      - --experimental-websocket-port=${LIGHTNING_WEBSOCKET_PORT}
       - --experimental-offers
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd:${CORE_LIGHTNING_PATH}
+      - ${PWD}/data/lightningd:${LIGHTNING_PATH}
     ports:
-      - ${APP_CORE_LIGHTNING_WEBSOCKET_PORT}:${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
+      - ${LIGHTNING_WEBSOCKET_PORT}:${LIGHTNING_WEBSOCKET_PORT}
     networks:
       networkcln:
-        ipv4_address: ${APP_CORE_LIGHTNING_DAEMON_IP}
+        ipv4_address: ${LIGHTNING_IP}
 
   lightningd-2:
     image: lncm/clightning:v22.11.1@sha256:e9939341ca6736566e0499db5a339b25140d6e77fb16ab202c217112f0df9b77
     command:
-      - --bitcoin-rpcconnect=${APP_BITCOIN_NODE_IP}
+      - --bitcoin-rpcconnect=${BITCOIN_NODE_IP}
       - --bitcoin-rpcuser=${APP_BITCOIN_RPC_USER}
       - --bitcoin-rpcpassword=${APP_BITCOIN_RPC_PASS}
       - --bind-addr=170.21.22.13:9736
-      - --network=${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
+      - --network=${BITCOIN_NETWORK}
       - --database-upgrade=true
-      # - --grpc-port=${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
+      # - --grpc-port=${LIGHTNING_GRPC_PORT}
       - --experimental-websocket-port=2116
       - --experimental-offers
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd-2:${CORE_LIGHTNING_PATH}
+      - ${PWD}/data/lightningd-2:${LIGHTNING_PATH}
     ports:
       - 2116:2116
     networks:
@@ -67,35 +67,35 @@ services:
       - bitcoind
       - lightningd
     environment:
-      APP_CORE_LIGHTNING_PORT: ${APP_CORE_LIGHTNING_PORT}
-      APP_CORE_LIGHTNING_DAEMON_IP: ${APP_CORE_LIGHTNING_DAEMON_IP}
-      APP_CORE_LIGHTNING_BITCOIN_NETWORK: ${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
-      APP_CORE_LIGHTNING_IP: ${APP_CORE_LIGHTNING_IP}
-      APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
-      APP_CORE_LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
-      APP_CORE_LIGHTNING_WEBSOCKET_PORT: ${APP_CORE_LIGHTNING_WEBSOCKET_PORT}
+      APP_PORT: ${APP_PORT}
+      LIGHTNING_IP: ${LIGHTNING_IP}
+      BITCOIN_NETWORK: ${BITCOIN_NETWORK}
+      APP_IP: ${APP_IP}
+      LIGHTNING_GRPC_PORT: ${LIGHTNING_GRPC_PORT}
+      LIGHTNING_REST_PORT: ${LIGHTNING_REST_PORT}
+      LIGHTNING_WEBSOCKET_PORT: ${LIGHTNING_WEBSOCKET_PORT}
       APP_CORE_LIGHTNING_REST_CERT_DIR: ${APP_CORE_LIGHTNING_REST_CERT_DIR}
-      APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
-      CORE_LIGHTNING_PATH: ${CORE_LIGHTNING_PATH}
+      HIDDEN_SERVICE_URL: http://${HIDDEN_SERVICE_URL}
+      LIGHTNING_PATH: ${LIGHTNING_PATH}
       COMMANDO_CONFIG: ${COMMANDO_CONFIG}
       APP_CONFIG_DIR: ${APP_CONFIG_DIR}
       APP_MODE: "production"
       DEVICE_DOMAIN_NAME: ${DEVICE_DOMAIN_NAME}
       LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
-      CA_CERT: ${CORE_LIGHTNING_PATH}/bitcoin/ca.pem
-      CLIENT_KEY: ${CORE_LIGHTNING_PATH}/bitcoin/client-key.pem
-      CLIENT_CERT: ${CORE_LIGHTNING_PATH}/bitcoin/client.pem
+      CA_CERT: ${LIGHTNING_PATH}/bitcoin/ca.pem
+      CLIENT_KEY: ${LIGHTNING_PATH}/bitcoin/client-key.pem
+      CLIENT_CERT: ${LIGHTNING_PATH}/bitcoin/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd:${CORE_LIGHTNING_PATH}
+      - ${PWD}/data/lightningd:${LIGHTNING_PATH}
       - ${PWD}/data/c-lightning-rest/certs:/c-lightning-rest/certs
       - ${PWD}/data/app:/data/app
     ports:
-      - "${APP_CORE_LIGHTNING_PORT}:${APP_CORE_LIGHTNING_PORT}"
+      - "${APP_PORT}:${APP_PORT}"
     networks:
       networkcln:
-        ipv4_address: ${APP_CORE_LIGHTNING_IP}
+        ipv4_address: ${APP_IP}
 
   application-2:
     build:
@@ -106,28 +106,28 @@ services:
       - bitcoind
       - lightningd
     environment:
-      APP_CORE_LIGHTNING_PORT: 2113
-      APP_CORE_LIGHTNING_DAEMON_IP: 170.21.22.13
-      APP_CORE_LIGHTNING_BITCOIN_NETWORK: ${APP_CORE_LIGHTNING_BITCOIN_NETWORK}
-      APP_CORE_LIGHTNING_IP: 170.21.22.15
-      APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: ${APP_CORE_LIGHTNING_DAEMON_GRPC_PORT}
-      APP_CORE_LIGHTNING_REST_PORT: ${APP_CORE_LIGHTNING_REST_PORT}
-      APP_CORE_LIGHTNING_WEBSOCKET_PORT: 2116
+      APP_PORT: 2113
+      LIGHTNING_IP: 170.21.22.13
+      BITCOIN_NETWORK: ${BITCOIN_NETWORK}
+      APP_IP: 170.21.22.15
+      LIGHTNING_GRPC_PORT: ${LIGHTNING_GRPC_PORT}
+      LIGHTNING_REST_PORT: ${LIGHTNING_REST_PORT}
+      LIGHTNING_WEBSOCKET_PORT: 2116
       APP_CORE_LIGHTNING_REST_CERT_DIR: ${APP_CORE_LIGHTNING_REST_CERT_DIR}
-      APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: http://${APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE}
-      CORE_LIGHTNING_PATH: ${CORE_LIGHTNING_PATH}
+      HIDDEN_SERVICE_URL: http://${HIDDEN_SERVICE_URL}
+      LIGHTNING_PATH: ${LIGHTNING_PATH}
       COMMANDO_CONFIG: ${COMMANDO_CONFIG}
       APP_CONFIG_DIR: ${APP_CONFIG_DIR}
       APP_MODE: "production"
       DEVICE_DOMAIN_NAME: ${DEVICE_DOMAIN_NAME}
       LOCAL_HOST: http://${DEVICE_DOMAIN_NAME}
-      CA_CERT: ${CORE_LIGHTNING_PATH}/bitcoin/ca.pem
-      CLIENT_KEY: ${CORE_LIGHTNING_PATH}/bitcoin/client-key.pem
-      CLIENT_CERT: ${CORE_LIGHTNING_PATH}/bitcoin/client.pem
+      CA_CERT: ${LIGHTNING_PATH}/bitcoin/ca.pem
+      CLIENT_KEY: ${LIGHTNING_PATH}/bitcoin/client-key.pem
+      CLIENT_CERT: ${LIGHTNING_PATH}/bitcoin/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd-2:${CORE_LIGHTNING_PATH}
+      - ${PWD}/data/lightningd-2:${LIGHTNING_PATH}
       - ${PWD}/data/c-lightning-rest/certs:/c-lightning-rest/certs
       - ${PWD}/data/app-2:/data/app
     ports:

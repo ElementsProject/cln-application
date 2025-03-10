@@ -11,7 +11,7 @@ export const logConfiguration = {
             format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }), winston.format.timestamp(), winston.format.align(), winston.format.json(), winston.format.colorize({ all: true })),
         }),
         new winston.transports.File({
-            filename: APP_CONSTANTS.LOG_FILE_LOCATION,
+            filename: APP_CONSTANTS.APP_LOG_FILE,
             level: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
                 ? "warn" /* LogLevel.WARN */
                 : APP_CONSTANTS.APP_MODE === Environment.TESTING
