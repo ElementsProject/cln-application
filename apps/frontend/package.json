@@ -18,14 +18,13 @@
     "copy-to-clipboard": "^3.3.3",
     "crypto-js": "^4.2.0",
     "framer-motion": "^10.16.5",
-    "node-sass": "^7.0.3",
+    "node-sass": "^9.0.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
     "react-perfect-scrollbar": "^1.5.8",
-    "react-router-dom": "^6.22.1",
-    "react-scripts": "^5.0.1"
+    "react-router-dom": "^6.22.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
@@ -37,8 +36,9 @@
     "@types/react-dom": "^18.2.19",
     "axios-mock-adapter": "^1.22.0",
     "canvas": "^2.11.2",
+    "react-scripts": "^5.0.1",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.8.2"
   },
   "eslintConfig": {
     "extends": "react-app"

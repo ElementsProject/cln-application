@@ -15,7 +15,7 @@ import {
   GRPC_CONFIG,
 } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
-import { readFileSync } from 'fs';
+import { refreshEnvVariables } from '../shared/utils.js';
 
 export class LightningService {
   private clnService: any = null;
@@ -23,8 +23,8 @@ export class LightningService {
   constructor() {
     try {
       logger.info('Getting Commando Rune');
-      if (fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
-        this.refreshEnvVariables();
+      if (fs.existsSync(APP_CONSTANTS.COMMANDO_CONFIG)) {
+        refreshEnvVariables();
         switch (APP_CONSTANTS.APP_CONNECT) {
           case AppConnect.REST:
             logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
@@ -60,7 +60,7 @@ export class LightningService {
           headers,
         };
         if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https') {
-          const caCert = fs.readFileSync(join(APP_CONSTANTS.CERT_PATH || '.', 'ca.pem'));
+          const caCert = fs.readFileSync(join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'ca.pem'));
           const httpsAgent = new https.Agent({
             ca: caCert,
           });
@@ -118,38 +118,6 @@ export class LightningService {
           });
     }
   };
-
-  refreshEnvVariables() {
-    const envVars = this.parseEnvFile(APP_CONSTANTS.COMMANDO_ENV_LOCATION);
-    process.env.LIGHTNING_PUBKEY = envVars.LIGHTNING_PUBKEY;
-    process.env.COMMANDO_RUNE = envVars.LIGHTNING_RUNE;
-    process.env.INVOICE_RUNE = envVars.INVOICE_RUNE !== undefined ? envVars.INVOICE_RUNE : '';
-    APP_CONSTANTS.COMMANDO_RUNE = process.env.COMMANDO_RUNE;
-    APP_CONSTANTS.NODE_PUBKEY = process.env.LIGHTNING_PUBKEY;
-    LN_MESSAGE_CONFIG.remoteNodePublicKey = process.env.LIGHTNING_PUBKEY;
-    GRPC_CONFIG.pubkey = process.env.LIGHTNING_PUBKEY;
-  }
-
-  private parseEnvFile(filePath: string): { [key: string]: string } {
-    try {
-      const content = readFileSync(filePath, 'utf8');
-      const lines = content.split('\n');
-      const envVars: { [key: string]: string } = {};
-
-      for (let line of lines) {
-        line = line.trim();
-        if (line && line.indexOf('=') !== -1 && !line.startsWith('#')) {
-          const [key, ...value] = line.split('=');
-          envVars[key] = value.join('=').replace(/(^"|"$)/g, '');
-        }
-      }
-
-      return envVars;
-    } catch (err) {
-      logger.error('Error reading .commando-env file:', err);
-      return {};
-    }
-  }
 }
 
 export const CLNService = new LightningService();

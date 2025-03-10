@@ -41,9 +41,9 @@ class AuthController {
             const isValid = req.body.isValid;
             const currPassword = req.body.currPassword;
             const newPassword = req.body.newPassword;
-            if (fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
+            if (fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
                 try {
-                    const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+                    const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
                     if (config.password === currPassword || !isValid) {
                         try {
                             if (typeof config.singleSignOn === 'undefined') {
@@ -51,7 +51,7 @@ class AuthController {
                             }
                             config.password = newPassword;
                             try {
-                                fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(config, null, 2), 'utf-8');
+                                fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
                                 const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
                                 res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
                                 res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });

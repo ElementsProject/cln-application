@@ -27,7 +27,7 @@ export const logConfiguration = {
       ),
     }),
     new winston.transports.File({
-      filename: APP_CONSTANTS.LOG_FILE_LOCATION,
+      filename: APP_CONSTANTS.APP_LOG_FILE,
       level:
         APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
           ? LogLevel.WARN

@@ -34,9 +34,11 @@ export class GRPCService {
     };
     if (APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL === 'https') {
       const httpsAgent = new https.Agent({
-        cert: fs.readFileSync(path.join(APP_CONSTANTS.CERT_PATH || '.', 'client.pem')),
-        key: fs.readFileSync(path.join(APP_CONSTANTS.CERT_PATH || '.', 'client-key.pem')),
-        ca: fs.readFileSync(path.join(APP_CONSTANTS.CERT_PATH || '.', 'ca.pem')),
+        cert: fs.readFileSync(path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'client.pem')),
+        key: fs.readFileSync(
+          path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'client-key.pem'),
+        ),
+        ca: fs.readFileSync(path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'ca.pem')),
       });
       this.axiosConfig.httpsAgent = httpsAgent;
     }

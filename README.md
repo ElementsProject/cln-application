@@ -40,36 +40,38 @@
       ```
 
   - ### Dependency Installation
-      ```
-      cd cln-application-0.0.1
-      npm install --omit=dev
-      ```
+
+    ```
+    cd cln-application-0.0.1
+    npm install --force --omit=dev
+    ```
 
   - ### Environment Variables
       This application accepts & depends upon these variables to be passed through environment:
 
       ```
-      - APP_CORE_LIGHTNING_IP: IP address of this application (cln-application) container (required)
-      - APP_CORE_LIGHTNING_PORT: Port on which this application should be served (required)
-      - APP_CORE_LIGHTNING_DAEMON_IP: IP address of Core lightning node container (required)
-      - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
-      - APP_CORE_LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required; from cln's config.json; starting with `bind-addr=ws:`)
-      - APP_CONFIG_DIR: Path for cln-application's configuration file (required; config.json)
-      - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
-      - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
-      - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: production)
       - SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
-      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: http)
-      - CORE_LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
-      - APP_BITCOIN_NODE_IP: IP address of bitcoin node container (required)
-      - APP_CORE_LIGHTNING_BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
+      - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
+      - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
+      - BITCOIN_NODE_IP: IP address of bitcoin node container (required)
+      - BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
+      - APP_CONFIG_DIR: Path for cln-application's configuration file (required; config.json)
+      - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: production)
       - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: COMMANDO)
-      - APP_CORE_LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)
-      - APP_CORE_LIGHTNING_REST_PORT: REST server port (optional; for connect wallet screen)
-      - APP_CORE_LIGHTNING_REST_CERT_DIR: Path for certificates (optional; required if APP_CORE_LIGHTNING_REST_PROTOCOL is https)
-      - APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
-      - APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: http)
-      - APP_CORE_LIGHTNING_DAEMON_GRPC_PORT: Core lightning's GRPC port (optional; future proofing for connect wallet screen)
+      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: http)
+      - APP_IP: IP address of this application (cln-application) container (required)
+      - APP_PORT: Port on which this application should be served (required)
+      - LIGHTNING_IP: IP address of Core lightning node container (required)
+      - LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
+      - HIDDEN_SERVICE_URL: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
+      - LIGHTNING_NODE_TYPE: Choose Core lightning node type (valid values: CLN/GREENLIGHT, default: CLN)
+      - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
+      - LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required; from cln's config.json; starting with `bind-addr=ws:`)
+      - LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)
+      - LIGHTNING_REST_PORT: REST server port (required if APP_CONNECT is REST)
+      - LIGHTNING_CERTS_DIR: Path for core lightning certificates (Required if APP_CONNECT is REST/GRPC with PROTOCOL 'https')
+      - LIGHTNING_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: http)
+      - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (Required if APP_CONNECT is GRPC)
       ```
 
       Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
@@ -106,7 +108,7 @@
 
   - ### Start The Application
       - Setup environment variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
-      - Run `start` script for starting your application's server at port `APP_CORE_LIGHTNING_PORT`
+      - Run `start` script for starting your application's server at port `APP_PORT`
 
       ```
         npm run start

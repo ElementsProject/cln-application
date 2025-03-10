@@ -283,7 +283,6 @@ const appReducer = (state, action) => {
       };
   
     case ApplicationActions.SET_WALLET_CONNECT:
-      action.payload.TOR_DOMAIN_NAME = action.payload.TOR_HOST?.replace('https://', '').replace('http://', '');
       return {
         ...state,
         walletConnect: action.payload
