@@ -18,8 +18,8 @@ let directoryName = dirname(fileURLToPath(import.meta.url));
 let routes = [];
 const app = express();
 const server = http.createServer(app);
-const LIGHTNING_PORT = normalizePort(process.env.APP_CORE_LIGHTNING_PORT || '2103');
-const APP_CORE_LIGHTNING_IP = process.env.APP_CORE_LIGHTNING_IP || 'localhost';
+const LIGHTNING_PORT = normalizePort(process.env.APP_PORT || '2103');
+const APP_IP = process.env.APP_IP || 'localhost';
 const APP_PROTOCOL = process.env.APP_PROTOCOL || 'http';
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 const corsOptions = {
     methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     origin: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
-        ? APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT
+        ? APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT
         : APP_PROTOCOL + '://localhost:4300',
     credentials: true,
     allowedHeaders: 'Content-Type, X-XSRF-TOKEN, XSRF-TOKEN',
@@ -67,14 +67,9 @@ const throwApiError = (err) => {
     logger.error('Server error: ' + err);
     switch (err.code) {
         case 'EACCES':
-            return new APIError(HttpStatusCode.ACCESS_DENIED, APP_PROTOCOL +
-                '://' +
-                APP_CORE_LIGHTNING_IP +
-                ':' +
-                LIGHTNING_PORT +
-                ' requires elevated privileges');
+            return new APIError(HttpStatusCode.ACCESS_DENIED, APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT + ' requires elevated privileges');
         case 'EADDRINUSE':
-            return new APIError(HttpStatusCode.ADDR_IN_USE, APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT + ' is already in use');
+            return new APIError(HttpStatusCode.ADDR_IN_USE, APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT + ' is already in use');
         case 'ECONNREFUSED':
             return new APIError(HttpStatusCode.UNAUTHORIZED, 'Server is down/locked');
         case 'EBADCSRFTOKEN':
@@ -84,5 +79,5 @@ const throwApiError = (err) => {
     }
 };
 server.on('error', throwApiError);
-server.on('listening', () => logger.warn('Server running at ' + APP_PROTOCOL + '://' + APP_CORE_LIGHTNING_IP + ':' + LIGHTNING_PORT));
-server.listen({ port: LIGHTNING_PORT, host: APP_CORE_LIGHTNING_IP });
+server.on('listening', () => logger.warn('Server running at ' + APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT));
+server.listen({ port: LIGHTNING_PORT, host: APP_IP });

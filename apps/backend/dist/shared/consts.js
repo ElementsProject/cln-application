@@ -12,6 +12,11 @@ export var AppConnect;
     AppConnect["REST"] = "REST";
     AppConnect["GRPC"] = "GRPC";
 })(AppConnect || (AppConnect = {}));
+export var NodeType;
+(function (NodeType) {
+    NodeType["CLN"] = "CLN";
+    NodeType["GREENLIGHT"] = "GREENLIGHT";
+})(NodeType || (NodeType = {}));
 export var HttpStatusCode;
 (function (HttpStatusCode) {
     HttpStatusCode[HttpStatusCode["GET_OK"] = 200] = "GET_OK";
@@ -31,20 +36,44 @@ export var HttpStatusCode;
 })(HttpStatusCode || (HttpStatusCode = {}));
 export const SECRET_KEY = crypto.randomBytes(64).toString('hex');
 export const APP_CONSTANTS = {
-    COMMANDO_RUNE: '',
-    NODE_PUBKEY: '',
-    COMMANDO_ENV_LOCATION: process.env.COMMANDO_CONFIG || './.commando-env',
+    SINGLE_SIGN_ON: process.env.SINGLE_SIGN_ON || 'false',
+    LOCAL_HOST: process.env.LOCAL_HOST || '',
+    DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
+    BITCOIN_NODE_IP: process.env.BITCOIN_NODE_IP || 'localhost',
+    BITCOIN_NETWORK: process.env.BITCOIN_NETWORK || 'bitcoin',
+    APP_CONFIG_FILE: join(process.env.APP_CONFIG_DIR || '.', 'config.json'),
+    APP_LOG_FILE: join(process.env.APP_CONFIG_DIR || '.', 'application-cln.log'),
     APP_MODE: process.env.APP_MODE || Environment.PRODUCTION,
-    CERT_PATH: process.env.APP_CORE_LIGHTNING_REST_CERT_DIR,
-    LOG_FILE_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'application-cln.log'),
-    CONFIG_LOCATION: join(process.env.APP_CONFIG_DIR || '.', 'config.json'),
     APP_CONNECT: process.env.APP_CONNECT || AppConnect.COMMANDO,
-    APP_CORE_LIGHTNING_DAEMON_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
-    LIGHTNING_WS_PORT: +(process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || 5001),
-    LIGHTNING_REST_PROTOCOL: process.env.APP_CORE_LIGHTNING_REST_PROTOCOL || 'https',
-    LIGHTNING_REST_PORT: +(process.env.APP_CORE_LIGHTNING_REST_PORT || 3010),
-    LIGHTNING_GRPC_PROTOCOL: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL || 'http',
-    LIGHTNING_GRPC_PORT: +(process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || 9736),
+    APP_PROTOCOL: process.env.APP_PROTOCOL || 'http',
+    APP_IP: process.env.APP_IP || 'localhost',
+    APP_PORT: process.env.APP_PORT || '2103',
+    LIGHTNING_IP: process.env.LIGHTNING_IP || process.env.APP_CORE_LIGHTNING_DAEMON_IP || 'localhost',
+    LIGHTNING_PATH: process.env.LIGHTNING_PATH || '',
+    HIDDEN_SERVICE_URL: process.env.HIDDEN_SERVICE_URL || '',
+    LIGHTNING_NODE_TYPE: process.env.LIGHTNING_NODE_TYPE || NodeType.CLN,
+    COMMANDO_CONFIG: process.env.COMMANDO_CONFIG || './.commando-env',
+    LIGHTNING_WS_PORT: +(process.env.LIGHTNING_WEBSOCKET_PORT ||
+        process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT ||
+        5001),
+    LIGHTNING_REST_PROTOCOL: process.env.LIGHTNING_REST_PROTOCOL || process.env.APP_CORE_LIGHTNING_REST_PROTOCOL || 'https',
+    LIGHTNING_REST_PORT: +(process.env.LIGHTNING_REST_PORT ||
+        process.env.APP_CORE_LIGHTNING_REST_PORT ||
+        3010),
+    LIGHTNING_CERTS_PATH: process.env.LIGHTNING_CERTS_PATH || '',
+    LIGHTNING_GRPC_PROTOCOL: process.env.LIGHTNING_GRPC_PROTOCOL ||
+        process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PROTOCOL ||
+        'http',
+    LIGHTNING_GRPC_PORT: +(process.env.LIGHTNING_GRPC_PORT ||
+        process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT ||
+        9736),
+    APP_VERSION: '',
+    NODE_PUBKEY: '',
+    COMMANDO_RUNE: '',
+    INVOICE_RUNE: '',
+    CLIENT_KEY: '',
+    CLIENT_CERT: '',
+    CA_CERT: '',
 };
 export const DEFAULT_CONFIG = {
     unit: 'SATS',
@@ -57,8 +86,8 @@ export const DEFAULT_CONFIG = {
 };
 export const LN_MESSAGE_CONFIG = {
     remoteNodePublicKey: '',
-    wsProxy: 'ws://' + APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP + ':' + APP_CONSTANTS.LIGHTNING_WS_PORT,
-    ip: APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP,
+    wsProxy: 'ws://' + APP_CONSTANTS.LIGHTNING_IP + ':' + APP_CONSTANTS.LIGHTNING_WS_PORT,
+    ip: APP_CONSTANTS.LIGHTNING_IP,
     port: APP_CONSTANTS.LIGHTNING_WS_PORT,
     privateKey: crypto.randomBytes(32).toString('hex'),
     logger: {
@@ -70,21 +99,21 @@ export const LN_MESSAGE_CONFIG = {
 export const GRPC_CONFIG = {
     pubkey: APP_CONSTANTS.NODE_PUBKEY,
     protocol: APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL,
-    ip: APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP,
+    ip: APP_CONSTANTS.LIGHTNING_IP,
     port: APP_CONSTANTS.LIGHTNING_GRPC_PORT,
     url: APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL +
         '://' +
-        APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP +
+        APP_CONSTANTS.LIGHTNING_IP +
         ':' +
         APP_CONSTANTS.LIGHTNING_GRPC_PORT,
 };
 export const REST_CONFIG = {
     protocol: APP_CONSTANTS.LIGHTNING_REST_PROTOCOL,
-    ip: APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP,
+    ip: APP_CONSTANTS.LIGHTNING_IP,
     port: APP_CONSTANTS.LIGHTNING_REST_PORT,
     url: APP_CONSTANTS.LIGHTNING_REST_PROTOCOL +
         '://' +
-        APP_CONSTANTS.APP_CORE_LIGHTNING_DAEMON_IP +
+        APP_CONSTANTS.LIGHTNING_IP +
         ':' +
         APP_CONSTANTS.LIGHTNING_REST_PORT,
 };

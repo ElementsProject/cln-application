@@ -190,7 +190,7 @@ export const mockStoreData = {
   walletConnect: {
     LOCAL_HOST: "http://user.local",
     DEVICE_DOMAIN_NAME: "user.local",
-    TOR_HOST: "http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion",
+    HIDDEN_SERVICE_URL: "oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion",
     WS_PORT: "5001",
     GRPC_PORT: "2106",
     CLIENT_KEY: "ClientKey",
@@ -205,7 +205,6 @@ export const mockStoreData = {
     APP_VERSION: "0.0.5",
     isLoading: false,
     error: null,
-    TOR_DOMAIN_NAME: "oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion"
   },
   appConfig: {
     unit: Units.SATS,

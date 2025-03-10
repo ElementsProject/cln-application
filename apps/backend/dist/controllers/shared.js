@@ -1,21 +1,19 @@
 import axios from 'axios';
 import * as fs from 'fs';
-import { join } from 'path';
 import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, FIAT_VENUES, HttpStatusCode, } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
-import { setSharedApplicationConfig, overrideSettingsWithEnvVariables } from '../shared/utils.js';
-import { sep } from 'path';
+import { setSharedApplicationConfig, overrideSettingsWithEnvVariables, refreshEnvVariables, } from '../shared/utils.js';
 import { CLNService } from '../service/lightning.service.js';
 class SharedController {
     getApplicationSettings(req, res, next) {
         try {
-            logger.info('Getting Application Settings from ' + APP_CONSTANTS.CONFIG_LOCATION);
-            if (!fs.existsSync(APP_CONSTANTS.CONFIG_LOCATION)) {
-                fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf-8');
+            logger.info('Getting Application Settings from ' + APP_CONSTANTS.APP_CONFIG_FILE);
+            if (!fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
+                fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf-8');
             }
-            let config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+            let config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
             config = overrideSettingsWithEnvVariables(config);
             setSharedApplicationConfig(config);
             delete config.password;
@@ -28,9 +26,9 @@ class SharedController {
     setApplicationSettings(req, res, next) {
         try {
             logger.info('Updating Application Settings: ' + JSON.stringify(req.body));
-            const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.CONFIG_LOCATION, 'utf-8'));
+            const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
             req.body.password = config.password; // Before saving, add password in the config received from frontend
-            fs.writeFileSync(APP_CONSTANTS.CONFIG_LOCATION, JSON.stringify(req.body, null, 2), 'utf-8');
+            fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(req.body, null, 2), 'utf-8');
             res.status(201).json({ message: 'Application Settings Updated Successfully' });
         }
         catch (error) {
@@ -40,60 +38,8 @@ class SharedController {
     getWalletConnectSettings(req, res, next) {
         try {
             logger.info('Getting Connection Settings');
-            const CERTS_PATH = process.env.CORE_LIGHTNING_PATH + sep + process.env.APP_BITCOIN_NETWORK + sep;
-            let macaroon = '';
-            let clientKey = '';
-            let clientCert = '';
-            let caCert = '';
-            let packageData = '{ version: "0.0.4" }';
-            let macaroonFile = join(APP_CONSTANTS.CERT_PATH || '.', 'access.macaroon');
-            if (fs.existsSync(macaroonFile)) {
-                logger.info('Getting REST Access Macaroon from ' + APP_CONSTANTS.CERT_PATH);
-                macaroon = Buffer.from(fs.readFileSync(macaroonFile)).toString('hex');
-            }
-            if (fs.existsSync('package.json')) {
-                packageData = Buffer.from(fs.readFileSync('package.json')).toString();
-            }
-            if (fs.existsSync(CERTS_PATH + 'client-key.pem')) {
-                clientKey = fs.readFileSync(CERTS_PATH + 'client-key.pem').toString();
-                clientKey = clientKey
-                    .replace(/(\r\n|\n|\r)/gm, '')
-                    .replace('-----BEGIN PRIVATE KEY-----', '')
-                    .replace('-----END PRIVATE KEY-----', '');
-            }
-            if (fs.existsSync(CERTS_PATH + 'client.pem')) {
-                clientCert = fs.readFileSync(CERTS_PATH + 'client.pem').toString();
-                clientCert = clientCert
-                    .replace(/(\r\n|\n|\r)/gm, '')
-                    .replace('-----BEGIN CERTIFICATE-----', '')
-                    .replace('-----END CERTIFICATE-----', '');
-            }
-            if (fs.existsSync(CERTS_PATH + 'ca.pem')) {
-                caCert = fs.readFileSync(CERTS_PATH + 'ca.pem').toString();
-                caCert = caCert
-                    .replace(/(\r\n|\n|\r)/gm, '')
-                    .replace('-----BEGIN CERTIFICATE-----', '')
-                    .replace('-----END CERTIFICATE-----', '');
-            }
-            CLNService.refreshEnvVariables();
-            const CONNECT_WALLET_SETTINGS = {
-                LOCAL_HOST: process.env.LOCAL_HOST || '',
-                DEVICE_DOMAIN_NAME: process.env.DEVICE_DOMAIN_NAME || '',
-                TOR_HOST: process.env.APP_CORE_LIGHTNING_REST_HIDDEN_SERVICE || '',
-                WS_PORT: process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT || '',
-                GRPC_PORT: process.env.APP_CORE_LIGHTNING_DAEMON_GRPC_PORT || '',
-                CLIENT_KEY: clientKey,
-                CLIENT_CERT: clientCert,
-                CA_CERT: caCert,
-                REST_PORT: process.env.APP_CORE_LIGHTNING_REST_PORT || '',
-                REST_MACAROON: macaroon,
-                CLN_NODE_IP: process.env.APP_CORE_LIGHTNING_DAEMON_IP || '',
-                NODE_PUBKEY: process.env.LIGHTNING_PUBKEY || '',
-                COMMANDO_RUNE: process.env.COMMANDO_RUNE,
-                APP_VERSION: JSON.parse(packageData).version || '',
-                INVOICE_RUNE: process.env.INVOICE_RUNE || '',
-            };
-            res.status(200).json(CONNECT_WALLET_SETTINGS);
+            refreshEnvVariables();
+            res.status(200).json(APP_CONSTANTS);
         }
         catch (error) {
             handleError(error, req, res, next);
@@ -130,9 +76,9 @@ class SharedController {
             const showRunes = await CLNService.call('showrunes', []);
             const invoiceRune = showRunes.runes.find(rune => rune.restrictions.some(restriction => restriction.alternatives.some(alternative => alternative.value === 'invoice')) &&
                 rune.restrictions.some(restriction => restriction.alternatives.some(alternative => alternative.value === 'listinvoices')));
-            if (invoiceRune && fs.existsSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION)) {
+            if (invoiceRune && fs.existsSync(APP_CONSTANTS.COMMANDO_CONFIG)) {
                 const invoiceRuneString = `INVOICE_RUNE="${invoiceRune.rune}"\n`;
-                fs.appendFileSync(APP_CONSTANTS.COMMANDO_ENV_LOCATION, invoiceRuneString, 'utf-8');
+                fs.appendFileSync(APP_CONSTANTS.COMMANDO_CONFIG, invoiceRuneString, 'utf-8');
                 res.status(201).send();
             }
             else {
