@@ -7,7 +7,7 @@ export const API_BASE_URL = PROTOCOL + '//' + HOST + ':' + PORT;
 export const API_VERSION = '/v1';
 export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn';
 
-export const APP_WAIT_TIME = 10 * 1000; // 10 seconds
+export const APP_WAIT_TIME = 1000 * 1000; // 10 seconds
 export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
 export const BTC_MSAT = 100000000000;
 export const BTC_SATS = 100000000;

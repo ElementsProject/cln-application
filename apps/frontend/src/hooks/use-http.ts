@@ -58,7 +58,7 @@ const useHttp = () => {
         requestsPromise = [axiosInstance(requests[0].url, { method: requests[0].method, data: requests[0].body})];
       }
 
-      Promise.all(requestsPromise)
+      return Promise.all(requestsPromise)
         .then((responses: any[]) => {
           logger.info(responses);
           for (let i = 0; i < requests.length; i++) {
@@ -76,6 +76,7 @@ const useHttp = () => {
           } else {
             //no-op
           }
+          return combinedResponses;
         }).catch((err: any) => {
           logger.error(err);
           setStoreFunction({ isLoading: false, error: err?.response?.data || err });
@@ -232,7 +233,9 @@ const useHttp = () => {
   };
 
   const getAppConfigurations = useCallback(() => {
-    sendRequestToSetStore(appCtx.setConfig, { method: 'get', url: '/shared/config' });
+    // Returing application Config response to capture in App useEffect
+    // We cannot add appCtx in the useEffect dependency on App Component
+    return sendRequestToSetStore(appCtx.setConfig, { method: 'get', url: '/shared/config' })?.then(appConfig => appConfig);
   }, [appCtx, sendRequestToSetStore]);
 
   const userLogin = (password: string) => {

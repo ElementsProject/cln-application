@@ -2,7 +2,7 @@ import React from 'react';
 
 import './App.scss';
 import { useContext, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 
 import useHttp from '../../hooks/use-http';
@@ -10,7 +10,6 @@ import useBreakpoint from '../../hooks/use-breakpoint';
 import { AppContext } from '../../store/AppContext';
 import { ApplicationModes } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
-import Header from '../ui/Header/Header';
 import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
 import LoginComponent from '../modals/Login/Login';
@@ -18,8 +17,10 @@ import LogoutComponent from '../modals/Logout/Logout';
 import SetPasswordComponent from '../modals/SetPassword/SetPassword';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
+import { EmptyCard } from '../ui/Loading/Loading';
 
 function App() {
+  const navigate = useNavigate();
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
@@ -52,7 +53,13 @@ function App() {
             }
           } else {
             if (authStatus.isValidPassword) {
-              initiateDataLoading();
+              if (config[0]?.serverConfig?.lightningNodeType === "GREENLIGHT") {
+                // LOAD GREENLIGHT DATA
+                navigate('/gl', { replace: true });
+              } else {
+                initiateDataLoading();
+                navigate('/cln', { replace: true });
+              }
             } else {
               logger.error(authStatus);
               appCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(authStatus) });
@@ -78,16 +85,17 @@ function App() {
 
   return (
     <>
+    { appCtx.authStatus.isAuthenticated ? (
       <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
-        <Header />
         <Outlet />
       </Container>
-      <ToastMessage />
-      <NodeInfo />
-      <ConnectWallet />
-      <LoginComponent />
-      <LogoutComponent />
-      <SetPasswordComponent />
+    ) : <EmptyCard className='mt-4 py-4 blurred-container' />}
+    <ToastMessage />
+    <NodeInfo />
+    <ConnectWallet />
+    <LoginComponent />
+    <LogoutComponent />
+    <SetPasswordComponent />
     </>
   );
 }
