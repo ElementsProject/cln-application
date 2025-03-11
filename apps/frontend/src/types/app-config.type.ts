@@ -49,10 +49,19 @@ export type WalletConnect = {
 
 export type ApplicationConfiguration = {
   isLoading: boolean;
-  unit: Units;
-  fiatUnit: string;
-  appMode: ApplicationModes;
-  singleSignOn?: boolean;
+  uiConfig: {
+    unit: Units;
+    fiatUnit: string;
+    appMode: ApplicationModes;
+  };
+  serverConfig: {
+    appConnect?: string;
+    appPort?: string;
+    appProtocol?: string;
+    appVersion?: string;
+    lightningNodeType?: string;
+    singleSignOn?: boolean;
+  }
   error?: any;
 }
 

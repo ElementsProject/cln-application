@@ -5,12 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { APP_CONSTANTS, HttpStatusCode, SECRET_KEY } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
-import {
-  verifyPassword,
-  isAuthenticated,
-  isValidPassword,
-  applicationConfig,
-} from '../shared/utils.js';
+import { verifyPassword, isAuthenticated, isValidPassword } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
 class AuthController {
@@ -53,9 +48,6 @@ class AuthController {
           const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
           if (config.password === currPassword || !isValid) {
             try {
-              if (typeof config.singleSignOn === 'undefined') {
-                config.singleSignOn = process.env.SINGLE_SIGN_ON || false;
-              }
               config.password = newPassword;
               try {
                 fs.writeFileSync(
@@ -91,7 +83,7 @@ class AuthController {
       const uaRes = isAuthenticated(req.cookies.token);
       if (req.body.returnResponse) {
         // Frontend is asking if user is authenticated or not
-        if (applicationConfig?.singleSignOn === true) {
+        if (APP_CONSTANTS.SINGLE_SIGN_ON === 'true') {
           return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
         } else {
           const vpRes = isValidPassword();
@@ -107,7 +99,7 @@ class AuthController {
         }
       } else {
         // Backend APIs are asking if user is authenticated or not
-        if (uaRes === true || applicationConfig?.singleSignOn === true) {
+        if (uaRes === true || APP_CONSTANTS.SINGLE_SIGN_ON === 'true') {
           return next();
         } else {
           return res.status(401).json({ error: 'Unauthorized user' });

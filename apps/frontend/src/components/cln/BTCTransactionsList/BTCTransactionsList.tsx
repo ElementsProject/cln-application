@@ -81,7 +81,7 @@ const BTCTransactionsAccordion = ({ i, expanded, setExpanded, initExpansions, tr
       <motion.div
         className={'btc-transaction-header ' + (expanded[i] ? 'expanded' : '')}
         initial={false}
-        animate={{ backgroundColor: ((appConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
+        animate={{ backgroundColor: ((appConfig.uiConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => { initExpansions[i]=!expanded[i]; return setExpanded(initExpansions); }}>
         {transaction?.tag?.toLowerCase() === 'withdrawal' ? <WithdrawHeader withdraw={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> : <DepositHeader deposit={transaction} appConfig={appConfig} fiatConfig={fiatConfig} /> }
@@ -132,7 +132,7 @@ export const BTCTransactionsList = () => {
       :
         <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center'>
-            { appCtx.appConfig.appMode === ApplicationModes.DARK ? 
+            { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
               <NoBTCTransactionDarkSVG className='no-btctx-dark pb-3' /> :
               <NoBTCTransactionLightSVG className='no-btctx-light pb-3' />
             }

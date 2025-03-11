@@ -63,7 +63,7 @@ const useHttp = () => {
           logger.info(responses);
           for (let i = 0; i < requests.length; i++) {
             if (requests[i].url === '/shared/config') {
-              getFiatRate(responses[0].data.fiatUnit); // shared/config will always have one response only
+              getFiatRate(responses[0].data.uiConfig.fiatUnit); // shared/config will always have one response only
             }
           }
 
@@ -126,8 +126,8 @@ const useHttp = () => {
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
     axiosInstance.post('/shared/config', updatedConfig)
     .then((response: any) => {
-      if(appCtx.appConfig.fiatUnit !== updatedConfig.fiatUnit) {
-        getFiatRate(updatedConfig.fiatUnit);
+      if(appCtx.appConfig.uiConfig.fiatUnit !== updatedConfig.uiConfig.fiatUnit) {
+        getFiatRate(updatedConfig.uiConfig.fiatUnit);
       }
       appCtx.setConfig(updatedConfig);
     }).catch(err => {

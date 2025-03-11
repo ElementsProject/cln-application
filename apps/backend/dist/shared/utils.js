@@ -3,19 +3,16 @@ import * as fs from 'fs';
 import { sep } from 'path';
 import { logger } from '../shared/logger.js';
 import { APP_CONSTANTS, GRPC_CONFIG, LN_MESSAGE_CONFIG, SECRET_KEY } from '../shared/consts.js';
-export var applicationConfig = null;
-export function overrideSettingsWithEnvVariables(config) {
-    config.singleSignOn =
-        (process.env.SINGLE_SIGN_ON && process.env.SINGLE_SIGN_ON === 'true') || false;
+export function addServerConfig(config) {
+    config.serverConfig = {
+        appConnect: APP_CONSTANTS.APP_CONNECT,
+        appPort: APP_CONSTANTS.APP_PORT,
+        appProtocol: APP_CONSTANTS.APP_PROTOCOL,
+        appVersion: APP_CONSTANTS.APP_VERSION,
+        lightningNodeType: APP_CONSTANTS.LIGHTNING_NODE_TYPE,
+        singleSignOn: APP_CONSTANTS.SINGLE_SIGN_ON,
+    };
     return config;
-}
-export function setSharedApplicationConfig(config) {
-    try {
-        applicationConfig = config;
-    }
-    catch (error) {
-        throw error;
-    }
 }
 export function isAuthenticated(token) {
     try {

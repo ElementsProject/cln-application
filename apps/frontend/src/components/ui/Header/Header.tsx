@@ -24,7 +24,13 @@ const Header = (props) => {
   const { updateConfig } = useHttp();
 
   const modeChangeHandler = (event: any) => {
-    updateConfig({...appCtx.appConfig, appMode: (appCtx.appConfig.appMode === ApplicationModes.DARK ? ApplicationModes.LIGHT : ApplicationModes.DARK)});
+    updateConfig({
+      ...appCtx.appConfig,
+      uiConfig: {
+        ...appCtx.appConfig.uiConfig,
+        appMode: (appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? ApplicationModes.LIGHT : ApplicationModes.DARK),
+      },
+    });
   };
 
   const logoutHandler = (event: any) => {
@@ -39,7 +45,7 @@ const Header = (props) => {
             <motion.img
               key='cln-logo'
               alt='Core Lightning Logo'
-              src={appCtx.appConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'}
+              src={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'}
               className='header-info-logo me-3 rounded float-start'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -50,7 +56,7 @@ const Header = (props) => {
             <h4 className='m-0 text-dark'><strong>CLN</strong></h4>
             <div className='d-flex align-items-center'>
               <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              { appCtx.appConfig.singleSignOn ?
+              { appCtx.appConfig.serverConfig.singleSignOn === true ?
                 <span className='mx-2'></span>
                 :
                 <div onClick={logoutHandler}>
@@ -58,7 +64,7 @@ const Header = (props) => {
                 </div>
               }
               <div onClick={modeChangeHandler}>
-                {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
+                {(appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
               </div>
             </div>
           </Col>
@@ -109,7 +115,7 @@ const Header = (props) => {
   return (
     <Row className='header mb-4 mx-1' data-testid='header'>
       <Col xs={12} lg={8} data-testid='header-info'>
-        <Image src={appCtx.appConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
+        <Image src={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
         <Row className='header-info-text mt-3'>
           {(currentScreenSize !== Breakpoints.MD) ?
             <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
@@ -118,7 +124,7 @@ const Header = (props) => {
               <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
               <div className='d-flex align-items-center'>
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
-                { appCtx.appConfig.singleSignOn ?
+                { appCtx.appConfig.serverConfig.singleSignOn === true ?
                   <span className='mx-2'></span>
                   :
                   <div onClick={logoutHandler}>
@@ -126,7 +132,7 @@ const Header = (props) => {
                   </div>
                 }
                 <div onClick={modeChangeHandler}>
-                  {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
+                  {(appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2' />}
                 </div>
               </div>
             </Col>
@@ -174,7 +180,7 @@ const Header = (props) => {
         <Col xs={12} lg={4} className='d-flex align-items-center justify-content-end' data-testid='header-context'>
           <div className='d-flex align-items-center'>
             <Settings onShowConnectWallet={props.onShowConnectWallet} />
-            { appCtx.appConfig.singleSignOn ?
+            { appCtx.appConfig.serverConfig.singleSignOn === true ?
               <span className='mx-2'></span>
               :
               <div onClick={logoutHandler}>
@@ -182,7 +188,7 @@ const Header = (props) => {
               </div>
             }
             <div onClick={modeChangeHandler}>
-              {(appCtx.appConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2'/>}
+              {(appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK) ? <NightModeSVG className='svg-night me-2' /> : <DayModeSVG className='svg-day me-2'/>}
             </div>
           </div>
         </Col>

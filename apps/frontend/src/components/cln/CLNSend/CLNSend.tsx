@@ -116,7 +116,7 @@ const CLNSend = (props) => {
               amountChangeHandler({target: {value: (amountmSats / SATS_MSAT).toString()}});
               setDecodeResponse({ 
                 description: (decodeRes.data.offer_description),
-                amount: (formatCurrency(amountmSats, Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                amount: (formatCurrency(amountmSats, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
               });
             }
           } else {
@@ -131,7 +131,7 @@ const CLNSend = (props) => {
                 amountChangeHandler({target: {value: ((decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
-                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.unit, false, 0, 'string') + ' Sats')
+                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
                 });
               }
             }
