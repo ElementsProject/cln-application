@@ -18,8 +18,10 @@ describe('ConnectWallet component ', () => {
     expect(screen.getByText('LN Message')).toBeInTheDocument();
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
-    expect(screen.getByTestId('macaroon')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
+    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
     expect(screen.queryByTestId('invoice-rune-spinner')).not.toBeInTheDocument();
   });
@@ -41,10 +43,12 @@ describe('ConnectWallet component ', () => {
 
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
-    expect(screen.getByTestId('macaroon')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
     expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
+    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
@@ -58,10 +62,12 @@ describe('ConnectWallet component ', () => {
 
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
-    expect(screen.getByTestId('macaroon')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
     expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'ln-message://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
+    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
@@ -73,13 +79,14 @@ describe('ConnectWallet component ', () => {
     const restNetworkItem = screen.getAllByTestId('network-item')[2];
     await act(async () => fireEvent.click(restNetworkItem));
 
-    expect(screen.getByTestId('port')).toHaveValue('3001');
-    expect(screen.getByTestId('host')).toHaveValue('http://user.local');
-    expect(screen.getByTestId('macaroon')).toHaveValue('0201036c6e6402e501030a1042beb666ba043f72cb147adf3eaafc9e1201301a160a076164647265737312047265616');
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('c-lightning-rest://http://user.local:3001?macaroon=0201036c6e6402e501030a1042beb666ba043f72cb147adf3eaafc9e1201301a160a076164647265737312047265616&protocol=http');
-    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('port')[1]).toHaveValue('3001');
+    expect(screen.getByTestId('host')).toHaveValue('user.local');
+    expect(screen.queryByTestId('client-key')).toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
+    expect(screen.queryByTestId('ca-cert')).toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'clnrest://https://user.local:3001?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
+    );
   });
 
   it('updates selected network and input fields on network change to REST (Tor)', async () => {
@@ -90,13 +97,13 @@ describe('ConnectWallet component ', () => {
     const restNetworkItem = screen.getAllByTestId('network-item')[3];
     await act(async () => fireEvent.click(restNetworkItem));
 
-    expect(screen.getByTestId('port')).toHaveValue('3001');
-    expect(screen.getByTestId('host')).toHaveValue('http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
-    expect(screen.getByTestId('macaroon')).toHaveValue('0201036c6e6402e501030a1042beb666ba043f72cb147adf3eaafc9e1201301a160a076164647265737312047265616');
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('c-lightning-rest://http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?macaroon=0201036c6e6402e501030a1042beb666ba043f72cb147adf3eaafc9e1201301a160a076164647265737312047265616&protocol=http');
-    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('port')[1]).toHaveValue('3001');
+    expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
+    expect(screen.queryByTestId('client-key')).toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'clnrest://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
+    );
   });
 
   it('updates selected network and input fields on network change to gRPC', async () => {
@@ -107,13 +114,12 @@ describe('ConnectWallet component ', () => {
     const restNetworkItem = screen.getAllByTestId('network-item')[4];
     await act(async () => fireEvent.click(restNetworkItem));
 
-    expect(screen.getByTestId('port')).toHaveValue('2106');
+    expect(screen.getAllByTestId('port')[1]).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
-    expect(screen.getByTestId('macaroon')).toHaveValue('ClientKey');
-    expect(screen.getByTestId('client-cert')).toHaveValue('ClientCert');
-    expect(screen.getByTestId('ca-cert')).toHaveValue('CACert');
-    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://user.local:2106?clientkey=ClientKey&clientCert=ClientCert&caCert=CACert');
-    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('client-key')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://http://user.local:2106');
   });
 
   it('updates selected network and input fields on network change to gRPC (Tor)', async () => {
@@ -122,14 +128,17 @@ describe('ConnectWallet component ', () => {
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[5];
+    console.warn('I AM HERE');
+    console.warn(screen.getAllByTestId('network-item'));
     await act(async () => fireEvent.click(restNetworkItem));
-    expect(screen.getByTestId('port')).toHaveValue('2106');
+    expect(screen.getAllByTestId('port')[1]).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
-    expect(screen.getByTestId('macaroon')).toHaveValue('ClientKey');
-    expect(screen.getByTestId('client-cert')).toHaveValue('ClientCert');
+    expect(screen.queryByTestId('client-key')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:2106?clientkey=ClientKey&clientCert=ClientCert');
-    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue(
+      'cln-grpc://http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:2106',
+    );
   });
 
   it('when creating an invoice rune, display loading spinner', async () => {

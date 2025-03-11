@@ -411,6 +411,7 @@ const AppProvider: React.PropsWithChildren<any> = (props) => {
   };
 
   const setWalletConnectHandler = (walletConnect: WalletConnect) => {
+    walletConnect.TOR_SERVICE = walletConnect.HIDDEN_SERVICE_URL?.replace('https://', '').replace('http://', '');
     dispatchApplicationAction({ type: ApplicationActions.SET_WALLET_CONNECT, payload: walletConnect });
   };
 
