@@ -85,7 +85,6 @@ const ChannelDetails = (props) => {
         }
       })
       .catch(err => {
-        console.warn(err);
         logger.error(err.response?.data || err.message || JSON.stringify(err));
         setResponseStatus(CallStatus.ERROR);
         setResponseMessage(err.response?.data || err.message || JSON.stringify(err));
@@ -127,10 +126,10 @@ const ChannelDetails = (props) => {
                     </ProgressBar>
                     <Row className='text-light d-flex align-items-end justify-content-between'>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                        {formatCurrency(props.selChannel.to_us_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                        {formatCurrency(props.selChannel.to_us_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
                       </Col>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                        {formatCurrency(props.selChannel.to_them_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                        {formatCurrency(props.selChannel.to_them_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
                       </Col>
                     </Row>
                   </Col>
@@ -161,19 +160,19 @@ const ChannelDetails = (props) => {
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Dust Limit</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.dust_limit_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.dust_limit_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Spendable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.spendable_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.spendable_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Receivable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.receivable_msat, Units.MSATS, appCtx.appConfig.unit, false, 8, 'string')} {appCtx.appConfig.unit}
+                      {formatCurrency(props.selChannel.receivable_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>

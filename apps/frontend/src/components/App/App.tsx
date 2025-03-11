@@ -2,7 +2,7 @@ import React from 'react';
 
 import './App.scss';
 import { useContext, useEffect } from 'react';
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 
 import useHttp from '../../hooks/use-http';
@@ -10,7 +10,6 @@ import useBreakpoint from '../../hooks/use-breakpoint';
 import { AppContext } from '../../store/AppContext';
 import { ApplicationModes } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
-import Header from '../ui/Header/Header';
 import NodeInfo from '../modals/NodeInfo/NodeInfo';
 import ConnectWallet from '../modals/ConnectWallet/ConnectWallet';
 import LoginComponent from '../modals/Login/Login';
@@ -18,23 +17,9 @@ import LogoutComponent from '../modals/Logout/Logout';
 import SetPasswordComponent from '../modals/SetPassword/SetPassword';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
-import Bookkeeper from '../bookkeeper/BkprRoot/BkprRoot';
-import CLNHome from '../cln/CLNHome/CLNHome';
+import { EmptyCard } from '../ui/Loading/Loading';
 
-export const rootRouteConfig = [
-  {
-    path: "/", Component: Root,
-    children: [
-      { path: "/", Component: () => <Navigate to="/home" replace /> },
-      { path: "home", Component: CLNHome },
-      { path: "bookkeeper", Component: Bookkeeper },
-    ]
-  },
-];
-
-const rootRouter = createBrowserRouter(rootRouteConfig);
-
-function Root() {
+function App() {
   const appCtx = useContext(AppContext);
   const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
@@ -42,9 +27,9 @@ function Root() {
   const bodyHTML = document.getElementsByTagName('body')[0];
   const htmlAttributes = bodyHTML.attributes;
   const theme = document.createAttribute('data-bs-theme');
-  theme.value = appCtx.appConfig.appMode?.toLowerCase() || 'dark';
+  theme.value = appCtx.appConfig.uiConfig.appMode?.toLowerCase() || 'dark';
   bodyHTML.style.backgroundColor =
-    appCtx.appConfig.appMode === ApplicationModes.LIGHT ? '#EBEFF9' : '#0C0C0F';
+    appCtx.appConfig.uiConfig.appMode === ApplicationModes.LIGHT ? '#EBEFF9' : '#0C0C0F';
   const screensize = document.createAttribute('data-screensize');
   screensize.value = currentScreenSize;
   htmlAttributes.setNamedItem(theme);
@@ -93,23 +78,20 @@ function Root() {
   return (
     <>
       <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
-        <Header />
+      { appCtx.authStatus.isAuthenticated ? 
         <Outlet />
+        :
+        <EmptyCard />
+      }
       </Container>
-      <ToastMessage />
-      <NodeInfo />
-      <ConnectWallet />
-      <LoginComponent />
-      <LogoutComponent />
-      <SetPasswordComponent />
+    <ToastMessage />
+    <NodeInfo />
+    <ConnectWallet />
+    <LoginComponent />
+    <LogoutComponent />
+    <SetPasswordComponent />
     </>
   );
 }
-
-const App = () => {
-  return (
-    <RouterProvider router={rootRouter} />
-  );
-};
 
 export default App;

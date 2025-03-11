@@ -128,8 +128,6 @@ describe('ConnectWallet component ', () => {
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[5];
-    console.warn('I AM HERE');
-    console.warn(screen.getAllByTestId('network-item'));
     await act(async () => fireEvent.click(restNetworkItem));
     expect(screen.getAllByTestId('port')[1]).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');

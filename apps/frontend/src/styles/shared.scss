@@ -14,6 +14,7 @@ body {
   }
   & #root-container {
     transition: filter $transition-time ease;
+    height: 100vh;
   }
   & .tooltip {
     padding: 0;
@@ -373,6 +374,11 @@ svg {
   & .card-footer {
     border-top: none;
   }
+}
+
+.cards-container {
+  height: 67vh;
+  margin-bottom: 1.5rem;
 }
 
 .dropdown {
