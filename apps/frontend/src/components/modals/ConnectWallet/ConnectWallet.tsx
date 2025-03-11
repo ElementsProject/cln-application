@@ -34,13 +34,13 @@ const ConnectWallet = () => {
     let newNetworkTypes: string[] = ['LN Message', 'LN Message (Tor)'];
     if (appCtx.walletConnect.LIGHTNING_REST_PORT && appCtx.walletConnect.LIGHTNING_REST_PORT !== '') {
       newNetworkTypes.push('REST');
-      if (appCtx.walletConnect.HIDDEN_SERVICE_URL && appCtx.walletConnect.HIDDEN_SERVICE_URL !== '') {
+      if (appCtx.walletConnect.TOR_SERVICE && appCtx.walletConnect.TOR_SERVICE !== '') {
         newNetworkTypes.push('REST (Tor)');
       }
     }
     if (appCtx.walletConnect.LIGHTNING_GRPC_PORT && appCtx.walletConnect.LIGHTNING_GRPC_PORT !== '') {
       newNetworkTypes.push('gRPC');
-      if (appCtx.walletConnect.HIDDEN_SERVICE_URL && appCtx.walletConnect.HIDDEN_SERVICE_URL !== '') {
+      if (appCtx.walletConnect.TOR_SERVICE && appCtx.walletConnect.TOR_SERVICE !== '') {
         newNetworkTypes.push('gRPC (Tor)');
       }
     }
@@ -63,7 +63,7 @@ const ConnectWallet = () => {
         textToCopy = appCtx.walletConnect.LIGHTNING_REST_PORT || '';
         break;
       case 'CLN Host':
-        textToCopy = (selNetwork.includes('(Tor)') ? appCtx.walletConnect.HIDDEN_SERVICE_URL : appCtx.walletConnect.DEVICE_DOMAIN_NAME) || '';
+        textToCopy = (selNetwork.includes('(Tor)') ? appCtx.walletConnect.TOR_SERVICE : appCtx.walletConnect.DEVICE_DOMAIN_NAME) || '';
         break;
       case 'Rune':
         textToCopy = appCtx.walletConnect.COMMANDO_RUNE || '';
@@ -119,18 +119,18 @@ const ConnectWallet = () => {
         break;
 
       case 'LN Message (Tor)':
-        setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'HIDDEN_SERVICE_URL' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + appCtx.walletConnect.HIDDEN_SERVICE_URL + ':' + appCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE + (appCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + appCtx.walletConnect.INVOICE_RUNE : ''));
+        setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setConnectUrl('ln-message://' + appCtx.walletConnect.TOR_SERVICE + ':' + appCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE + (appCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + appCtx.walletConnect.INVOICE_RUNE : ''));
         break;
 
       case 'REST':
-        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'HIDDEN_SERVICE_URL' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
+        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
         setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
         break;
 
       case 'REST (Tor)':
-        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'HIDDEN_SERVICE_URL' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
-        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.HIDDEN_SERVICE_URL + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
+        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
+        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.TOR_SERVICE + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
         break;
 
       case 'gRPC':
@@ -139,8 +139,8 @@ const ConnectWallet = () => {
         break;
 
       case 'gRPC (Tor)':
-        setConnectValues({ protocol: { title: 'gRPC Protocol', field: 'LIGHTNING_GRPC_PROTOCOL' }, host: { title: 'CLN Host', field: 'HIDDEN_SERVICE_URL' }, port: { title: 'GRPC Port', field: 'LIGHTNING_GRPC_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'gRPC URL', field: '' } });
-        setConnectUrl('cln-grpc://' + appCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL + '://' + appCtx.walletConnect.HIDDEN_SERVICE_URL + ':' + appCtx.walletConnect.LIGHTNING_GRPC_PORT + (appCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
+        setConnectValues({ protocol: { title: 'gRPC Protocol', field: 'LIGHTNING_GRPC_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'GRPC Port', field: 'LIGHTNING_GRPC_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'gRPC URL', field: '' } });
+        setConnectUrl('cln-grpc://' + appCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL + '://' + appCtx.walletConnect.TOR_SERVICE + ':' + appCtx.walletConnect.LIGHTNING_GRPC_PORT + (appCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
         break;
 
       default:
