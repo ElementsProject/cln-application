@@ -16,7 +16,13 @@ const FiatSelection = (props) => {
   const { updateConfig } = useHttp();
 
   const fiatChangeHandler = (eventKey: any, event: any) => {
-    updateConfig({...appCtx.appConfig, fiatUnit: eventKey});
+    updateConfig({
+      ...appCtx.appConfig,
+      uiConfig: {
+        ...appCtx.appConfig.uiConfig,
+        fiatUnit: eventKey,
+      },
+    });
   };
 
   return (
@@ -27,11 +33,11 @@ const FiatSelection = (props) => {
           { appCtx.fiatConfig.symbol ? 
             <FontAwesomeIcon className='text-dark fa-md' icon={appCtx.fiatConfig.symbol} />
             :
-            <CurrencySVG className='svg-currency' fiat={appCtx.appConfig.fiatUnit}></CurrencySVG>
+            <CurrencySVG className='svg-currency' fiat={appCtx.appConfig.uiConfig.fiatUnit}></CurrencySVG>
           }
         </Col>
         <Col xs={6}>
-          <span className='dropdown-toggle-text text-dark'>{appCtx.appConfig.fiatUnit || 'USD'}</span>
+          <span className='dropdown-toggle-text text-dark'>{appCtx.appConfig.uiConfig.fiatUnit || 'USD'}</span>
         </Col>
       </Dropdown.Toggle>
       <Dropdown.Menu>

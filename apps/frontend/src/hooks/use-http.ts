@@ -1,14 +1,15 @@
 import axios, { AxiosResponse } from 'axios';
 import { useCallback, useContext } from 'react';
-import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT } from '../utilities/constants';
+import { API_BASE_URL, API_VERSION, ApplicationModes, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT, Units } from '../utilities/constants';
 import logger from '../services/logger.service';
 import { AppContext } from '../store/AppContext';
-import { ApplicationConfiguration } from '../types/app-config.type';
+import { ApplicationConfiguration, AuthResponse } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { isCompatibleVersion } from '../utilities/data-formatters';
 
 let intervalID;
-let localAuthStatus: any = null;
+let localAuthStatus: AuthResponse = { isLoading: true, isAuthenticated: false, isValidPassword: false };
+let localAppConfig: ApplicationConfiguration = {isLoading: true, uiConfig: { unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK}, serverConfig: { singleSignOn: false, lightningNodeType: 'CLN' } };
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -26,16 +27,29 @@ const useHttp = () => {
   let appCtx = useContext(AppContext);
 
   const initiateDataLoading = () => {
-    getConnectWallet();
-    fetchData();
-    if (intervalID) { window.clearInterval(intervalID); }
-    intervalID = window.setInterval(() => {
-      logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
-      // Check if the user has logged out before next data refresh
-      if (localAuthStatus?.isAuthenticated) {
-        fetchData();
+    const checkAuthStatus = () => {
+      if (localAuthStatus.isLoading || localAppConfig.isLoading) {
+        setTimeout(checkAuthStatus, 100);
+      } else {
+        if (localAppConfig.serverConfig?.lightningNodeType === 'GREENLIGHT') {
+          console.warn('LOAD GREENLIGHT DATA');
+        } else {
+          getConnectWallet();
+          fetchData();
+          if (intervalID) {
+            window.clearInterval(intervalID);
+          }
+          intervalID = window.setInterval(() => {
+            logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
+            // Check if the user has logged out before next data refresh
+            if (localAuthStatus?.isAuthenticated) {
+              fetchData();
+            }
+          }, APP_WAIT_TIME);
+        }
       }
-    }, APP_WAIT_TIME);
+    };
+    checkAuthStatus();
   };
 
   const getFiatRate = useCallback((fiatUnit: string) => {
@@ -63,7 +77,9 @@ const useHttp = () => {
           logger.info(responses);
           for (let i = 0; i < requests.length; i++) {
             if (requests[i].url === '/shared/config') {
-              getFiatRate(responses[0].data.fiatUnit); // shared/config will always have one response only
+              responses[0].data = { ...responses[0].data, ...{ isLoading: false, error: null } };
+              localAppConfig = responses[0].data;
+              getFiatRate(responses[0].data.uiConfig.fiatUnit); // shared/config will always have one response only
             }
           }
 
@@ -126,8 +142,8 @@ const useHttp = () => {
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
     axiosInstance.post('/shared/config', updatedConfig)
     .then((response: any) => {
-      if(appCtx.appConfig.fiatUnit !== updatedConfig.fiatUnit) {
-        getFiatRate(updatedConfig.fiatUnit);
+      if(appCtx.appConfig.uiConfig.fiatUnit !== updatedConfig.uiConfig.fiatUnit) {
+        getFiatRate(updatedConfig.uiConfig.fiatUnit);
       }
       appCtx.setConfig(updatedConfig);
     }).catch(err => {
@@ -239,6 +255,7 @@ const useHttp = () => {
     return axiosInstance.post('/auth/login', {password: password})
     .then((response: any) => {
       logger.info(response);
+      response.data = { ...response.data, isLoading: false, error: null };
       appCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
@@ -252,6 +269,7 @@ const useHttp = () => {
     return axiosInstance.post('/auth/reset', {isValid: isValid, currPassword: currPassword, newPassword: newPassword})
     .then((response: any) => {
       logger.info(response);
+      response.data = { ...response.data, isLoading: false, error: null };
       appCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
@@ -265,6 +283,7 @@ const useHttp = () => {
     return axiosInstance.get('/auth/logout')
     .then((response: any) => {
       logger.info(response);
+      response.data = { ...response.data, isLoading: false, error: null };
       appCtx.clearStore();
       localAuthStatus = JSON.parse(JSON.stringify(response.data));
       appCtx.setShowModals({...appCtx.showModals, loginModal: true, logoutModal: false});
@@ -278,6 +297,7 @@ const useHttp = () => {
     return axiosInstance.post('/auth/isauthenticated', { returnResponse: true })
     .then((response: any) => {
       logger.info(response);
+      response.data = { ...response.data, isLoading: false, error: null };
       appCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
