@@ -58,10 +58,10 @@ const Channels = (props) => {
                           </ProgressBar>
                           <Row className='text-light d-flex align-items-end justify-content-between'>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                              {formatCurrency(channel.to_us_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                              {formatCurrency(channel.to_us_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
                             </Col>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                              {formatCurrency(channel.to_them_sat, Units.SATS, appCtx.appConfig.unit, false, 5, 'string')} {appCtx.appConfig.unit}
+                              {formatCurrency(channel.to_them_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
                             </Col>
                           </Row>
                         </>
@@ -73,7 +73,7 @@ const Channels = (props) => {
             :
               <Row className='text-light fs-6 mt-3 h-100 mt-2 align-items-center justify-content-center'>
                 <Row className='d-flex align-items-center justify-content-center'>
-                  { appCtx.appConfig.appMode === ApplicationModes.DARK ? 
+                  { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
                     <NoChannelDarkSVG className='no-channel-dark mt-5 pb-1' /> :
                     <NoChannelLightSVG className='no-channel-light mt-5 pb-1' />
                   }

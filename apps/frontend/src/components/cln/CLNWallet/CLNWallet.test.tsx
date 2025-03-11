@@ -28,7 +28,7 @@ describe('CLNWallet component ', () => {
   })
 
   it('if has lightning spendable balance, show it', async () => {
-    providerProps.appConfig.unit = 'BTC';
+    providerProps.appConfig.uiConfig.unit = 'BTC';
     jest.useFakeTimers();
     renderWithMockContext(<CLNWallet />, { providerProps });
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));

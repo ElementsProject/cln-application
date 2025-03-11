@@ -27,7 +27,7 @@ describe('CurrencyBox component ', () => {
   })
 
   it('if using BTC as the appConfig unit without shortening', async () => {
-    providerProps.appConfig.unit = Units.BTC;
+    providerProps.appConfig.uiConfig.unit = Units.BTC;
     renderWithMockContext(<CurrencyBox value='11111111' shorten='false' />, { providerProps });
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
@@ -36,7 +36,7 @@ describe('CurrencyBox component ', () => {
   })
 
   it('if using BTC as the appConfig unit when shortened', async () => {
-    providerProps.appConfig.unit = Units.MSATS;
+    providerProps.appConfig.uiConfig.unit = Units.MSATS;
     renderWithMockContext(<CurrencyBox value='11111111' shorten='true' />, { providerProps });
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');

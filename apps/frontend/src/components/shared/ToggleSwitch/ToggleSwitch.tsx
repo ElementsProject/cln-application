@@ -15,7 +15,13 @@ const ToggleSwitch = (props) => {
  
   const changeValueHandler = (event) => {
     setIsSwitchOn((prevValue) => {
-      updateConfig({ ...appCtx[props.storeSelector], [props.storeKey]: props.values[+!prevValue]});
+      updateConfig({ 
+        ...appCtx[props.storeSelector], 
+        uiConfig: {
+          ...appCtx.appConfig.uiConfig,
+          [props.storeKey]: props.values[+!prevValue]
+        }
+      });
       return !prevValue;
     })
   };

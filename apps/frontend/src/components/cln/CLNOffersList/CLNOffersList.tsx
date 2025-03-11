@@ -43,7 +43,7 @@ const CLNOffersAccordion = ({ i, expanded, setExpanded, initExpansions, offer, a
       <motion.div
         className={'cln-offer-header ' + (expanded[i] ? 'expanded' : '')}
         initial={false}
-        animate={{ backgroundColor: ((appConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
+        animate={{ backgroundColor: ((appConfig.uiConfig.appMode === ApplicationModes.DARK) ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => { initExpansions[i]=!expanded[i]; return setExpanded(initExpansions); }}>
         <OfferHeader offer={offer} />
@@ -94,7 +94,7 @@ export const CLNOffersList = () => {
       :
         <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center mt-2'>
-            { appCtx.appConfig.appMode === ApplicationModes.DARK ? 
+            { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
               <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
             }
