@@ -29,6 +29,7 @@ export type WalletConnect = {
   LIGHTNING_IP?: string;
   LIGHTNING_PATH?: string;
   HIDDEN_SERVICE_URL?: string;
+  TOR_SERVICE?: string;
   LIGHTNING_NODE_TYPE?: string;
   COMMANDO_CONFIG?: string;
   LIGHTNING_WS_PORT?: string;
