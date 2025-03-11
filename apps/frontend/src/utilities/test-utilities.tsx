@@ -172,6 +172,7 @@ const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign'
 
 export const mockStoreData = {
   authStatus: {
+    isLoading: true,
     isAuthenticated: true,
     isValidPassword: true
   },
@@ -210,16 +211,25 @@ export const mockStoreData = {
     error: null,
   },
   appConfig: {
-    unit: Units.SATS,
-    fiatUnit: "USD",
-    appMode: ApplicationModes.LIGHT,
+    uiConfig: {
+      unit: Units.SATS,
+      fiatUnit: "USD",
+      appMode: ApplicationModes.LIGHT,
+    },
+    serverConfig: {
+      appConnect: "REST",
+      appPort: "2103",
+      appProtocol: "http",
+      appVersion: "0.0.7",
+      lightningNodeType: "CLN",
+      singleSignOn: false
+    },
     isLoading: false,
     error: null,
-    singleSignOn: false
   },
   fiatConfig: {
     venue: "KRAKEN",
-    rate: "62950.00000",
+    rate: 62950.00000,
     isLoading: false,
     symbol: mockFaDollarSign,
     error: null
@@ -293,7 +303,7 @@ export const mockStoreData = {
     version: "v24.02.1-40-g1b08de2",
     blockheight: 593,
     network: "regtest",
-    fees_collected_msat: 0,
+    fees_collected_msat: "0",
     "lightning-dir": "/home/user/.lightning/regtest",
     our_features: {
       init: "08aa802a8a5961",
@@ -308,17 +318,17 @@ export const mockStoreData = {
     outputs: [
       {
         txid: "9d666e7b08ed19e065edfb797726c1bf78596f821fb3c8f7c7b75ad02b31e942",
-        output: 1,
+        output: "1",
         amount_msat: 74099668000,
         scriptpubkey: "5120b657aa289a0ad3290902dc2a7b3ffeab1a6884e934ce25f8414e67151443e487",
         address: "bcrt1pket652y6ptfjjzgzms48k0l74vdx3p8fxn8zt7zpfen329zrujrsltlfuj",
         status: "confirmed",
-        blockheight: 589,
+        blockheight: "589",
         reserved: false
       },
       {
         txid: "f04794e0bd5542139a5cf19c99ad294e97edb49f180d06ec5d634f2df63fb898",
-        output: 0,
+        output: "0",
         amount_msat: 2499838000,
         scriptpubkey: "5120c8415874d3666a6db5b85ebba5b58c7cb275cdb5837872030bb49bea5266bd48",
         address: "bcrt1pepq4saxnve4xmddct6a6tdvv0je8tnd4sdu8yqctkjd755nxh4yqqf5u0p",
@@ -336,7 +346,7 @@ export const mockStoreData = {
         our_amount_msat: 2500000000,
         amount_msat: 2500000000,
         funding_txid: "bbecc5e19be2929080678eecd064cb035cc9f5a835f45fc86a8d87b0967c7349",
-        funding_output: 0
+        funding_output: "0"
       },
       {
         peer_id: "0348e58210bbc128b1cc3cc1a520a654aaa01e5fe65c65341e21b61a1f09da94d5",
@@ -347,7 +357,7 @@ export const mockStoreData = {
         our_amount_msat: 1150000000,
         amount_msat: 60000000000,
         funding_txid: "05e4a3f71410f73042a7d0f8d1cbe1c0e902cb4ea44ed46609582e005dd38690",
-        funding_output: 0
+        funding_output: "0"
       },
       {
         peer_id: "023d28435ce4b49f068c964aacbcb6dd114317a70f03e5a731ea72d25df1cff35b",
@@ -358,7 +368,7 @@ export const mockStoreData = {
         our_amount_msat: 8000000,
         amount_msat: 1500000000,
         funding_txid: "20ef294814ca01a7464a0896b39e3e8e3a6bcb7b54ffe78f7d4c2163e2b55f48",
-        funding_output: 0
+        funding_output: "0"
       },
       {
         peer_id: "03a183403bbcc01576516a5c237fac0f850f4662c0e3b06060b9dc60bdcaf1c43d",
@@ -369,7 +379,7 @@ export const mockStoreData = {
         our_amount_msat: 3398000000,
         amount_msat: 3400000000,
         funding_txid: "9d666e7b08ed19e065edfb797726c1bf78596f821fb3c8f7c7b75ad02b31e942",
-        funding_output: 0
+        funding_output: "0"
       }
     ],
     isLoading: false,
@@ -991,8 +1001,6 @@ export const mockStoreData = {
         created_at: 1711142515,
         amount_sent_msat: 50000000,
         destination: "0348e58210bbc128b1cc3cc1a520a654aaa01e5fe65c65341e21b61a1f09da94d5",
-        expires_at: null,
-        paid_at: null
       },
       {
         type: "PAYMENT",
@@ -1004,8 +1012,6 @@ export const mockStoreData = {
         created_at: 1711142369,
         amount_sent_msat: 2000000,
         destination: "03a183403bbcc01576516a5c237fac0f850f4662c0e3b06060b9dc60bdcaf1c43d",
-        expires_at: null,
-        paid_at: null
       },
       {
         type: "INVOICE",
@@ -1016,9 +1022,6 @@ export const mockStoreData = {
         description: "News subscription",
         bolt12: "lni1qqg20jpqx7tk3z6ljpmugunj7espyq3qqc3xu3s3rg94nj40zfsy866mhu5vxne6tcej5878k2mneuvgjy8sspz8s6xqqzs3fejhwueqwd6kyumrwf5hqarfdahpvggr5wym8ghh4fhe7nxvr8et673wh2p4je5eap4hzh924g28lsmlx9z9qgqxyfhyvyg6pdvu4tcjvpp7kkal9rp57wj7xv4pl3ajku70rzy3pavzzqktf0wnwpt9tqjhunagtxgg93jqx5yuskfwr2whzyc3emxgnf9s06sfsqar3xe69aa2d705enqe727h5t46sdvkdx0gddc4e242z3luxle3gsp4ndg8tz0fre32pmsr5tdt0edvfymfgeys5lm03mh9yfr8nmscknqpq0t3rcn4kwdx0t8we7yxrq9dgtgk8dfl6k7lk4fn9n9m8p27yfujkqpj2dzr3dv2gv3vyea94t0033wmgfxdtqssatx3dn8fwgwdu88f36fjsmp2jkv98dn3pycfn24fvq7vwxh95gwqqqqqqqqqqqqqqq9qqqqqqqqqqqqqr5jt9hav2gqqqqqq5szxtl04wz5zqdlupvpv06mrz2x59tjgw9rhzck83chnwt59zmzzawxdjnksf0a34gzy0p5vqzczzqar3xe69aa2d705enqe727h5t46sdvkdx0gddc4e242z3luxle3gncyqfqjx5xmr9z0008smhn9wxzakmph30vgfuthrv6x4yakars20x9d7qwc6x5ukcfp050ma8hct9nkknxattp7mnjgwvrydegjuj6ag8ks",
         payment_preimage: "6174acc80f0c12e3b8c36ee653c5be17a6182ff4ba6f7e0947d71903487d307d",
-        created_at: null,
-        amount_sent_msat: null,
-        destination: null,
         expires_at: 1711149456,
         amount_received_msat: 1200000000,
         paid_at: 1711142277
@@ -1032,9 +1035,6 @@ export const mockStoreData = {
         bolt11: "lnbcrt80u1pjlmulusp54zr04y9qmzn5k40j57jmscsdswx4q2r84uvrmtzc5z58qnnuvskqpp5znn23w0l7f5y9082rflxvuv4qcq2q9wv6d587s8ar507lzuglfysdq2gdhkven9v5xqyjw5qcqp2rzjqg7jss6uuj6f7p5vje92e09km5g5x9a8pup7tfe3afedyh03ele4kqqzfyqqqqgqqqqqqqlgqqqqqqgq2q9qx3qysgqhgql4cvhejwtp4mrj64r86v9jj7amvkwcyr6z04z3yzardya6puy3df2q0z98mpd08hy47pz3tc23cnuqvh6ad9tf3vxmaxk9nxm32gpksda99",
         description: "Coffee",
         payment_preimage: "ef6d57c86f874109b55b0598d5859cd98732d6ebb03fdef49e55b0842e8b7954",
-        created_at: null,
-        amount_sent_msat: null,
-        destination: null,
         expires_at: 1711746684,
         amount_received_msat: 8000000,
         paid_at: 1711141983
@@ -1091,5 +1091,21 @@ export const mockStoreData = {
     btcSpendableBalance: 74099668,
     btcReservedBalance: 2499838,
     error: null
-  }
+  },
+  setAuthStatus: jest.fn(),
+  setShowModals: jest.fn(),
+  setShowToast: jest.fn(),
+  setWalletConnect: jest.fn(),
+  setConfig: jest.fn(),
+  setFiatConfig: jest.fn(),
+  setFeeRate: jest.fn(),
+  setNodeInfo: jest.fn(),
+  setListFunds: jest.fn(),
+  setListPeers: jest.fn(),
+  setListChannels: jest.fn(),
+  setListInvoices: jest.fn(),
+  setListPayments: jest.fn(),
+  setListOffers: jest.fn(),
+  setListBitcoinTransactions: jest.fn(),
+  clearStore: jest.fn(),
 };

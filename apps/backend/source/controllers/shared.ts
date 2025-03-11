@@ -12,11 +12,7 @@ import {
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
-import {
-  setSharedApplicationConfig,
-  overrideSettingsWithEnvVariables,
-  refreshEnvVariables,
-} from '../shared/utils.js';
+import { addServerConfig, refreshEnvVariables } from '../shared/utils.js';
 import { CLNService } from '../service/lightning.service.js';
 import { ShowRunes } from '../models/showrunes.type.js';
 
@@ -31,10 +27,14 @@ class SharedController {
           'utf-8',
         );
       }
-      let config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-      config = overrideSettingsWithEnvVariables(config);
-      setSharedApplicationConfig(config);
-      delete config.password;
+      let config = {
+        uiConfig: JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8')),
+      };
+      delete config.uiConfig.password;
+      delete config.uiConfig.isLoading;
+      delete config.uiConfig.error;
+      delete config.uiConfig.singleSignOn;
+      config = addServerConfig(config);
       res.status(200).json(config);
     } catch (error: any) {
       handleError(error, req, res, next);
@@ -45,8 +45,12 @@ class SharedController {
     try {
       logger.info('Updating Application Settings: ' + JSON.stringify(req.body));
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-      req.body.password = config.password; // Before saving, add password in the config received from frontend
-      fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(req.body, null, 2), 'utf-8');
+      req.body.uiConfig.password = config.password; // Before saving, add password in the config received from frontend
+      fs.writeFileSync(
+        APP_CONSTANTS.APP_CONFIG_FILE,
+        JSON.stringify(req.body.uiConfig, null, 2),
+        'utf-8',
+      );
       res.status(201).json({ message: 'Application Settings Updated Successfully' });
     } catch (error: any) {
       handleError(error, req, res, next);

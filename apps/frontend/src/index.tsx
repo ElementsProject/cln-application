@@ -1,8 +1,9 @@
 import React from 'react';
 
 import ReactDOM from 'react-dom/client';
-import App from './components/App/App';
+import { RouterProvider } from 'react-router-dom';
 import { AppProvider } from './store/AppContext';
+import { rootRouter } from './utilities/router.config';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,6 +11,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <AppProvider>
-    <App />
+    <RouterProvider router={rootRouter} />
   </AppProvider>
 );

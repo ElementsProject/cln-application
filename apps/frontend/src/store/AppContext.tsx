@@ -205,11 +205,11 @@ const filterOnChainTransactions = (events: BkprTransaction[], currentVersion: st
 };
 
 const AppContext = React.createContext<AppContextType>({
-  authStatus: { isAuthenticated: false, isValidPassword: false },
+  authStatus: { isLoading: true, isAuthenticated: false, isValidPassword: false },
   showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false, logoutModal: false, setPasswordModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
-  appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
+  appConfig: {isLoading: true, uiConfig: { unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK}, serverConfig: { singleSignOn: false, lightningNodeType: 'CLN' } },
   fiatConfig: {isLoading: true, symbol: faDollarSign, venue: '', rate: 1},
   feeRate: {isLoading: true},
   nodeInfo: {isLoading: true, alias: '', version: ''},
@@ -241,11 +241,11 @@ const AppContext = React.createContext<AppContextType>({
 });
 
 const defaultAppState = {
-  authStatus: { isAuthenticated: false, isValidPassword: false },
+  authStatus: { isLoading: true, isAuthenticated: false, isValidPassword: false },
   showModals: {nodeInfoModal: false, connectWalletModal: false, loginModal: false, logoutModal: false, setPasswordModal: false},
   showToast: {show: false, message: ''},
   walletConnect: {isLoading: true},
-  appConfig: {isLoading: true, unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK},
+  appConfig: {isLoading: true, uiConfig: { unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.DARK}, serverConfig: { singleSignOn: false, lightningNodeType: 'CLN' } },
   fiatConfig: {isLoading: true, symbol: faDollarSign, venue: '', rate: 1},
   feeRate: {isLoading: true},
   nodeInfo: {isLoading: true, alias: '', version: ''},
