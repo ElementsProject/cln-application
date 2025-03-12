@@ -118,13 +118,13 @@ const ConnectWallet = () => {
         break;
 
       case 'REST':
-        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
-        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
+        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
+        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
         break;
 
       case 'REST (Tor)':
-        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
-        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.TOR_SERVICE + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
+        setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
+        setConnectUrl('clnrest://' + appCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + appCtx.walletConnect.TOR_SERVICE + ':' + appCtx.walletConnect.LIGHTNING_REST_PORT + '?rune=' + appCtx.walletConnect.COMMANDO_RUNE + (appCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + appCtx.walletConnect.CLIENT_KEY + '&clientCert=' + appCtx.walletConnect.CLIENT_CERT + '&caCert=' + appCtx.walletConnect.CA_CERT : ''));
         break;
 
       case 'gRPC':
@@ -186,7 +186,7 @@ const ConnectWallet = () => {
           <Row className='d-flex align-items-start justify-content-center'>
             <Col xs={selNetwork.includes('LN Message') ? 12 : 6}>
               <Form.Label className='text-light'>Network</Form.Label>
-              <Dropdown className='dropdown-network mt-1 mb-3'>
+              <Dropdown className='dropdown-network mt-1 mb-2'>
                 <Dropdown.Toggle variant='secondary' id='network' className='w-100 d-flex align-items-center justify-content-between' data-testid='network-toggle'>
                   {selNetwork}
                 </Dropdown.Toggle>
@@ -200,7 +200,7 @@ const ConnectWallet = () => {
             {!selNetwork.includes('LN Message') && connectValues.protocol ?
               <Col xs={6}>
                 <Form.Label className='text-light'>{connectValues.protocol.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.protocol.title}
@@ -221,7 +221,7 @@ const ConnectWallet = () => {
           <Row className='d-flex align-items-start justify-content-center'>
             <Col xs={6}>
               <Form.Label className='text-light'>{connectValues.host.title}</Form.Label>
-              <InputGroup className='mb-3'>
+              <InputGroup className='mb-2'>
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.host.title}
@@ -239,7 +239,7 @@ const ConnectWallet = () => {
             </Col>
             <Col xs={6}>
               <Form.Label className='text-light'>{connectValues.port.title}</Form.Label>
-              <InputGroup className='mb-3'>
+              <InputGroup className='mb-2'>
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.port.title}
@@ -256,11 +256,11 @@ const ConnectWallet = () => {
               </InputGroup>
             </Col>
           </Row>
-          {(selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') && connectValues.rune ?
+          {(selNetwork !== 'gRPC' && selNetwork !== 'gRPC (Tor)') && connectValues.rune ?
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.rune.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.rune.title}
@@ -282,7 +282,7 @@ const ConnectWallet = () => {
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.invoiceRune?.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={invoiceRuneClickHandler}
                     id={connectValues.invoiceRune?.title}
@@ -314,7 +314,7 @@ const ConnectWallet = () => {
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.clientKey?.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.clientKey?.title}
@@ -334,7 +334,7 @@ const ConnectWallet = () => {
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.clientCert?.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.clientCert?.title}
@@ -360,7 +360,7 @@ const ConnectWallet = () => {
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
                 <Form.Label className='text-light'>{connectValues.caCert?.title}</Form.Label>
-                <InputGroup className='mb-3'>
+                <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.caCert?.title}
@@ -383,7 +383,7 @@ const ConnectWallet = () => {
           <Row className='mb-4 d-flex align-items-start justify-content-center'>
             <Col xs={12}>
               <Form.Label className='text-light'>{connectValues.connectUrl?.title}</Form.Label>
-              <InputGroup className='mb-3'>
+              <InputGroup className='mb-2'>
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.connectUrl?.title}
