@@ -6,43 +6,45 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Modal, Row, InputGroup, Form } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { ApplicationModes } from '../../../utilities/constants';
 import { CloseSVG } from '../../../svgs/Close';
 import logger from '../../../services/logger.service';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
+import { RootContext } from '../../../store/RootContext';
+import { CLNContext } from '../../../store/CLNContext';
 
 const NodeInfo = () => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const [nodeURI, setNodeURI] = useState('');
 
   useEffect(() => {
-    let uri = (appCtx.nodeInfo.id || '');
-    if (appCtx.nodeInfo.address && appCtx.nodeInfo.address?.length && appCtx.nodeInfo.address.length > 0) {
-      uri = uri + '@' + appCtx.nodeInfo.address[0].address + ':' + appCtx.nodeInfo.address[0].port;
-    } else if (appCtx.nodeInfo.binding && appCtx.nodeInfo.binding?.length && appCtx.nodeInfo.binding.length > 0) {
-      uri = uri + '@' + appCtx.nodeInfo.binding[0].address + ':' + appCtx.nodeInfo.binding[0].port;
+    let uri = (clnCtx.nodeInfo.id || '');
+    if (clnCtx.nodeInfo.address && clnCtx.nodeInfo.address?.length && clnCtx.nodeInfo.address.length > 0) {
+      uri = uri + '@' + clnCtx.nodeInfo.address[0].address + ':' + clnCtx.nodeInfo.address[0].port;
+    } else if (clnCtx.nodeInfo.binding && clnCtx.nodeInfo.binding?.length && clnCtx.nodeInfo.binding.length > 0) {
+      uri = uri + '@' + clnCtx.nodeInfo.binding[0].address + ':' + clnCtx.nodeInfo.binding[0].port;
     } else {
       uri = uri + '@ : ';
     }
     setNodeURI(uri);
-  }, [appCtx]);
+  }, [clnCtx]);
 
   const copyHandler = () => {
     copyTextToClipboard(nodeURI).then((response) => {
-      appCtx.setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'});
+      rootCtx.setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });
   }
 
   const closeHandler = () => {
-    appCtx.setShowModals({...appCtx.showModals, nodeInfoModal: false});
+    rootCtx.setShowModals({...rootCtx.showModals, nodeInfoModal: false});
   }
 
   return (
-      <Modal show={appCtx.showModals.nodeInfoModal} onHide={closeHandler} centered className='modal-lg' data-testid='node-info-modal'>
+      <Modal show={rootCtx.showModals.nodeInfoModal} onHide={closeHandler} centered className='modal-lg' data-testid='node-info-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
           <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
         </Modal.Header>
@@ -52,14 +54,14 @@ const NodeInfo = () => {
               <motion.img
                 key='cln-logo'
                 alt='Core Lightning Logo'
-                src={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'}
+                src={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
                 className='qr-cln-logo'
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.05, duration: 0.01 }}
               />
             </AnimatePresence>
-            <QRCodeCanvas value={nodeURI || ''} size={220} includeMargin={true} bgColor={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
+            <QRCodeCanvas value={nodeURI || ''} size={220} includeMargin={true} bgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
           </Row>
           <Row className='d-flex align-items-start justify-content-center pt-2'>
             <h4 className='text-blue fw-bold d-flex justify-content-center'>Node ID</h4>

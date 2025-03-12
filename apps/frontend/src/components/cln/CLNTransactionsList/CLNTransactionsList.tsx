@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { formatCurrency } from '../../../utilities/data-formatters';
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
 import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
@@ -15,6 +15,7 @@ import Transaction from '../CLNTransaction/CLNTransaction';
 import { ApplicationModes, TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
+import { RootContext } from '../../../store/RootContext';
 
 const TODAY = Math.floor(Date.now() / 1000);
 
@@ -123,34 +124,35 @@ const CLNTransactionsAccordion = ({ i, expanded, setExpanded, initExpansions, tr
 };
 
 export const CLNTransactionsList = () => {
-  const appCtx = useContext(AppContext);
-  const initExpansions = (appCtx.listLightningTransactions.clnTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
+  const initExpansions = (clnCtx.listLightningTransactions.clnTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
   return (
-    appCtx.authStatus.isAuthenticated && appCtx.listLightningTransactions.isLoading ?
+    rootCtx.authStatus.isAuthenticated && clnCtx.listLightningTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' data-testid='cln-transactions-list-spinner'/>
       </span> 
     : 
-    appCtx.listLightningTransactions.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-transactions-list-error'>{appCtx.listLightningTransactions.error}</Alert> : 
-      appCtx.listLightningTransactions?.clnTransactions && appCtx.listLightningTransactions?.clnTransactions.length && appCtx.listLightningTransactions?.clnTransactions.length > 0 ?
+    clnCtx.listLightningTransactions.error ? 
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-transactions-list-error'>{clnCtx.listLightningTransactions.error}</Alert> : 
+      clnCtx.listLightningTransactions?.clnTransactions && clnCtx.listLightningTransactions?.clnTransactions.length && clnCtx.listLightningTransactions?.clnTransactions.length > 0 ?
         <div className='cln-transactions-list' data-testid='cln-transactions-list'>
           { 
-            appCtx.listLightningTransactions?.clnTransactions?.map((transaction, i) => (
-              <CLNTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />
+            clnCtx.listLightningTransactions?.clnTransactions?.map((transaction, i) => (
+              <CLNTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={rootCtx.appConfig} fiatConfig={rootCtx.fiatConfig} />
             ))
           }
         </div>
       :
         <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center mt-2'>
-            { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
+            { rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
               <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
             }
             <Row className='text-center'>
-            { (appCtx.listChannels.activeChannels.length > 0) ? 
+            { (clnCtx.listChannels.activeChannels.length > 0) ? 
               'No transaction found. Click send/receive to start!' : 
               'No transaction found. Open channel to start!'
             }

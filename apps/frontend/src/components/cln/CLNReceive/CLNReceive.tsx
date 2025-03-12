@@ -8,7 +8,6 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
 import { DescriptionSVG } from '../../../svgs/Description';
@@ -18,9 +17,10 @@ import FiatBox from '../../shared/FiatBox/FiatBox';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
+import { RootContext } from '../../../store/RootContext';
 
 const CLNReceive = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { clnReceiveInvoice } = useHttp();
   const [paymentType, setPaymentType] = useState(PaymentType.INVOICE);
   const [showInvoice, setShowInvoice] = useState(false);
@@ -194,7 +194,7 @@ const CLNReceive = (props) => {
                   {!amountHasError ?
                     amountValue && amountValue !== 'All' ?
                       <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                        ~ <FiatBox value={(+amountValue || 0)} fiatUnit={appCtx.appConfig.uiConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+                        ~ <FiatBox value={(+amountValue || 0)} fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
                       </p>
                     :
                       <p className='message'></p>

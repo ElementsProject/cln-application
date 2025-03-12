@@ -1,19 +1,38 @@
 import { screen } from '@testing-library/react';
 import Logout from './Logout';
-import { renderWithMockContext, getMockStoreData } from '../../../utilities/test-utilities';
+import { renderWithMockCLNContext, getMockCLNStoreData, getMockRootStoreData } from '../../../utilities/test-utilities';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe('Logout component ', () => {
-  let providerProps;
-  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData('showModals', { logoutModal: true }))));
+  let providerRootProps;
+  let providerCLNProps;
+  beforeEach(() => {
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData('showModals', { logoutModal: true })));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+  });
 
   it('should be in the document', () => {
-    renderWithMockContext(<Logout />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Logout />);
     expect(screen.getByTestId('logout-modal')).toBeInTheDocument();
   });
 
   it('if AppContext config says hide, hide this modal', () => {
-    providerProps.showModals.logoutModal = false;
-    renderWithMockContext(<Logout />, { providerProps });
+    providerRootProps.showModals.logoutModal = false;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Logout />);
     expect(screen.queryByTestId('logout-modal')).not.toBeInTheDocument();
   });
 

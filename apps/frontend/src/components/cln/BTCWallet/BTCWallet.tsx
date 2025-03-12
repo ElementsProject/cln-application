@@ -1,20 +1,21 @@
 import React from 'react';
 
 import './BTCWallet.scss';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Alert, Card, Col, ButtonGroup } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { BitcoinWalletSVG } from '../../../svgs/BitcoinWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 import BTCTransactionsList from '../BTCTransactionsList/BTCTransactionsList';
+import { RootContext } from '../../../store/RootContext';
 
 const BTCWallet = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
 
   return (
     <Card className='h-100 d-flex align-items-stretch' data-testid="btc-wallet">
@@ -25,11 +26,11 @@ const BTCWallet = (props) => {
               <BitcoinWalletSVG svgClassName='me-4' className='fill-contrast' />
               <div>
                 <div className='fs-6 fw-bold'>Bitcoin Wallet</div>
-                { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
+                { rootCtx.authStatus.isAuthenticated && clnCtx.walletBalances.isLoading ? 
                     <Spinner animation='grow' variant='secondary' data-testid="btc-wallet-spinner"/> : 
-                  appCtx.walletBalances.error ? 
-                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid="btc-wallet-error">{appCtx.walletBalances.error}</Alert> : 
-                    <CurrencyBox value={appCtx.walletBalances.btcSpendableBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold'></CurrencyBox>
+                  clnCtx.walletBalances.error ? 
+                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid="btc-wallet-error">{clnCtx.walletBalances.error}</Alert> : 
+                    <CurrencyBox value={clnCtx.walletBalances.btcSpendableBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold'></CurrencyBox>
                 }
                 </div>
             </Col>

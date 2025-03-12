@@ -1,12 +1,12 @@
-import { mockInvoiceRune, mockStoreData, mockInvoice, mockOffer } from '../utilities/test-utilities';
+import { mockInvoiceRune, mockInvoice, mockOffer, mockRootStoreData } from '../utilities/test-utilities';
 
 const useHttp = () => {
   const mockData = {
     setCSRFToken: jest.fn(() => new Promise((resolve) => setTimeout(() => resolve({ csrfToken: 'mockToken-oFIyo9pYNXp_1-1LooPUDdGA_K0' }), 1000))),
-    getAuthStatus: jest.fn(() => Promise.resolve(mockStoreData.authStatus)),
-    getAppConfigurations: jest.fn(() => Promise.resolve(mockStoreData.appConfig)),
+    getAuthStatus: jest.fn(() => Promise.resolve(mockRootStoreData.authStatus)),
+    getAppConfigurations: jest.fn(() => Promise.resolve(mockRootStoreData.appConfig)),
     initiateDataLoading: jest.fn(),
-    getConnectWallet: jest.fn(() => Promise.resolve(mockStoreData.walletConnect)),
+    getConnectWallet: jest.fn(() => Promise.resolve(mockRootStoreData.walletConnect)),
     fetchData: jest.fn(),
     getFiatRate: jest.fn(() => Promise.resolve()),
     updateConfig: jest.fn(() => Promise.resolve()),

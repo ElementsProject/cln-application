@@ -8,7 +8,7 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, FeeRate, FEE_RATES } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
 import { AddressSVG } from '../../../svgs/Address';
@@ -18,15 +18,17 @@ import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMe
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import FeerateRange from '../../shared/FeerateRange/FeerateRange';
+import { RootContext } from '../../../store/RootContext';
 
 const BTCWithdraw = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const { btcWithdraw } = useHttp();
   const [selFeeRate, setSelFeeRate] = useState(FeeRate.NORMAL);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const isValidAmount = (value) => value === 'All' || (value > 0 && value <= (appCtx.walletBalances.btcSpendableBalance || 0));
+  const isValidAmount = (value) => value === 'All' || (value > 0 && value <= (clnCtx.walletBalances.btcSpendableBalance || 0));
   const isValidAddress = (value) => value.trim() !== '';
 
   const {
@@ -133,7 +135,7 @@ const BTCWithdraw = (props) => {
                       tabIndex={1}
                       id='amount'
                       type={amountValue === 'All' ? 'text' : 'number'}
-                      placeholder={'Amount (Between 1 - ' + parseFloat((appCtx.walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
+                      placeholder={'Amount (Between 1 - ' + parseFloat((clnCtx.walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
                       aria-label='amount'
                       aria-describedby='addon-amount'
                       className={amountValue === 'All' ? 'form-control-middle' : 'form-control-right'}
@@ -154,7 +156,7 @@ const BTCWithdraw = (props) => {
                     !amountHasError ?
                       amountValue && amountValue !== 'All' ?
                         <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                          ~ <FiatBox value={(+amountValue || 0)}  fiatUnit={appCtx.appConfig.uiConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+                          ~ <FiatBox value={(+amountValue || 0)}  fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
                         </p>
                       :
                         <p className='message'></p>
@@ -162,8 +164,8 @@ const BTCWithdraw = (props) => {
                       <InvalidInputMessage message={
                         (+amountValue <= 0) ? 
                         'Amount should be greater than 0'
-                        : (+amountValue > (appCtx.walletBalances.btcSpendableBalance || 0)) ? 
-                          'Amount should be lesser then ' + (appCtx.walletBalances.btcSpendableBalance || 0)
+                        : (+amountValue > (clnCtx.walletBalances.btcSpendableBalance || 0)) ? 
+                          'Amount should be lesser then ' + (clnCtx.walletBalances.btcSpendableBalance || 0)
                         :
                           'Invalid Amount'
                       } />

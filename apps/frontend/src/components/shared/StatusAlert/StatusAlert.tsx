@@ -8,16 +8,16 @@ import { CallStatus, OPACITY_VARIANTS } from '../../../utilities/constants';
 import { copyTextToClipboard, titleCase } from '../../../utilities/data-formatters';
 import { InformationSVG } from '../../../svgs/Information';
 import { CopySVG } from '../../../svgs/Copy';
-import { AppContext } from '../../../store/AppContext';
 import { useContext } from 'react';
 import logger from '../../../services/logger.service';
+import { RootContext } from '../../../store/RootContext';
 
 const StatusAlert = props => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
 
   const copyHandler = (event) => {
     copyTextToClipboard(props.responseMessage).then((response) => {
-      appCtx.setShowToast({show: true, message: ('Response Copied Successfully!'), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: ('Response Copied Successfully!'), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });

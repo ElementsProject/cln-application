@@ -5,12 +5,13 @@ import { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { RootContext } from '../../../store/RootContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { OpenLinkSVG } from '../../../svgs/OpenLink';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
 import logger from '../../../services/logger.service';
+import { CLNContext } from '../../../store/CLNContext';
 
 const TransactionDetail = ({transaction, copyHandler, openLinkHandler}) => {
   return (
@@ -66,10 +67,11 @@ const TransactionDetail = ({transaction, copyHandler, openLinkHandler}) => {
 };
 
 const BTCTransaction = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (appCtx.nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
+    window.open('https://blockstream.info/' + (clnCtx.nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
   };
 
   const copyHandler = (event) => {
@@ -89,7 +91,7 @@ const BTCTransaction = (props) => {
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });

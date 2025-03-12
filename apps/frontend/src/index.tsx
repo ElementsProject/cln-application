@@ -2,7 +2,7 @@ import React from 'react';
 
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { AppProvider } from './store/AppContext';
+import { RootProvider } from './store/RootContext';
 import { rootRouter } from './utilities/router.config';
 
 const root = ReactDOM.createRoot(
@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <AppProvider>
+  <RootProvider>
     <RouterProvider router={rootRouter} />
-  </AppProvider>
+  </RootProvider>
 );

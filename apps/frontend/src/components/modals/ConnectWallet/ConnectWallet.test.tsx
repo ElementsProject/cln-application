@@ -1,18 +1,36 @@
 import { act, fireEvent, screen } from '@testing-library/react';
 import ConnectWallet from './ConnectWallet';
-import { renderWithMockContext, getMockStoreData } from '../../../utilities/test-utilities';
+import { renderWithMockCLNContext, getMockRootStoreData, getMockCLNStoreData } from '../../../utilities/test-utilities';
 import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe('ConnectWallet component ', () => {
-  let providerProps;
+  let providerRootProps;
+  let providerCLNProps;
+
   beforeEach(() => {
-    providerProps = JSON.parse(JSON.stringify(getMockStoreData('showModals', { connectWalletModal: true })));
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData('showModals', { connectWalletModal: true })));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
     jest.useFakeTimers();
   });
 
   it('renders with initial state', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     expect(screen.getByTestId('connect-wallet')).toBeInTheDocument();
     expect(screen.getByText('LN Message')).toBeInTheDocument();
@@ -27,15 +45,15 @@ describe('ConnectWallet component ', () => {
   });
 
   it('hide ConnectWallet modal if AppContext says to hide it', async () => {
-    providerProps.showModals.connectWalletModal = false;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = false;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     expect(screen.queryByTestId('connect-wallet')).not.toBeInTheDocument();
   });
 
   it('updates selected network and input fields on network change to LN Message', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[0];
@@ -53,8 +71,8 @@ describe('ConnectWallet component ', () => {
   });
 
   it('updates selected network and input fields on network change to LN Message (Tor)', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[1];
@@ -72,8 +90,8 @@ describe('ConnectWallet component ', () => {
   });
 
   it('updates selected network and input fields on network change to REST', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[2];
@@ -90,8 +108,8 @@ describe('ConnectWallet component ', () => {
   });
 
   it('updates selected network and input fields on network change to REST (Tor)', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[3];
@@ -107,8 +125,8 @@ describe('ConnectWallet component ', () => {
   });
 
   it('updates selected network and input fields on network change to gRPC', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[4];
@@ -123,8 +141,8 @@ describe('ConnectWallet component ', () => {
   });
 
   it('updates selected network and input fields on network change to gRPC (Tor)', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    providerRootProps.showModals.connectWalletModal = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
     await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
     const restNetworkItem = screen.getAllByTestId('network-item')[5];
@@ -140,11 +158,11 @@ describe('ConnectWallet component ', () => {
   });
 
   it('when creating an invoice rune, display loading spinner', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    providerProps.setShowToast = jest.fn();
-    providerProps.walletConnect.INVOICE_RUNE = '';
+    providerRootProps.showModals.connectWalletModal = true;
+    providerRootProps.setShowToast = jest.fn();
+    providerRootProps.walletConnect.INVOICE_RUNE = '';
     window.prompt = jest.fn();
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
 
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     fireEvent.click(screen.getByTestId('invoice-rune-button'));
@@ -153,11 +171,11 @@ describe('ConnectWallet component ', () => {
   });
 
   it('when invoice rune loading, buttons are disabled so additional runes are not created', async () => {
-    providerProps.showModals.connectWalletModal = true;
-    providerProps.setShowToast = jest.fn();
-    providerProps.walletConnect.INVOICE_RUNE = '';
+    providerRootProps.showModals.connectWalletModal = true;
+    providerRootProps.setShowToast = jest.fn();
+    providerRootProps.walletConnect.INVOICE_RUNE = '';
     window.prompt = jest.fn();
-    renderWithMockContext(<ConnectWallet />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
 
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
 
@@ -168,10 +186,10 @@ describe('ConnectWallet component ', () => {
     expect(invoiceRuneField).toBeDisabled();
 
     fireEvent.click(invoiceRuneField);
-    expect(providerProps.setShowToast).not.toHaveBeenCalled();
+    expect(providerRootProps.setShowToast).not.toHaveBeenCalled();
 
     fireEvent.click(invoiceRuneButton);
-    expect(providerProps.setShowToast).not.toHaveBeenCalled();
+    expect(providerRootProps.setShowToast).not.toHaveBeenCalled();
   });
 
 });

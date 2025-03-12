@@ -7,19 +7,19 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Dropdown, Col } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
-import { AppContext } from '../../../store/AppContext';
 import { FIAT_CURRENCIES } from '../../../utilities/constants';
 import { CurrencySVG } from '../../../svgs/Currency';
+import { RootContext } from '../../../store/RootContext';
 
 const FiatSelection = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { updateConfig } = useHttp();
 
   const fiatChangeHandler = (eventKey: any, event: any) => {
     updateConfig({
-      ...appCtx.appConfig,
+      ...rootCtx.appConfig,
       uiConfig: {
-        ...appCtx.appConfig.uiConfig,
+        ...rootCtx.appConfig.uiConfig,
         fiatUnit: eventKey,
       },
     });
@@ -30,14 +30,14 @@ const FiatSelection = (props) => {
     <Dropdown className={props.className} onSelect={fiatChangeHandler} data-testid='fiat-selection'>
       <Dropdown.Toggle variant='outline border-gray-300 d-flex align-items-center'>
         <Col xs={4}>
-          { appCtx.fiatConfig.symbol ? 
-            <FontAwesomeIcon className='text-dark fa-md' icon={appCtx.fiatConfig.symbol} />
+          { rootCtx.fiatConfig.symbol ? 
+            <FontAwesomeIcon className='text-dark fa-md' icon={rootCtx.fiatConfig.symbol} />
             :
-            <CurrencySVG className='svg-currency' fiat={appCtx.appConfig.uiConfig.fiatUnit}></CurrencySVG>
+            <CurrencySVG className='svg-currency' fiat={rootCtx.appConfig.uiConfig.fiatUnit}></CurrencySVG>
           }
         </Col>
         <Col xs={6}>
-          <span className='dropdown-toggle-text text-dark'>{appCtx.appConfig.uiConfig.fiatUnit || 'USD'}</span>
+          <span className='dropdown-toggle-text text-dark'>{rootCtx.appConfig.uiConfig.fiatUnit || 'USD'}</span>
         </Col>
       </Dropdown.Toggle>
       <Dropdown.Menu>
