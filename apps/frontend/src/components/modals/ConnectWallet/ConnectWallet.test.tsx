@@ -85,7 +85,7 @@ describe('ConnectWallet component ', () => {
     expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).toBeInTheDocument();
     expect(screen.getByTestId('connect-url')).toHaveValue(
-      'clnrest://https://user.local:3001?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
+      'clnrest://https://user.local:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
     );
   });
 
@@ -102,7 +102,7 @@ describe('ConnectWallet component ', () => {
     expect(screen.queryByTestId('client-key')).toBeInTheDocument();
     expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
     expect(screen.getByTestId('connect-url')).toHaveValue(
-      'clnrest://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
+      'clnrest://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
     );
   });
 
