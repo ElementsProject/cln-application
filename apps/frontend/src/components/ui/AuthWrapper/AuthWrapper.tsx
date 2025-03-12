@@ -1,24 +1,25 @@
 import { useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AppContext } from '../../../store/AppContext';
+import { CLNProvider } from '../../../store/CLNContext';
+import { GLProvider } from '../../../store/GLContext';
+import { RootContext } from '../../../store/RootContext';
 
 const AuthWrapper = ({ children }) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const { lightningNodeType } = rootCtx.appConfig.serverConfig;
 
   useEffect(() => {
-    if (appCtx.authStatus.isLoading) {
+    if (rootCtx.authStatus.isLoading) {
       return;
     }
-    
-    if (!appCtx.authStatus.isAuthenticated) {
+
+    if (!rootCtx.authStatus.isAuthenticated) {
       navigate('/');
       return;
     }
-    
-    const { lightningNodeType } = appCtx.appConfig.serverConfig;
-    
+
     if (location.pathname === '/') {
       if (lightningNodeType === 'GREENLIGHT') {
         navigate('/gl');
@@ -27,17 +28,26 @@ const AuthWrapper = ({ children }) => {
       }
       return;
     }
-    
+
     if (lightningNodeType === 'GREENLIGHT' && location.pathname.startsWith('/cln')) {
       navigate('/gl');
       return;
     }
-    
+
     if (lightningNodeType !== 'GREENLIGHT' && location.pathname.startsWith('/gl')) {
       navigate('/cln');
       return;
     }
-  }, [appCtx.authStatus, navigate, location.pathname, appCtx.appConfig.serverConfig.lightningNodeType, appCtx.appConfig.serverConfig]);
+  }, [rootCtx.authStatus, navigate, location.pathname, lightningNodeType]);
+
+
+  if (lightningNodeType === 'GREENLIGHT' && location.pathname.startsWith('/gl')) {
+    return <GLProvider><div data-testid='gl-provider'>{children}</div></GLProvider>;
+  }
+
+  if (lightningNodeType !== 'GREENLIGHT' && location.pathname.startsWith('/cln')) {
+    return <CLNProvider><div data-testid='cln-provider'>{children}</div></CLNProvider>;
+  }
 
   return children;
 };

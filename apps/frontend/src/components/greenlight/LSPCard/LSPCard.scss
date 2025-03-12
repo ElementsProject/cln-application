@@ -1,0 +1,31 @@
+@import '../../../styles/constants.scss';
+
+.btc-transaction-placeholder {
+  transform-origin: top left;
+  & .btc-transaction-detail {
+    align-items: center;
+    margin: 0.5rem;
+  }
+  & .btc-transaction-copy {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      svg path {
+        stroke: darken($primary, 10%);
+      }
+    }
+  }
+  & .btc-transaction-open {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      svg path {
+        fill: darken($primary, 10%);
+      }
+    }
+  }
+}

@@ -9,16 +9,16 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { CallStatus } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { PasswordSVG } from '../../../svgs/Password';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import { ShowSVG } from '../../../svgs/Show';
 import { HideSVG } from '../../../svgs/Hide';
+import { RootContext } from '../../../store/RootContext';
 
 const LoginComponent = () => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { userLogin, initiateDataLoading } = useHttp();
   const [hidePassword, setHidePassword] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
@@ -63,7 +63,7 @@ const LoginComponent = () => {
         setResponseMessage('');
         resetFormValues();
         initiateDataLoading();
-        appCtx.setShowModals({...appCtx.showModals, loginModal: false});
+        rootCtx.setShowModals({...rootCtx.showModals, loginModal: false});
       } else {
         setResponseStatus(CallStatus.ERROR);
         setResponseMessage(response.response.data || response.message || 'Unknown Error');
@@ -82,7 +82,7 @@ const LoginComponent = () => {
 
   return (
     <form className='h-100'>
-      <Modal show={appCtx.showModals.loginModal} centered className='modal-lg' data-testid='login-modal'>
+      <Modal show={rootCtx.showModals.loginModal} centered className='modal-lg' data-testid='login-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-start pb-0'></Modal.Header>
         <Modal.Body className='py-0'>
           <Row className='d-flex align-items-start justify-content-center'>

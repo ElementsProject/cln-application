@@ -1,19 +1,112 @@
 import { render } from '@testing-library/react';
-import { AppContext } from '../store/AppContext';
+import { RootContext } from '../store/RootContext';
 import { ApplicationModes, Units } from './constants';
 import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel, Rune } from '../types/lightning-wallet.type';
+import { CLNContext } from '../store/CLNContext';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Suspense } from 'react';
+import { Loading } from '../components/ui/Loading/Loading';
+import { GLContext } from '../store/GLContext';
+import AuthWrapper from '../components/ui/AuthWrapper/AuthWrapper';
+import CLNHome from '../components/cln/CLNHome/CLNHome';
+import Bookkeeper from '../components/bookkeeper/BkprRoot/BkprRoot';
+import App from '../components/App/App';
+import GLHome from '../components/greenlight/GLHome/GLHome';
+import LSPList from '../components/greenlight/LSPList/LSPList';
 
-export const getMockStoreData = (replaceKey?: string, replaceValue?: any) => {
-  if (replaceKey && replaceKey !== '' && !!replaceValue) {
-    mockStoreData[replaceKey] = replaceValue;
-  }
-  return mockStoreData;
+const routeComponentMap = {
+  '/': <App />,
+  '/cln': <CLNHome />,
+  '/cln/bookkeeper': <Bookkeeper />,
+  '/gl': <GLHome />,
+  '/gl/lsps': <LSPList />,
 };
 
-export const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
+export const getMockRootStoreData = (replaceKey?: string, replaceValue?: any) => {
+  if (replaceKey && replaceKey !== '' && !!replaceValue) {
+    mockRootStoreData[replaceKey] = replaceValue;
+  }
+  return mockRootStoreData;
+};
+
+export const getMockCLNStoreData = (replaceKey?: string, replaceValue?: any) => {
+  if (replaceKey && replaceKey !== '' && !!replaceValue) {
+    mockCLNStoreData[replaceKey] = replaceValue;
+  }
+  return mockCLNStoreData;
+};
+
+export const getMockGLStoreData = (replaceKey?: string, replaceValue?: any) => {
+  if (replaceKey && replaceKey !== '' && !!replaceValue) {
+    mockGLStoreData[replaceKey] = replaceValue;
+  }
+  return mockGLStoreData;
+};
+
+export const renderWithMockRootContext = (providerRootProps, ui: any | null = null, initialRoute = '/') => {
   return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
+    <RootContext.Provider value={providerRootProps}>
+      <AuthWrapper>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route
+                path='/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    {ui ? ui : routeComponentMap[initialRoute]}
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </MemoryRouter>
+      </AuthWrapper>
+    </RootContext.Provider>
+  );
+};
+
+export const renderWithMockCLNContext = (providerRootProps, providerCLNProps, ui: any | null = null, initialRoute = '/cln') => {
+  return render(
+    <RootContext.Provider value={providerRootProps}>
+      <AuthWrapper>
+        <CLNContext.Provider value={providerCLNProps}>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route
+                path='/cln/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    {ui ? ui : routeComponentMap[initialRoute]}
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </MemoryRouter>
+        </CLNContext.Provider>
+      </AuthWrapper>
+    </RootContext.Provider>
+  );
+};
+
+export const renderWithMockGLContext = (providerRootProps, providerGLProps, initialRoute = '/gl') => {
+  return render(
+    <RootContext.Provider value={providerRootProps}>
+      <AuthWrapper>
+        <GLContext.Provider value={providerGLProps}>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route
+                path='/gl/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    {routeComponentMap[initialRoute]}
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </MemoryRouter>
+        </GLContext.Provider>
+      </AuthWrapper>
+    </RootContext.Provider>
   );
 };
 
@@ -170,7 +263,7 @@ export const mockSelectedChannel: PeerChannel = {
 
 const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };
 
-export const mockStoreData = {
+export const mockRootStoreData = {
   authStatus: {
     isLoading: true,
     isAuthenticated: true,
@@ -234,6 +327,16 @@ export const mockStoreData = {
     symbol: mockFaDollarSign,
     error: null
   },
+  setAuthStatus: jest.fn(),
+  setShowModals: jest.fn(),
+  setShowToast: jest.fn(),
+  setWalletConnect: jest.fn(),
+  setConfig: jest.fn(),
+  setFiatConfig: jest.fn(),
+  clearStore: jest.fn(),
+};
+
+export const mockCLNStoreData = {
   feeRate: {
     perkb: {
       opening: 1080,
@@ -1092,12 +1195,6 @@ export const mockStoreData = {
     btcReservedBalance: 2499838,
     error: null
   },
-  setAuthStatus: jest.fn(),
-  setShowModals: jest.fn(),
-  setShowToast: jest.fn(),
-  setWalletConnect: jest.fn(),
-  setConfig: jest.fn(),
-  setFiatConfig: jest.fn(),
   setFeeRate: jest.fn(),
   setNodeInfo: jest.fn(),
   setListFunds: jest.fn(),
@@ -1107,5 +1204,58 @@ export const mockStoreData = {
   setListPayments: jest.fn(),
   setListOffers: jest.fn(),
   setListBitcoinTransactions: jest.fn(),
+  clearStore: jest.fn(),
+};
+
+export const mockGLStoreData = {
+  nodeInfo: {
+    id: "03a389b3a2f7aa6f9f4ccc19f2bd7a2eba83596699e86b715caaaa147fc37f3144",
+    alias: "CLNReg1",
+    color: "03a389",
+    num_peers: 5,
+    num_pending_channels: 0,
+    num_active_channels: 3,
+    num_inactive_channels: 1,
+    address: [
+      {
+        type: "ipv4",
+        address: "127.0.0.1",
+        port: 19738
+      }
+    ],
+    binding: [
+      {
+        type: "ipv4",
+        address: "127.0.0.1",
+        port: 7171
+      }
+    ],
+    version: "v24.02.1-40-g1b08de2",
+    blockheight: 593,
+    network: "regtest",
+    fees_collected_msat: "0",
+    "lightning-dir": "/home/user/.lightning/regtest",
+    our_features: {
+      init: "08aa802a8a5961",
+      node: "88aa802a8a5961",
+      channel: "",
+      invoice: "02000022024100"
+    },
+    isLoading: false,
+    error: null
+  },
+  nodeCapacity: {
+    isLoading: true,
+    inbound: 0,
+    outbound: 0,
+    error: null
+  },
+  lspList: {
+    isLoading: true,
+    glLSPS: [],
+    error: null
+  },
+  setNodeInfo: jest.fn(),
+  setNodeCapacity: jest.fn(),
   clearStore: jest.fn(),
 };

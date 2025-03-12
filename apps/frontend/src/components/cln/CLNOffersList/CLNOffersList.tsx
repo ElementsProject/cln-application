@@ -5,12 +5,13 @@ import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
 import Offer from '../CLNOffer/CLNOffer';
 import { ApplicationModes, TRANSITION_DURATION } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
+import { RootContext } from '../../../store/RootContext';
 
 const OfferHeader = ({offer}) => {
   return (
@@ -71,30 +72,31 @@ const CLNOffersAccordion = ({ i, expanded, setExpanded, initExpansions, offer, a
 };
 
 export const CLNOffersList = () => {
-  const appCtx = useContext(AppContext);
-  const initExpansions = (appCtx.listOffers.offers?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
+  const initExpansions = (clnCtx.listOffers.offers?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.authStatus.isAuthenticated && appCtx.listOffers.isLoading ?
+    rootCtx.authStatus.isAuthenticated && clnCtx.listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' data-testid='cln-offers-list-spinner'/>
       </span> 
     : 
-    appCtx.listOffers.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>{appCtx.listOffers.error}</Alert> : 
-      appCtx.listOffers?.offers && appCtx.listOffers?.offers.length && appCtx.listOffers?.offers.length > 0 ?
+    clnCtx.listOffers.error ? 
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>{clnCtx.listOffers.error}</Alert> : 
+      clnCtx.listOffers?.offers && clnCtx.listOffers?.offers.length && clnCtx.listOffers?.offers.length > 0 ?
         <div className='cln-offers-list' data-testid='cln-offers-list'>
           { 
-            appCtx.listOffers?.offers?.map((offer, i) => (
-              <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />
+            clnCtx.listOffers?.offers?.map((offer, i) => (
+              <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} appConfig={rootCtx.appConfig} fiatConfig={rootCtx.fiatConfig} />
             ))
           }
         </div>
       :
         <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center mt-2'>
-            { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
+            { rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
               <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
               <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
             }

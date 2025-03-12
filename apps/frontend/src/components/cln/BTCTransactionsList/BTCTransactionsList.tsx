@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner, Alert, Row, Col } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
 import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
@@ -15,6 +15,7 @@ import Transaction from '../BTCTransaction/BTCTransaction';
 import { ApplicationModes, TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { NoBTCTransactionDarkSVG } from '../../../svgs/NoBTCTransactionDark';
 import { NoBTCTransactionLightSVG } from '../../../svgs/NoBTCTransactionLight';
+import { RootContext } from '../../../store/RootContext';
 
 const WithdrawHeader = ({withdraw, appConfig, fiatConfig}) => {
   return (
@@ -106,30 +107,31 @@ const BTCTransactionsAccordion = ({ i, expanded, setExpanded, initExpansions, tr
 };
 
 export const BTCTransactionsList = () => {
-  const appCtx = useContext(AppContext);
-  const initExpansions = (appCtx.listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
+  const initExpansions = (clnCtx.listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (
-    appCtx.authStatus.isAuthenticated && appCtx.listBitcoinTransactions.isLoading ?
+    rootCtx.authStatus.isAuthenticated && clnCtx.listBitcoinTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' />
       </span> 
     : 
-    appCtx.listBitcoinTransactions.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger'>{appCtx.listBitcoinTransactions.error}</Alert> : 
-      appCtx.listBitcoinTransactions?.btcTransactions && appCtx.listBitcoinTransactions?.btcTransactions.length && appCtx.listBitcoinTransactions?.btcTransactions.length > 0 ?
+    clnCtx.listBitcoinTransactions.error ? 
+      <Alert className='py-0 px-1 fs-7' variant='danger'>{clnCtx.listBitcoinTransactions.error}</Alert> : 
+      clnCtx.listBitcoinTransactions?.btcTransactions && clnCtx.listBitcoinTransactions?.btcTransactions.length && clnCtx.listBitcoinTransactions?.btcTransactions.length > 0 ?
         <div className='btc-transactions-list'>
           { 
-            appCtx.listBitcoinTransactions?.btcTransactions?.map((transaction, i) => (
-              <BTCTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={appCtx.appConfig} fiatConfig={appCtx.fiatConfig} />
+            clnCtx.listBitcoinTransactions?.btcTransactions?.map((transaction, i) => (
+              <BTCTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} appConfig={rootCtx.appConfig} fiatConfig={rootCtx.fiatConfig} />
             ))
           }
         </div>
       :
         <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center'>
-            { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
+            { rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
               <NoBTCTransactionDarkSVG className='no-btctx-dark pb-3' /> :
               <NoBTCTransactionLightSVG className='no-btctx-light pb-3' />
             }

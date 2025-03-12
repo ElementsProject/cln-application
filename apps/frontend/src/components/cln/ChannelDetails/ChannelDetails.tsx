@@ -8,7 +8,7 @@ import { Spinner, Card, Row, Col, ProgressBar, OverlayTrigger, Tooltip } from 'r
 import useHttp from '../../../hooks/use-http';
 import { copyTextToClipboard, formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, Units } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
@@ -16,9 +16,11 @@ import logger from '../../../services/logger.service';
 import { CopySVG } from '../../../svgs/Copy';
 import { OpenLinkSVG } from '../../../svgs/OpenLink';
 import ToastMessage from '../../shared/ToastMessage/ToastMessage';
+import { RootContext } from '../../../store/RootContext';
 
 const ChannelDetails = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const { closeChannel } = useHttp();
   const [showToast, setShowToast] = useState(false);
   const [channelClosed, setChannelClosed] = useState(props.selChannel.current_state !== 'ACTIVE');
@@ -26,7 +28,7 @@ const ChannelDetails = (props) => {
   const [responseMessage, setResponseMessage] = useState('');
 
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (appCtx.nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
+    window.open('https://blockstream.info/' + (clnCtx.nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
   };
 
   const ChannelCloseHandler = (event) => {
@@ -50,7 +52,7 @@ const ChannelDetails = (props) => {
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });
@@ -65,7 +67,7 @@ const ChannelDetails = (props) => {
 
   const confirmResponseHandler = (response) => {
     setShowToast(false);
-    appCtx.setShowToast({...appCtx.showToast, show: false, onConfirmResponse: null});
+    rootCtx.setShowToast({...rootCtx.showToast, show: false, onConfirmResponse: null});
     if (response) {
       setResponseStatus(CallStatus.PENDING);
       setResponseMessage('Closing Channel...');
@@ -126,10 +128,10 @@ const ChannelDetails = (props) => {
                     </ProgressBar>
                     <Row className='text-light d-flex align-items-end justify-content-between'>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                        {formatCurrency(props.selChannel.to_us_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
+                        {formatCurrency(props.selChannel.to_us_sat, Units.SATS, rootCtx.appConfig.uiConfig.unit, false, 5, 'string')} {rootCtx.appConfig.uiConfig.unit}
                       </Col>
                       <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                        {formatCurrency(props.selChannel.to_them_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
+                        {formatCurrency(props.selChannel.to_them_sat, Units.SATS, rootCtx.appConfig.uiConfig.unit, false, 5, 'string')} {rootCtx.appConfig.uiConfig.unit}
                       </Col>
                     </Row>
                   </Col>
@@ -160,19 +162,19 @@ const ChannelDetails = (props) => {
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Dust Limit</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.dust_limit_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
+                      {formatCurrency(props.selChannel.dust_limit_msat, Units.MSATS, rootCtx.appConfig.uiConfig.unit, false, 8, 'string')} {rootCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Spendable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.spendable_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
+                      {formatCurrency(props.selChannel.spendable_msat, Units.MSATS, rootCtx.appConfig.uiConfig.unit, false, 8, 'string')} {rootCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>
                     <Col xs={12} className='fs-7 text-light'>Receivable</Col>
                     <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
-                      {formatCurrency(props.selChannel.receivable_msat, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 8, 'string')} {appCtx.appConfig.uiConfig.unit}
+                      {formatCurrency(props.selChannel.receivable_msat, Units.MSATS, rootCtx.appConfig.uiConfig.unit, false, 8, 'string')} {rootCtx.appConfig.uiConfig.unit}
                     </Col>
                   </Row>
                   <Row className='mt-12px'>

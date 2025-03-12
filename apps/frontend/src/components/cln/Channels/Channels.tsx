@@ -6,28 +6,30 @@ import { motion } from "framer-motion";
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Card, Row, Col, ListGroup, Alert, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { ActionSVG } from '../../../svgs/Action';
 import { ApplicationModes, STAGERRED_SPRING_VARIANTS_3, Units } from '../../../utilities/constants';
 import { NoChannelLightSVG } from '../../../svgs/NoChannelLight';
 import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
+import { RootContext } from '../../../store/RootContext';
 
 const Channels = (props) => {
-  const appCtx = useContext(AppContext);
-  const allChannelsMerged = [...appCtx.listChannels.activeChannels, ...appCtx.listChannels.pendingChannels, ...appCtx.listChannels.inactiveChannels];
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
+  const allChannelsMerged = [...clnCtx.listChannels.activeChannels, ...clnCtx.listChannels.pendingChannels, ...clnCtx.listChannels.inactiveChannels];
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
       <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
-        { appCtx.authStatus.isAuthenticated && appCtx.listChannels.isLoading ? 
+        { rootCtx.authStatus.isAuthenticated && clnCtx.listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
               <Spinner animation='grow' variant='primary' data-testid='channels-spinner'/>
             </span> 
           :
-          appCtx.listChannels.error ? 
-            <Alert className='fs-8' variant='danger' data-testid='channels-error'>{appCtx.listChannels.error}</Alert> : 
+          clnCtx.listChannels.error ? 
+            <Alert className='fs-8' variant='danger' data-testid='channels-error'>{clnCtx.listChannels.error}</Alert> : 
             allChannelsMerged && allChannelsMerged.length && allChannelsMerged.length > 0 ?
               <PerfectScrollbar>
                 <ListGroup as='ul' variant='flush' className='list-channels'>
@@ -58,10 +60,10 @@ const Channels = (props) => {
                           </ProgressBar>
                           <Row className='text-light d-flex align-items-end justify-content-between'>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                              {formatCurrency(channel.to_us_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
+                              {formatCurrency(channel.to_us_sat, Units.SATS, rootCtx.appConfig.uiConfig.unit, false, 5, 'string')} {rootCtx.appConfig.uiConfig.unit}
                             </Col>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                              {formatCurrency(channel.to_them_sat, Units.SATS, appCtx.appConfig.uiConfig.unit, false, 5, 'string')} {appCtx.appConfig.uiConfig.unit}
+                              {formatCurrency(channel.to_them_sat, Units.SATS, rootCtx.appConfig.uiConfig.unit, false, 5, 'string')} {rootCtx.appConfig.uiConfig.unit}
                             </Col>
                           </Row>
                         </>
@@ -73,7 +75,7 @@ const Channels = (props) => {
             :
               <Row className='text-light fs-6 mt-3 h-100 mt-2 align-items-center justify-content-center'>
                 <Row className='d-flex align-items-center justify-content-center'>
-                  { appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
+                  { rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 
                     <NoChannelDarkSVG className='no-channel-dark mt-5 pb-1' /> :
                     <NoChannelLightSVG className='no-channel-light mt-5 pb-1' />
                   }

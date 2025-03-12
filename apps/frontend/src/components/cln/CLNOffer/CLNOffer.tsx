@@ -5,11 +5,11 @@ import { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
 import logger from '../../../services/logger.service';
+import { RootContext } from '../../../store/RootContext';
 
 const OfferDetail = ({offer, copyHandler}) => {
   return (
@@ -28,7 +28,7 @@ const OfferDetail = ({offer, copyHandler}) => {
 };
 
 const CLNOffer = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   
   const copyHandler = (event) => {
     let textToCopy = '';
@@ -41,7 +41,7 @@ const CLNOffer = (props) => {
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });
