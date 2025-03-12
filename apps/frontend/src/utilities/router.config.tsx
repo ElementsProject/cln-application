@@ -6,7 +6,6 @@ import { Loading } from '../components/ui/Loading/Loading';
 const App = lazy(() => import('../components/App/App'));
 const CLNHome = lazy(() => import('../components/cln/CLNHome/CLNHome'));
 const Bookkeeper = lazy(() => import('../components/bookkeeper/BkprRoot/BkprRoot'));
-const Greenlight = lazy(() => import('../components/greenlight/GLRoot/GLRoot'));
 
 export const rootRouteConfig = [
   {
@@ -36,14 +35,6 @@ export const rootRouteConfig = [
             ),
           },
         ],
-      },
-      {
-        path: 'gl',
-        element: (
-          <Suspense fallback={<Loading />}>
-            <Greenlight />
-          </Suspense>
-        ),
       },
     ],
   },

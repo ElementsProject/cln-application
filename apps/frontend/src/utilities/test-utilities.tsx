@@ -1,19 +1,77 @@
 import { render } from '@testing-library/react';
-import { AppContext } from '../store/AppContext';
+import { RootContext } from '../store/RootContext';
 import { ApplicationModes, Units } from './constants';
 import { Offer, LightningTransaction, Invoice, BkprTransaction, PeerChannel, Rune } from '../types/lightning-wallet.type';
+import { CLNContext } from '../store/CLNContext';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Suspense } from 'react';
+import { Loading } from '../components/ui/Loading/Loading';
+import AuthWrapper from '../components/ui/AuthWrapper/AuthWrapper';
+import CLNHome from '../components/cln/CLNHome/CLNHome';
+import Bookkeeper from '../components/bookkeeper/BkprRoot/BkprRoot';
+import App from '../components/App/App';
 
-export const getMockStoreData = (replaceKey?: string, replaceValue?: any) => {
-  if (replaceKey && replaceKey !== '' && !!replaceValue) {
-    mockStoreData[replaceKey] = replaceValue;
-  }
-  return mockStoreData;
+const routeComponentMap = {
+  '/': <App />,
+  '/cln': <CLNHome />,
+  '/cln/bookkeeper': <Bookkeeper />,
 };
 
-export const renderWithMockContext = (ui, { providerProps, ...renderOptions }) => {
+export const getMockRootStoreData = (replaceKey?: string, replaceValue?: any) => {
+  if (replaceKey && replaceKey !== '' && !!replaceValue) {
+    mockRootStoreData[replaceKey] = replaceValue;
+  }
+  return mockRootStoreData;
+};
+
+export const getMockCLNStoreData = (replaceKey?: string, replaceValue?: any) => {
+  if (replaceKey && replaceKey !== '' && !!replaceValue) {
+    mockCLNStoreData[replaceKey] = replaceValue;
+  }
+  return mockCLNStoreData;
+};
+
+export const renderWithMockRootContext = (providerRootProps, ui: any | null = null, initialRoute = '/') => {
   return render(
-    <AppContext.Provider value={providerProps}>{ui}</AppContext.Provider>,
-    renderOptions
+    <RootContext.Provider value={providerRootProps}>
+      <AuthWrapper>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route
+                path='/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    {ui ? ui : routeComponentMap[initialRoute]}
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </MemoryRouter>
+      </AuthWrapper>
+    </RootContext.Provider>
+  );
+};
+
+export const renderWithMockCLNContext = (providerRootProps, providerCLNProps, ui: any | null = null, initialRoute = '/cln') => {
+  return render(
+    <RootContext.Provider value={providerRootProps}>
+      <AuthWrapper>
+        <CLNContext.Provider value={providerCLNProps}>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route
+                path='/cln/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    {ui ? ui : routeComponentMap[initialRoute]}
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </MemoryRouter>
+        </CLNContext.Provider>
+      </AuthWrapper>
+    </RootContext.Provider>
   );
 };
 
@@ -170,7 +228,7 @@ export const mockSelectedChannel: PeerChannel = {
 
 const mockFaDollarSign = { icon: ['fas', 'dollar-sign'], iconName: 'dollar-sign', prefix: 'fas' };
 
-export const mockStoreData = {
+export const mockRootStoreData = {
   authStatus: {
     isLoading: true,
     isAuthenticated: true,
@@ -234,6 +292,16 @@ export const mockStoreData = {
     symbol: mockFaDollarSign,
     error: null
   },
+  setAuthStatus: jest.fn(),
+  setShowModals: jest.fn(),
+  setShowToast: jest.fn(),
+  setWalletConnect: jest.fn(),
+  setConfig: jest.fn(),
+  setFiatConfig: jest.fn(),
+  clearStore: jest.fn(),
+};
+
+export const mockCLNStoreData = {
   feeRate: {
     perkb: {
       opening: 1080,
@@ -1092,12 +1160,6 @@ export const mockStoreData = {
     btcReservedBalance: 2499838,
     error: null
   },
-  setAuthStatus: jest.fn(),
-  setShowModals: jest.fn(),
-  setShowToast: jest.fn(),
-  setWalletConnect: jest.fn(),
-  setConfig: jest.fn(),
-  setFiatConfig: jest.fn(),
   setFeeRate: jest.fn(),
   setNodeInfo: jest.fn(),
   setListFunds: jest.fn(),

@@ -1,4 +1,9 @@
-import { Card, Col, Placeholder, Row, Spinner } from "react-bootstrap";
+import { Col, Row, Spinner } from "react-bootstrap";
+import BTCCard from "../../cln/BTCCard/BTCCard";
+import ChannelsCard from "../../cln/ChannelsCard/ChannelsCard";
+import CLNCard from "../../cln/CLNCard/CLNCard";
+import Overview from "../../cln/Overview/Overview";
+import Header from "../Header/Header";
 
 export const Loading = () => {
   return (
@@ -13,13 +18,28 @@ export const Loading = () => {
   );
 }
 
-export const EmptyCard = (props) => {
+export const EmptyHome = (props) => {
   return (
-    <Card className='mt-5 cards-container inner-box-shadow p-5'>
-      <Placeholder animation='glow'>
-        <Placeholder xs={12} />
-      </Placeholder>
-      <Col xs={12} className='mt-3 d-flex justify-content-center'>Loading...</Col>
-    </Card>
+    <>
+      <div data-testid='row-loading'>
+        <Header />
+        <Row>
+          <Col className='mx-1'>
+            <Overview />
+          </Col>
+        </Row>
+        <Row className='px-3'>
+          <Col xs={12} lg={4} className='cards-container'>
+            <BTCCard />
+          </Col>
+          <Col xs={12} lg={4} className='cards-container'>
+            <CLNCard />
+          </Col>
+          <Col xs={12} lg={4} className='cards-container'>
+            <ChannelsCard />
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 }

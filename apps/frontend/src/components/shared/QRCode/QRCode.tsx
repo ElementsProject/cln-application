@@ -8,16 +8,16 @@ import { Row, Form, InputGroup } from 'react-bootstrap';
 
 import { CopySVG } from '../../../svgs/Copy';
 import { ApplicationModes } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import logger from '../../../services/logger.service';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
+import { RootContext } from '../../../store/RootContext';
 
 const QRCodeComponent = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
 
   const copyHandler = () => {
     copyTextToClipboard(props.message).then((response) => {
-      appCtx.setShowToast({show: true, message: (props.toastMessage || props.message), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: (props.toastMessage || props.message), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });
@@ -30,14 +30,14 @@ const QRCodeComponent = (props) => {
           <motion.img
             key='cln-logo'
             alt='Core Lightning Logo'
-            src={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? 'images/cln-logo-dark.png' : 'images/cln-logo-light.png'}
+            src={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
             className='qr-cln-logo'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.05, duration: 0.01 }}
         />
         </AnimatePresence>
-        <QRCodeCanvas value={props.message || ''} size={220} includeMargin={true} bgColor={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#2A2A2C' : '#FFFFFF'} fgColor={appCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
+        <QRCodeCanvas value={props.message || ''} size={220} includeMargin={true} bgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#2A2A2C' : '#FFFFFF'} fgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
       </Row>
       <Row className='w-100 mt-5 d-flex align-items-start justify-content-center'>
         <InputGroup className='px-0 mb-3'>

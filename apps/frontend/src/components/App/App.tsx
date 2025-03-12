@@ -7,7 +7,8 @@ import { Container } from 'react-bootstrap';
 
 import useHttp from '../../hooks/use-http';
 import useBreakpoint from '../../hooks/use-breakpoint';
-import { AppContext } from '../../store/AppContext';
+import { RootContext } from '../../store/RootContext';
+import { CLNContext } from '../../store/CLNContext';
 import { ApplicationModes } from '../../utilities/constants';
 import ToastMessage from '../shared/ToastMessage/ToastMessage';
 import NodeInfo from '../modals/NodeInfo/NodeInfo';
@@ -17,19 +18,20 @@ import LogoutComponent from '../modals/Logout/Logout';
 import SetPasswordComponent from '../modals/SetPassword/SetPassword';
 import logger from '../../services/logger.service';
 import { AuthResponse } from '../../types/app-config.type';
-import { EmptyCard } from '../ui/Loading/Loading';
+import { EmptyHome } from '../ui/Loading/Loading';
 
 function App() {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const currentScreenSize = useBreakpoint();
   const { setCSRFToken, getAppConfigurations, getAuthStatus, initiateDataLoading } = useHttp();
 
   const bodyHTML = document.getElementsByTagName('body')[0];
   const htmlAttributes = bodyHTML.attributes;
   const theme = document.createAttribute('data-bs-theme');
-  theme.value = appCtx.appConfig.uiConfig.appMode?.toLowerCase() || 'dark';
+  theme.value = rootCtx.appConfig.uiConfig.appMode?.toLowerCase() || 'dark';
   bodyHTML.style.backgroundColor =
-    appCtx.appConfig.uiConfig.appMode === ApplicationModes.LIGHT ? '#EBEFF9' : '#0C0C0F';
+    rootCtx.appConfig.uiConfig.appMode === ApplicationModes.LIGHT ? '#EBEFF9' : '#0C0C0F';
   const screensize = document.createAttribute('data-screensize');
   screensize.value = currentScreenSize;
   htmlAttributes.setNamedItem(theme);
@@ -40,56 +42,56 @@ function App() {
       setCSRFToken(),
       getAppConfigurations()
     ])
-    .then(([isCsrfSet, config]: [any, any]) => {
-      if (isCsrfSet) {
-        getAuthStatus().then((authStatus: AuthResponse) => {
-          if (!authStatus.isAuthenticated) {
-            if (authStatus.isValidPassword) {
-              appCtx.setShowModals({ ...appCtx.showModals, loginModal: true });
+      .then(([isCsrfSet, config]: [any, any]) => {
+        if (isCsrfSet) {
+          getAuthStatus().then((authStatus: AuthResponse) => {
+            if (!authStatus.isAuthenticated) {
+              if (authStatus.isValidPassword) {
+                rootCtx.setShowModals({ ...rootCtx.showModals, loginModal: true });
+              } else {
+                rootCtx.setShowModals({ ...rootCtx.showModals, setPasswordModal: true });
+              }
             } else {
-              appCtx.setShowModals({ ...appCtx.showModals, setPasswordModal: true });
+              if (authStatus.isValidPassword) {
+                initiateDataLoading();
+              } else {
+                logger.error(authStatus);
+                clnCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(authStatus) });
+              }
             }
-          } else {
-            if (authStatus.isValidPassword) {
-              initiateDataLoading();
-            } else {
-              logger.error(authStatus);
-              appCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(authStatus) });
-            }
-          }
-        });
-      } else {
-        logger.error(isCsrfSet);
-        appCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
-      }
-    }).catch(err => {
-      logger.error(err);
-      if (err.response && err.response.data) {
-        appCtx.setNodeInfo({ isLoading: false, error: err.response.data });
-      } else if (!err.response && err.message) {
-        appCtx.setNodeInfo({ isLoading: false, error: err.message })
-      } else {
-        appCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(err)});
-      }
-    });
+          });
+        } else {
+          logger.error(isCsrfSet);
+          clnCtx.setNodeInfo({ isLoading: false, error: typeof isCsrfSet === 'object' ? JSON.stringify(isCsrfSet) : isCsrfSet });
+        }
+      }).catch(err => {
+        logger.error(err);
+        if (err.response && err.response.data) {
+          clnCtx.setNodeInfo({ isLoading: false, error: err.response.data });
+        } else if (!err.response && err.message) {
+          clnCtx.setNodeInfo({ isLoading: false, error: err.message })
+        } else {
+          clnCtx.setNodeInfo({ isLoading: false, error: JSON.stringify(err) });
+        }
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
-      <Container className={appCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
-      { appCtx.authStatus.isAuthenticated ? 
-        <Outlet />
-        :
-        <EmptyCard />
-      }
+      <Container className={rootCtx.authStatus.isAuthenticated ? 'py-4' : 'py-4 blurred-container'} id='root-container' data-testid='container'>
+        {rootCtx.authStatus.isAuthenticated ?
+          <Outlet />
+          :
+          <EmptyHome />
+        }
       </Container>
-    <ToastMessage />
-    <NodeInfo />
-    <ConnectWallet />
-    <LoginComponent />
-    <LogoutComponent />
-    <SetPasswordComponent />
+      <ToastMessage />
+      <NodeInfo />
+      <ConnectWallet />
+      <LoginComponent />
+      <LogoutComponent />
+      <SetPasswordComponent />
     </>
   );
 }

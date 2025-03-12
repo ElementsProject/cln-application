@@ -7,8 +7,4 @@ describe('Header component ', () => {
   it('should be in the document', () => {
     expect(screen.getByTestId('header-context')).toBeInTheDocument();
   });
-
-  it('should be in the document', () => {
-    expect(screen.getByTestId('header-context')).toBeInTheDocument();
-  });
 });

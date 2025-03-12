@@ -8,20 +8,20 @@ import { motion } from 'framer-motion';
 import { Toast, Col } from 'react-bootstrap';
 
 import { BOUNCY_SPRING_VARIANTS_3, STAGERRED_SPRING_VARIANTS_2 } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import { CloseSVG } from '../../../svgs/Close';
 import { QuestionMarkSVG } from '../../../svgs/QuestionMark';
+import { RootContext } from '../../../store/RootContext';
 
 const ToastMessage = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const [y, setY] = useState('0');
-  const TOAST_SHOW = props.showOnComponent ? !!props.show : !!appCtx.showToast.show;
-  const TOAST_TYPE = props.type || appCtx.showToast.type || '';
-  const SHOW_DELAY = props.showDelay  || appCtx.showToast.delay || 3000;
-  const TOAST_BG = props.bg || appCtx.showToast.bg || 'primary';
-  const TOAST_CONTAINER_CLASS_NAME = 'toast-container w-100 d-flex justify-content-center ' + (props.containerClassName || appCtx.showToast.containerClassName || 'top-0');
-  const TOAST_CLASS_NAME = 'd-flex align-items-start justify-content-between ' + (props.className || appCtx.showToast.className || '');
-  const TOAST_MESSAGE = props.message || appCtx.showToast.message || '';
+  const TOAST_SHOW = props.showOnComponent ? !!props.show : !!rootCtx.showToast.show;
+  const TOAST_TYPE = props.type || rootCtx.showToast.type || '';
+  const SHOW_DELAY = props.showDelay  || rootCtx.showToast.delay || 3000;
+  const TOAST_BG = props.bg || rootCtx.showToast.bg || 'primary';
+  const TOAST_CONTAINER_CLASS_NAME = 'toast-container w-100 d-flex justify-content-center ' + (props.containerClassName || rootCtx.showToast.containerClassName || 'top-0');
+  const TOAST_CLASS_NAME = 'd-flex align-items-start justify-content-between ' + (props.className || rootCtx.showToast.className || '');
+  const TOAST_MESSAGE = props.message || rootCtx.showToast.message || '';
 
   useEffect(() => {
     if (!props.showOnComponent) {
@@ -31,13 +31,13 @@ const ToastMessage = (props) => {
   
   const closeHandler = () => {
     if (!props.showOnComponent) {
-      appCtx.setShowToast({...appCtx.showToast, show: false});
+      rootCtx.setShowToast({...rootCtx.showToast, show: false});
     }
   }
 
   const confirmCloseHandler = (response) => {
     if (!props.showOnComponent) {
-      appCtx.setShowToast({...appCtx.showToast, show: false, onConfirmResponse: response});
+      rootCtx.setShowToast({...rootCtx.showToast, show: false, onConfirmResponse: response});
     } else {
       props.onConfirmResponse(response);
     }

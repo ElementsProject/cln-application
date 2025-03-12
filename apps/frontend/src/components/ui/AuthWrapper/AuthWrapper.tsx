@@ -1,43 +1,33 @@
 import { useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AppContext } from '../../../store/AppContext';
+import { CLNProvider } from '../../../store/CLNContext';
+import { RootContext } from '../../../store/RootContext';
 
 const AuthWrapper = ({ children }) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (appCtx.authStatus.isLoading) {
-      return;
-    }
-    
-    if (!appCtx.authStatus.isAuthenticated) {
+    if (rootCtx.authStatus.isLoading) {
       navigate('/');
       return;
     }
-    
-    const { lightningNodeType } = appCtx.appConfig.serverConfig;
-    
+
+    if (!rootCtx.authStatus.isAuthenticated) {
+      navigate('/');
+      return;
+    }
+
     if (location.pathname === '/') {
-      if (lightningNodeType === 'GREENLIGHT') {
-        navigate('/gl');
-      } else {
-        navigate('/cln');
-      }
-      return;
-    }
-    
-    if (lightningNodeType === 'GREENLIGHT' && location.pathname.startsWith('/cln')) {
-      navigate('/gl');
-      return;
-    }
-    
-    if (lightningNodeType !== 'GREENLIGHT' && location.pathname.startsWith('/gl')) {
       navigate('/cln');
       return;
     }
-  }, [appCtx.authStatus, navigate, location.pathname, appCtx.appConfig.serverConfig.lightningNodeType, appCtx.appConfig.serverConfig]);
+  }, [rootCtx.authStatus, navigate, location.pathname]);
+
+  if (location.pathname.startsWith('/cln')) {
+    return <CLNProvider><div data-testid='cln-provider'>{children}</div></CLNProvider>;
+  }
 
   return children;
 };

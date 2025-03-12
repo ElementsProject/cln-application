@@ -1,14 +1,32 @@
-import { act, render, screen } from '@testing-library/react';
-import App from './App';
-import { RouterProvider, createMemoryRouter } from 'react-router-dom';
-import { cleanup } from "@testing-library/react";
+import { screen } from '@testing-library/react';
+import { getMockCLNStoreData, getMockRootStoreData, renderWithMockCLNContext } from '../../utilities/test-utilities';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-afterEach(cleanup);
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
-describe('App component ', () => {
-  beforeEach(() => render(<App />));
+describe('App component', () => {
+  let providerRootProps;
+  let providerCLNProps;
+
+  beforeEach(() => {
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+  });
 
   it('should be in the document', () => {
-    expect(screen.getByTestId('container')).not.toBeEmptyDOMElement();
+    renderWithMockCLNContext(providerRootProps, providerCLNProps);
+    expect(screen.getByTestId('cln-container')).toBeInTheDocument();
   });
 });

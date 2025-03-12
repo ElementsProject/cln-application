@@ -15,7 +15,6 @@ export enum AppConnect {
 
 export enum NodeType {
   CLN = 'CLN',
-  GREENLIGHT = 'GREENLIGHT',
 }
 
 export enum HttpStatusCode {

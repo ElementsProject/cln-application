@@ -15,7 +15,6 @@ export var AppConnect;
 export var NodeType;
 (function (NodeType) {
     NodeType["CLN"] = "CLN";
-    NodeType["GREENLIGHT"] = "GREENLIGHT";
 })(NodeType || (NodeType = {}));
 export var HttpStatusCode;
 (function (HttpStatusCode) {

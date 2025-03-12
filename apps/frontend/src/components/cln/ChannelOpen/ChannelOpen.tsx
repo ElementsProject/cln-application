@@ -9,7 +9,7 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { CallStatus, FeeRate, BOUNCY_SPRING_VARIANTS_1, CLEAR_STATUS_ALERT_DELAY } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
 import { AddressSVG } from '../../../svgs/Address';
@@ -18,16 +18,18 @@ import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMe
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import FeerateRange from '../../shared/FeerateRange/FeerateRange';
+import { RootContext } from '../../../store/RootContext';
 
 
 const ChannelOpen = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const { openChannel } = useHttp();
   const [selFeeRate, setSelFeeRate] = useState(FeeRate.NORMAL)
   const [announce, setAnnounce] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
-  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (appCtx.walletBalances.btcSpendableBalance || 0);
+  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (clnCtx.walletBalances.btcSpendableBalance || 0);
   const isValidPubkey = (value) => value.includes('@') && value.includes(':');
 
   const {
@@ -161,7 +163,7 @@ const ChannelOpen = (props) => {
                       tabIndex={2}
                       id='amount'
                       type='number'
-                      placeholder={'Amount (Between 1 - ' + parseFloat((appCtx.walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
+                      placeholder={'Amount (Between 1 - ' + parseFloat((clnCtx.walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
                       aria-label='amount'
                       aria-describedby='addon-amount'
                       className='form-control-right'
@@ -174,7 +176,7 @@ const ChannelOpen = (props) => {
                     !amountHasError ?
                       amountValue ?
                         <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                          ~ <FiatBox value={(+amountValue || 0)} fiatUnit={appCtx.appConfig.uiConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+                          ~ <FiatBox value={(+amountValue || 0)} fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
                         </p>
                       :
                         <p className='message'></p>
@@ -182,8 +184,8 @@ const ChannelOpen = (props) => {
                       <InvalidInputMessage message={
                         (+amountValue <= 0) ? 
                           'Amount should be greater than 0'
-                        : (+amountValue > (appCtx.walletBalances.btcSpendableBalance || 0)) ? 
-                          'Amount should be lesser then ' + (appCtx.walletBalances.btcSpendableBalance || 0)
+                        : (+amountValue > (clnCtx.walletBalances.btcSpendableBalance || 0)) ? 
+                          'Amount should be lesser then ' + (clnCtx.walletBalances.btcSpendableBalance || 0)
                         :
                           'Invalid Amount'
                       } />

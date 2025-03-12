@@ -5,18 +5,20 @@ import { useContext } from 'react';
 import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { FeeRate, FEE_RATES, Units } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import FiatBox from '../FiatBox/FiatBox';
+import { CLNContext } from '../../../store/CLNContext';
+import { RootContext } from '../../../store/RootContext';
 
 const FeerateRange = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
 
   const getSelFeeRateValue = () => {
     return (props.selFeeRate === FeeRate.SLOW) ? 
-      (appCtx.feeRate.perkb?.min_acceptable || 0) :
+      (clnCtx.feeRate.perkb?.min_acceptable || 0) :
       (props.selFeeRate === FeeRate.URGENT) ? 
-        (appCtx.feeRate.perkb?.unilateral_close || 0) :
-        (appCtx.feeRate.perkb?.opening || 0);
+        (clnCtx.feeRate.perkb?.unilateral_close || 0) :
+        (clnCtx.feeRate.perkb?.opening || 0);
   };
 
   return (
@@ -32,7 +34,7 @@ const FeerateRange = (props) => {
             <Tooltip className={'feerate-tooltip feerate-tooltip-' + props.selFeeRate}>
               {Math.round(getSelFeeRateValue() / 1000)} Sats/vB
                ≈ 
-              <FiatBox className='ms-1' value={Math.round(getSelFeeRateValue() * .18)} fromUnit={Units.SATS} fiatUnit={appCtx.appConfig.uiConfig.fiatUnit} symbol={appCtx.fiatConfig.symbol} rate={appCtx.fiatConfig.rate} />
+              <FiatBox className='ms-1' value={Math.round(getSelFeeRateValue() * .18)} fromUnit={Units.SATS} fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
             </Tooltip>
             }
           >
