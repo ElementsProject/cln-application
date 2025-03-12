@@ -4,11 +4,7 @@ import './BTCWallet.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Card from 'react-bootstrap/Card';
-import Col from 'react-bootstrap/Col';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import { Spinner, Alert, Card, Col, ButtonGroup } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { BitcoinWalletSVG } from '../../../svgs/BitcoinWallet';

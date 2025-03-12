@@ -3,10 +3,7 @@ import React from 'react';
 import './CLNOffersList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Row from 'react-bootstrap/esm/Row';
-import Col from 'react-bootstrap/esm/Col';
+import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';

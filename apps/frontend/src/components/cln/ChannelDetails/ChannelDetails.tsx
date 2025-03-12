@@ -3,13 +3,7 @@ import React from 'react';
 import './ChannelDetails.scss';
 import { useContext, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import ProgressBar from 'react-bootstrap/ProgressBar';
-import Spinner from 'react-bootstrap/Spinner';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { Spinner, Card, Row, Col, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
 import { copyTextToClipboard, formatCurrency, titleCase } from '../../../utilities/data-formatters';

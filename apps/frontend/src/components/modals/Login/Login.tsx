@@ -3,13 +3,7 @@ import React from 'react';
 import './Login.scss';
 import { useContext, useState } from 'react';
 import SHA256 from "crypto-js/sha256";
-
-import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Spinner from 'react-bootstrap/Spinner';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Form from 'react-bootstrap/Form';
+import { Modal, Col, Row, Spinner, InputGroup, Form } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';

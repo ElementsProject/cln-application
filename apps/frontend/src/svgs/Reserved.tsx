@@ -1,7 +1,5 @@
 import React from 'react';
-
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 // Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc.
 export const ReservedSVG = props => {

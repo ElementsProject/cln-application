@@ -3,11 +3,7 @@ import React from 'react';
 import './Overview.scss';
 import { useContext, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap';
 
 import useBreakpoint from '../../../hooks/use-breakpoint';
 import { Breakpoints, COUNTUP_DURATION } from '../../../utilities/constants';

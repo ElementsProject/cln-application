@@ -2,9 +2,7 @@ import React from 'react';
 
 import './BkprRoot.scss';
 import { ActionSVG } from '../../../svgs/Action';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Card, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 function Bookkeeper() {

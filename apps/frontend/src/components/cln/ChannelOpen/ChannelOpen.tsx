@@ -3,12 +3,7 @@ import React from 'react';
 import './ChannelOpen.scss';
 import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Spinner from 'react-bootstrap/Spinner';
+import { Spinner, Card, Row, Col, Form, InputGroup } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';

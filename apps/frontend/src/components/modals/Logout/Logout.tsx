@@ -2,9 +2,7 @@ import React from 'react';
 
 import './Logout.scss';
 import { useContext } from 'react';
-
-import Modal from 'react-bootstrap/Modal';
-import Col from 'react-bootstrap/Col';
+import { Modal, Col } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
 import { QuestionMarkSVG } from '../../../svgs/QuestionMark';

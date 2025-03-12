@@ -2,11 +2,7 @@ import React from 'react';
 
 import './FeerateRange.scss';
 import { useContext } from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip';
+import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { FeeRate, FEE_RATES, Units } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';

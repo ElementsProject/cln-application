@@ -3,11 +3,7 @@ import React from 'react';
 import './Header.scss';
 import { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip';
+import { Row, Col, Image, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
 import useBreakpoint from '../../../hooks/use-breakpoint';

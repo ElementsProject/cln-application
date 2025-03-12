@@ -4,8 +4,7 @@ import './FiatSelection.scss';
 import { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Col from 'react-bootstrap/Col';
+import { Dropdown, Col } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
 import { AppContext } from '../../../store/AppContext';
