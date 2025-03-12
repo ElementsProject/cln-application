@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Suspense } from 'react';
 import { Loading } from '../../ui/Loading/Loading';
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import CLNHome from './CLNHome';
 
 jest.mock('../../ui/Header/Header', () => () => <div data-testid='mock-header' />);
@@ -15,7 +15,7 @@ jest.mock('../ChannelsCard/ChannelsCard', () => () => <div data-testid='mock-cha
 
 const renderWithContext = (contextValue, initialRoute = '/cln') => {
   return render(
-    <AppContext.Provider value={contextValue}>
+    <CLNContext.Provider value={contextValue}>
       <MemoryRouter initialEntries={[initialRoute]}>
         <Routes>
           <Route
@@ -28,7 +28,7 @@ const renderWithContext = (contextValue, initialRoute = '/cln') => {
           />
         </Routes>
       </MemoryRouter>
-    </AppContext.Provider>
+    </CLNContext.Provider>
   );
 };
 

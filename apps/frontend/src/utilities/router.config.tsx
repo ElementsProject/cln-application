@@ -1,12 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
+import LSPList from '../components/greenlight/LSPList/LSPList';
 import AuthWrapper from '../components/ui/AuthWrapper/AuthWrapper';
 import { Loading } from '../components/ui/Loading/Loading';
 
 const App = lazy(() => import('../components/App/App'));
 const CLNHome = lazy(() => import('../components/cln/CLNHome/CLNHome'));
 const Bookkeeper = lazy(() => import('../components/bookkeeper/BkprRoot/BkprRoot'));
-const Greenlight = lazy(() => import('../components/greenlight/GLRoot/GLRoot'));
+const GLHome = lazy(() => import('../components/greenlight/GLHome/GLHome'));
 
 export const rootRouteConfig = [
   {
@@ -41,9 +42,19 @@ export const rootRouteConfig = [
         path: 'gl',
         element: (
           <Suspense fallback={<Loading />}>
-            <Greenlight />
+            <GLHome />
           </Suspense>
         ),
+        children: [
+          {
+            path: 'lsps',
+            element: (
+              <Suspense fallback={<Loading />}>
+                <LSPList />
+              </Suspense>
+            ),
+          },
+        ],
       },
     ],
   },

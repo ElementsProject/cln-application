@@ -1,0 +1,133 @@
+@use 'sass:math';
+@import '../../../styles/constants.scss';
+
+.header {
+  & .header-info-logo {
+    height: 5.5rem;
+  }
+}
+
+.svg-logout {
+  transition: all $theme-transition ease;
+  &:hover {
+    scale: 1.1;
+  }
+}
+
+.svg-night {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all $theme-transition ease;
+  & path {
+    fill: $primary;
+  }
+  &:hover {
+    opacity: 1;
+    scale: 1.05;
+    filter: drop-shadow(0px 0px 3px $light)
+    drop-shadow(0px 0px 6px  $light)
+    drop-shadow(0px 0px 20px $light);
+    & path {
+      fill: $light;
+    }
+  }
+}
+
+.svg-day {
+  cursor: pointer;
+  opacity: 1;
+  transition: all $theme-transition ease;
+  & path {
+    fill: $primary;
+    &.delay-1 {
+      transition: all $theme-transition ease 300ms;
+    }
+    &.delay-2 {
+      transition: all $theme-transition ease 276ms;
+    }
+    &.delay-3 {
+      transition: all $theme-transition ease 253ms;
+    }
+    &.delay-4 {
+      transition: all $theme-transition ease 230ms;
+    }
+    &.delay-5 {
+      transition: all $theme-transition ease 207ms;
+    }
+    &.delay-6 {
+      transition: all $theme-transition ease 184ms;
+    }
+    &.delay-7 {
+      transition: all $theme-transition ease 161ms;
+    }
+    &.delay-8 {
+      transition: all $theme-transition ease 138ms;
+    }
+    &.delay-9 {
+      transition: all $theme-transition ease 115ms;
+    }
+    &.delay-10 {
+      transition: all $theme-transition ease 92ms;
+    }
+    &.delay-11 {
+      transition: all $theme-transition ease 69ms;
+    }
+    &.delay-12 {
+      transition: all $theme-transition ease 46ms;
+    }
+    &.delay-13 {
+      transition: all $theme-transition ease 23ms;
+    }
+    &.delay-14 {
+      transition: all $theme-transition ease 0ms;
+    }
+  }
+  &:hover {
+    opacity: 0.8;
+    & path {
+      fill: $dark;
+      &.delay-1 {
+        transition: all $theme-transition ease 0ms;
+      }
+      &.delay-2 {
+        transition: all $theme-transition ease 23ms;
+      }
+      &.delay-3 {
+        transition: all $theme-transition ease 46ms;
+      }
+      &.delay-4 {
+        transition: all $theme-transition ease 69ms;
+      }
+      &.delay-5 {
+        transition: all $theme-transition ease 92ms;
+      }
+      &.delay-6 {
+        transition: all $theme-transition ease 115ms;
+      }
+      &.delay-7 {
+        transition: all $theme-transition ease 138ms;
+      }
+      &.delay-8 {
+        transition: all $theme-transition ease 161ms;
+      }
+      &.delay-9 {
+        transition: all $theme-transition ease 184ms;
+      }
+      &.delay-10 {
+        transition: all $theme-transition ease 207ms;
+      }
+      &.delay-11 {
+        transition: all $theme-transition ease 230ms;
+      }
+      &.delay-12 {
+        transition: all $theme-transition ease 253ms;
+      }
+      &.delay-13 {
+        transition: all $theme-transition ease 276ms;
+      }
+      &.delay-14 {
+        transition: all $theme-transition ease 300ms;
+      }
+    }
+  }
+}

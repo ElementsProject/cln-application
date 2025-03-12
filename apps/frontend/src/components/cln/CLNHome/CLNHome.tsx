@@ -4,7 +4,7 @@ import './CLNHome.scss';
 import { useContext } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import Overview from '../Overview/Overview';
 import BTCCard from '../BTCCard/BTCCard';
 import CLNCard from '../CLNCard/CLNCard';
@@ -12,19 +12,22 @@ import ChannelsCard from '../ChannelsCard/ChannelsCard';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../../ui/Header/Header';
 import { Loading } from '../../ui/Loading/Loading';
+import { RootContext } from '../../../store/RootContext';
 
 function CLNHome() {
   const location = useLocation();
-  const appCtx = useContext(AppContext);
-  if (appCtx.authStatus.isAuthenticated && appCtx.nodeInfo.isLoading) {
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
+
+  if (rootCtx.authStatus.isAuthenticated && clnCtx.nodeInfo.isLoading) {
     return (<Loading />);
   }
 
-  if (appCtx.nodeInfo.error) {
+  if (clnCtx.nodeInfo.error) {
     return (
       <Row className='message invalid mt-10'>
         <Col xs={12} className='d-flex align-items-center justify-content-center'>
-          {appCtx.nodeInfo.error}
+          {clnCtx.nodeInfo.error}
         </Col>
       </Row>
     );

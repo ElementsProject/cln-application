@@ -9,7 +9,6 @@ import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { CallStatus } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
 import { ActionSVG } from '../../../svgs/Action';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { PasswordSVG } from '../../../svgs/Password';
@@ -17,9 +16,10 @@ import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import { ShowSVG } from '../../../svgs/Show';
 import { HideSVG } from '../../../svgs/Hide';
 import { CloseSVG } from '../../../svgs/Close';
+import { RootContext } from '../../../store/RootContext';
 
 const SetPasswordComponent = () => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { resetUserPassword, initiateDataLoading } = useHttp();
   const [hideCurrPassword, setHideCurrPassword] = useState(true);
   const [hideNewPassword, setHideNewPassword] = useState(true);
@@ -61,8 +61,8 @@ const SetPasswordComponent = () => {
   let formIsValid = false;
 
   if (
-    (appCtx.authStatus.isValidPassword && currPasswordIsValid && newPasswordIsValid && confirmNewPasswordIsValid)
-    || (!appCtx.authStatus.isValidPassword && newPasswordIsValid && confirmNewPasswordIsValid)
+    (rootCtx.authStatus.isValidPassword && currPasswordIsValid && newPasswordIsValid && confirmNewPasswordIsValid)
+    || (!rootCtx.authStatus.isValidPassword && newPasswordIsValid && confirmNewPasswordIsValid)
   ) {
     formIsValid = true;
   };
@@ -84,7 +84,7 @@ const SetPasswordComponent = () => {
     if (!formIsValid) { return; }
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Resetting Password...');
-    resetUserPassword(appCtx.authStatus.isValidPassword, appCtx.authStatus.isValidPassword ? SHA256(currPasswordValue).toString() : '', SHA256(newPasswordValue).toString())
+    resetUserPassword(rootCtx.authStatus.isValidPassword, rootCtx.authStatus.isValidPassword ? SHA256(currPasswordValue).toString() : '', SHA256(newPasswordValue).toString())
     .then((response: any) => {
       logger.info(response);
       if (response) {
@@ -95,7 +95,7 @@ const SetPasswordComponent = () => {
         setResponseMessage('');
         resetFormValues();
         initiateDataLoading();
-        appCtx.setShowModals({...appCtx.showModals, setPasswordModal: false});
+        rootCtx.setShowModals({...rootCtx.showModals, setPasswordModal: false});
       } else {
         setResponseStatus(CallStatus.ERROR);
         setResponseMessage(response.response.data || response.message || 'Unknown Error');
@@ -121,21 +121,21 @@ const SetPasswordComponent = () => {
   };
 
   const closeHandler = () => {
-    appCtx.setShowModals({...appCtx.showModals, setPasswordModal: false});
+    rootCtx.setShowModals({...rootCtx.showModals, setPasswordModal: false});
   }
 
   return (
     <form className='h-100'>
-      <Modal show={appCtx.showModals.setPasswordModal} onHide={appCtx.authStatus.isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
+      <Modal show={rootCtx.showModals.setPasswordModal} onHide={rootCtx.authStatus.isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
-          { appCtx.authStatus.isValidPassword
+          { rootCtx.authStatus.isValidPassword
             ? <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
             : <></>
           }
         </Modal.Header>
         <Modal.Body className='py-0'>
           <Row className='d-flex align-items-start justify-content-center'>
-            { appCtx.authStatus.isValidPassword ?
+            { rootCtx.authStatus.isValidPassword ?
               <Col xs={12}>
                 <Form.Label className=' text-dark'>Current Password*</Form.Label>
                 <InputGroup className={(currPasswordHasError ? 'invalid ' : '')}>
@@ -176,7 +176,7 @@ const SetPasswordComponent = () => {
                 </InputGroup.Text>
                 <Form.Control
                   tabIndex={1}
-                  autoFocus={!appCtx.authStatus.isValidPassword}
+                  autoFocus={!rootCtx.authStatus.isValidPassword}
                   id='newpassword'
                   type={hideNewPassword ? 'password' : 'text'}
                   placeholder='New Password'
@@ -230,7 +230,7 @@ const SetPasswordComponent = () => {
         </Modal.Body>
         <Modal.Footer>
           <button tabIndex={3} type='button' className='btn-rounded bg-primary' onClick={resetPasswordHandler} disabled={responseStatus === CallStatus.PENDING}>
-            { appCtx.authStatus.isValidPassword ? 'Reset Password' : 'Set Password' }
+            { rootCtx.authStatus.isValidPassword ? 'Reset Password' : 'Set Password' }
             {responseStatus === CallStatus.PENDING ? <Spinner className='mt-1 ms-2 text-white-dark' size='sm' /> : <ActionSVG className='ms-3' />}
           </button>
         </Modal.Footer>

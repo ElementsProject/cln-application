@@ -2,10 +2,11 @@ import axios, { AxiosResponse } from 'axios';
 import { useCallback, useContext } from 'react';
 import { API_BASE_URL, API_VERSION, ApplicationModes, APP_WAIT_TIME, FIAT_CURRENCIES, PaymentType, SATS_MSAT, Units } from '../utilities/constants';
 import logger from '../services/logger.service';
-import { AppContext } from '../store/AppContext';
+import { RootContext } from '../store/RootContext';
+import { CLNContext } from '../store/CLNContext';
 import { ApplicationConfiguration, AuthResponse } from '../types/app-config.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { isCompatibleVersion } from '../utilities/data-formatters';
+import { GLContext } from '../store/GLContext';
 
 let intervalID;
 let localAuthStatus: AuthResponse = { isLoading: true, isAuthenticated: false, isValidPassword: false };
@@ -24,29 +25,26 @@ type Request = {
 }
 
 const useHttp = () => {
-  let appCtx = useContext(AppContext);
+  let rootCtx = useContext(RootContext);
+  let clnCtx = useContext(CLNContext);
+  let glCtx = useContext(GLContext);
 
   const initiateDataLoading = () => {
     const checkAuthStatus = () => {
       if (localAuthStatus.isLoading || localAppConfig.isLoading) {
         setTimeout(checkAuthStatus, 100);
       } else {
-        if (localAppConfig.serverConfig?.lightningNodeType === 'GREENLIGHT') {
-          console.warn('LOAD GREENLIGHT DATA');
-        } else {
-          getConnectWallet();
-          fetchData();
-          if (intervalID) {
-            window.clearInterval(intervalID);
-          }
-          intervalID = window.setInterval(() => {
-            logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
-            // Check if the user has logged out before next data refresh
-            if (localAuthStatus?.isAuthenticated) {
-              fetchData();
-            }
-          }, APP_WAIT_TIME);
+        fetchData();
+        if (intervalID) {
+          window.clearInterval(intervalID);
         }
+        intervalID = window.setInterval(() => {
+          logger.info('Current Auth Status: ', JSON.stringify(localAuthStatus));
+          // Check if the user has logged out before next data refresh
+          if (localAuthStatus?.isAuthenticated) {
+            fetchData();
+          }
+        }, APP_WAIT_TIME);
       }
     };
     checkAuthStatus();
@@ -56,11 +54,11 @@ const useHttp = () => {
     return axiosInstance.get('/shared/rate/' + fiatUnit)
     .then((response: any) => {
       const foundCurrency = FIAT_CURRENCIES.find(curr => curr.currency === fiatUnit);
-      appCtx.setFiatConfig({ ...response.data, isLoading: false, symbol: (foundCurrency ? foundCurrency.symbol : faDollarSign), error: null });
+      rootCtx.setFiatConfig({ ...response.data, isLoading: false, symbol: (foundCurrency ? foundCurrency.symbol : faDollarSign), error: null });
     }).catch(err => {
-      appCtx.setFiatConfig({ isLoading: false, symbol: faDollarSign, rate: 1, venue: '', error: err.response?.data || ''});
+      rootCtx.setFiatConfig({ isLoading: false, symbol: faDollarSign, rate: 1, venue: '', error: err.response?.data || ''});
     });
-  }, [appCtx]);
+  }, [rootCtx]);
 
   const sendRequestToSetStore = useCallback((setStoreFunction: any, ...requests: Request[]) => {
     try {
@@ -84,7 +82,6 @@ const useHttp = () => {
           }
 
           const combinedResponses = responses.map(response => ({ ...response.data, ...{ isLoading: false, error: null } }));
-
           if (combinedResponses.length === 1) {
             setStoreFunction({ ...responses[0].data, ...{ isLoading: false, error: null }});
           } else if (combinedResponses.length > 1) {
@@ -105,18 +102,18 @@ const useHttp = () => {
 
   const getConnectWallet = useCallback(() => {
     sendRequestToSetStore(
-      appCtx.setWalletConnect, 
+      rootCtx.setWalletConnect, 
       { method: 'get', url: '/shared/connectwallet' }
     );
-  }, [appCtx, sendRequestToSetStore]);
+  }, [rootCtx, sendRequestToSetStore]);
 
   const setAfterNodeInfo = useCallback((nodeInfo: any) => {
     sendRequestToSetStore(
-      appCtx.setListChannels,
+      clnCtx.setListChannels,
       {
         method: 'post',
         url: '/cln/call',
-        body: { 'method': isCompatibleVersion((nodeInfo.version || ''), '23.02') ? 'listpeerchannels' : 'listpeers', 'params': {} },
+        body: { 'method': 'listpeerchannels', 'params': {} },
       },
       {
         method: 'post',
@@ -124,28 +121,32 @@ const useHttp = () => {
         body: { 'method': 'listnodes', 'params': {} }
       }
     );
-    appCtx.setNodeInfo(nodeInfo);
-  }, [appCtx, sendRequestToSetStore]);
+    sendRequestToSetStore(clnCtx.setNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': {} } });
+  }, [clnCtx, sendRequestToSetStore]);
 
   const fetchData = useCallback(() => {
-    sendRequestToSetStore(setAfterNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListPeers, { method: 'post', url: '/cln/call', body: { 'method': 'listpeers', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListInvoices, { method: 'post', url: '/cln/call', body: { 'method': 'listinvoices', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListPayments, { method: 'post', url: '/cln/call', body: { 'method': 'listsendpays', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListFunds, { method: 'post', url: '/cln/call', body: { 'method': 'listfunds', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListOffers, { method: 'post', url: '/cln/call', body: { 'method': 'listoffers', 'params': {} } });
-    sendRequestToSetStore(appCtx.setListBitcoinTransactions, { method: 'post', url: '/cln/call', body: { 'method': 'bkpr-listaccountevents', 'params': {} } });
-    sendRequestToSetStore(appCtx.setFeeRate, { method: 'post', url: '/cln/call', body: { 'method': 'feerates', 'params': {style: 'perkb'} } });
-    getConnectWallet();
-  }, [appCtx, sendRequestToSetStore, setAfterNodeInfo, getConnectWallet]);
+    if (localAppConfig.serverConfig?.lightningNodeType === 'GREENLIGHT') {
+      sendRequestToSetStore(glCtx.setNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': {} } });
+    } else {
+      getConnectWallet();
+      sendRequestToSetStore(setAfterNodeInfo, { method: 'post', url: '/cln/call', body: { 'method': 'getinfo', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListPeers, { method: 'post', url: '/cln/call', body: { 'method': 'listpeers', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListInvoices, { method: 'post', url: '/cln/call', body: { 'method': 'listinvoices', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListPayments, { method: 'post', url: '/cln/call', body: { 'method': 'listsendpays', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListFunds, { method: 'post', url: '/cln/call', body: { 'method': 'listfunds', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListOffers, { method: 'post', url: '/cln/call', body: { 'method': 'listoffers', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setListBitcoinTransactions, { method: 'post', url: '/cln/call', body: { 'method': 'bkpr-listaccountevents', 'params': {} } });
+      sendRequestToSetStore(clnCtx.setFeeRate, { method: 'post', url: '/cln/call', body: { 'method': 'feerates', 'params': {style: 'perkb'} } });
+    }
+  }, [clnCtx, glCtx, sendRequestToSetStore, setAfterNodeInfo, getConnectWallet]);
 
   const updateConfig = (updatedConfig: ApplicationConfiguration) => {
     axiosInstance.post('/shared/config', updatedConfig)
     .then((response: any) => {
-      if(appCtx.appConfig.uiConfig.fiatUnit !== updatedConfig.uiConfig.fiatUnit) {
+      if(rootCtx.appConfig.uiConfig.fiatUnit !== updatedConfig.uiConfig.fiatUnit) {
         getFiatRate(updatedConfig.uiConfig.fiatUnit);
       }
-      appCtx.setConfig(updatedConfig);
+      rootCtx.setConfig(updatedConfig);
     }).catch(err => {
       logger.error(err);
       return err;
@@ -248,15 +249,15 @@ const useHttp = () => {
   };
 
   const getAppConfigurations = useCallback(() => {
-    sendRequestToSetStore(appCtx.setConfig, { method: 'get', url: '/shared/config' });
-  }, [appCtx, sendRequestToSetStore]);
+    sendRequestToSetStore(rootCtx.setConfig, { method: 'get', url: '/shared/config' });
+  }, [rootCtx, sendRequestToSetStore]);
 
   const userLogin = (password: string) => {
     return axiosInstance.post('/auth/login', {password: password})
     .then((response: any) => {
       logger.info(response);
       response.data = { ...response.data, isLoading: false, error: null };
-      appCtx.setAuthStatus(response.data);
+      rootCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
     }).catch(err => {
@@ -270,7 +271,7 @@ const useHttp = () => {
     .then((response: any) => {
       logger.info(response);
       response.data = { ...response.data, isLoading: false, error: null };
-      appCtx.setAuthStatus(response.data);
+      rootCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
     }).catch(err => {
@@ -284,9 +285,9 @@ const useHttp = () => {
     .then((response: any) => {
       logger.info(response);
       response.data = { ...response.data, isLoading: false, error: null };
-      appCtx.clearStore();
+      clnCtx.clearStore();
       localAuthStatus = JSON.parse(JSON.stringify(response.data));
-      appCtx.setShowModals({...appCtx.showModals, loginModal: true, logoutModal: false});
+      rootCtx.setShowModals({...rootCtx.showModals, loginModal: true, logoutModal: false});
     }).catch(err => {
       logger.error(err);
       throw err;
@@ -298,7 +299,7 @@ const useHttp = () => {
     .then((response: any) => {
       logger.info(response);
       response.data = { ...response.data, isLoading: false, error: null };
-      appCtx.setAuthStatus(response.data);
+      rootCtx.setAuthStatus(response.data);
       localAuthStatus = response.data;
       return response.data;
     }).catch(err => {
