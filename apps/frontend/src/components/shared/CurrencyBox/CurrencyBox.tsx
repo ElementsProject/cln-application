@@ -3,8 +3,7 @@ import React from 'react';
 import './CurrencyBox.scss';
 import { useContext, useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { formatCurrency } from '../../../utilities/data-formatters';

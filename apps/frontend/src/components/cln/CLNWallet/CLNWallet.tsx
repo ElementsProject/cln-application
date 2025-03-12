@@ -5,13 +5,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Card from 'react-bootstrap/Card';
-import Col from 'react-bootstrap/Col';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Tab from 'react-bootstrap/Tab';
-import Nav from 'react-bootstrap/Nav';
+import { Card, Col, ButtonGroup, Spinner, Alert, Tab, Nav } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { LightningWalletSVG } from '../../../svgs/LightningWallet';

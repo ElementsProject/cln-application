@@ -2,8 +2,7 @@ import React from 'react';
 
 import './StatusAlert.scss';
 import { motion } from 'framer-motion';
-import Spinner from 'react-bootstrap/Spinner';
-import Col from 'react-bootstrap/Col';
+import { Spinner, Col } from 'react-bootstrap';
 
 import { CallStatus, OPACITY_VARIANTS } from '../../../utilities/constants';
 import { copyTextToClipboard, titleCase } from '../../../utilities/data-formatters';

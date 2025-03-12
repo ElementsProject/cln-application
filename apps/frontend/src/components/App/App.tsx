@@ -3,7 +3,7 @@ import React from 'react';
 import './App.scss';
 import { useContext, useEffect } from 'react';
 import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
+import { Container } from 'react-bootstrap';
 
 import useHttp from '../../hooks/use-http';
 import useBreakpoint from '../../hooks/use-breakpoint';

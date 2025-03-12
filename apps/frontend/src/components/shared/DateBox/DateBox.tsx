@@ -1,8 +1,7 @@
 import React from 'react';
 
 import './DateBox.scss';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Tooltip from 'react-bootstrap/Tooltip';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { convertIntoDateFormat } from '../../../utilities/data-formatters';
 
 const DateBox = props => {

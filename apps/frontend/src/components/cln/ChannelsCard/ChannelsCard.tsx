@@ -3,7 +3,7 @@ import React from 'react';
 import './ChannelsCard.scss';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Card from 'react-bootstrap/Card';
+import { Card } from 'react-bootstrap';
 
 import Channels from '../Channels/Channels';
 import ChannelOpen from '../ChannelOpen/ChannelOpen';
