@@ -3,8 +3,7 @@ import React from 'react';
 import './CLNTransaction.scss';
 import { useContext } from 'react';
 import { motion } from 'framer-motion';
-import Row from 'react-bootstrap/esm/Row';
-import Col from 'react-bootstrap/esm/Col';
+import { Row, Col } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { copyTextToClipboard, formatCurrency } from '../../../utilities/data-formatters';

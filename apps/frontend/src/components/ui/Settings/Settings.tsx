@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Settings.scss';
 import { useContext } from 'react';
-import Dropdown from 'react-bootstrap/Dropdown';
+import { Dropdown } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useBreakpoint from '../../../hooks/use-breakpoint';

@@ -2,9 +2,7 @@ import React from 'react';
 
 import './CLNHome.scss';
 import { useContext } from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Spinner from 'react-bootstrap/Spinner';
+import { Row, Col, Spinner } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import Overview from '../Overview/Overview';

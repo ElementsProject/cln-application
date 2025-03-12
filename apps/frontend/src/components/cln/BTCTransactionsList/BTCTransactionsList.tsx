@@ -3,10 +3,7 @@ import React from 'react';
 import './BTCTransactionsList.scss';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Row from 'react-bootstrap/esm/Row';
-import Col from 'react-bootstrap/esm/Col';
+import { Spinner, Alert, Row, Col } from 'react-bootstrap';
 
 import { AppContext } from '../../../store/AppContext';
 import { formatCurrency, titleCase } from '../../../utilities/data-formatters';

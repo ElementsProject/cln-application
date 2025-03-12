@@ -2,12 +2,7 @@ import './ConnectWallet.scss';
 import { useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
-import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Dropdown from 'react-bootstrap/esm/Dropdown';
-import InputGroup from 'react-bootstrap/esm/InputGroup';
-import Form from 'react-bootstrap/esm/Form';
+import { Modal, Col, Row, Spinner, Dropdown, InputGroup, Form } from 'react-bootstrap';
 
 import { ApplicationModes } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
@@ -18,7 +13,6 @@ import { ConnectWalletFields } from '../../../types/app-config.type';
 import logger from '../../../services/logger.service';
 import useHttp from '../../../hooks/use-http';
 import { AddSVG } from '../../../svgs/Add';
-import { Spinner } from 'react-bootstrap';
 
 const ConnectWallet = () => {
   const appCtx = useContext(AppContext);

@@ -4,9 +4,7 @@ import './QRCode.scss';
 import { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
-import Row from 'react-bootstrap/Row';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
+import { Row, Form, InputGroup } from 'react-bootstrap';
 
 import { CopySVG } from '../../../svgs/Copy';
 import { ApplicationModes } from '../../../utilities/constants';

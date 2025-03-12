@@ -2,7 +2,7 @@ import React from 'react';
 
 import './BTCDeposit.scss';
 import { useEffect, useState } from 'react';
-import Card from 'react-bootstrap/Card';
+import { Card } from 'react-bootstrap';
 
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY } from '../../../utilities/constants';
 import logger from '../../../services/logger.service';

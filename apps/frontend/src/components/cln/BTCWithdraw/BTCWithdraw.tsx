@@ -2,13 +2,7 @@ import React from 'react';
 
 import './BTCWithdraw.scss';
 import { useContext, useState } from 'react';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Spinner from 'react-bootstrap/Spinner';
+import { Spinner, Card, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';

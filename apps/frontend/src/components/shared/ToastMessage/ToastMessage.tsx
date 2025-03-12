@@ -5,8 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import { motion } from 'framer-motion';
-import Toast from 'react-bootstrap/Toast';
-import Col from 'react-bootstrap/Col';
+import { Toast, Col } from 'react-bootstrap';
 
 import { BOUNCY_SPRING_VARIANTS_3, STAGERRED_SPRING_VARIANTS_2 } from '../../../utilities/constants';
 import { AppContext } from '../../../store/AppContext';

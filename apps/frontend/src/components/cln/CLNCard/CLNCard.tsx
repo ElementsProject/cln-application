@@ -3,7 +3,7 @@ import React from 'react';
 import './CLNCard.scss';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Card from 'react-bootstrap/Card';
+import { Card } from 'react-bootstrap';
 
 import CLNWallet from '../CLNWallet/CLNWallet';
 import CLNReceive from '../CLNReceive/CLNReceive';
