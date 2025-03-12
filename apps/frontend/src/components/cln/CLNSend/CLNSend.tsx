@@ -9,7 +9,7 @@ import useInput from '../../../hooks/use-input';
 import useHttp from '../../../hooks/use-http';
 import { formatCurrency, isCompatibleVersion } from '../../../utilities/data-formatters';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT, Units, InputType } from '../../../utilities/constants';
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
 import { AddressSVG } from '../../../svgs/Address';
@@ -17,9 +17,11 @@ import { LightningWalletSVG } from '../../../svgs/LightningWallet';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
+import { RootContext } from '../../../store/RootContext';
 
 const CLNSend = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const { clnSendPayment, decodeInvoice, fetchInvoice } = useHttp();
   const [paymentType, setPaymentType] = useState(PaymentType.INVOICE);
   const [emptyInvoice, setEmptyInvoice] = useState(false);
@@ -27,7 +29,7 @@ const CLNSend = (props) => {
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (appCtx.walletBalances.clnLocalBalance || 0);
+  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (clnCtx.walletBalances.clnLocalBalance || 0);
   const isValidInvoice = (value) => value.trim() !== '' && (paymentType === PaymentType.KEYSEND || (paymentType === PaymentType.INVOICE && value.startsWith('lnb')) || (paymentType === PaymentType.OFFER && value.startsWith('lno')));
 
   const {
@@ -102,7 +104,7 @@ const CLNSend = (props) => {
               });
             } else {
               let amountmSats = 0;
-              if (isCompatibleVersion((appCtx.nodeInfo.version || ''), '23.02')) {
+              if (isCompatibleVersion((clnCtx.nodeInfo.version || ''), '23.02')) {
                 amountmSats = decodeRes.data.offer_amount_msat || 0;
               } else {
                 amountmSats = +(decodeRes.data.offer_amount_msat.substring(0, (decodeRes.data.offer_amount_msat.length - 4))) || 0;
@@ -110,7 +112,7 @@ const CLNSend = (props) => {
               amountChangeHandler({target: {value: (amountmSats / SATS_MSAT).toString()}});
               setDecodeResponse({ 
                 description: (decodeRes.data.offer_description),
-                amount: (formatCurrency(amountmSats, Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
+                amount: (formatCurrency(amountmSats, Units.MSATS, rootCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
               });
             }
           } else {
@@ -125,7 +127,7 @@ const CLNSend = (props) => {
                 amountChangeHandler({target: {value: ((decodeRes.data.amount_msat) / SATS_MSAT).toString()}});
                 setDecodeResponse({ 
                   description: (decodeRes.data.description),
-                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, appCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
+                  amount: (formatCurrency((decodeRes.data.amount_msat || 0), Units.MSATS, rootCtx.appConfig.uiConfig.unit, false, 0, 'string') + ' Sats')
                 });
               }
             }

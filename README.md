@@ -64,7 +64,6 @@
       - LIGHTNING_IP: IP address of Core lightning node container (required)
       - LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       - HIDDEN_SERVICE_URL: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
-      - LIGHTNING_NODE_TYPE: Choose Core lightning node type (valid values: CLN/GREENLIGHT, default: CLN)
       - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
       - LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required; from cln's config.json; starting with `bind-addr=ws:`)
       - LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)

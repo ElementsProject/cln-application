@@ -5,20 +5,20 @@ import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import useHttp from '../../../hooks/use-http';
-import { AppContext } from '../../../store/AppContext';
+import { RootContext } from '../../../store/RootContext';
 import { SPRING_VARIANTS } from '../../../utilities/constants';
 
 const ToggleSwitch = (props) => {
   const [isSwitchOn, setIsSwitchOn] = useState(props.selValue === props.values[1]);
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { updateConfig } = useHttp();
  
   const changeValueHandler = (event) => {
     setIsSwitchOn((prevValue) => {
       updateConfig({ 
-        ...appCtx[props.storeSelector], 
+        ...rootCtx[props.storeSelector], 
         uiConfig: {
-          ...appCtx.appConfig.uiConfig,
+          ...rootCtx.appConfig.uiConfig,
           [props.storeKey]: props.values[+!prevValue]
         }
       });

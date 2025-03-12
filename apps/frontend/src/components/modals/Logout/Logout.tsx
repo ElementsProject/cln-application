@@ -6,10 +6,10 @@ import { Modal, Col } from 'react-bootstrap';
 
 import useHttp from '../../../hooks/use-http';
 import { QuestionMarkSVG } from '../../../svgs/QuestionMark';
-import { AppContext } from '../../../store/AppContext';
+import { RootContext } from '../../../store/RootContext';
 
 const LogoutComponent = () => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   const { userLogout } = useHttp();
 
   const logoutHandler = (event) => {
@@ -20,12 +20,12 @@ const LogoutComponent = () => {
   };
 
   const closeHandler = () => {
-    appCtx.setShowModals({...appCtx.showModals, logoutModal: false});
+    rootCtx.setShowModals({...rootCtx.showModals, logoutModal: false});
   }
 
   return (
     <form className='h-100'>
-      <Modal show={appCtx.showModals.logoutModal} onHide={closeHandler} centered className='modal-lg' data-testid='logout-modal'>
+      <Modal show={rootCtx.showModals.logoutModal} onHide={closeHandler} centered className='modal-lg' data-testid='logout-modal'>
         <Modal.Body className='p-0 w-100 d-flex align-items-start justify-content-start'>
           <Col className='d-flex align-items-stretch justify-content-between modal-box'>
             <Col xs={2} className='message-type-box d-flex align-items-center justify-content-center'>

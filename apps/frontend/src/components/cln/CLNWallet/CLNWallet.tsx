@@ -1,13 +1,12 @@
 import React from 'react';
 
 import './CLNWallet.scss';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Card, Col, ButtonGroup, Spinner, Alert, Tab, Nav } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
+import { CLNContext } from '../../../store/CLNContext';
 import { LightningWalletSVG } from '../../../svgs/LightningWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
@@ -15,9 +14,11 @@ import CLNTransactionsList from '../CLNTransactionsList/CLNTransactionsList';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import CLNOffersList from '../CLNOffersList/CLNOffersList';
+import { RootContext } from '../../../store/RootContext';
 
 const CLNWallet = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
+  const clnCtx = useContext(CLNContext);
   const [selectedTab, setSelectedTab] = useState('transactions');
 
   return (
@@ -29,11 +30,11 @@ const CLNWallet = (props) => {
               <LightningWalletSVG svgClassName='me-4' className='fill-contrast' />
               <div>
                 <div className='fs-6 fw-bold'>Lightning Wallet</div>
-                { appCtx.authStatus.isAuthenticated && appCtx.walletBalances.isLoading ? 
+                { rootCtx.authStatus.isAuthenticated && clnCtx.walletBalances.isLoading ? 
                     <Spinner animation='grow' variant='secondary' data-testid='cln-wallet-spinner'/> : 
-                  appCtx.walletBalances.error ? 
-                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-wallet-error'>{appCtx.walletBalances.error}</Alert> : 
-                    <CurrencyBox value={appCtx.walletBalances.clnLocalBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold' data-testid='cln-wallet-currency-box'></CurrencyBox>
+                  clnCtx.walletBalances.error ? 
+                    <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-wallet-error'>{clnCtx.walletBalances.error}</Alert> : 
+                    <CurrencyBox value={clnCtx.walletBalances.clnLocalBalance} shorten={false} rootClasses='d-inline-flex flex-column' currencyClasses='lh-1 fs-4 fw-bold' unitClasses='fs-7 fw-bold' data-testid='cln-wallet-currency-box'></CurrencyBox>
                 }
               </div>
             </Col>

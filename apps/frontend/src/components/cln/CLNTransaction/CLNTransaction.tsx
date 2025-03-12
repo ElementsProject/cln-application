@@ -5,12 +5,12 @@ import { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
 
-import { AppContext } from '../../../store/AppContext';
 import { copyTextToClipboard, formatCurrency } from '../../../utilities/data-formatters';
 import { TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
 import DateBox from '../../shared/DateBox/DateBox';
 import logger from '../../../services/logger.service';
+import { RootContext } from '../../../store/RootContext';
 
 const TODAY = Math.floor(Date.now() / 1000);
 
@@ -89,7 +89,7 @@ const Invoice = ({invoice, copyHandler}) => {
 };
 
 const CLNTransaction = (props) => {
-  const appCtx = useContext(AppContext);
+  const rootCtx = useContext(RootContext);
   
   const copyHandler = (event) => {
     let textToCopy = '';
@@ -108,7 +108,7 @@ const CLNTransaction = (props) => {
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      appCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+      rootCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
     }).catch((err) => {
       logger.error(err);
     });
