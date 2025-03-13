@@ -1,12 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import Header from './GLHeader';
+import GLHeader from './GLHeader';
 
-describe('Header component ', () => {
-  beforeEach(() => render(<Header />));
-
-  it('should be in the document', () => {
-    expect(screen.getByTestId('header-context')).toBeInTheDocument();
-  });
+describe('GLHeader component ', () => {
+  beforeEach(() => render(<GLHeader />));
 
   it('should be in the document', () => {
     expect(screen.getByTestId('header-context')).toBeInTheDocument();

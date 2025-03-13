@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import BTCTransaction from './LSPCard';
-import { mockBTCTransaction } from '../../../utilities/test-utilities';
+import LSPCard from './LSPCard';
 
-describe('BTCTransaction component ', () => {
+describe('LSPCard component ', () => {
   beforeEach(
-    () => render(<BTCTransaction transaction={mockBTCTransaction} />)
+    () => render(<LSPCard />)
   );
 
   it('should be in the document', () => {
-    expect(screen.getByTestId('transaction')).toBeInTheDocument();
+    expect(screen.getByTestId('lsps-card')).toBeInTheDocument();
   });
 });

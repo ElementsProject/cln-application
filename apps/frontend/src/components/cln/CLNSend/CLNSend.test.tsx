@@ -1,18 +1,38 @@
 import { act, fireEvent, screen } from '@testing-library/react';
 import CLNSend from './CLNSend';
-import { getMockStoreData, renderWithMockContext } from '../../../utilities/test-utilities';
+import { getMockCLNStoreData, getMockRootStoreData, renderWithMockCLNContext } from '../../../utilities/test-utilities';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe('CLNSend component ', () => {
-  let providerProps;
-  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData())));
+  let providerRootProps;
+  let providerCLNProps;
+
+  beforeEach(() => {
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/cln',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+  });
 
   it('should be in the document', () => {
-    renderWithMockContext(<CLNSend />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
     expect(screen.getByTestId('cln-send')).toBeInTheDocument();
   });
 
   it('should accept lowercase invoice', async () => {
-    renderWithMockContext(<CLNSend />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
 
     const invoiceInput = screen.getByTestId("address-input");
     const testInvoice = 'lnb12345';
@@ -22,7 +42,7 @@ describe('CLNSend component ', () => {
   });
   
   it('should accept UPPERCASE invoice', async () => {
-    renderWithMockContext(<CLNSend />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
 
     const invoiceInput = screen.getByTestId("address-input");
     const testInvoice = "LNB12345";
@@ -32,7 +52,7 @@ describe('CLNSend component ', () => {
   });
 
   it('should accept lowercase offer', async () => {
-    renderWithMockContext(<CLNSend />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
 
     const offerRadioButton = screen.getByLabelText("Offer");
     await act(async () => fireEvent.click(offerRadioButton));
@@ -46,7 +66,7 @@ describe('CLNSend component ', () => {
   });
 
   it('should accept UPPERCASE offer', async () => {
-    renderWithMockContext(<CLNSend />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
 
     const offerRadioButton = screen.getByLabelText("Offer");
     await act(async () => fireEvent.click(offerRadioButton));

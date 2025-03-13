@@ -1,10 +1,30 @@
 import { render, screen } from '@testing-library/react';
 import Channels from './Channels';
-import { getMockStoreData, renderWithMockContext } from '../../../utilities/test-utilities';
+import { getMockCLNStoreData, getMockRootStoreData, renderWithMockCLNContext } from '../../../utilities/test-utilities';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe('Channels component ', () => {
-  let providerProps;
-  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData())));
+  let providerRootProps;
+  let providerCLNProps;
+
+  beforeEach(() => {
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/cln',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+  });
   beforeEach(() => render(<Channels />));
 
   it('should be in the document', () => {
@@ -12,29 +32,29 @@ describe('Channels component ', () => {
   });
 
   it('if it is loading show the spinner', () => {
-    providerProps.listChannels.isLoading = true;
-    renderWithMockContext(<Channels />, { providerProps });
+    providerCLNProps.listChannels.isLoading = true;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Channels />,);
     expect(screen.getByTestId('channels-spinner')).toBeInTheDocument();
   });
 
   it('if it is not loading dont show the spinner', () => {
-    renderWithMockContext(<Channels />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Channels />,);
     expect(screen.queryByTestId('channels-spinner')).not.toBeInTheDocument();
   });
 
   it('if it has an error, show the error view', () => {
-    providerProps.listChannels.error = "error message";
-    renderWithMockContext(<Channels />, { providerProps });
+    providerCLNProps.listChannels.error = "error message";
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Channels />,);
     expect(screen.getByTestId('channels-error')).toBeInTheDocument();
   })
 
   it('alias should display in the document', () => {
-    renderWithMockContext(<Channels />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <Channels />,);
     expect(screen.getByText('LNDReg')).toBeInTheDocument();
   })
 
   it('if no channels found, show open channel text', () => {
-    providerProps.listChannels.activeChannels = [];
+    providerCLNProps.listChannels.activeChannels = [];
     expect(screen.getByText("No channel found. Open channel to start!")).toBeInTheDocument();
   })
 
