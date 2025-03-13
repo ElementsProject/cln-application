@@ -1,40 +1,10 @@
-import { act, screen } from '@testing-library/react';
-import BTCWallet from './CapacityCard';
-import { renderWithMockContext, getMockStoreData } from '../../../utilities/test-utilities';
-import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
+import { render, screen } from '@testing-library/react';
+import CapacityCard from './CapacityCard';
 
-describe('BTCWallet component ', () => {
-  let providerProps;
-  beforeEach(() => providerProps = JSON.parse(JSON.stringify(getMockStoreData())));
+describe('CapacityCard component ', () => {
+  beforeEach(() => render(<CapacityCard />));
 
   it('should be in the document', () => {
-    providerProps.walletBalances.isLoading = false;
-    renderWithMockContext(<BTCWallet />, { providerProps });
-    expect(screen.getByTestId('btc-wallet')).toBeInTheDocument();
-    expect(screen.queryByTestId('btc-wallet-spinner')).not.toBeInTheDocument();
-    expect(screen.queryByTestId("btc-wallet-error")).not.toBeInTheDocument();
+    expect(screen.getByTestId('capacity-card')).toBeInTheDocument();
   });
-
-  it('when loading wallet balance it shows spinner', () => {
-    providerProps.walletBalances.isLoading = true;
-    renderWithMockContext(<BTCWallet />, { providerProps });
-    expect(screen.getByTestId('btc-wallet-spinner')).toBeInTheDocument();
-  })
-
-  it('if error occurs, show error', () => {
-    providerProps.walletBalances.error = "error message!";
-    renderWithMockContext(<BTCWallet />, { providerProps });
-    expect(screen.getByTestId("btc-wallet-error")).toBeInTheDocument();
-  })
-
-  it('if has btc spendable balance, show it', async () => {
-    providerProps.appConfig.uiConfig.unit = 'BTC';
-    jest.useFakeTimers();
-    renderWithMockContext(<BTCWallet />, { providerProps });
-    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-    const currencyBox = await screen.findByTestId('currency-box-finished-text');
-    expect(currencyBox).toBeInTheDocument();
-    expect(currencyBox).toHaveTextContent('0.74100');
-  })
-
 });

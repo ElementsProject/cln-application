@@ -1,17 +1,35 @@
 import { act, screen } from '@testing-library/react';
 import CurrencyBox from './CurrencyBox';
 import { APP_ANIMATION_DURATION, Units } from '../../../utilities/constants';
-import { renderWithMockContext, mockStoreData } from '../../../utilities/test-utilities';
+import { renderWithMockCLNContext, getMockRootStoreData, getMockCLNStoreData } from '../../../utilities/test-utilities';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
 describe('CurrencyBox component ', () => {
-  let providerProps;
+  let providerRootProps;
+  let providerCLNProps;
+
   beforeEach(() => {
-    providerProps = JSON.parse(JSON.stringify(mockStoreData));
+    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
+    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
+    (useLocation as jest.Mock).mockImplementation(() => ({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: null,
+      key: '5nvxpbdafa',
+    }));
+    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
     jest.useFakeTimers();
   });
 
   it('if not in shorten mode', async () => {
-    renderWithMockContext(<CurrencyBox value='2222222' shorten='false' />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CurrencyBox value='2222222' shorten='false' />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
@@ -19,7 +37,7 @@ describe('CurrencyBox component ', () => {
   })
 
   it('if in shorten mode', async () => {
-    renderWithMockContext(<CurrencyBox value='11111111' shorten='true' />, { providerProps });
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CurrencyBox value='11111111' shorten='true' />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
@@ -27,8 +45,8 @@ describe('CurrencyBox component ', () => {
   })
 
   it('if using BTC as the appConfig unit without shortening', async () => {
-    providerProps.appConfig.uiConfig.unit = Units.BTC;
-    renderWithMockContext(<CurrencyBox value='11111111' shorten='false' />, { providerProps });
+    providerRootProps.appConfig.uiConfig.unit = Units.BTC;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CurrencyBox value='11111111' shorten='false' />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
@@ -36,8 +54,8 @@ describe('CurrencyBox component ', () => {
   })
 
   it('if using BTC as the appConfig unit when shortened', async () => {
-    providerProps.appConfig.uiConfig.unit = Units.MSATS;
-    renderWithMockContext(<CurrencyBox value='11111111' shorten='true' />, { providerProps });
+    providerRootProps.appConfig.uiConfig.unit = Units.MSATS;
+    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CurrencyBox value='11111111' shorten='true' />);
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();

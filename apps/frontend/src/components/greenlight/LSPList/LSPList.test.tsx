@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import BTCTransactionsList from './LSPList';
+import LSPList from './LSPList';
 
-describe('BTCTransactionsList component ', () => {
-  beforeEach(() => render(<BTCTransactionsList />));
+describe('LSPList component ', () => {
+  beforeEach(() => render(<LSPList />));
 
   it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+    expect(screen.getByTestId('lsps-list')).toBeInTheDocument();
   });
 
 });
