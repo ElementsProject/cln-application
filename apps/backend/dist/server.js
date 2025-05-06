@@ -45,7 +45,7 @@ const corsOptions = {
     methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
     origin: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
         ? APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT
-        : APP_PROTOCOL + '://localhost:4301',
+        : APP_PROTOCOL + '://localhost:4300',
     credentials: true,
     allowedHeaders: 'Content-Type, X-XSRF-TOKEN, XSRF-TOKEN',
 };
