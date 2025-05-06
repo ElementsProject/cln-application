@@ -13,7 +13,8 @@
     "backend:watch": "npm run watch -w cln-application-backend",
     "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
-    "start": "npm run serve -w cln-application-backend"
+    "start": "npm run serve -w cln-application-backend",
+    "format": "prettier --write ."
   },
   "keywords": [
     "cln application",
