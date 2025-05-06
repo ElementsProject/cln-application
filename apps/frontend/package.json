@@ -5,26 +5,32 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "PORT=4300 react-scripts start",
-    "build": "react-scripts build",
+    "start": "GENERATE_SOURCEMAP=false PORT=4300 react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@reduxjs/toolkit": "^2.7.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "copy-to-clipboard": "^3.3.3",
     "crypto-js": "^4.2.0",
     "framer-motion": "^10.16.5",
+    "moment": "^2.30.1",
     "node-sass": "^9.0.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
+    "react-datepicker": "^8.1.0",
     "react-dom": "^18.2.0",
     "react-perfect-scrollbar": "^1.5.8",
-    "react-router-dom": "^6.22.1"
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^6.30.0",
+    "recharts": "^2.15.1",
+    "redux-thunk": "^3.1.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
@@ -34,9 +40,11 @@
     "@types/node": "^20.9.4",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@types/redux-mock-store": "^1.5.0",
     "axios-mock-adapter": "^1.22.0",
     "canvas": "^2.11.2",
     "react-scripts": "^5.0.1",
+    "redux-mock-store": "^1.5.5",
     "ts-jest": "^29.1.2",
     "typescript": "^5.8.2"
   },
@@ -60,7 +68,7 @@
       "^.+\\.[t|j]sx?$": "ts-jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!axios)/"
+      "<rootDir>/node_modules/(?!axios|react-router-dom)/"
     ]
   }
 }
