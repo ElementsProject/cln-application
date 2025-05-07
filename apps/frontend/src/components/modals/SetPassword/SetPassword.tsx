@@ -1,13 +1,9 @@
-import React from 'react';
-
 import './SetPassword.scss';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import SHA256 from "crypto-js/sha256";
-import { Modal, Col, Row, Spinner, InputGroup, Form } from 'react-bootstrap';
-
+import { Modal, Row, Col, Spinner, InputGroup, Form } from 'react-bootstrap';
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
-import useHttp from '../../../hooks/use-http';
 import { CallStatus } from '../../../utilities/constants';
 import { ActionSVG } from '../../../svgs/Action';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
@@ -16,17 +12,23 @@ import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import { ShowSVG } from '../../../svgs/Show';
 import { HideSVG } from '../../../svgs/Hide';
 import { CloseSVG } from '../../../svgs/Close';
-import { RootContext } from '../../../store/RootContext';
+import { RootService } from '../../../services/http.service';
+import { setAuthStatus, setShowModals, setShowToast } from '../../../store/rootSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectIsValidPassword, selectShowModals } from '../../../store/rootSelectors';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const SetPasswordComponent = () => {
-  const rootCtx = useContext(RootContext);
-  const { resetUserPassword, initiateDataLoading } = useHttp();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const showModals = useSelector(selectShowModals);
+  const isValidPassword = useSelector(selectIsValidPassword);
   const [hideCurrPassword, setHideCurrPassword] = useState(true);
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [hideConfirmNewPassword, setHideConfirmNewPassword] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
-
   const isValidCurrPassword = (value) => value.trim() !== '';
   const isValidNewPassword = (value) => value.trim() !== '';
   const isValidConfirmNewPassword = (value) => value.trim() !== '' && value === newPasswordValue;
@@ -61,8 +63,8 @@ const SetPasswordComponent = () => {
   let formIsValid = false;
 
   if (
-    (rootCtx.authStatus.isValidPassword && currPasswordIsValid && newPasswordIsValid && confirmNewPasswordIsValid)
-    || (!rootCtx.authStatus.isValidPassword && newPasswordIsValid && confirmNewPasswordIsValid)
+    (isValidPassword && currPasswordIsValid && newPasswordIsValid && confirmNewPasswordIsValid)
+    || (!isValidPassword && newPasswordIsValid && confirmNewPasswordIsValid)
   ) {
     formIsValid = true;
   };
@@ -79,33 +81,30 @@ const SetPasswordComponent = () => {
     resetConfirmNewPassword();
   };
 
-  const resetPasswordHandler = (event) => {
+  const resetPasswordHandler = async (event) => {
     touchFormControls();
     if (!formIsValid) { return; }
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Resetting Password...');
-    resetUserPassword(rootCtx.authStatus.isValidPassword, rootCtx.authStatus.isValidPassword ? SHA256(currPasswordValue).toString() : '', SHA256(newPasswordValue).toString())
-    .then((response: any) => {
-      logger.info(response);
-      if (response) {
+    try {
+      const authStatus = await RootService.resetUserPassword(isValidPassword, isValidPassword ? SHA256(currPasswordValue).toString() : '', SHA256(newPasswordValue).toString());
+      logger.info(authStatus);
+      dispatch(setAuthStatus(authStatus));
+      if (authStatus.isAuthenticated) {
         setHideCurrPassword(true);
         setHideNewPassword(true);
         setHideConfirmNewPassword(true);
         setResponseStatus(CallStatus.NONE);
         setResponseMessage('');
         resetFormValues();
-        initiateDataLoading();
-        rootCtx.setShowModals({...rootCtx.showModals, setPasswordModal: false});
-      } else {
-        setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.response.data || response.message || 'Unknown Error');
-      }
-    })
-    .catch(err => {
-      logger.error(err.response?.data || err.message || JSON.stringify(err));
+        dispatch(setShowToast({ show: true, message: ('Password Reset Successfully!'), bg: 'success' }));
+        dispatch(setShowModals({...showModals, setPasswordModal: false}));
+        navigate(pathname.includes('/bookkeeper') ? pathname : '/cln', { replace: true });
+      }        
+    } catch (error: any) {
       setResponseStatus(CallStatus.ERROR);
-      setResponseMessage(err.response && err.response.data && err.response.data.error ? err.response.data.error : err.response?.data || err.message || JSON.stringify(err));
-    });
+      setResponseMessage(error.response || error.message || 'Unknown Error');
+    }
   };
 
   const toggleCurrPasswordVisibility = () => {
@@ -121,21 +120,21 @@ const SetPasswordComponent = () => {
   };
 
   const closeHandler = () => {
-    rootCtx.setShowModals({...rootCtx.showModals, setPasswordModal: false});
+    dispatch(setShowModals({...showModals, setPasswordModal: false}));
   }
 
   return (
     <form className='h-100'>
-      <Modal show={rootCtx.showModals.setPasswordModal} onHide={rootCtx.authStatus.isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
+      <Modal show={showModals.setPasswordModal} onHide={isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
-          { rootCtx.authStatus.isValidPassword
+          { isValidPassword
             ? <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
             : <></>
           }
         </Modal.Header>
         <Modal.Body className='py-0'>
           <Row className='d-flex align-items-start justify-content-center'>
-            { rootCtx.authStatus.isValidPassword ?
+            { isValidPassword ?
               <Col xs={12}>
                 <Form.Label className=' text-dark'>Current Password*</Form.Label>
                 <InputGroup className={(currPasswordHasError ? 'invalid ' : '')}>
@@ -176,7 +175,7 @@ const SetPasswordComponent = () => {
                 </InputGroup.Text>
                 <Form.Control
                   tabIndex={1}
-                  autoFocus={!rootCtx.authStatus.isValidPassword}
+                  autoFocus={!isValidPassword}
                   id='newpassword'
                   type={hideNewPassword ? 'password' : 'text'}
                   placeholder='New Password'
@@ -230,7 +229,7 @@ const SetPasswordComponent = () => {
         </Modal.Body>
         <Modal.Footer>
           <button tabIndex={3} type='button' className='btn-rounded bg-primary' onClick={resetPasswordHandler} disabled={responseStatus === CallStatus.PENDING}>
-            { rootCtx.authStatus.isValidPassword ? 'Reset Password' : 'Set Password' }
+            { isValidPassword ? 'Reset Password' : 'Set Password' }
             {responseStatus === CallStatus.PENDING ? <Spinner className='mt-1 ms-2 text-white-dark' size='sm' /> : <ActionSVG className='ms-3' />}
           </button>
         </Modal.Footer>

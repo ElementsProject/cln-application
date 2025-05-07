@@ -10,8 +10,8 @@
     }
     & .message-type-box {
       background-color: $light;
-      border-top-left-radius: .35rem;
-      border-bottom-left-radius: .35rem;
+      border-top-left-radius: 0.35rem;
+      border-bottom-left-radius: 0.35rem;
     }
 
     span.btn-toast-close {
@@ -64,7 +64,6 @@
     }
   }
 }
-
 
 @include color-mode(dark) {
   & .toast {

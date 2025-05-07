@@ -14,11 +14,9 @@
 }
 
 @include color-mode(dark) {
-  
   .fa-circle-xmark {
     & path {
       fill: $white;
     }
   }
-
 }

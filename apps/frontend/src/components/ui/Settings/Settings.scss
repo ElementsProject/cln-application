@@ -2,6 +2,7 @@
 
 .settings-menu.dropdown {
   & .dropdown-toggle.btn-settings-menu {
+    margin-left: 0.5rem;
     padding: 1.25rem 1.375rem;
     &::after {
       display: none;
@@ -9,18 +10,22 @@
   }
   & .dropdown-menu {
     & a.dropdown-item {
-        &.active, &:active, &:focus, &:hover {
-          color: $primary;
-        }
+      &.active,
+      &:active,
+      &:focus,
+      &:hover {
+        color: $primary;
       }
+    }
     & div.dropdown-item {
-        color: $dark;
+      color: $dark;
     }
   }
 }
 
 @include color-mode(light) {
   .settings-menu.dropdown {
+    margin-left: 0.5rem;
     & .dropdown-toggle.btn-settings-menu {
       color: $white;
       & svg path {
@@ -49,7 +54,7 @@
     }
     & .dropdown-menu {
       & div.dropdown-item {
-          color: $white;
+        color: $white;
       }
     }
   }

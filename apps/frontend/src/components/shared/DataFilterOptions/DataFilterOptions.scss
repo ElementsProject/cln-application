@@ -1,0 +1,21 @@
+@import '../../../styles/constants.scss';
+
+.time-granularity-group {
+  & .dropdown-toggle {
+    & .form-control.form-control-left {
+      width: 5rem;
+    }
+    &::after {
+      display: none;
+    }
+  }
+  & .dropdown-menu {
+    width: 7rem;
+    font-size: $font-size-base;
+    & .dropdown-item:hover {
+      color: $primary;
+      background-color: transparent;
+      background-image: none;
+    }
+  }
+}

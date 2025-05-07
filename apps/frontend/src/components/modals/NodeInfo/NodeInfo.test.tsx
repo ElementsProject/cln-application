@@ -1,40 +1,35 @@
 import { screen } from '@testing-library/react';
 import NodeInfo from './NodeInfo';
-import { renderWithMockCLNContext, getMockCLNStoreData, getMockRootStoreData } from '../../../utilities/test-utilities';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
+import { defaultRootState } from '../../../store/rootSelectors';
+import { mockShowModals } from '../../../utilities/test-utilities/mockData';
+import { defaultCLNState } from '../../../store/clnSelectors';
+import { defaultBKPRState } from '../../../store/bkprSelectors';
 
 describe('NodeInfo component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
-
+  let customMockStore;
   beforeEach(() => {
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData('showModals', { nodeInfoModal: true })));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+    customMockStore = {
+      root: {
+        ...defaultRootState,
+        showModals: {
+          ...mockShowModals,
+          nodeInfoModal: true,
+        },
+      },
+      cln: defaultCLNState,
+      bkpr: defaultBKPRState
+    };
   });
 
   it('should be in the document', async () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <NodeInfo />);
+    await renderWithProviders(<NodeInfo />, { preloadedState: customMockStore });
     expect(screen.getByTestId('node-info-modal')).toBeInTheDocument();
   });
 
-  it('if AppContext config says hide, hide this modal', () => {
-    providerRootProps.showModals.nodeInfoModal = false;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <NodeInfo />);
+  it('if AppContext config says hide, hide this modal', async () => {
+    customMockStore.root.showModals.nodeInfoModal = false;
+    await renderWithProviders(<NodeInfo />, { preloadedState: customMockStore });
     expect(screen.queryByTestId('node-info-modal')).not.toBeInTheDocument();
   });
-
 });
