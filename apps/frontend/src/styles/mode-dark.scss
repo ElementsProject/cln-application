@@ -1,13 +1,14 @@
 @import 'constants';
 
 @include color-mode(dark) {
-  
   .text-light {
     transition: color $theme-transition ease;
     color: $light-dark !important;
   }
 
-  .text-light-white, .text-dark, .text-contrast {
+  .text-light-white,
+  .text-dark,
+  .text-contrast {
     transition: color $theme-transition ease;
     color: $white !important;
   }
@@ -21,12 +22,13 @@
     transition: color $theme-transition ease;
     color: $primary;
   }
-  
-  .text-blue, .text-darker-blue {
+
+  .text-blue,
+  .text-darker-blue {
     transition: color $theme-transition ease;
     color: $white;
   }
-  
+
   .card {
     background-color: $card-bg-dark;
     box-shadow: none;
@@ -34,12 +36,13 @@
       color: $text-dark;
     }
   }
-  
-  .list-group-item, .dropdown-menu {
+
+  .list-group-item,
+  .dropdown-menu {
     background-color: $card-bg-dark;
     box-shadow: none;
   }
-  
+
   .fill-light {
     fill: $light-dark;
   }
@@ -49,7 +52,8 @@
     fill: $text-dark;
   }
 
-  .fill-primary, .fill-2 {
+  .fill-primary,
+  .fill-2 {
     fill: $primary;
   }
 
@@ -74,7 +78,8 @@
     stroke: $body-bg-dark;
   }
 
-  .stroke-bg, .stroke-primary-bg {
+  .stroke-bg,
+  .stroke-primary-bg {
     stroke: $body-bg-dark;
   }
 
@@ -82,12 +87,18 @@
     stroke: $light-dark;
   }
 
+  .stroke-white-primary {
+    stroke: $primary;
+  }
+
   span.span-close-svg {
     cursor: pointer;
+    border-radius: $border-radius;
     & svg path {
       transition: all $transition-time ease;
     }
-    &:hover {
+    &:hover, &:focus-visible {
+      outline: none;
       & svg path {
         stroke: lighten($light-dark, 15%);
       }
@@ -95,13 +106,15 @@
   }
 
   .btn.btn-primary {
-    &.hover, &:hover {
+    &.hover,
+    &:hover {
       box-shadow: 0px 2px 4px 0px rgba($light-dark, 0.25);
     }
   }
-  
+
   .btn-rounded {
-    &.btn.btn-primary, &.bg-primary {
+    &.btn.btn-primary,
+    &.bg-primary {
       color: $card-bg-dark;
       &:hover {
         box-shadow: 0px 2px 4px 0px rgba($light-dark, 0.25);
@@ -113,13 +126,14 @@
         color: $white;
         &:hover {
           color: $card-bg-dark;
-        }  
+        }
       }
     }
   }
-  
+
   .btn-group {
-    &.btn-group-action .btn, &.btn-group-action button.btn-actions {
+    &.btn-group-action .btn,
+    &.btn-group-action button.btn-actions {
       color: $text-dark;
       &:hover {
         & + button.btn-actions {
@@ -130,9 +144,9 @@
       }
     }
   }
-  
-  .form-check.form-check-inline {  
-    & .form-check-input[type="radio"] {
+
+  .form-check.form-check-inline {
+    & .form-check-input {
       background-color: $form-ctrl-bg-dark;
     }
   }
@@ -140,11 +154,17 @@
   .dropdown {
     & a.dropdown-item {
       color: $white;
-      &.active, &:active, &:focus, &:hover {
+      &.active,
+      &:active,
+      &:focus,
+      &:hover {
         color: $primary !important;
       }
       &.no-focus {
-        &.active, &:active, &:focus, &:hover {
+        &.active,
+        &:active,
+        &:focus,
+        &:hover {
           color: $white !important;
         }
       }
@@ -161,7 +181,7 @@
       &:focus {
         border-color: $border-color-dark;
       }
-      &::-webkit-input-placeholder { 
+      &::-webkit-input-placeholder {
         color: $light-dark;
       }
       &:-moz-placeholder {
@@ -186,11 +206,11 @@
 
   .switch {
     border: 1px solid lighten($white, 20%);
-  
+
     & .handle {
       background-color: $dark;
     }
-  
+
     &:focus {
       box-shadow: 0 0 0 0.2rem rgba($light-dark, 0.25);
     }
@@ -198,7 +218,6 @@
     &[data-isswitchon='true'] {
       border: 1px solid darken($success, 10%);
     }
- 
   }
 
   & .tooltip {
@@ -213,4 +232,53 @@
     }
   }
 
+  .recharts-surface {
+    & >path:not(.recharts-legend-icon) {
+      fill: $body-bg-dark;
+    }
+  }
+
+  & .react-datepicker-popper {
+    & .react-datepicker__triangle {
+      fill: $form-ctrl-bg-dark;
+      color: $form-ctrl-bg-dark;
+      stroke: $card-border-color;
+    }
+    & .react-datepicker {
+      border-color: $card-border-color;
+      background-color: $form-ctrl-bg-dark;
+      & .react-datepicker__header {
+        background-color: $card-bg-dark;
+        border-bottom: $card-border-width solid $card-border-color;
+        & .react-datepicker__current-month, & .react-datepicker-time__header, & .react-datepicker-year-header,
+        & .react-datepicker__day-names {
+          color: $body-color-dark;
+          & .react-datepicker__day-name {
+            color: $body-color-dark;
+          }
+        }
+      }
+      & .react-datepicker__navigation {
+        & .react-datepicker__navigation-icon::before {
+          border-color: $body-color-dark;
+        }
+      }
+      & .react-datepicker__month-container {
+        & .react-datepicker__day {
+          color: $body-color-dark;
+          &:hover {
+            background-color: $body-bg-dark;
+          }
+          &--disabled {
+            color: $dark;
+          }
+        }
+      }
+    }
+  }
+
+  .ps.ps--active-y > .ps__rail-y {
+    background-color: $dark;
+  }
+  
 } // CLOSE FOR DARK MODE
