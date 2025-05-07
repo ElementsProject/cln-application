@@ -1,6 +1,6 @@
 import './VolumeInfo.scss';
 import { useNavigate } from 'react-router-dom';
-import { Card, Col, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Card, Col, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { ActionSVG } from '../../../../svgs/Action';
 import { VolumeChartSVG } from '../../../../svgs/VolumeChart';
 import { formatCurrency } from '../../../../utilities/data-formatters';
@@ -26,7 +26,7 @@ const VolumeInfo = () => {
   const navigate = useNavigate();
   const uiConfigUnit = useSelector(selectUIConfigUnit);
   const bkprSummary = useSelector(selectSummary);
-  const isVolumeLoading = useSelector(selectIsVolumeLoading);
+  const volumeLoading = useSelector(selectIsVolumeLoading);
   const volumeError = useSelector(selectVolumeError);
 
   return (
@@ -39,13 +39,20 @@ const VolumeInfo = () => {
         </Row>
       </Card.Header>
       <Card.Body className='mt-2 p-0'>
-        {isVolumeLoading ?
-          <span className='h-100 d-flex justify-content-center align-items-center text-light fs-6 delayed-load'>
-            No forwarding activity found. Forward transactions to see details!
+        {volumeLoading ?
+          <span className='h-100 d-flex justify-content-center align-items-center'>
+            <Spinner animation='grow' variant='primary' />
           </span>
           :
           volumeError ?
             <StatusAlert responseStatus={CallStatus.ERROR} responseMessage={volumeError.replace('Volume: ', '')} />
+            :
+            bkprSummary.most_traffic_route?.channel_scids === '' && bkprSummary.least_traffic_route?.channel_scids === '' ?
+              <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
+                <Row className='d-flex align-items-center justify-content-center text-center'>
+                  No forwarding activity found.<br />Forward transactions to see details!
+                </Row>
+              </Row>
             :
             <>
               <div className='d-flex flex-column align-items-start p-2 pb-0 h-50'>
@@ -71,12 +78,12 @@ const VolumeInfo = () => {
             </>
         }
       </Card.Body>
-      <Card.Footer className='d-flex justify-content-end'>
+      <Card.Footer className='d-flex justify-content-end px-2'>
         <button
           tabIndex={1}
           type='button'
-          disabled
-          className='btn-rounded bg-primary fs-6 me-3'
+          disabled={volumeLoading || !!volumeError}
+          className='btn-rounded bg-primary fs-6'
           onClick={() => navigate('./volume')}
         >
           View More
