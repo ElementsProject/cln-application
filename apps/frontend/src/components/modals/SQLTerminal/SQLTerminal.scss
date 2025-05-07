@@ -1,0 +1,57 @@
+@import '../../../styles/constants.scss';
+
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-input {
+  resize: none;
+  white-space: pre-wrap;
+  height: 8rem;
+  overflow: hidden;
+}
+
+.terminal-output {
+  height: 47vh;
+  overflow: hidden;
+  width: 100%;
+  resize: none;
+  font-size: $font-size-base;
+  white-space: pre-wrap;
+  padding: 1rem 0 1rem 2rem;
+  margin-bottom: 1.5rem;
+  background-color: $body-bg-light;
+  border-radius: $border-radius;
+  border: $input-border-width solid $input-border-color;
+  box-shadow: 0px 1px 2px rgba($dark-blue, 0.05);
+}
+
+.btn-copy-output {
+  padding: 1rem;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  background: transparent;
+  z-index: 1;
+  border-radius: $border-radius;
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    svg path {
+      stroke: darken($primary, 10%);
+      &.svg-add {
+        stroke: none;
+        fill: darken($primary, 10%);
+      }
+    }
+  }
+}
+
+@include color-mode(dark) {
+  .terminal-output {
+    background-color: $body-bg-dark;
+    border: $input-border-width solid $input-border-color;
+  }
+}
