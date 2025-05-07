@@ -1,0 +1,143 @@
+@import '../../../../styles/constants.scss';
+
+.table-container {
+  padding: 0 !important;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid $border-color;
+  height: 100%;
+  border-radius: 1rem;
+  & .expandable-table {
+    table-layout: fixed;
+    overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    & tr.expandable-header-row {
+      cursor: pointer;
+      &:hover {
+        background-color: $body-bg-light;
+      }
+    }
+    & .expandable-head {
+      border-bottom-color: $border-color;
+      border-bottom-width: 1px;
+    }
+    & .expandable-head, & .expandable-body {
+      & .expandable-row>th, & .expandable-header-row>td {
+        border: 1px solid $border-color;
+        padding: 0.5rem 0.75rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 33%;
+        border-top: none;
+        border-right: 1px solid $border-color;
+        border-left: none;
+        border-bottom: 1px solid $border-color;
+        &:last-child {
+          border-right: none;
+        }
+      }
+      & .expandable-row>th {
+        color: $primary;
+        background-color: $body-bg;
+      }
+      & .expandable-header-row>td {
+        background-color: transparent;
+      }
+    }
+    & .expandable-child-row {
+      height: 100%;
+      overflow: hidden;
+      & .expandable-child-cell {
+        padding: 0;
+        background-color: transparent;
+        border: none;
+      }
+    }
+    & .child-table {
+      table-layout: fixed;
+      overflow: hidden;
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+      & .child-body {
+        & .child-row {
+          &:last-child {
+            border-bottom-width: 1px;
+          }
+          &:hover {
+            background-color: $body-bg-light;
+          }
+        }
+      }
+      & .child-head, & .child-body {
+        & .child-row>th, & .child-row>td {
+          border: 1px solid $border-color;
+          padding: 0.5rem 0.75rem;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 20%;
+        }
+        & .child-row>th {
+          color: $primary;
+          background-color: $body-bg;
+        }
+        & .child-row>td {
+          background-color: transparent;
+        }
+      }
+    }
+  }  
+}
+
+@include color-mode(dark) {
+  .table-container {
+    border: 1px solid $border-color-dark;
+    & .expandable-table {
+      & tr.expandable-header-row {
+        &:hover {
+          background-color: $tooltip-bg-dark;
+        }
+      }
+      & .expandable-head {
+        border-bottom-color: $border-color-dark;
+      }
+      & .expandable-head, & .expandable-body {
+        & .expandable-row>th, & .expandable-header-row>td {
+          border-top: none;
+          border-right: 1px solid $border-color-dark;
+          border-left: none;
+          border-bottom: 1px solid $border-color-dark;
+          &:last-child {
+            border-right: none;
+          }
+        }
+        & .expandable-row>th {
+          background-color: $tooltip-bg-dark;
+          border-bottom: none;
+        }
+      }
+      & .child-table {
+        & .child-body {
+          & .child-row {
+            &:hover {
+              background-color: $tooltip-bg-dark;
+            }
+          }
+        }
+        & .child-head, & .child-body {
+          & .child-row>th, & .child-row>td {
+            border: 1px solid $border-color-dark;
+            border-bottom-width: 0;
+          }
+          & .child-row>th {
+            background-color: $tooltip-bg-dark;
+          }
+        }
+      }
+    }
+  }
+}
