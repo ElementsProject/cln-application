@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { mockAppStore } from '../../../utilities/test-utilities/mockData';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import BTCTransactionsList from './BTCTransactionsList';
 
 describe('BTCTransactionsList component ', () => {
-  beforeEach(() => render(<BTCTransactionsList />));
-
-  it('should be in the document', () => {
-    // expect(screen.getByTestId('header-context')).toBeInTheDocument();
+  it('should be in the document', async () => {
+    await renderWithProviders(<BTCTransactionsList />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    expect(screen.getByTestId('btc-transactions-list')).toBeInTheDocument();
   });
-
 });

@@ -12,7 +12,9 @@
     & span {
       padding: 0.25rem 0.25rem 0.25rem 0.25rem;
     }
-    &.active, &:hover, &:focus {
+    &.active,
+    &:hover,
+    &:focus {
       background-color: transparent;
       & span {
         border-bottom: 2px solid $primary;
