@@ -1,0 +1,27 @@
+@import '../../../styles/constants.scss';
+
+[data-screensize='SM'],
+[data-screensize='XS'] {
+  & .cards-container {
+    height: 77vh;
+  }
+}
+
+.bookkeeper-dashboard-container {
+    padding: 0 1rem;
+}
+
+.positive {
+    color: $success;
+    line-break: anywhere;
+}
+
+.negative {
+    color: $warning;
+    line-break: anywhere;
+}
+
+.primary {
+    color: $primary;
+    line-break: anywhere;
+}
