@@ -1,0 +1,23 @@
+@import '../../../../styles/constants.scss';
+
+[data-screensize='SM'],
+[data-screensize='XS'] {
+  & .volume-info {
+    max-height: 42vh;
+    min-height: 42vh;
+  }
+}
+
+.volume-info {
+  max-height: 32vh;
+  min-height: 32vh;
+}
+
+.tooltip {
+  & .tooltip-inner {
+    max-width: 30vw;
+    width: auto;
+    white-space: pre-line;
+    text-align: left;
+  }
+}

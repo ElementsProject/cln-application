@@ -1,0 +1,19 @@
+@import '../../../../styles/constants.scss';
+
+[data-screensize='SM'],
+[data-screensize='XS'] {
+  & .sats-flow-info {
+    max-height: 42vh;
+    min-height: 42vh;
+  }
+  & .card-body {
+    flex-direction: column !important;
+  }
+}
+
+.sats-flow-info {
+  max-height: 32vh;
+  min-height: 32vh;
+  margin-bottom: 1.5rem;
+}
+
