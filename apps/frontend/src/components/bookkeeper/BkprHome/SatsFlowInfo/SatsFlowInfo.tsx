@@ -1,6 +1,6 @@
 import './SatsFlowInfo.scss';
 import { useNavigate } from 'react-router-dom';
-import { Card, Row } from 'react-bootstrap';
+import { Card, Row, Spinner } from 'react-bootstrap';
 import { SatsFlowSVG } from '../../../../svgs/SatsFlow';
 import { ActionSVG } from '../../../../svgs/Action';
 import { CallStatus, Units } from '../../../../utilities/constants';
@@ -13,7 +13,7 @@ import { selectIsSatsFlowLoading, selectSatsFlowError, selectSummary } from '../
 const SatsFlowInfo = () => {
   const navigate = useNavigate();
   const bkprSummary = useSelector(selectSummary);
-  const isSatsFlowLoading = useSelector(selectIsSatsFlowLoading);
+  const satsFlowLoading = useSelector(selectIsSatsFlowLoading);
   const satsFlowError = useSelector(selectSatsFlowError);
 
   return (
@@ -26,36 +26,43 @@ const SatsFlowInfo = () => {
         </Row>
       </Card.Header>
       <Card.Body className='mt-2 p-0'>
-        {isSatsFlowLoading ?
-          <span className='h-100 d-flex justify-content-center align-items-center text-light fs-6 delayed-load'>
-            No inbound/outboud satsflow yet. Forward transactions to see details!
+        {satsFlowLoading ?
+          <span className='h-100 d-flex justify-content-center align-items-center'>
+            <Spinner animation='grow' variant='primary' />
           </span>
           :
           satsFlowError ?
             <StatusAlert responseStatus={CallStatus.ERROR} responseMessage={satsFlowError.replace('Satsflow: ', '')} />
             :
-            <div className='d-flex flex-row justify-content-between '>
-              <div className='d-flex flex-column align-items-start p-2'>
-                <span className='fs-6 text-dark'>Inflow this month</span>
-                <span className='fs-3 fw-bold positive'>
-                  <CurrencyBox value={bkprSummary.inflows_for_period_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-3 fw-bold positive'></CurrencyBox>
-                </span>
+            bkprSummary.inflows_for_period_msat === 0 && bkprSummary.outflows_for_period_msat === 0 ?
+              <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
+                <Row className='d-flex align-items-center justify-content-center text-center'>
+                  No inbound/outbound satsflow yet.<br />Forward transactions to see details!
+                </Row>
+              </Row>
+            :
+              <div className='d-flex flex-row justify-content-between '>
+                <div className='d-flex flex-column align-items-start p-2'>
+                  <span className='fs-6 text-dark'>Inflow this month</span>
+                  <span className='fs-3 fw-bold positive'>
+                    <CurrencyBox value={bkprSummary.inflows_for_period_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-3 fw-bold positive'></CurrencyBox>
+                  </span>
+                </div>
+                <div className='d-flex flex-column align-items-start p-2'>
+                  <span className='fs-6 text-dark'>Outflow this month</span>
+                  <span className='fs-3 fw-bold negative'>
+                    <CurrencyBox value={bkprSummary.outflows_for_period_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-3 fw-bold negative'></CurrencyBox>
+                  </span>
+                </div>
               </div>
-              <div className='d-flex flex-column align-items-start p-2'>
-                <span className='fs-6 text-dark'>Outflow this month</span>
-                <span className='fs-3 fw-bold negative'>
-                  <CurrencyBox value={bkprSummary.outflows_for_period_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-3 fw-bold negative'></CurrencyBox>
-                </span>
-              </div>
-            </div>
         }
       </Card.Body>
-      <Card.Footer className='d-flex justify-content-end'>
+      <Card.Footer className='d-flex justify-content-end px-2'>
         <button
           tabIndex={1}
           type='button'
-          disabled
-          className='btn-rounded bg-primary fs-6 me-3'
+          disabled={satsFlowLoading || !!satsFlowError}
+          className='btn-rounded bg-primary fs-6'
           onClick={() => navigate('./satsflow')}
         >
           View More
