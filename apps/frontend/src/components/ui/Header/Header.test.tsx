@@ -1,10 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
+import { mockAppStore } from '../../../utilities/test-utilities/mockData';
 import Header from './Header';
 
 describe('Header component ', () => {
-  beforeEach(() => render(<Header />));
+  beforeEach(() => {});
 
-  it('should be in the document', () => {
-    expect(screen.getByTestId('header-context')).toBeInTheDocument();
+  it('should be in the document', async () => {
+    await renderWithProviders(<Header />, { preloadedState: mockAppStore, initialRoute: ['/cln'] })
+    expect(screen.getByTestId('header')).toBeInTheDocument();
   });
 });

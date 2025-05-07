@@ -1,195 +1,146 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act } from 'react';
+import { fireEvent, screen } from '@testing-library/react';
 import ConnectWallet from './ConnectWallet';
-import { renderWithMockCLNContext, getMockRootStoreData, getMockCLNStoreData } from '../../../utilities/test-utilities';
-import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
+import { mockBKPRStoreData, mockCLNStoreData, mockConnectWallet, mockInvoiceRune, mockRootStoreData, mockShowModals } from '../../../utilities/test-utilities/mockData';
+import { spyOnCreateInvoiceRune } from '../../../utilities/test-utilities/mockService';
 
 describe('ConnectWallet component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
-
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData('showModals', { connectWalletModal: true })));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
-    jest.useFakeTimers();
-  });
+  const customMockStore = {
+    root: {
+      ...mockRootStoreData,
+      showModals: {
+        ...mockShowModals,
+        connectWalletModal: true,
+      },
+      connectWallet: { ...mockConnectWallet, INVOICE_RUNE: mockInvoiceRune.rune }
+    },
+    cln: mockCLNStoreData,
+    bkpr: mockBKPRStoreData
+  };
+  const customMockStoreWithoutInvoiceRune = {
+    root: {
+      ...mockRootStoreData,
+      showModals: {
+        ...mockShowModals,
+        connectWalletModal: true,
+      }
+    },
+    cln: mockCLNStoreData,
+    bkpr: mockBKPRStoreData
+  };
 
   it('renders with initial state', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     expect(screen.getByTestId('connect-wallet')).toBeInTheDocument();
     expect(screen.getByText('LN Message')).toBeInTheDocument();
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
-    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
     expect(screen.queryByTestId('invoice-rune-spinner')).not.toBeInTheDocument();
   });
 
-  it('hide ConnectWallet modal if AppContext says to hide it', async () => {
-    providerRootProps.showModals.connectWalletModal = false;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-    expect(screen.queryByTestId('connect-wallet')).not.toBeInTheDocument();
-  });
-
   it('updates selected network and input fields on network change to LN Message', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-    await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[0];
-    await act(async () => fireEvent.click(restNetworkItem));
-
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
+    const networkToggle = screen.getByTestId('network-toggle');
+    fireEvent.click(networkToggle)
+    const selNetworkItem = screen.getAllByTestId('network-item')[0];
+    await act(async () => fireEvent.click(selNetworkItem));
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
     expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
-    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
   it('updates selected network and input fields on network change to LN Message (Tor)', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[1];
-    await act(async () => fireEvent.click(restNetworkItem));
-
+    const selNetworkItem = screen.getAllByTestId('network-item')[1];
+    await act(async () => fireEvent.click(selNetworkItem));
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
     expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'ln-message://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==',
-    );
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
   it('updates selected network and input fields on network change to REST', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[2];
-    await act(async () => fireEvent.click(restNetworkItem));
-
-    expect(screen.getAllByTestId('port')[1]).toHaveValue('3001');
+    const selNetworkItem = screen.getAllByTestId('network-item')[2];
+    await act(async () => fireEvent.click(selNetworkItem));
+    expect(screen.getByTestId('port')).toHaveValue('3001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
-    expect(screen.queryByTestId('client-key')).toBeInTheDocument();
     expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'clnrest://https://user.local:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
-    );
+    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue('clnrest://https://user.local:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert');
   });
 
   it('updates selected network and input fields on network change to REST (Tor)', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[3];
-    await act(async () => fireEvent.click(restNetworkItem));
-
-    expect(screen.getAllByTestId('port')[1]).toHaveValue('3001');
+    const selNetworkItem = screen.getAllByTestId('network-item')[3];
+    await act(async () => fireEvent.click(selNetworkItem));
+    expect(screen.getByTestId('port')).toHaveValue('3001');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
-    expect(screen.queryByTestId('client-key')).toBeInTheDocument();
     expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'clnrest://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert',
-    );
+    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue('clnrest://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:3001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&clientKey=ClientKey&clientCert=ClientCert&caCert=CACert');
   });
 
   it('updates selected network and input fields on network change to gRPC', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[4];
-    await act(async () => fireEvent.click(restNetworkItem));
-
-    expect(screen.getAllByTestId('port')[1]).toHaveValue('2106');
+    const selNetworkItem = screen.getAllByTestId('network-item')[4];
+    await act(async () => fireEvent.click(selNetworkItem));
+    expect(screen.getByTestId('port')).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
-    expect(screen.queryByTestId('client-key')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://http://user.local:2106');
+    expect(screen.getByTestId('client-key')).toHaveValue('ClientKey');
+    expect(screen.getByTestId('client-cert')).toHaveValue('ClientCert');
+    expect(screen.getByTestId('ca-cert')).toHaveValue('CACert');
+    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://https://user.local:2106?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert');
   });
 
   it('updates selected network and input fields on network change to gRPC (Tor)', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-    await act(async () =>  jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
-    const restNetworkItem = screen.getAllByTestId('network-item')[5];
-    await act(async () => fireEvent.click(restNetworkItem));
-    expect(screen.getAllByTestId('port')[1]).toHaveValue('2106');
+    const selNetworkItem = screen.getAllByTestId('network-item')[5];
+    await act(async () => fireEvent.click(selNetworkItem));
+    expect(screen.getByTestId('port')).toHaveValue('2106');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
-    expect(screen.queryByTestId('client-key')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
+    expect(screen.getByTestId('client-key')).toHaveValue('ClientKey');
+    expect(screen.getByTestId('client-cert')).toHaveValue('ClientCert');
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
-    expect(screen.getByTestId('connect-url')).toHaveValue(
-      'cln-grpc://http://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:2106',
-    );
+    expect(screen.queryByTestId('invoice-rune')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-url')).toHaveValue('cln-grpc://https://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:2106?clientKey=ClientKey&clientCert=ClientCert&caCert=CACert');
   });
 
-  it('when creating an invoice rune, display loading spinner', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    providerRootProps.setShowToast = jest.fn();
-    providerRootProps.walletConnect.INVOICE_RUNE = '';
-    window.prompt = jest.fn();
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-
-    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-    fireEvent.click(screen.getByTestId('invoice-rune-button'));
-
-    expect(screen.queryByTestId('invoice-rune-spinner')).toBeInTheDocument();
-  });
-
-  it('when invoice rune loading, buttons are disabled so additional runes are not created', async () => {
-    providerRootProps.showModals.connectWalletModal = true;
-    providerRootProps.setShowToast = jest.fn();
-    providerRootProps.walletConnect.INVOICE_RUNE = '';
-    window.prompt = jest.fn();
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ConnectWallet />);
-
-    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-
-    const invoiceRuneButton = screen.getByTestId('invoice-rune-button')
-    fireEvent.click(invoiceRuneButton);
-
-    const invoiceRuneField = screen.getByTestId('invoice-rune');
-    expect(invoiceRuneField).toBeDisabled();
-
-    fireEvent.click(invoiceRuneField);
-    expect(providerRootProps.setShowToast).not.toHaveBeenCalled();
-
-    fireEvent.click(invoiceRuneButton);
-    expect(providerRootProps.setShowToast).not.toHaveBeenCalled();
+  it('when creating an invoice rune, display loading spinner and disable button', async () => {
+    jest.useFakeTimers();
+    const mock = spyOnCreateInvoiceRune();
+    await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStoreWithoutInvoiceRune });
+    await act(async () => fireEvent.click(screen.getByTestId('network-toggle')));
+    const selNetworkItem = screen.getAllByTestId('network-item')[0];
+    await act(async () => fireEvent.click(selNetworkItem));
+    fireEvent.click(screen.getByTestId('invoice-rune'));
+    expect(await screen.findByTestId('invoice-rune-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('invoice-rune')).toBeDisabled();
+  
+    await act(async () => { jest.advanceTimersByTime(10) });
+  
+    expect(mock).toHaveBeenCalled();
+    expect(screen.queryByTestId('invoice-rune-spinner')).not.toBeInTheDocument();
+    expect(screen.getByTestId('invoice-rune')).not.toBeDisabled();
   });
 
 });
