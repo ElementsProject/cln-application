@@ -137,7 +137,6 @@ export const API_VERSION = '/v1';
 export const FIAT_RATE_API = 'https://green-bitcoin-mainnet.blockstream.com/prices/v0/venues/';
 export const FIAT_VENUES: any = {
   USD: 'KRAKEN',
-  CAD: 'BULLBITCOIN',
   EUR: 'KRAKEN',
   NZD: 'KIWICOIN',
 };
