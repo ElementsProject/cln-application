@@ -4,7 +4,7 @@
   .text-contrast {
     color: $dark;
   }
-  
+
   .text-white-dark {
     color: $white;
   }
@@ -21,11 +21,13 @@
     fill: $light;
   }
 
-  .fill-primary, .fill-1 {
+  .fill-primary,
+  .fill-1 {
     fill: $primary;
   }
 
-  .fill-strong-contrast, .fill-2 {
+  .fill-strong-contrast,
+  .fill-2 {
     fill: $white;
     stop-color: $white;
   }
@@ -49,7 +51,7 @@
   .stroke-bg {
     stroke: $body-bg;
   }
-  
+
   .stroke-primary-bg {
     stroke: $primary;
   }
@@ -58,22 +60,29 @@
     stroke: $light;
   }
 
+  .stroke-white-primary {
+    stroke: $white;
+  }
+
   .card {
     &.bg-primary {
       color: $white;
     }
   }
 
-  .list-group-item, .dropdown-menu {
+  .list-group-item,
+  .dropdown-menu {
     box-shadow: none;
   }
 
   span.span-close-svg {
     cursor: pointer;
+    border-radius: $border-radius;
     & svg path {
       transition: all $transition-time ease;
     }
-    &:hover {
+    &:hover, &:focus-visible {
+      outline: none;
       & svg path {
         stroke: darken($light, 15%);
       }
@@ -81,14 +90,15 @@
   }
 
   .btn-rounded {
-    &.btn.btn-primary, &.bg-primary {
+    &.btn.btn-primary,
+    &.bg-primary {
       color: $white;
       &:hover {
         box-shadow: 0px 2px 4px 0px $gray-400;
       }
     }
   }
-  
+
   .btn-group {
     & button.btn-actions {
       color: $white;
@@ -98,7 +108,10 @@
   .dropdown {
     & .dropdown-item {
       color: $dark;
-      &.active, &:active, &:focus, &:hover {
+      &.active,
+      &:active,
+      &:focus,
+      &:hover {
         color: $primary;
       }
     }
@@ -111,7 +124,7 @@
       &:focus {
         border-color: $border-color;
       }
-      &::-webkit-input-placeholder { 
+      &::-webkit-input-placeholder {
         color: $light;
       }
       &:-moz-placeholder {
@@ -124,7 +137,7 @@
       }
       &:-ms-input-placeholder {
         color: $light;
-      }  
+      }
     }
     & .form-control-addon {
       background-color: $body-bg;
@@ -145,7 +158,50 @@
       color: $dark;
       background-color: $white;
       & svg path {
-        fill: $dark;  
+        fill: $dark;
+      }
+    }
+  }
+
+  & .recharts-surface {
+    & >path:not(.recharts-legend-icon) {
+      fill: $body-bg-light;
+    }
+  }
+
+  & .react-datepicker-popper {
+    & .react-datepicker__triangle {
+      fill: $body-bg;
+      color: $body-bg;
+      stroke: $card-border-color;
+    }
+    & .react-datepicker {
+      border-color: $card-border-color;
+      background-color: $body-bg;
+      & .react-datepicker__header {
+        background-color: $body-bg;
+        border-bottom: $card-border-width solid $card-border-color;
+        & .react-datepicker__current-month, & .react-datepicker-time__header, & .react-datepicker-year-header,
+        & .react-datepicker__day-names {
+          color: $dark;
+          & .react-datepicker__day-name {
+            color: $dark;
+          }
+        }
+      }
+      & .react-datepicker__navigation-icon::before {
+        border-color: $dark;
+      }
+      & .react-datepicker__month-container {
+        & .react-datepicker__day {
+          color: $dark;
+          &:hover {
+            background-color: $body-bg-light;
+          }
+          &--disabled {
+            color: $light;
+          }
+        }
       }
     }
   }
