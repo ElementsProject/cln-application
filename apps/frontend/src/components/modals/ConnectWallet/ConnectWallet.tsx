@@ -1,22 +1,25 @@
 import './ConnectWallet.scss';
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Modal, Col, Row, Spinner, Dropdown, InputGroup, Form } from 'react-bootstrap';
 
-import { ApplicationModes } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
 import { CloseSVG } from '../../../svgs/Close';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
-import { ConnectWalletFields } from '../../../types/app-config.type';
+import { ConnectWalletFields } from '../../../types/root.type';
 import logger from '../../../services/logger.service';
-import useHttp from '../../../hooks/use-http';
 import { AddSVG } from '../../../svgs/Add';
-import { RootContext } from '../../../store/RootContext';
+import { CLNService } from '../../../services/http.service';
+import { setShowModals, setShowToast, setConnectWallet } from '../../../store/rootSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectIsDarkMode, selectShowModals, selectWalletConnect } from '../../../store/rootSelectors';
 
 const ConnectWallet = () => {
-  const rootCtx = useContext(RootContext);
-  const { createInvoiceRune } = useHttp();
+  const dispatch = useDispatch();
+  const isDarkMode = useSelector(selectIsDarkMode);
+  const connectWallet = useSelector(selectWalletConnect);
+  const showModals = useSelector(selectShowModals);
   const [networkTypes, setNetworkTypes] = useState<string[]>(['LN Message', 'LN Message (Tor)']);
   const [selNetwork, setSelNetwork] = useState('LN Message');
   const [connectUrl, setConnectUrl] = useState('');
@@ -26,60 +29,60 @@ const ConnectWallet = () => {
 
   useEffect(() => {
     let newNetworkTypes: string[] = ['LN Message', 'LN Message (Tor)'];
-    if (rootCtx.walletConnect.LIGHTNING_REST_PORT && rootCtx.walletConnect.LIGHTNING_REST_PORT !== '') {
+    if (connectWallet.LIGHTNING_REST_PORT) {
       newNetworkTypes.push('REST');
-      if (rootCtx.walletConnect.TOR_SERVICE && rootCtx.walletConnect.TOR_SERVICE !== '') {
+      if (connectWallet.TOR_SERVICE && connectWallet.TOR_SERVICE !== '') {
         newNetworkTypes.push('REST (Tor)');
       }
     }
-    if (rootCtx.walletConnect.LIGHTNING_GRPC_PORT && rootCtx.walletConnect.LIGHTNING_GRPC_PORT !== '') {
+    if (connectWallet.LIGHTNING_GRPC_PORT) {
       newNetworkTypes.push('gRPC');
-      if (rootCtx.walletConnect.TOR_SERVICE && rootCtx.walletConnect.TOR_SERVICE !== '') {
+      if (connectWallet.TOR_SERVICE && connectWallet.TOR_SERVICE !== '') {
         newNetworkTypes.push('gRPC (Tor)');
       }
     }
     setNetworkTypes(newNetworkTypes);
     if (selNetwork === 'LN Message') {
-      setConnectUrl('ln-message://' + rootCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + rootCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + rootCtx.walletConnect.INVOICE_RUNE : ''));
+      setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
     }
-  }, [rootCtx, selNetwork]);
+  }, [connectWallet, selNetwork]);
 
   const copyHandler = (event) => {
     let textToCopy = '';
     switch (event.target.id) {
       case 'Websocket Port':
-        textToCopy = rootCtx.walletConnect.LIGHTNING_WS_PORT || '';
+        textToCopy = connectWallet.LIGHTNING_WS_PORT?.toString() || '';
         break;
       case 'gRPC Port':
-        textToCopy = rootCtx.walletConnect.LIGHTNING_GRPC_PORT || '';
+        textToCopy = connectWallet.LIGHTNING_GRPC_PORT?.toString() || '';
         break;
       case 'REST Port':
-        textToCopy = rootCtx.walletConnect.LIGHTNING_REST_PORT || '';
+        textToCopy = connectWallet.LIGHTNING_REST_PORT?.toString() || '';
         break;
       case 'CLN Host':
-        textToCopy = (selNetwork.includes('(Tor)') ? rootCtx.walletConnect.TOR_SERVICE : rootCtx.walletConnect.DEVICE_DOMAIN_NAME) || '';
+        textToCopy = (selNetwork.includes('(Tor)') ? connectWallet.TOR_SERVICE : connectWallet.DEVICE_DOMAIN_NAME) || '';
         break;
       case 'Rune':
-        textToCopy = rootCtx.walletConnect.COMMANDO_RUNE || '';
+        textToCopy = connectWallet.COMMANDO_RUNE || '';
         break;
       case 'Invoice Rune':
-        textToCopy = rootCtx.walletConnect.INVOICE_RUNE || '';
+        textToCopy = connectWallet.INVOICE_RUNE || '';
         break;
       case 'Client Key':
-        textToCopy = rootCtx.walletConnect.CLIENT_KEY || '';
+        textToCopy = connectWallet.CLIENT_KEY || '';
         break;
       case 'Client Cert':
-        textToCopy = rootCtx.walletConnect.CLIENT_CERT || '';
+        textToCopy = connectWallet.CLIENT_CERT || '';
         break;
       case 'CA Cert':
-        textToCopy = rootCtx.walletConnect.CA_CERT || '';
+        textToCopy = connectWallet.CA_CERT || '';
         break;
       default:
         textToCopy = connectUrl || '';
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      rootCtx.setShowToast({ show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success' });
+      dispatch(setShowToast({ show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success' }));
     }).catch((err) => {
       logger.error(err);
     });
@@ -87,21 +90,22 @@ const ConnectWallet = () => {
 
   const createInvoiceRuneHandler = () => {
     setIsLoadingInvoiceRune(true);
-    createInvoiceRune()
-      .then(() => {
-        rootCtx.setShowToast({ show: true, message: ('Created Invoice Rune Successfully!'), bg: 'success' });
+    CLNService.createInvoiceRune()
+      .then((updatedWalletConnectData) => {
+        dispatch(setConnectWallet(updatedWalletConnectData));
+        dispatch(setShowToast({ show: true, message: ('Created Invoice Rune Successfully!'), bg: 'success' }));
       })
       .catch(err => {
         logger.error(err.message || JSON.stringify(err));
-        rootCtx.setShowToast({ show: true, message: (`Error Creating Invoice Rune: ${err.message || ''}`), bg: 'danger' });
+        dispatch(setShowToast({ show: true, message: (`Error Creating Invoice Rune: ${err.message || ''}`), bg: 'danger' }));
       })
       .finally(() => {
         setIsLoadingInvoiceRune(false);
       });
-  }
+  };
 
   const closeHandler = () => {
-    rootCtx.setShowModals({ ...rootCtx.showModals, connectWalletModal: false });
+    dispatch(setShowModals({ ...showModals, connectWalletModal: false }));
   }
 
   const networkChangeHandler = (event) => {
@@ -109,46 +113,46 @@ const ConnectWallet = () => {
     switch (event.target.id) {
       case 'LN Message':
         setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + rootCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + rootCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + rootCtx.walletConnect.INVOICE_RUNE : ''));
+        setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
 
       case 'LN Message (Tor)':
         setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + rootCtx.walletConnect.TOR_SERVICE + ':' + rootCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + rootCtx.walletConnect.INVOICE_RUNE : ''));
+        setConnectUrl('ln-message://' + connectWallet.TOR_SERVICE + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
 
       case 'REST':
         setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
-        setConnectUrl('clnrest://' + rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + rootCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + rootCtx.walletConnect.LIGHTNING_REST_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + rootCtx.walletConnect.CLIENT_KEY + '&clientCert=' + rootCtx.walletConnect.CLIENT_CERT + '&caCert=' + rootCtx.walletConnect.CA_CERT : ''));
+        setConnectUrl('clnrest://' + connectWallet.LIGHTNING_REST_PROTOCOL + '://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_REST_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT + '&caCert=' + connectWallet.CA_CERT : ''));
         break;
 
       case 'REST (Tor)':
         setConnectValues({ protocol: { title: 'REST Protocol', field: 'LIGHTNING_REST_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'REST Port', field: 'LIGHTNING_REST_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'REST URL', field: '' } });
-        setConnectUrl('clnrest://' + rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL + '://' + rootCtx.walletConnect.TOR_SERVICE + ':' + rootCtx.walletConnect.LIGHTNING_REST_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + rootCtx.walletConnect.CLIENT_KEY + '&clientCert=' + rootCtx.walletConnect.CLIENT_CERT + '&caCert=' + rootCtx.walletConnect.CA_CERT : ''));
+        setConnectUrl('clnrest://' + connectWallet.LIGHTNING_REST_PROTOCOL + '://' + connectWallet.TOR_SERVICE + ':' + connectWallet.LIGHTNING_REST_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT + '&caCert=' + connectWallet.CA_CERT : ''));
         break;
 
       case 'gRPC':
         setConnectValues({ protocol: { title: 'gRPC Protocol', field: 'LIGHTNING_GRPC_PROTOCOL' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, port: { title: 'GRPC Port', field: 'LIGHTNING_GRPC_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'gRPC URL', field: '' } });
-        setConnectUrl('cln-grpc://' + rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL + '://' + rootCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + rootCtx.walletConnect.LIGHTNING_GRPC_PORT + (rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + rootCtx.walletConnect.CLIENT_KEY + '&clientCert=' + rootCtx.walletConnect.CLIENT_CERT + '&caCert=' + rootCtx.walletConnect.CA_CERT : ''));
+        setConnectUrl('cln-grpc://' + connectWallet.LIGHTNING_GRPC_PROTOCOL + '://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_GRPC_PORT + (connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT + '&caCert=' + connectWallet.CA_CERT : ''));
         break;
 
       case 'gRPC (Tor)':
         setConnectValues({ protocol: { title: 'gRPC Protocol', field: 'LIGHTNING_GRPC_PROTOCOL' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, port: { title: 'GRPC Port', field: 'LIGHTNING_GRPC_PORT' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, caCert: { title: 'CA Cert', field: 'CA_CERT' }, connectUrl: { title: 'gRPC URL', field: '' } });
-        setConnectUrl('cln-grpc://' + rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL + '://' + rootCtx.walletConnect.TOR_SERVICE + ':' + rootCtx.walletConnect.LIGHTNING_GRPC_PORT + (rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + rootCtx.walletConnect.CLIENT_KEY + '&clientCert=' + rootCtx.walletConnect.CLIENT_CERT + '&caCert=' + rootCtx.walletConnect.CA_CERT : ''));
+        setConnectUrl('cln-grpc://' + connectWallet.LIGHTNING_GRPC_PROTOCOL + '://' + connectWallet.TOR_SERVICE + ':' + connectWallet.LIGHTNING_GRPC_PORT + (connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https' ? '?clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT + '&caCert=' + connectWallet.CA_CERT : ''));
         break;
 
       default:
         setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + rootCtx.walletConnect.DEVICE_DOMAIN_NAME + ':' + rootCtx.walletConnect.LIGHTNING_WS_PORT + '?rune=' + rootCtx.walletConnect.COMMANDO_RUNE + (rootCtx.walletConnect.INVOICE_RUNE !== '' ? '&invoiceRune=' + rootCtx.walletConnect.INVOICE_RUNE : ''));
+        setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
     }
-  }
+  };
 
   let invoiceRuneClickHandler;
   let InvoiceRuneSvg;
 
   if (selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') {
-    if (rootCtx.walletConnect.INVOICE_RUNE && rootCtx.walletConnect.INVOICE_RUNE !== '') {
+    if (connectWallet.INVOICE_RUNE && connectWallet.INVOICE_RUNE !== '') {
       invoiceRuneClickHandler = copyHandler;
       InvoiceRuneSvg = CopySVG;
     } else {
@@ -159,7 +163,7 @@ const ConnectWallet = () => {
 
   return (
     <>
-      <Modal show={rootCtx.showModals.connectWalletModal} onHide={closeHandler} centered className='modal-lg' data-testid='connect-wallet'>
+      <Modal show={showModals.connectWalletModal} onHide={closeHandler} centered className='modal-lg' data-testid='connect-wallet'>
         <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
           <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
         </Modal.Header>
@@ -169,14 +173,14 @@ const ConnectWallet = () => {
               <motion.img
                 key='cln-logo'
                 alt='Core Lightning Logo'
-                src={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
+                src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
                 className='qr-cln-logo'
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.05, duration: 0.01 }}
               />
             </AnimatePresence>
-            <QRCodeCanvas value={connectUrl} size={220} includeMargin={true} bgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#0C0C0F' : '#FFFFFF'} fgColor={rootCtx.appConfig.uiConfig.appMode === ApplicationModes.DARK ? '#FFFFFF' : '#000000'} />
+            <QRCodeCanvas value={connectUrl} size={220} includeMargin={true} bgColor={isDarkMode ? '#0C0C0F' : '#FFFFFF'} fgColor={isDarkMode ? '#FFFFFF' : '#000000'} />
           </Row>
           <Row className='d-flex align-items-start justify-content-center pt-2'>
             <h4 className='w-100 text-blue fw-semibold d-flex justify-content-center text-center'>
@@ -204,11 +208,11 @@ const ConnectWallet = () => {
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.protocol.title}
-                    value={rootCtx.walletConnect[connectValues.protocol.field]}
-                    aria-label={rootCtx.walletConnect[connectValues.protocol.field]}
+                    value={connectWallet[connectValues.protocol.field] || ''}
+                    aria-label={connectWallet[connectValues.protocol.field]}
                     aria-describedby='copy-addon-port'
                     className='form-control-left'
-                    data-testid='port'
+                    data-testid='protocol'
                     readOnly
                   />
                   <InputGroup.Text id={connectValues.port.title} className='form-control-addon form-control-addon-right' onClick={copyHandler}>
@@ -225,8 +229,8 @@ const ConnectWallet = () => {
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.host.title}
-                  value={rootCtx.walletConnect[connectValues.host.field]}
-                  aria-label={rootCtx.walletConnect[connectValues.host.field]}
+                  value={connectWallet[connectValues.host.field] || ''}
+                  aria-label={connectWallet[connectValues.host.field]}
                   aria-describedby='copy-addon-host'
                   className='form-control-left'
                   data-testid='host'
@@ -238,19 +242,23 @@ const ConnectWallet = () => {
               </InputGroup>
             </Col>
             <Col xs={6}>
-              <Form.Label className='text-light'>{connectValues.port.title}</Form.Label>
+              <Form.Label className='text-light'>{connectValues.port.title || ''}</Form.Label>
               <InputGroup className='mb-2'>
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.port.title}
-                  value={rootCtx.walletConnect[connectValues.port.field]}
-                  aria-label={rootCtx.walletConnect[connectValues.port.field]}
+                  value={connectWallet[connectValues.port.field] || ''}
+                  aria-label={connectWallet[connectValues.port.field]}
                   aria-describedby='copy-addon-port'
                   className='form-control-left'
                   data-testid='port'
                   readOnly
                 />
-                <InputGroup.Text id={connectValues.port.title} className='form-control-addon form-control-addon-right' onClick={copyHandler}>
+                <InputGroup.Text
+                  id={connectValues.port.title}
+                  className="form-control-addon form-control-addon-right"
+                  onClick={copyHandler}
+                >
                   <CopySVG id={connectValues.port.title} />
                 </InputGroup.Text>
               </InputGroup>
@@ -259,13 +267,13 @@ const ConnectWallet = () => {
           {(selNetwork !== 'gRPC' && selNetwork !== 'gRPC (Tor)') && connectValues.rune ?
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
-                <Form.Label className='text-light'>{connectValues.rune.title}</Form.Label>
+                <Form.Label className='text-light'>{connectValues.rune.title || ''}</Form.Label>
                 <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.rune.title}
-                    value={rootCtx.walletConnect[connectValues.rune.field]}
-                    aria-label={rootCtx.walletConnect[connectValues.rune.field]}
+                    value={connectWallet[connectValues.rune.field] || ''}
+                    aria-label={connectWallet[connectValues.rune.field]}
                     aria-describedby='copy-addon-rune'
                     className='form-control-left'
                     data-testid='rune'
@@ -281,16 +289,16 @@ const ConnectWallet = () => {
           {(selNetwork === 'LN Message' || selNetwork === 'LN Message (Tor)') && (
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
-                <Form.Label className='text-light'>{connectValues.invoiceRune?.title}</Form.Label>
+                <Form.Label className='text-light'>{connectValues.invoiceRune?.title || ''}</Form.Label>
                 <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={invoiceRuneClickHandler}
                     id={connectValues.invoiceRune?.title}
-                    value={rootCtx.walletConnect['INVOICE_RUNE']}
+                    value={connectWallet['INVOICE_RUNE'] || ''}
                     placeholder='Not Found'
-                    aria-label={rootCtx.walletConnect['INVOICE_RUNE']}
+                    aria-label={connectWallet['INVOICE_RUNE']}
                     disabled={isLoadingInvoiceRune}
-                    aria-describedby='copy-addon-rune'
+                    aria-describedby='copy-addon-invoice-rune'
                     className='form-control-left'
                     data-testid='invoice-rune'
                     readOnly
@@ -300,26 +308,25 @@ const ConnectWallet = () => {
                       <span className='h-100 d-flex justify-content-center align-items-center'>
                         <Spinner className='me-1' variant='light' size='sm' data-testid='invoice-rune-spinner' />
                       </span>
-                      : InvoiceRuneSvg && <InvoiceRuneSvg id={connectValues.invoiceRune?.title} showTooltip={rootCtx.walletConnect.INVOICE_RUNE === ''} tooltipText={'Create New Invoice Rune'} />
+                      : InvoiceRuneSvg && <InvoiceRuneSvg id={connectValues.invoiceRune?.title} showTooltip={connectWallet.INVOICE_RUNE === ''} tooltipText={'Create New Invoice Rune'} />
                     }
                   </InputGroup.Text>
                 </InputGroup>
               </Col>
             </Row>
-          )
-          }
-          {(selNetwork.includes('REST') && rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https') || 
-            (selNetwork.includes('gRPC') && rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
+          )}
+          {(selNetwork.includes('REST') && connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https') || 
+            (selNetwork.includes('gRPC') && connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
             <>
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
-                <Form.Label className='text-light'>{connectValues.clientKey?.title}</Form.Label>
+                <Form.Label className='text-light'>{connectValues.clientKey?.title || ''}</Form.Label>
                 <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.clientKey?.title}
-                    value={rootCtx.walletConnect['CLIENT_KEY']}
-                    aria-label={rootCtx.walletConnect['CLIENT_KEY']}
+                    value={connectWallet['CLIENT_KEY'] || ''}
+                    aria-label={connectWallet['CLIENT_KEY']}
                     aria-describedby='copy-addon-host'
                     className='form-control-left'
                     data-testid='client-key'
@@ -333,13 +340,13 @@ const ConnectWallet = () => {
             </Row>
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
-                <Form.Label className='text-light'>{connectValues.clientCert?.title}</Form.Label>
+                <Form.Label className='text-light'>{connectValues.clientCert?.title || ''}</Form.Label>
                 <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.clientCert?.title}
-                    value={rootCtx.walletConnect['CLIENT_CERT']}
-                    aria-label={rootCtx.walletConnect['CLIENT_CERT']}
+                    value={connectWallet['CLIENT_CERT'] || ''}
+                    aria-label={connectWallet['CLIENT_CERT']}
                     aria-describedby='copy-addon-host'
                     className='form-control-left'
                     data-testid='client-cert'
@@ -355,17 +362,17 @@ const ConnectWallet = () => {
             :
             <></>
           }
-          {(selNetwork === 'REST' && rootCtx.walletConnect.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https') || 
-            (selNetwork === 'gRPC' && rootCtx.walletConnect.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
+          {(selNetwork === 'REST' && connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https') || 
+            (selNetwork === 'gRPC' && connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
-                <Form.Label className='text-light'>{connectValues.caCert?.title}</Form.Label>
+                <Form.Label className='text-light'>{connectValues.caCert?.title || ''}</Form.Label>
                 <InputGroup className='mb-2'>
                   <Form.Control
                     onClick={copyHandler}
                     id={connectValues.caCert?.title}
-                    value={rootCtx.walletConnect['CA_CERT']}
-                    aria-label={rootCtx.walletConnect['CA_CERT']}
+                    value={connectWallet['CA_CERT'] || ''}
+                    aria-label={connectWallet['CA_CERT']}
                     aria-describedby='copy-addon-host'
                     className='form-control-left'
                     data-testid='ca-cert'
@@ -380,16 +387,16 @@ const ConnectWallet = () => {
             :
             <></>
           }
-          <Row className='mb-4 d-flex align-items-start justify-content-center'>
+          <Row className="mb-4 d-flex align-items-start justify-content-center">
             <Col xs={12}>
-              <Form.Label className='text-light'>{connectValues.connectUrl?.title}</Form.Label>
+              <Form.Label className='text-light'>{connectValues.connectUrl?.title || ''}</Form.Label>
               <InputGroup className='mb-2'>
                 <Form.Control
                   onClick={copyHandler}
                   id={connectValues.connectUrl?.title}
                   value={connectUrl || ''}
                   aria-label={connectUrl || ''}
-                  aria-describedby='copy-addon-rune'
+                  aria-describedby='copy-addon-url'
                   className='form-control-left'
                   data-testid='connect-url'
                   readOnly
@@ -404,6 +411,6 @@ const ConnectWallet = () => {
       </Modal>
     </>
   );
-}
+};
 
 export default ConnectWallet;

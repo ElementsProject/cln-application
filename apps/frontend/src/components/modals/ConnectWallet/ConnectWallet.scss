@@ -15,7 +15,7 @@
     border-radius: 0.375rem !important;
   }
   & .dropdown-menu {
-    font-size: .875rem;
+    font-size: 0.875rem;
     width: 100%;
   }
 }
@@ -30,7 +30,10 @@
     & .dropdown-menu {
       & .dropdown-item {
         color: $dark;
-        &.active, &:active, &:focus, &:hover {
+        &.active,
+        &:active,
+        &:focus,
+        &:hover {
           color: $primary;
         }
       }
@@ -48,7 +51,10 @@
     & .dropdown-menu {
       & .dropdown-item {
         color: $light-dark;
-        &.active, &:active, &:focus, &:hover {
+        &.active,
+        &:active,
+        &:focus,
+        &:hover {
           color: $primary;
         }
       }

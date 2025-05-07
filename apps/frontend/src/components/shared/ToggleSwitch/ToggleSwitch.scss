@@ -4,7 +4,7 @@
   color: $dark;
   font-weight: 600;
   border: 1px solid $gray-300;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   height: 2rem;
   width: 6.5rem;
   box-sizing: border-box;
@@ -28,13 +28,13 @@
     background: $primary;
     &.toggle-left {
       border-color: $primary;
-      border-top-left-radius: .5rem;
-      border-bottom-left-radius: .5rem;
+      border-top-left-radius: 0.5rem;
+      border-bottom-left-radius: 0.5rem;
     }
     &.toggle-right {
       border-color: $primary;
-      border-top-right-radius: .5rem;
-      border-bottom-right-radius: .5rem;
+      border-top-right-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
     }
     &:hover {
       background-color: lighten($primary, 5%);
@@ -46,14 +46,13 @@
   }
 }
 
-
 @include color-mode(dark) {
   .toggle {
     color: $white;
     background: lighten($card-bg-dark, 10%);
-    
+
     & .toggle-switch {
       color: $card-bg-dark;
     }
-  }  
+  }
 }
