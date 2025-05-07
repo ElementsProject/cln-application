@@ -1,15 +1,11 @@
-import React from 'react';
-
 import './ChannelOpen.scss';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Spinner, Card, Row, Col, Form, InputGroup } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
-import useHttp from '../../../hooks/use-http';
 import { CallStatus, FeeRate, BOUNCY_SPRING_VARIANTS_1, CLEAR_STATUS_ALERT_DELAY } from '../../../utilities/constants';
-import { CLNContext } from '../../../store/CLNContext';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
 import { AddressSVG } from '../../../svgs/Address';
@@ -18,18 +14,19 @@ import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMe
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import FeerateRange from '../../shared/FeerateRange/FeerateRange';
-import { RootContext } from '../../../store/RootContext';
-
+import { CLNService } from '../../../services/http.service';
+import { useSelector } from 'react-redux';
+import { selectFiatConfig, selectFiatUnit, selectWalletBalances } from '../../../store/rootSelectors';
 
 const ChannelOpen = (props) => {
-  const rootCtx = useContext(RootContext);
-  const clnCtx = useContext(CLNContext);
-  const { openChannel } = useHttp();
-  const [selFeeRate, setSelFeeRate] = useState(FeeRate.NORMAL)
+  const fiatUnit = useSelector(selectFiatUnit);
+  const fiatConfig = useSelector(selectFiatConfig);
+  const walletBalances = useSelector(selectWalletBalances);
+  const [selFeeRate, setSelFeeRate] = useState(FeeRate.NORMAL);
   const [announce, setAnnounce] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
-  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (clnCtx.walletBalances.btcSpendableBalance || 0);
+  const isValidAmount = (value) => value.trim() !== '' && value > 0 && value <= (walletBalances.btcSpendableBalance || 0);
   const isValidPubkey = (value) => value.includes('@') && value.includes(':');
 
   const {
@@ -53,10 +50,10 @@ const ChannelOpen = (props) => {
 
   if (pubkeyIsValid && amountIsValid) {
     formIsValid = true;
-  };
-  
-  const selFeeRateChangeHandler = (event) => {
-    switch (+(event.target.value)) {
+  }
+
+  const selFeeRateChangeHandler = event => {
+    switch (+event.target.value) {
       case 0:
         setSelFeeRate(FeeRate.SLOW);
         break;
@@ -84,43 +81,52 @@ const ChannelOpen = (props) => {
   const delayedClearStatusAlert = (shouldClose: boolean, channelId: string = '') => {
     setTimeout(() => {
       logger.info('Should Close: ' + shouldClose);
-      if(shouldClose) { props.onClose(channelId); }
+      if (shouldClose) {
+        props.onClose(channelId);
+      }
       setResponseStatus(CallStatus.NONE);
-      setResponseMessage('');  
+      setResponseMessage('');
     }, CLEAR_STATUS_ALERT_DELAY);
-  }
+  };
 
-  const ChannelOpenHandler = (event) => {
+  const ChannelOpenHandler = event => {
     event.preventDefault();
     touchFormControls();
-    if (!formIsValid) { return; }
+    if (!formIsValid) {
+      return;
+    }
     setResponseStatus(CallStatus.PENDING);
     setResponseMessage('Opening Channel...');
-    openChannel(pubkeyValue, +amountValue, selFeeRate.toLowerCase(), announce)
-    .then((response: any) => {
-      logger.info(response);
-      if (response.data && (response.data.channel_id || response.data.txid)) {
-        setResponseStatus(CallStatus.SUCCESS);
-        setResponseMessage('Channel opened with ' + (response.data.channel_id ? ('channel id ' + response.data.channel_id) : ('transaction id ' + response.data.txid)));
-        resetFormValues();
-        delayedClearStatusAlert(true, response.data.channel_id);
-      } else {
+    CLNService.openChannel(pubkeyValue, +amountValue, selFeeRate.toLowerCase(), announce)
+      .then((response: any) => {
+        logger.info(response);
+        if (response.channel_id || response.txid) {
+          setResponseStatus(CallStatus.SUCCESS);
+          setResponseMessage(
+            'Channel opened with ' +
+              (response.channel_id
+                ? 'channel id ' + response.channel_id
+                : 'transaction id ' + response.txid),
+          );
+          resetFormValues();
+          delayedClearStatusAlert(true, response.channel_id);
+        } else {
+          setResponseStatus(CallStatus.ERROR);
+          setResponseMessage(response.response || response.message || 'Unknown Error');
+          delayedClearStatusAlert(false);
+        }
+      })
+      .catch(err => {
+        logger.error(err);
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.response.data || response.message || 'Unknown Error');
+        setResponseMessage(err);
         delayedClearStatusAlert(false);
-      }
-    })
-    .catch(err => {
-      logger.error(err.response?.data || err.message || JSON.stringify(err));
-      setResponseStatus(CallStatus.ERROR);
-      setResponseMessage(err.response?.data || err.message || JSON.stringify(err));
-      delayedClearStatusAlert(false);
-    });
+      });
   };
 
   return (
     <form onSubmit={ChannelOpenHandler} className='h-100' data-testid='channel-open'>
-      <Card className='h-100 d-flex align-items-stretch'>
+      <Card className='h-100 d-flex align-items-stretch' data-testid='channel-open-card'>
         <Card.Body className='text-dark d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
               <div className='fs-4 p-0 fw-bold text-dark'>
@@ -163,7 +169,7 @@ const ChannelOpen = (props) => {
                       tabIndex={2}
                       id='amount'
                       type='number'
-                      placeholder={'Amount (Between 1 - ' + parseFloat((clnCtx.walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
+                      placeholder={'Amount (Between 1 - ' + parseFloat((walletBalances.btcSpendableBalance || 0).toString()).toLocaleString('en-us')  + ' Sats)'}
                       aria-label='amount'
                       aria-describedby='addon-amount'
                       className='form-control-right'
@@ -176,7 +182,7 @@ const ChannelOpen = (props) => {
                     !amountHasError ?
                       amountValue ?
                         <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                          ~ <FiatBox value={(+amountValue || 0)} fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
+                          ~ <FiatBox value={(+amountValue || 0)} fiatUnit={fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
                         </p>
                       :
                         <p className='message'></p>
@@ -184,8 +190,8 @@ const ChannelOpen = (props) => {
                       <InvalidInputMessage message={
                         (+amountValue <= 0) ? 
                           'Amount should be greater than 0'
-                        : (+amountValue > (clnCtx.walletBalances.btcSpendableBalance || 0)) ? 
-                          'Amount should be lesser then ' + (clnCtx.walletBalances.btcSpendableBalance || 0)
+                        : (+amountValue > (walletBalances.btcSpendableBalance || 0)) ? 
+                          'Amount should be lesser then ' + (walletBalances.btcSpendableBalance || 0)
                         :
                           'Invalid Amount'
                       } />

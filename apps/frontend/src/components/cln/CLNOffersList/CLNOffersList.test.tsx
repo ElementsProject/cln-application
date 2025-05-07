@@ -1,60 +1,68 @@
 import { screen } from '@testing-library/react';
+import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListOffers, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNOffersList from './CLNOffersList';
-import { renderWithMockCLNContext, getMockCLNStoreData, getMockRootStoreData } from '../../../utilities/test-utilities';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
 
 describe('CLNOffersList component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
-
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/cln',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
-  });
-
-  it('if it is loading show the spinner', () => {
-    providerCLNProps.listOffers.isLoading = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffersList />,);
+  it('if it is loading show the spinner', async () => {
+    const customMockStore = {
+      root: mockRootStoreData,
+      cln: {
+        ...mockCLNStoreData,
+        listOffers: {
+          ...mockListOffers,
+          isLoading: true
+        }
+      },
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<CLNOffersList />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     expect(screen.getByTestId('cln-offers-list-spinner')).toBeInTheDocument();
   });
 
-  it('if it is not loading dont show the spinner', () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffersList />,);
+  it('if it is not loading dont show the spinner', async () => {
+    await renderWithProviders(<CLNOffersList />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
     expect(screen.queryByTestId('cln-offers-list-spinner')).not.toBeInTheDocument();
-  })
+  });
 
-  it('if it has an error, show the error view', () => {
-    providerCLNProps.listOffers.offers = [];
-    providerCLNProps.listOffers.error = "error message!";
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffersList />,);
+  it('if it has an error, show the error view', async () => {
+    const customMockStore = {
+      root: mockRootStoreData,
+      cln: {
+        ...mockCLNStoreData,
+        listOffers: {
+          isLoading: false,
+          offers: [],
+          error: 'error message'
+        }
+      },
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<CLNOffersList />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     expect(screen.getByTestId('cln-offers-list-error')).toBeInTheDocument();
-  })
+  });
 
-  it('if it has offers, show the offers list', () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffersList />,);
+  it('if it has offers, show the offers list', async () => {
+    await renderWithProviders(<CLNOffersList />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
     const offersList = screen.getByTestId('cln-offers-list');
 
     expect(offersList).toBeInTheDocument();
     expect(offersList.children.length).toBe(1);
-  })
+  });
 
-  it('if there are no offers, show the on offers text', () => {
-    providerCLNProps.listOffers.offers = [];
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffersList />,);
+  it('if there are no offers, show the on offers text', async () => {
+    const customMockStore = {
+      root: mockRootStoreData,
+      cln: {
+        ...mockCLNStoreData,
+        listOffers: {
+          isLoading: false,
+          offers: [],
+        }
+      },
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<CLNOffersList />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     expect(screen.getByText('No offer found. Click receive to generate new offer!')).toBeInTheDocument();
   })
 

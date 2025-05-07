@@ -1,80 +1,110 @@
-import React from 'react';
-
 import './BTCTransaction.scss';
-import { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
 
-import { RootContext } from '../../../store/RootContext';
 import { CopySVG } from '../../../svgs/Copy';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { OpenLinkSVG } from '../../../svgs/OpenLink';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
 import logger from '../../../services/logger.service';
-import { CLNContext } from '../../../store/CLNContext';
+import { setShowToast } from '../../../store/rootSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectNodeInfo } from '../../../store/rootSelectors';
 
-const TransactionDetail = ({transaction, copyHandler, openLinkHandler}) => {
+const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
   return (
     <>
-    {transaction.blockheight ?
-      <Row className='btc-transaction-detail'>
-        <Col xs={12} className='fs-7 text-light'>Blockheight</Col>
-        <Col xs={12} className='fs-7 overflow-x-ellipsis'>{transaction.blockheight}</Col>
-      </Row>
-      :
-      <></>
-    }
-    {(transaction.description) ?
-      <Row className='btc-transaction-detail'>
-        <Col xs={12} className='fs-7 text-light'>Description</Col>
-        <Col xs={12} className='pe-1 fs-7 overflow-x-ellipsis'>{transaction.description}</Col>
-      </Row>
-    :
-      <></>
-    }
-    {transaction.txid ?
-      <Row className='btc-transaction-detail'>
-        <Col xs={12} className='fs-7 text-light'>Transaction ID</Col>
-        <Col xs={10} className='pe-1 fs-7 overflow-x-ellipsis'>{transaction.txid}</Col>
-        <Col xs={1} onClick={copyHandler} className='btc-transaction-copy' id='Transaction ID' ><CopySVG id='Transaction ID' showTooltip={true} /></Col>
-        <Col xs={1} onClick={openLinkHandler} className='btc-transaction-open'><OpenLinkSVG id={transaction.txid} /></Col>
-      </Row>
-    :
-      <></>
-    }
-    {transaction.payment_id ?
-      <Row className='btc-transaction-detail'>
-        <Col xs={12} className='fs-7 text-light'>Payment ID</Col>
-        <Col xs={10} className='pe-1 fs-7 overflow-x-ellipsis'>{transaction.payment_id}</Col>
-        <Col xs={1} onClick={copyHandler} className='btc-transaction-copy' id='Payment ID'><CopySVG id='Payment ID' showTooltip={true} /></Col>
-        <Col xs={1} onClick={openLinkHandler} className='btc-transaction-open'><OpenLinkSVG id={transaction.payment_id} /></Col>
-      </Row>
-    :
-      <></>
-    }
-    {transaction.outpoint ?
-      <Row className='btc-transaction-detail'>
-        <Col xs={12} className='fs-7 text-light'>Outpoint</Col>
-        <Col xs={10} className='pe-1 fs-7 overflow-x-ellipsis'>{transaction.outpoint}</Col>
-        <Col xs={1} onClick={copyHandler} className='btc-transaction-copy' id='Outpoint'><CopySVG id='Outpoint' showTooltip={true} /></Col>
-        <Col xs={1} onClick={openLinkHandler} className='btc-transaction-open'><OpenLinkSVG id={transaction.outpoint ? (transaction.outpoint).split(':')[0] : ''} /></Col>
-      </Row>
-    :
-      <></>
-    }
+      {transaction.blockheight ? (
+        <Row className="btc-transaction-detail">
+          <Col xs={12} className="fs-7 text-light">
+            Blockheight
+          </Col>
+          <Col xs={12} className="fs-7 overflow-x-ellipsis">
+            {transaction.blockheight}
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
+      {transaction.description ? (
+        <Row className="btc-transaction-detail">
+          <Col xs={12} className="fs-7 text-light">
+            Description
+          </Col>
+          <Col xs={12} className="pe-1 fs-7 overflow-x-ellipsis">
+            {transaction.description}
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
+      {transaction.txid ? (
+        <Row className="btc-transaction-detail">
+          <Col xs={12} className="fs-7 text-light">
+            Transaction ID
+          </Col>
+          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+            {transaction.txid}
+          </Col>
+          <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Transaction ID">
+            <CopySVG id="Transaction ID" showTooltip={true} />
+          </Col>
+          <Col xs={1} onClick={openLinkHandler} className="btc-transaction-open">
+            <OpenLinkSVG id={transaction.txid} />
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
+      {transaction.payment_id ? (
+        <Row className="btc-transaction-detail">
+          <Col xs={12} className="fs-7 text-light">
+            Payment ID
+          </Col>
+          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+            {transaction.payment_id}
+          </Col>
+          <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Payment ID">
+            <CopySVG id="Payment ID" showTooltip={true} />
+          </Col>
+          <Col xs={1} onClick={openLinkHandler} className="btc-transaction-open">
+            <OpenLinkSVG id={transaction.payment_id} />
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
+      {transaction.outpoint ? (
+        <Row className="btc-transaction-detail">
+          <Col xs={12} className="fs-7 text-light">
+            Outpoint
+          </Col>
+          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+            {transaction.outpoint}
+          </Col>
+          <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Outpoint">
+            <CopySVG id="Outpoint" showTooltip={true} />
+          </Col>
+          <Col xs={1} onClick={openLinkHandler} className="btc-transaction-open">
+            <OpenLinkSVG id={transaction.outpoint ? transaction.outpoint.split(':')[0] : ''} />
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
     </>
-  )
+  );
 };
 
 const BTCTransaction = (props) => {
-  const rootCtx = useContext(RootContext);
-  const clnCtx = useContext(CLNContext);
+  const dispatch = useDispatch();
+  const nodeInfo = useSelector(selectNodeInfo);
   
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (clnCtx.nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
+    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
   };
 
-  const copyHandler = (event) => {
+  const copyHandler = event => {
     let textToCopy = '';
     switch (event.target.id) {
       case 'Outpoint':
@@ -91,7 +121,7 @@ const BTCTransaction = (props) => {
         break;
     }
     copyTextToClipboard(textToCopy).then((response) => {
-      rootCtx.setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'});
+      dispatch(setShowToast({show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success'}));
     }).catch((err) => {
       logger.error(err);
     });
@@ -99,12 +129,16 @@ const BTCTransaction = (props) => {
 
   return (
     <motion.div
-        variants={{ collapsed: { scale: 0.8, opacity: 0 }, open: { scale: 1, opacity: 1 } }}
-        transition={{ duration: TRANSITION_DURATION }}
-        className='btc-transaction-placeholder pb-2'
-        data-testid='transaction'
-      >
-      <TransactionDetail transaction={props.transaction} copyHandler={copyHandler} openLinkHandler={openLinkHandler} />
+      variants={{ collapsed: { scale: 0.8, opacity: 0 }, open: { scale: 1, opacity: 1 } }}
+      transition={{ duration: TRANSITION_DURATION }}
+      className="btc-transaction-placeholder pb-2"
+      data-testid="transaction"
+    >
+      <TransactionDetail
+        transaction={props.transaction}
+        copyHandler={copyHandler}
+        openLinkHandler={openLinkHandler}
+      />
     </motion.div>
   );
 };
