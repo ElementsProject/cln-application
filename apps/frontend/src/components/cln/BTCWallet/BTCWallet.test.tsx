@@ -1,60 +1,70 @@
-import { act, screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { act } from 'react';
+import { APP_ANIMATION_DURATION, Units } from '../../../utilities/constants';
+import { mockAppConfig, mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockRootStoreData, mockUIConfig } from '../../../utilities/test-utilities/mockData';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import BTCWallet from './BTCWallet';
-import { renderWithMockCLNContext, getMockCLNStoreData, getMockRootStoreData } from '../../../utilities/test-utilities';
-import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
 
 describe('BTCWallet component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
-
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/cln',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
-  });
-
-  it('should be in the document', () => {
-    providerCLNProps.walletBalances.isLoading = false;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <BTCWallet />);
+  it('should be in the document', async () => {
+    await renderWithProviders(<BTCWallet />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
     expect(screen.getByTestId('btc-wallet')).toBeInTheDocument();
     expect(screen.queryByTestId('btc-wallet-spinner')).not.toBeInTheDocument();
-    expect(screen.queryByTestId("btc-wallet-error")).not.toBeInTheDocument();
+    expect(screen.queryByTestId('btc-wallet-error')).not.toBeInTheDocument();
   });
 
-  it('when loading wallet balance it shows spinner', () => {
-    providerCLNProps.walletBalances.isLoading = true;
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <BTCWallet />);
+  it('when loading wallet balance it shows spinner', async () => {
+    const customMockStore = {
+      root: {
+        ...mockRootStoreData,
+        walletBalances: {
+          isLoading: true
+        }
+      },
+      cln: mockCLNStoreData,
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<BTCWallet />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     expect(screen.getByTestId('btc-wallet-spinner')).toBeInTheDocument();
-  })
+  });
 
-  it('if error occurs, show error', () => {
-    providerCLNProps.walletBalances.error = "error message!";
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <BTCWallet />);
+  it('if error occurs, show error', async () => {
+    const customMockStore = {
+      root: {
+        ...mockRootStoreData,
+        walletBalances: {
+          isLoading: false,
+          error: 'error message!'
+        }
+      },
+      cln: mockCLNStoreData,
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<BTCWallet />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     expect(screen.getByTestId("btc-wallet-error")).toBeInTheDocument();
   })
 
   it('if has btc spendable balance, show it', async () => {
-    providerRootProps.appConfig.uiConfig.unit = 'BTC';
     jest.useFakeTimers();
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <BTCWallet />);
+    const customMockStore = {
+      root: {
+        ...mockRootStoreData,
+        appConfig: {
+          ...mockAppConfig,
+          uiConfig: {
+            ...mockUIConfig,
+            unit: Units.BTC
+          }
+        }
+      },
+      cln: mockCLNStoreData,
+      bkpr: mockBKPRStoreData
+    };
+    await renderWithProviders(<BTCWallet />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
-    const currencyBox = await screen.findByTestId('currency-box-finished-text');
+    const btcWalletCard = screen.getByTestId('btc-wallet-balance-card');
+    const currencyBox = await within(btcWalletCard).getByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
     expect(currencyBox).toHaveTextContent('0.74100');
-  })
-
+  });
 });

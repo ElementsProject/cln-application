@@ -1,33 +1,23 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { mockAppStore } from '../../../utilities/test-utilities/mockData';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import ChannelDetails from './ChannelDetails';
-import { renderWithMockCLNContext, getMockCLNStoreData, mockSelectedChannel, getMockRootStoreData } from '../../../utilities/test-utilities';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
 
 describe('ChannelDetails component', () => {
-  let providerRootProps;
-  let providerCLNProps;
+  it('should be in the document', async () => {
+    await renderWithProviders(<ChannelDetails />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
 
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/cln',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
-  });
+    // Channels list rendered
+    expect(screen.getByTestId('channels')).toBeInTheDocument();
+    expect(screen.queryByTestId('channel-details')).not.toBeInTheDocument();
 
-  it('should be in the document', () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <ChannelDetails selChannel={mockSelectedChannel} />);
-    expect(screen.getByTestId('channel-details')).toBeInTheDocument();
+    // Click an first channel
+    const channelItems = screen.getAllByTestId('list-item-channel');
+    fireEvent.click(channelItems[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('channel-details')).toBeInTheDocument();
+      expect(screen.queryByTestId('channels')).not.toBeInTheDocument();
+    });
   });
 });

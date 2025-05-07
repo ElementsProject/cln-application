@@ -1,12 +1,9 @@
-import React from 'react';
-
 import './CLNReceive.scss';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Card, Row, Col, Spinner, Button, Form, InputGroup } from 'react-bootstrap';
 
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
-import useHttp from '../../../hooks/use-http';
 import { CallStatus, CLEAR_STATUS_ALERT_DELAY, PaymentType, SATS_MSAT } from '../../../utilities/constants';
 import { ActionSVG } from '../../../svgs/Action';
 import { AmountSVG } from '../../../svgs/Amount';
@@ -17,18 +14,20 @@ import FiatBox from '../../shared/FiatBox/FiatBox';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
-import { RootContext } from '../../../store/RootContext';
+import { CLNService } from '../../../services/http.service';
+import { useSelector } from 'react-redux';
+import { selectFiatConfig, selectFiatUnit } from '../../../store/rootSelectors';
 
 const CLNReceive = (props) => {
-  const rootCtx = useContext(RootContext);
-  const { clnReceiveInvoice } = useHttp();
+  const fiatUnit = useSelector(selectFiatUnit);
+  const fiatConfig = useSelector(selectFiatConfig);
   const [paymentType, setPaymentType] = useState(PaymentType.INVOICE);
   const [showInvoice, setShowInvoice] = useState(false);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const isValidAmount = (value) => value.trim() === '' || !isNaN(value);
-  const isValidDescription = (value) => value.trim() !== '';
+  const isValidAmount = value => value.trim() === '' || !isNaN(value);
+  const isValidDescription = value => value.trim() !== '';
 
   const {
     value: descriptionValue,
@@ -51,13 +50,13 @@ const CLNReceive = (props) => {
 
   if (descriptionIsValid && amountIsValid) {
     formIsValid = true;
-  };
+  }
 
-  const paymentTypeChangeHandler = (event) => {
+  const paymentTypeChangeHandler = event => {
     setPaymentType(event.target.id);
     resetDescription();
     resetAmount();
-  }
+  };
 
   const touchFormControls = () => {
     descriptionBlurHandler(null);
@@ -74,55 +73,75 @@ const CLNReceive = (props) => {
       setResponseStatus(CallStatus.NONE);
       setResponseMessage('');
     }, CLEAR_STATUS_ALERT_DELAY);
-  }
+  };
 
-  const CLNReceiveHandler = (event) => {
+  const CLNReceiveHandler = event => {
     event.preventDefault();
     touchFormControls();
-    if (!formIsValid) { return; }
+    if (!formIsValid) {
+      return;
+    }
     setResponseStatus(CallStatus.PENDING);
-    setResponseMessage('Generating ' + (paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + '...');
-    let amtValueMSats = (amountValue === '') ? 'any' : (+amountValue * SATS_MSAT);
-    clnReceiveInvoice(paymentType, amtValueMSats, descriptionValue, ('invoicelbl' + Math.random().toString(36).slice(2) + Date.now()))
-    .then((response: any) => {
-      logger.info(response);
-      if (response.data && (response.data.bolt11 || response.data.bolt12)) {
-        setResponseStatus(CallStatus.SUCCESS);
-        setResponseMessage(response.data.bolt11 || response.data.bolt12);
-        setShowInvoice(true);
-        resetFormValues();
-      } else {
+    setResponseMessage(
+      'Generating ' + (paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + '...',
+    );
+    let amtValueMSats = amountValue === '' ? 'any' : +amountValue * SATS_MSAT;
+    CLNService.clnReceiveInvoice(
+      paymentType,
+      amtValueMSats,
+      descriptionValue,
+      'invoicelbl' + Math.random().toString(36).slice(2) + Date.now(),
+    )
+      .then((response: any) => {
+        logger.info(response);
+        if (response.bolt11 || response.bolt12) {
+          setResponseStatus(CallStatus.SUCCESS);
+          setResponseMessage(response.bolt11 || response.bolt12);
+          setShowInvoice(true);
+          resetFormValues();
+        } else {
+          setResponseStatus(CallStatus.ERROR);
+          setResponseMessage(response.response || response.message || 'Unknown Error');
+          delayedClearStatusAlert();
+        }
+      })
+      .catch(err => {
+        logger.error(err);
         setResponseStatus(CallStatus.ERROR);
-        setResponseMessage(response.response.data || response.message || 'Unknown Error');
+        setResponseMessage(err);
         delayedClearStatusAlert();
-      }
-    })
-    .catch(err => {
-      logger.error(err.response.data);
-      setResponseStatus(CallStatus.ERROR);
-      setResponseMessage(err.response.data);
-      delayedClearStatusAlert();
-    });
+      });
   };
 
   if (showInvoice) {
     return (
-      <Row className='h-100 mx-1'>
-        <Card className='d-flex align-items-stretch px-0'>
-          <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
-              <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
-                <div className='p-0 fw-bold text-primary d-flex align-items-center'>
-                  <LightningWalletSVG svgClassName='svg-small me-2' className='fill-primary' />
-                  <span className='fw-bold'>Lightning Wallet</span>
-                </div>
-                <span className='span-close-svg' onClick={props.onClose}><CloseSVG /></span>
-              </Card.Header>
-              <h4 className='text-blue fw-bold mt-2'>{paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}</h4>
-              <Card.Body className='p-0 d-flex align-items-start justify-content-center'>
-                <Row className='w-100 d-flex align-items-start justify-content-center'>
-                  <QRCodeComponent message={responseMessage} toastMessage={(paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') + ' Copied Successfully!'} className='py-0 px-1 d-flex flex-column align-items-center justify-content-start' />
-                </Row>
-              </Card.Body>
+      <Row className="h-100 mx-1" data-testid='cln-invoice'>
+        <Card className="d-flex align-items-stretch px-0" data-testid='cln-invoice-card'>
+          <Card.Body className="d-flex align-items-stretch flex-column pt-4">
+            <Card.Header className="p-0 d-flex align-items-start justify-content-between">
+              <div className="p-0 fw-bold text-primary d-flex align-items-center">
+                <LightningWalletSVG svgClassName="svg-small me-2" className="fill-primary" />
+                <span className="fw-bold">Lightning Wallet</span>
+              </div>
+              <span className="span-close-svg" onClick={props.onClose}>
+                <CloseSVG />
+              </span>
+            </Card.Header>
+            <h4 className="text-blue fw-bold mt-2">
+              {paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}
+            </h4>
+            <Card.Body className="p-0 d-flex align-items-start justify-content-center">
+              <Row className="w-100 d-flex align-items-start justify-content-center">
+                <QRCodeComponent
+                  message={responseMessage}
+                  toastMessage={
+                    (paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice') +
+                    ' Copied Successfully!'
+                  }
+                  className="py-0 px-1 d-flex flex-column align-items-center justify-content-start"
+                />
+              </Row>
+            </Card.Body>
           </Card.Body>
         </Card>
       </Row>
@@ -131,7 +150,7 @@ const CLNReceive = (props) => {
 
   return (
     <form onSubmit={CLNReceiveHandler} className='h-100' data-testid='cln-receive'>
-      <Card className='h-100 d-flex align-items-stretch px-0'>
+      <Card className='h-100 d-flex align-items-stretch px-0' data-testid='cln-receive-card'>
         <Card.Body className='d-flex align-items-stretch flex-column pt-4'>
             <Card.Header className='p-0 d-flex align-items-start justify-content-between'>
               <div className='p-0 fw-bold text-primary d-flex align-items-center'>
@@ -194,7 +213,7 @@ const CLNReceive = (props) => {
                   {!amountHasError ?
                     amountValue && amountValue !== 'All' ?
                       <p className='fs-7 text-light d-flex align-items-center justify-content-end'>
-                        ~ <FiatBox value={(+amountValue || 0)} fiatUnit={rootCtx.appConfig.uiConfig.fiatUnit} symbol={rootCtx.fiatConfig.symbol} rate={rootCtx.fiatConfig.rate} />
+                        ~ <FiatBox value={(+amountValue || 0)} fiatUnit={fiatUnit} symbol={fiatConfig.symbol} rate={fiatConfig.rate} />
                       </p>
                     :
                       <p className='message'></p>
@@ -211,7 +230,7 @@ const CLNReceive = (props) => {
               <StatusAlert responseStatus={responseStatus} responseMessage={responseMessage} />
             </Card.Body>
             <Card.Footer className='d-flex justify-content-center'>
-              <Button tabIndex={5} type='submit' variant='primary' className='btn-rounded' disabled={responseStatus === CallStatus.PENDING}>
+              <Button tabIndex={5} type='submit' variant='primary' className='btn-rounded' data-testid='button-generate' disabled={responseStatus === CallStatus.PENDING}>
                 Generate {paymentType === PaymentType.OFFER ? 'Offer' : 'Invoice'}
                 {responseStatus === CallStatus.PENDING ? <Spinner className='mt-1 ms-2 text-white-dark' size='sm' /> : <ActionSVG className='ms-3' />}
               </Button>

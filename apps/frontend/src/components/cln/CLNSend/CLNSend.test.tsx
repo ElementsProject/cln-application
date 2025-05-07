@@ -1,82 +1,105 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act } from 'react';
+import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
+import { mockAppStore } from '../../../utilities/test-utilities/mockData';
+import { spyOnDecode } from '../../../utilities/test-utilities/mockService';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNSend from './CLNSend';
-import { getMockCLNStoreData, getMockRootStoreData, renderWithMockCLNContext } from '../../../utilities/test-utilities';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
 
 describe('CLNSend component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
+  it('should show send card when clicking send action from CLN card', async () => {
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+    
+    // Initial state
+    expect(screen.getByTestId('cln-wallet-balance-card')).toBeInTheDocument();
 
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/cln',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
-  });
-
-  it('should be in the document', () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
-    expect(screen.getByTestId('cln-send')).toBeInTheDocument();
+    // Click the deposit button
+    const sendButton = screen.getByTestId('send-button');
+    fireEvent.click(sendButton);
+    await waitFor(() => {
+      expect(screen.getByTestId('cln-send-card')).toBeInTheDocument();
+      expect(screen.getByTestId('address-input')).toBeInTheDocument();
+    });
   });
 
   it('should accept lowercase invoice', async () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
+    spyOnDecode();
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
 
-    const invoiceInput = screen.getByTestId("address-input");
-    const testInvoice = 'lnb12345';
-    await act(async () => fireEvent.change(invoiceInput, { target: { value: testInvoice } }));
+    // Load send card by clicking the send button on the wallet first
+    expect(screen.getByTestId('cln-wallet-balance-card')).toBeInTheDocument();
+    const sendButton = screen.getByTestId('send-button');
+    fireEvent.click(sendButton);
 
-    expect(screen.queryByText('Invalid Invoice')).not.toBeInTheDocument();
+    await waitFor(() => {
+      const invoiceInput = screen.getByTestId('address-input');
+      const testInvoice = 'lnb12345';
+      fireEvent.change(invoiceInput, { target: { value: testInvoice } });
+      expect(screen.queryByText('Invalid Invoice')).not.toBeInTheDocument();
+    });
   });
-  
+
   it('should accept UPPERCASE invoice', async () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
+    spyOnDecode();
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
 
-    const invoiceInput = screen.getByTestId("address-input");
-    const testInvoice = "LNB12345";
-    await act(async () => fireEvent.change(invoiceInput, { target: { value: testInvoice } }));
+    // Load send card by clicking the send button on the wallet first
+    expect(screen.getByTestId('cln-wallet-balance-card')).toBeInTheDocument();
+    const sendButton = screen.getByTestId('send-button');
+    fireEvent.click(sendButton);
 
-    expect(screen.queryByText("Invalid Invoice")).not.toBeInTheDocument();
+    await waitFor(() => {
+      const invoiceInput = screen.getByTestId('address-input');
+      const testInvoice = 'LNB12345';
+      fireEvent.change(invoiceInput, { target: { value: testInvoice } });
+      expect(screen.queryByText('Invalid Invoice')).not.toBeInTheDocument();
+    });
   });
 
   it('should accept lowercase offer', async () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
+    spyOnDecode();
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
 
-    const offerRadioButton = screen.getByLabelText("Offer");
-    await act(async () => fireEvent.click(offerRadioButton));
+    // Load send card by clicking the send button on the wallet first
+    expect(screen.getByTestId('cln-wallet-balance-card')).toBeInTheDocument();
+    const sendButton = screen.getByTestId('send-button');
+    fireEvent.click(sendButton);
+    await waitFor(() => {
+      // Load offers card
+      const offerRadioButton = screen.getByLabelText('Offer');
+      act(() => fireEvent.click(offerRadioButton));
 
-    const offerInput = screen.getByTestId("address-input");
-    const testOffer = "lno12345";
-    await act(async () => fireEvent.change(offerInput, { target: { value: testOffer } }));
-
-    expect(offerRadioButton).toBeChecked();
-    expect(screen.queryByText("Invalid Offer")).not.toBeInTheDocument();
+      const offerInput = screen.getByTestId('address-input');
+      const testOffer = 'lno12345';
+      act(() => fireEvent.change(offerInput, { target: { value: testOffer } }));
+      expect(offerRadioButton).toBeChecked();
+      expect(screen.queryByText('Invalid Offer')).not.toBeInTheDocument();
+    });
   });
 
   it('should accept UPPERCASE offer', async () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNSend />);
+    spyOnDecode();
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
 
-    const offerRadioButton = screen.getByLabelText("Offer");
-    await act(async () => fireEvent.click(offerRadioButton));
+    // Load send card by clicking the send button on the wallet first
+    expect(screen.getByTestId('cln-wallet-balance-card')).toBeInTheDocument();
+    const sendButton = screen.getByTestId('send-button');
+    fireEvent.click(sendButton);
+    await waitFor(() => {
+      // Load offers card
+      const offerRadioButton = screen.getByLabelText('Offer');
+      act(() => fireEvent.click(offerRadioButton));
 
-    const offerInput = screen.getByTestId("address-input");
-    const testOffer = "LNO12345";
-    await act(async () => fireEvent.change(offerInput, { target: { value: testOffer } }));
-
-    expect(offerRadioButton).toBeChecked();
-    expect(screen.queryByText("Invalid Offer")).not.toBeInTheDocument();
+      const offerInput = screen.getByTestId('address-input');
+      const testOffer = 'LNO12345';
+      act(() => fireEvent.change(offerInput, { target: { value: testOffer } }));
+      expect(offerRadioButton).toBeChecked();
+      expect(screen.queryByText('Invalid Offer')).not.toBeInTheDocument();
+    });
   });
-
 });

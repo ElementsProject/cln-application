@@ -1,35 +1,31 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act } from 'react';
+import { mockAppStore, mockOffer1 } from '../../../utilities/test-utilities/mockData';
+import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNOffer from './CLNOffer';
-import { renderWithMockCLNContext, getMockCLNStoreData, mockOffer, getMockRootStoreData } from '../../../utilities/test-utilities';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-  useNavigate: jest.fn(),
-}));
 
 describe('CLNOffer component ', () => {
-  let providerRootProps;
-  let providerCLNProps;
+  it('should be in the document', async () => {
+    await renderWithProviders(<CLNOffer />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
 
-  beforeEach(() => {
-    providerRootProps = JSON.parse(JSON.stringify(getMockRootStoreData()));
-    providerCLNProps = JSON.parse(JSON.stringify(getMockCLNStoreData()));
-    (useLocation as jest.Mock).mockImplementation(() => ({
-      pathname: '/cln',
-      search: '',
-      hash: '',
-      state: null,
-      key: '5nvxpbdafa',
-    }));
-    (useNavigate as jest.Mock).mockImplementation(() => jest.fn());
+    // Initial state
+    expect(screen.getByTestId('cln-offers-list')).toBeInTheDocument();
+
+    // Click to expand
+    const expandDiv = await screen.getByTestId('cln-offer-header');
+    fireEvent.click(expandDiv);
+
+    await act(async () => {
+      let safety = 0;
+      while (jest.getTimerCount() > 0 && safety++ < 100) {
+        jest.runOnlyPendingTimers();
+        await Promise.resolve();
+      }
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('cln-offer-detail')).toBeInTheDocument();
+      expect(screen.getByText(mockOffer1.bolt12)).toBeInTheDocument();
+    });
   });
-
-  it('should be in the document', () => {
-    renderWithMockCLNContext(providerRootProps, providerCLNProps, <CLNOffer offer={mockOffer}/>);
-    expect(screen.getByTestId('cln-offer-detail')).toBeInTheDocument();
-    expect(screen.getByText('lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q')).toBeInTheDocument();
-  });
-
 });
