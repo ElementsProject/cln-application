@@ -234,7 +234,7 @@
 
   .recharts-surface {
     & >path:not(.recharts-legend-icon) {
-      fill: $body-bg-dark;
+      fill: $tooltip-bg-dark;
     }
   }
 
