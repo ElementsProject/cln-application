@@ -28,7 +28,7 @@ function AccountEventsTable({periods}: {periods: AccountEventsPeriod[]}) {
   };
 
   return (
-    <div className='table-container'>
+    <div className='account-events-table-container' data-testid="account-events-table-container">
       <PerfectScrollbar>
         <Table className='expandable-table'>
           <thead className='expandable-head'>

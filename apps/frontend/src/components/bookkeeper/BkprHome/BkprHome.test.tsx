@@ -30,14 +30,16 @@ describe('Bookkeeper Component', () => {
       preloadedState: mockAppStore,
     });
     expect(screen.getByTestId('account-event-info-container')).toBeInTheDocument();
-    expect(screen.getByTestId('satsflow-volume-container')).toBeInTheDocument();
+    expect(screen.getByTestId('satsflow-info-container')).toBeInTheDocument();
+    expect(screen.getByTestId('volume-info-container')).toBeInTheDocument();
   });
 
   it('should not render overview/cards if path is not /bookkeeper', async () => {
     setMockedLocation({ pathname: '/bookkeeper/satsflow' });
     await renderWithProviders(<Bookkeeper />, { preloadedState: mockAppStore, initialRoute: ['/bookkeeper/satsflow'] });
     expect(screen.queryByTestId('account-event-info-container')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('satsflow-volume-container')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('satsflow-info-container')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('volume-info-container')).not.toBeInTheDocument();
   });
 
   it('should display error message if nodeInfo has error', async () => {

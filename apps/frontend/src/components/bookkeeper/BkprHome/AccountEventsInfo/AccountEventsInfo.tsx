@@ -16,7 +16,7 @@ const AccountEventsInfo = () => {
   const satsFlowError = useSelector(selectSatsFlowError);
 
   return (
-    <Card className='h-100 inner-box-shadow px-4 pt-4 pb-3'>
+    <Card className='h-100 inner-box-shadow px-4 pt-4 pb-3' data-testid='account-event-info-container'>
       <Card.Header className='d-flex px-1 fs-18px p-0 fw-bold text-dark'>
         <AccountEventsSVG className='me-3' />
         <Row>
@@ -37,7 +37,7 @@ const AccountEventsInfo = () => {
             bkprSummary.routing_revenue_msat === 0 && bkprSummary.onchain_fee_msat === 0 ?
               <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
                 <Row className='d-flex align-items-center justify-content-center text-center'>
-                  No account activity found.<br />Send/Receive payments to see details!
+                  No account activity found for the period.<br />Choose another period or send/receive payments!
                 </Row>
               </Row>
             :
