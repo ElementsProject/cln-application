@@ -56,6 +56,10 @@ const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (sh
   const onTimeGranularityChanged = (eventKey: string | null) => {
     if (eventKey !== null) {
       setTimeGranularity(eventKey as TimeGranularity);
+      if (eventKey === TimeGranularity.MINUTELY || eventKey === TimeGranularity.HOURLY) {
+        setShowZeroActivityPeriods(false);
+        props.onShowZeroActivityChange(false);
+      }
     }
   };
 
@@ -116,6 +120,7 @@ const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (sh
           tabIndex={4}
           onChange={showZeroActivityPeriodsChangeHandler}
           checked={showZeroActivityPeriods}
+          disabled={timeGranularity === TimeGranularity.MINUTELY || timeGranularity === TimeGranularity.HOURLY}
           inline
           className="mt-2 fs-base fw-light"
           label="Show Zero Activity"

@@ -135,6 +135,7 @@ export enum PaymentType {
 }
 
 export enum TimeGranularity {
+  MINUTELY = 'Minutely',
   HOURLY = 'Hourly',
   DAILY = 'Daily',
   WEEKLY = 'Weekly',
@@ -147,6 +148,7 @@ const SECONDS_IN_DAY = 86400;
 
 // Pre-calculated durations in seconds
 const GRANULARITY_DURATIONS = {
+  [TimeGranularity.MINUTELY]: 60,
   [TimeGranularity.HOURLY]: 3600,
   [TimeGranularity.DAILY]: SECONDS_IN_DAY,
   [TimeGranularity.WEEKLY]: SECONDS_IN_DAY * 7,
@@ -170,6 +172,8 @@ export function getPeriodKey(timeGranularity: TimeGranularity, timestamp: number
   const date = moment.unix(timestamp);
   
   switch (timeGranularity) {
+    case TimeGranularity.MINUTELY:
+      return date.format('YYYY-MM-DD HH:mm')
     case TimeGranularity.HOURLY:
       return date.format('YYYY-MM-DD HH:00');
     case TimeGranularity.DAILY:
@@ -190,6 +194,10 @@ export function getTimestampFromPeriodKey(timeGranularity: TimeGranularity, peri
   let startOfUnit: moment.unitOfTime.StartOf;
   
   switch (timeGranularity) {
+    case TimeGranularity.MINUTELY:
+      format = 'YYYY-MM-DD HH:mm'
+      startOfUnit = 'minute';
+      break;
     case TimeGranularity.HOURLY:
       format = 'YYYY-MM-DD HH';
       startOfUnit = 'hour';
@@ -239,6 +247,7 @@ export const getTimestampWithGranularity = (
 
 export function getFormatForGranularity(granularity: TimeGranularity): string {
   switch (granularity) {
+    case TimeGranularity.MINUTELY: return 'YYYY-MM-DD HH:mm'
     case TimeGranularity.HOURLY: return 'YYYY-MM-DD HH';
     case TimeGranularity.DAILY: return 'YYYY-MM-DD';
     case TimeGranularity.WEEKLY: return 'YYYY-MM-DD';
@@ -250,6 +259,7 @@ export function getFormatForGranularity(granularity: TimeGranularity): string {
 
 export function getMomentUnit(granularity: TimeGranularity): moment.unitOfTime.DurationConstructor {
   switch (granularity) {
+    case TimeGranularity.MINUTELY: return 'minute'
     case TimeGranularity.HOURLY: return 'hour';
     case TimeGranularity.DAILY: return 'day';
     case TimeGranularity.WEEKLY: return 'week';
