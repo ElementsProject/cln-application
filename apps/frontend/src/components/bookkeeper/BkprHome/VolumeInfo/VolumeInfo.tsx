@@ -30,7 +30,7 @@ const VolumeInfo = () => {
   const volumeError = useSelector(selectVolumeError);
 
   return (
-    <Card className='volume-info inner-box-shadow p-4 pb-3'>
+    <Card className='volume-info inner-box-shadow p-4 pb-3' data-testid='volume-info-container'>
       <Card.Header className='d-flex px-1 fs-18px p-0 fw-bold text-dark'>
         <VolumeChartSVG className='me-3' />
         <Row>

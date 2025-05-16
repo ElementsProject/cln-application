@@ -39,10 +39,10 @@ const Bookkeeper = () => {
           </Col>
         </Row>
         <Row className='px-3'>
-          <Col xs={12} lg={6} className='cards-container' data-testid='account-event-info-container'>
+          <Col xs={12} lg={6} className='cards-container'>
             <AccountEventsInfo />
           </Col>
-          <Col xs={12} lg={6} className='cards-container d-flex flex-column justify-content-between' data-testid='satsflow-volume-container'>
+          <Col xs={12} lg={6} className='cards-container d-flex flex-column justify-content-between'>
             <SatsFlowInfo />
             <VolumeInfo />
           </Col>

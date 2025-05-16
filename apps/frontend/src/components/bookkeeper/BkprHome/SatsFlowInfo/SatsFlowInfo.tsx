@@ -17,7 +17,7 @@ const SatsFlowInfo = () => {
   const satsFlowError = useSelector(selectSatsFlowError);
 
   return (
-    <Card className='sats-flow-info inner-box-shadow p-4 pb-3'>
+    <Card className='sats-flow-info inner-box-shadow p-4 pb-3' data-testid='satsflow-info-container'>
       <Card.Header className='d-flex px-1 fs-18px p-0 fw-bold text-dark'>
         <SatsFlowSVG className='me-3' />
         <Row>
@@ -37,7 +37,7 @@ const SatsFlowInfo = () => {
             bkprSummary.inflows_for_period_msat === 0 && bkprSummary.outflows_for_period_msat === 0 ?
               <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
                 <Row className='d-flex align-items-center justify-content-center text-center'>
-                  No inbound/outbound satsflow yet.<br />Forward transactions to see details!
+                  No inbound/outbound satsflow for the period.<br />Choose another period or forward transactions to see details!
                 </Row>
               </Row>
             :

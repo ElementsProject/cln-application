@@ -44,6 +44,16 @@ export const selectAccountEventPeriods = createSelector(
   (events) => events.periods || []
 );
 
+export const selectAccountEventsLoading = createSelector(
+  selectAccountEvents,
+  (accountEvents) => accountEvents.isLoading
+);
+
+export const selectAccountEventsError = createSelector(
+  selectAccountEvents,
+  (accountEvents) => accountEvents.error
+)
+
 export const selectSatsFlow = createSelector(
   selectBKPRState,
   (bkpr) => bkpr.satsFlow

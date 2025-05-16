@@ -3,7 +3,7 @@ import { mockAppStore } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import VolumeRoot from './VolumeRoot';
 
-describe('Sats Flow component ', () => {
+describe('Volume component ', () => {
   beforeEach(() => {
     global.ResizeObserver = jest.fn().mockImplementation(() => ({
       observe: jest.fn(),
