@@ -63,7 +63,6 @@ export function RootRouterReduxSync() {
     }, APP_WAIT_TIME);
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authStatus.isAuthenticated]);
 
   // Handle navigation for authenticated users

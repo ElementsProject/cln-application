@@ -26,7 +26,6 @@ const CurrencyBox = props => {
       setAnimationFinished(1);
     }, APP_ANIMATION_DURATION * 1000);
     return animation.stop;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
