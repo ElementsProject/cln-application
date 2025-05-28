@@ -16,8 +16,8 @@ function handleError(
   res: Response,
   next?: NextFunction,
 ) {
-  var route = req.url || '';
-  var message = error.message
+  const route = req.url || '';
+  const message = error.message
     ? error.message
     : typeof error === 'object'
       ? JSON.stringify(error)

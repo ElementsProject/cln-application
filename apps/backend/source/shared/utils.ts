@@ -105,7 +105,7 @@ export function refreshEnvVariables() {
   let clientCert = '';
   let caCert = '';
   if (fs.existsSync('package.json')) {
-    let packageData = Buffer.from(fs.readFileSync('package.json')).toString();
+    const packageData = Buffer.from(fs.readFileSync('package.json')).toString();
     APP_CONSTANTS.APP_VERSION = JSON.parse(packageData).version;
   }
   if (fs.existsSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'client-key.pem')) {

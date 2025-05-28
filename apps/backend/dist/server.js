@@ -14,15 +14,15 @@ import { AuthRoutes } from './routes/v1/auth.js';
 import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
-let directoryName = dirname(fileURLToPath(import.meta.url));
-let routes = [];
+const directoryName = dirname(fileURLToPath(import.meta.url));
+const routes = [];
 const app = express();
 const server = http.createServer(app);
 const LIGHTNING_PORT = normalizePort(process.env.APP_PORT || '2103');
 const APP_IP = process.env.APP_IP || 'localhost';
 const APP_PROTOCOL = process.env.APP_PROTOCOL || 'http';
 function normalizePort(val) {
-    var port = parseInt(val, 10);
+    const port = parseInt(val, 10);
     if (isNaN(port)) {
         return val;
     }
