@@ -165,6 +165,7 @@ export class GRPCService {
         ? rpcErrorMessageMatch[1].replaceAll('\\', '')
         : errorMessage;
     } catch (error) {
+      logger.error('Error extracting RPC error message: ', error);
       return errorMessage;
     }
   }
@@ -172,8 +173,7 @@ export class GRPCService {
   private decodeResponse(method: string, response: any): object {
     const responseType = this.clnNode.lookupType(`cln.${method}Response`);
     const dataBuffer = Buffer.from(response.data || '');
-    const resFlag = dataBuffer.subarray(0, 1);
-    const resDataLength = dataBuffer.subarray(1, 5);
+    // resFlag (0, 1) and resDataLength (1, 5) not used in code
     const responseData = dataBuffer.subarray(5);
     const grpcStatus = Number(response.headers['grpc-status']);
     if (grpcStatus !== 0) {

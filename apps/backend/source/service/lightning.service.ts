@@ -55,7 +55,7 @@ export class LightningService {
       case AppConnect.REST:
         const headers = new AxiosHeaders();
         headers.set('rune', APP_CONSTANTS.COMMANDO_RUNE);
-        let axiosConfig: any = {
+        const axiosConfig: any = {
           baseURL: REST_CONFIG.url + '/v1/',
           headers,
         };

@@ -1,8 +1,8 @@
 import { HttpStatusCode } from './consts.js';
 import { logger } from './logger.js';
 function handleError(error, req, res, next) {
-    var route = req.url || '';
-    var message = error.message
+    const route = req.url || '';
+    const message = error.message
         ? error.message
         : typeof error === 'object'
             ? JSON.stringify(error)
