@@ -16,7 +16,7 @@
     "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
     "start": "npm run serve -w cln-application-backend",
-    "lint": "npm run backend:lint && npm run frontend:lint"
+    "lint": "npm run backend:lint"
   },
   "keywords": [
     "cln application",

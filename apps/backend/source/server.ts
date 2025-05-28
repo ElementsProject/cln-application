@@ -17,8 +17,8 @@ import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 
-let directoryName = dirname(fileURLToPath(import.meta.url));
-let routes: Array<CommonRoutesConfig> = [];
+const directoryName = dirname(fileURLToPath(import.meta.url));
+const routes: Array<CommonRoutesConfig> = [];
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -28,7 +28,7 @@ const APP_IP = process.env.APP_IP || 'localhost';
 const APP_PROTOCOL = process.env.APP_PROTOCOL || 'http';
 
 function normalizePort(val: string) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
   if (isNaN(port)) {
     return val;
   }
