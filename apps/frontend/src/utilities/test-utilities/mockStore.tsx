@@ -13,7 +13,7 @@ import { mockAppStore } from './mockData';
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: AppState;
   initialRoute?: string[];
-  useRouter?: Boolean
+  useRouter?: boolean
 }
 
 export function createMockStore(route: string, preloadedState?: AppState) {
@@ -84,7 +84,7 @@ export async function renderWithProviders(
     } as any,
   });
 
-  const Wrapper = ({ children }: PropsWithChildren<{}>) => {
+  const Wrapper = ({ children }: PropsWithChildren<object>) => {
     if (useRouter) {
       return (
         <Provider store={store}>

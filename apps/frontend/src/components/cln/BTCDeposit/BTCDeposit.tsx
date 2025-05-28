@@ -42,7 +42,6 @@ const BTCDeposit = props => {
         setResponseMessage(err);
         delayedClearStatusAlert();
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
