@@ -108,7 +108,7 @@ const Header = (props) => {
                     >
                       <span className='d-inline-block mx-3 dot bg-success'></span>
                     </OverlayTrigger>
-                    <span className='fs-7'>{nodeInfo.alias + ' (' + nodeInfo.version + ')'}</span>
+                    <span className='fs-7'>{nodeInfo.alias?.replace(/--\d+-.*$/, '') + ' (' + nodeInfo.version + ')'}</span>
                   </>
               }
             </Col>
@@ -177,7 +177,7 @@ const Header = (props) => {
                   >
                     <span className='d-inline-block me-3 dot bg-success'></span>
                   </OverlayTrigger>
-                  <span className='fs-7'>{nodeInfo.alias + ' (' + nodeInfo.version + ')'}</span>
+                  <span className='fs-7'>{nodeInfo.alias?.replace(/--\d+-.*$/, '') + ' (' + nodeInfo.version + ')'}</span>
                 </>
             }
           </Col>

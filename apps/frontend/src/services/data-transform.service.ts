@@ -248,7 +248,7 @@ export function transformVolumeData(sqlResultSet: VolumeRow[]): {volume: VolumeD
   if (highestForwardIndex != null) {
     most_traffic_route = {
       channel_scids: sqlResultSet[highestForwardIndex].in_channel_scid + ' -> ' + sqlResultSet[highestForwardIndex].out_channel_scid,
-      channel_aliases: sqlResultSet[highestForwardIndex].in_channel_peer_alias + ' -> ' + sqlResultSet[highestForwardIndex].out_channel_peer_alias,
+      channel_aliases: sqlResultSet[highestForwardIndex].in_channel_peer_alias?.replace(/-\d+-.*$/, '') + ' -> ' + sqlResultSet[highestForwardIndex].out_channel_peer_alias?.replace(/-\d+-.*$/, ''),
       fee_msat: sqlResultSet[highestForwardIndex].fee_msat,
     };
   }
@@ -256,7 +256,7 @@ export function transformVolumeData(sqlResultSet: VolumeRow[]): {volume: VolumeD
   if (lowestForwardIndex != null) {
     least_traffic_route = {
       channel_scids: sqlResultSet[lowestForwardIndex].in_channel_scid + ' -> ' + sqlResultSet[lowestForwardIndex].out_channel_scid,
-      channel_aliases: sqlResultSet[lowestForwardIndex].in_channel_peer_alias + ' -> ' + sqlResultSet[lowestForwardIndex].out_channel_peer_alias,
+      channel_aliases: sqlResultSet[lowestForwardIndex].in_channel_peer_alias?.replace(/-\d+-.*$/, '') + ' -> ' + sqlResultSet[lowestForwardIndex].out_channel_peer_alias?.replace(/-\d+-.*$/, ''),
       fee_msat: sqlResultSet[lowestForwardIndex].fee_msat,
     };
   }
@@ -316,10 +316,10 @@ export function transformVolumeGraphData(forwards: VolumeRow[]) {
       found.in_msat += curr.in_msat;
     } else {
       acc.push({
-        name: curr.in_channel_peer_alias,
+        name: curr.in_channel_peer_alias?.replace(/-\d+-.*$/, ''),
         in_channel_scid: curr.in_channel_scid,
         in_channel_peer_id: curr.in_channel_peer_id,
-        in_channel_peer_alias: curr.in_channel_peer_alias,
+        in_channel_peer_alias: curr.in_channel_peer_alias?.replace(/-\d+-.*$/, ''),
         in_msat: curr.in_msat,
         out_msat: curr.out_msat,
         fee_msat: curr.fee_msat
@@ -333,15 +333,15 @@ export function transformVolumeGraphData(forwards: VolumeRow[]) {
     forwards
       .filter(f => f.in_channel_scid === inForward.in_channel_scid)
       .map(forward => ({
-        name: forward.out_channel_peer_alias,
+        name: forward.out_channel_peer_alias?.replace(/-\d+-.*$/, ''),
         out_channel_scid: forward.out_channel_scid,
         out_channel_peer_id: forward.out_channel_peer_id,
-        out_channel_peer_alias: forward.out_channel_peer_alias,
+        out_channel_peer_alias: forward.out_channel_peer_alias?.replace(/-\d+-.*$/, ''),
         in_msat: forward.in_msat,
         out_msat: forward.out_msat,
         fee_msat: forward.fee_msat,
         in_channel_scid: inForward.in_channel_scid,
-        in_channel_peer_alias: inForward.in_channel_peer_alias
+        in_channel_peer_alias: inForward.in_channel_peer_alias?.replace(/-\d+-.*$/, '')
       }))
   );
 

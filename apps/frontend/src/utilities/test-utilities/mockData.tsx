@@ -1406,11 +1406,11 @@ export const mockBKPRVolume = {
     {
       in_channel_scid: "110x1x0",
       in_channel_peer_id: "020371140f2ec44c4d6cea50c018310e9409c97c410c56fbc120de3e85b0358d02",
-      in_channel_peer_alias: "IRATESPORK-v25.02-31-g08210da",
+      in_channel_peer_alias: "IRATESPORK",
       in_msat: 15200154,
       out_channel_scid: "146x1x0",
       out_channel_peer_id: "03fbdd0a9ddba420be1ec9146802c9b95f6233b1a36c5e2c223884fde157be7ff5",
-      out_channel_peer_alias: "SLICKERMAESTRO-25.02-31-g08210da",
+      out_channel_peer_alias: "SLICKERMAESTRO",
       out_msat: 15200000,
       fee_msat: 154
     }
