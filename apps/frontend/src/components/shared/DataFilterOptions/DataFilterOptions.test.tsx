@@ -48,8 +48,8 @@ describe('DataFilterOptions', () => {
     await renderComponent();
 
     expect(screen.getByTestId('selected-time-granularity')).toHaveTextContent(TimeGranularity.DAILY);
-    expect(screen.getByDisplayValue(moment().subtract(1, 'month').add(1, 'day').format('MM/DD/YYYY'))).toBeInTheDocument();
-    expect(screen.getByDisplayValue(moment().format('MM/DD/YYYY'))).toBeInTheDocument();
+    expect(screen.getByDisplayValue(moment().subtract(1, 'month').add(1, 'day').format('DD MMM, YYYY'))).toBeInTheDocument();
+    expect(screen.getByDisplayValue(moment().format('DD MMM, YYYY'))).toBeInTheDocument();
     expect(screen.getByLabelText('Show Zero Activity')).not.toBeChecked();
   });
 
@@ -109,12 +109,12 @@ describe('DataFilterOptions', () => {
   
     const startDateInput = screen.getByPlaceholderText('Start');
     fireEvent.change(startDateInput, {
-      target: { value: moment(newStartDate).format('MM/DD/YYYY') }
+      target: { value: moment(newStartDate).format('DD MMM, YYYY') }
     });
   
     const endDateInput = screen.getByPlaceholderText('End');
     fireEvent.change(endDateInput, {
-      target: { value: moment(newEndDate).format('MM/DD/YYYY') }
+      target: { value: moment(newEndDate).format('DD MMM, YYYY') }
     });
   
     expect(mockFetchData).toHaveBeenLastCalledWith(
