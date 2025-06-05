@@ -1,5 +1,6 @@
 SETUP=${1:-local}
 
+export GENERATE_SOURCEMAP=false
 export APP_BITCOIN_NETWORK="regtest"
 export BITCOIN_NETWORK="$APP_BITCOIN_NETWORK"
 if [[ "$APP_BITCOIN_NETWORK" == "mainnet" ]]; then
