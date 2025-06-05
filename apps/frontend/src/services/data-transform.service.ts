@@ -132,6 +132,8 @@ export function transformAccountEventsByPeriods(
         existingAccount.balance_msat += currentAccount.balance_msat;
         existingAccount.credit_msat += currentAccount.credit_msat;
         existingAccount.debit_msat += currentAccount.debit_msat;
+        // Update timestamp to latest
+        existingAccount.timestamp = currentAccount.timestamp;
       } else {
         const newAccount = {...currentAccount};
         prevAccounts.set(currentAccount.account, newAccount);
