@@ -16,12 +16,12 @@ const VolumeGraphTooltip = ({ active, payload, label, unit }: any) => {
     if (!forward) return null;
     return (
       <div className='bkpr-tooltip p-3'>
-        <p><strong>Inbound Channel SCID:</strong>{forward.in_channel_scid}</p>
-        <p><strong>Inbound Peer Alias:</strong>{forward.in_channel_peer_alias}</p>
+        <p><strong>Inbound Channel SCID: </strong>{forward.in_channel_scid}</p>
+        <p><strong>Inbound Peer Alias: </strong>{forward.in_channel_peer_alias}</p>
         {forward.out_channel_scid && (
           <>
-            <p><strong>Outbout Channel SCID:</strong>{forward.out_channel_scid}</p>
-            <p><strong>Outbout Peer Alias:</strong>{forward.out_channel_peer_alias}</p>
+            <p><strong>Outbout Channel SCID: </strong>{forward.out_channel_scid}</p>
+            <p><strong>Outbout Peer Alias: </strong>{forward.out_channel_peer_alias}</p>
           </>
         )}
         <hr />

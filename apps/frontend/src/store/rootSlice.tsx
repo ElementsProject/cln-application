@@ -12,7 +12,7 @@ const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[]) => {
   listPeerChannels.channels.forEach((peerChannel: any) => {
     peerChannel = {
       ...peerChannel,
-      node_alias: listNodes.find((node) => node?.nodeid === peerChannel.peer_id)?.alias || 'Unknown',
+      node_alias: listNodes.find((node) => node?.nodeid === peerChannel.peer_id)?.alias?.replace(/-\d+-.*$/, '') || 'Unknown',
       to_us_sat: Math.floor((peerChannel.to_us_msat || 0) / SATS_MSAT),
       total_sat: Math.floor((peerChannel.total_msat || 0) / SATS_MSAT),
       to_them_sat: Math.floor(((peerChannel.total_msat || 0) - (peerChannel.to_us_msat || 0)) / SATS_MSAT),
