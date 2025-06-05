@@ -13,8 +13,8 @@ const AccountEventsGraphTooltip = ({ active, payload, unit }: { active?: boolean
     const total = payload.reduce((sum, entry) => sum + (entry.value || 0), 0);
     return (
       <div className='bkpr-tooltip p-3'>
-        <p><strong>Period:</strong>{payload[0].payload.period_key}</p>
-        <p><strong>Total:</strong>{formatCurrency(total, Units.MSATS, unit, false, 0, 'string')}</p>
+        <p><strong>Period: </strong>{payload[0].payload.period_key}</p>
+        <p><strong>Total: </strong>{formatCurrency(total, Units.MSATS, unit, false, 0, 'string')}</p>
         <hr />
         {payload.map((entry, index) => (
           <p className='ps-4' key={index} style={{ color: entry.color }}>
