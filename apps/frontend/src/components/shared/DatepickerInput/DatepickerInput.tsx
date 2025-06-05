@@ -21,6 +21,7 @@ const CLNDatePicker = (props) => {
         onChange={props.onChangeDate}
         maxDate={props.maxDate}
         minDate={new Date(2018, 0, 1)}
+        dateFormat="dd MMM, yyyy"
         ref={datePickerRef}
         placeholderText={props.placeholderText}
         className='form-control form-control-left'

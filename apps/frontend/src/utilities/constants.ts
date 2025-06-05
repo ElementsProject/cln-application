@@ -173,15 +173,15 @@ export function getPeriodKey(timeGranularity: TimeGranularity, timestamp: number
   
   switch (timeGranularity) {
     case TimeGranularity.MINUTELY:
-      return date.format('YYYY-MM-DD HH:mm')
+      return date.format('DD MMM, YYYY HH:mm')
     case TimeGranularity.HOURLY:
-      return date.format('YYYY-MM-DD HH:00');
+      return date.format('DD MMM, YYYY HH:00');
     case TimeGranularity.DAILY:
-      return date.format('YYYY-MM-DD');
+      return date.format('DD MMM, YYYY');
     case TimeGranularity.WEEKLY:
-      return date.startOf('isoWeek').format('YYYY-MM-DD');
+      return date.startOf('isoWeek').format('DD MMM, YYYY');
     case TimeGranularity.MONTHLY:
-      return date.format('YYYY-MM');
+      return date.format('MMM, YYYY');
     case TimeGranularity.YEARLY:
       return date.format('YYYY');
     default:
@@ -195,23 +195,23 @@ export function getTimestampFromPeriodKey(timeGranularity: TimeGranularity, peri
   
   switch (timeGranularity) {
     case TimeGranularity.MINUTELY:
-      format = 'YYYY-MM-DD HH:mm'
+      format = 'DD MMM, YYYY HH:mm'
       startOfUnit = 'minute';
       break;
     case TimeGranularity.HOURLY:
-      format = 'YYYY-MM-DD HH';
+      format = 'DD MMM, YYYY HH';
       startOfUnit = 'hour';
       break;
     case TimeGranularity.DAILY:
-      format = 'YYYY-MM-DD';
+      format = 'DD MMM, YYYY';
       startOfUnit = 'day';
       break;
     case TimeGranularity.WEEKLY:
-      format = 'YYYY-MM-DD';
+      format = 'DD MMM, YYYY';
       startOfUnit = 'isoWeek';
       break;
     case TimeGranularity.MONTHLY:
-      format = 'YYYY-MM';
+      format = 'DD MMM, YYYY';
       startOfUnit = 'month';
       break;
     case TimeGranularity.YEARLY:
@@ -247,11 +247,11 @@ export const getTimestampWithGranularity = (
 
 export function getFormatForGranularity(granularity: TimeGranularity): string {
   switch (granularity) {
-    case TimeGranularity.MINUTELY: return 'YYYY-MM-DD HH:mm'
-    case TimeGranularity.HOURLY: return 'YYYY-MM-DD HH';
-    case TimeGranularity.DAILY: return 'YYYY-MM-DD';
-    case TimeGranularity.WEEKLY: return 'YYYY-MM-DD';
-    case TimeGranularity.MONTHLY: return 'YYYY-MM';
+    case TimeGranularity.MINUTELY: return 'DD MMM, YYYY HH:mm'
+    case TimeGranularity.HOURLY: return 'DD MMM, YYYY HH';
+    case TimeGranularity.DAILY: return 'DD MMM, YYYY';
+    case TimeGranularity.WEEKLY: return 'DD MMM, YYYY';
+    case TimeGranularity.MONTHLY: return 'MMM, YYYY';
     case TimeGranularity.YEARLY: return 'YYYY';
     default: throw new Error(`Unsupported granularity: ${granularity}`);
   }
