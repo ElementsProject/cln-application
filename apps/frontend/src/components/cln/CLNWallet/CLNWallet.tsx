@@ -1,18 +1,18 @@
 import './CLNWallet.scss';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Card, Col, ButtonGroup, Spinner, Alert, Tab, Nav } from 'react-bootstrap';
-
+const CLNTransactionsList = lazy(() => import('../CLNTransactionsList/CLNTransactionsList'));
+const CLNOffersList = lazy(() => import('../CLNOffersList/CLNOffersList'));
 import { LightningWalletSVG } from '../../../svgs/LightningWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
-import CLNTransactionsList from '../CLNTransactionsList/CLNTransactionsList';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
-import CLNOffersList from '../CLNOffersList/CLNOffersList';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectWalletBalances } from '../../../store/rootSelectors';
+import { Loading } from '../../ui/Loading/Loading';
 
 const CLNWallet = (props) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -85,10 +85,14 @@ const CLNWallet = (props) => {
                 >
                   <Tab.Content className="h-100 d-flex flex-column">
                     <Tab.Pane className="h-100 list-scroll-container" eventKey="transactions">
-                      <CLNTransactionsList />
+                      <Suspense fallback={<Loading />}>
+                        <CLNTransactionsList />
+                      </Suspense>
                     </Tab.Pane>
                     <Tab.Pane eventKey="offers">
-                      <CLNOffersList />
+                      <Suspense fallback={<Loading />}>
+                        <CLNOffersList />
+                      </Suspense>
                     </Tab.Pane>
                   </Tab.Content>
                 </motion.div>

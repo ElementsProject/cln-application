@@ -1,13 +1,15 @@
 import './BTCWallet.scss';
+import { lazy, Suspense } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Alert, Card, Col, ButtonGroup } from 'react-bootstrap';
+const BTCTransactionsList = lazy(() => import('../BTCTransactionsList/BTCTransactionsList'));
 import { BitcoinWalletSVG } from '../../../svgs/BitcoinWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
-import BTCTransactionsList from '../BTCTransactionsList/BTCTransactionsList';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectWalletBalances } from '../../../store/rootSelectors';
+import { Loading } from '../../ui/Loading/Loading';
 
 const BTCWallet = (props) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -52,9 +54,11 @@ const BTCWallet = (props) => {
         </Card>
         <Card.Body className="px-4 list-scroll-container">
           <div className="text-light btc-transactions-tabs">Transactions</div>
-          <PerfectScrollbar>
-            <BTCTransactionsList />
-          </PerfectScrollbar>
+          <Suspense fallback={<Loading />}>
+            <PerfectScrollbar>
+              <BTCTransactionsList />
+            </PerfectScrollbar>
+          </Suspense>
         </Card.Body>
       </Card.Body>
     </Card>
