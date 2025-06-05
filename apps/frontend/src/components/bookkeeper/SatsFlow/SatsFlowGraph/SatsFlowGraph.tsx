@@ -25,7 +25,7 @@ const SatsFlowGraphTooltip = ({ active, payload, label, unit, periods }: any) =>
     if (!period) return null;
     return (
       <div className='bkpr-tooltip p-3'>
-        <p><strong>Period:</strong>{period.period_key}</p>
+        <p><strong>Period: </strong>{period.period_key}</p>
         <hr />
         <p>Period Inflow: {formatCurrency(period.inflow_msat, Units.MSATS, unit, false, 0, 'string')}</p>
         <p>Period Outflow: {formatCurrency(period.outflow_msat, Units.MSATS, unit, false, 0, 'string')}</p>
