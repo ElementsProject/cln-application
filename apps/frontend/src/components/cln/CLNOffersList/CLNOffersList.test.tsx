@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListOffers, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNOffersList from './CLNOffersList';
@@ -45,9 +45,9 @@ describe('CLNOffersList component ', () => {
   it('if it has offers, show the offers list', async () => {
     await renderWithProviders(<CLNOffersList />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
     const offersList = screen.getByTestId('cln-offers-list');
-
+    const offerHeader = within(offersList).getAllByTestId('cln-offer-header');
     expect(offersList).toBeInTheDocument();
-    expect(offersList.children.length).toBe(1);
+    expect(offerHeader.length).toBe(1);
   });
 
   it('if there are no offers, show the on offers text', async () => {
