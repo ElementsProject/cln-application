@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListChannels, mockRootStoreData, mockSelectedChannel } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNTransactionsList from './CLNTransactionsList';
@@ -45,8 +45,9 @@ describe('CLNTransactionsList component ', () => {
   it('if it has transactions, show the offers list', async () => {
     await renderWithProviders(<CLNTransactionsList />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
     const transactionsList = screen.getByTestId('cln-transactions-list');
+    const transactionHeaders = within(transactionsList).getAllByTestId('cln-transaction-header');
     expect(transactionsList).toBeInTheDocument();
-    expect(transactionsList.children.length).toBe(1);
+    expect(transactionHeaders.length).toBe(1);
   });
 
   it('if there are no channels, show the text encouraging opening a channel', async () => {

@@ -1,7 +1,6 @@
 import './CLNWallet.scss';
 import { useState, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Card, Col, ButtonGroup, Spinner, Alert, Tab, Nav } from 'react-bootstrap';
 const CLNTransactionsList = lazy(() => import('../CLNTransactionsList/CLNTransactionsList'));
 const CLNOffersList = lazy(() => import('../CLNOffersList/CLNOffersList'));
@@ -74,30 +73,28 @@ const CLNWallet = (props) => {
                 </Nav.Link>
               </Nav.Item>
             </Nav>
-            <PerfectScrollbar>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedTab}
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: TRANSITION_DURATION }}
-                  className="h-100 d-flex flex-column align-items-stretch"
-                >
-                  <Tab.Content className="h-100 d-flex flex-column">
-                    <Tab.Pane className="h-100 list-scroll-container" eventKey="transactions">
-                      <Suspense fallback={<Loading />}>
-                        <CLNTransactionsList />
-                      </Suspense>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="offers">
-                      <Suspense fallback={<Loading />}>
-                        <CLNOffersList />
-                      </Suspense>
-                    </Tab.Pane>
-                  </Tab.Content>
-                </motion.div>
-              </AnimatePresence>
-            </PerfectScrollbar>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedTab}
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: TRANSITION_DURATION }}
+                className="h-100 d-flex flex-column align-items-stretch"
+              >
+                <Tab.Content className="h-100 d-flex flex-column">
+                  <Tab.Pane className="h-100 list-scroll-container" eventKey="transactions">
+                    <Suspense fallback={<Loading />}>
+                      <CLNTransactionsList />
+                    </Suspense>
+                  </Tab.Pane>
+                  <Tab.Pane eventKey="offers">
+                    <Suspense fallback={<Loading />}>
+                      <CLNOffersList />
+                    </Suspense>
+                  </Tab.Pane>
+                </Tab.Content>
+              </motion.div>
+            </AnimatePresence>
           </Tab.Container>
         </Card.Body>
       </Card.Body>
