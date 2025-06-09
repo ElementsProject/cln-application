@@ -4,7 +4,7 @@ import VolumeGraph from './VolumeGraph/VolumeGraph';
 import { CloseSVG } from '../../../svgs/Close';
 import { useNavigate } from 'react-router-dom';
 
-const VolumeRoot = props => {
+const VolumeRoot = () => {
   const navigate = useNavigate();
 
   return (

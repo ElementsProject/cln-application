@@ -175,7 +175,7 @@ export const BTCTransactionsList = () => {
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const listBitcoinTransactions = useSelector(selectListBitcoinTransactions);
-  const initExpansions = (listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const initExpansions = (listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (

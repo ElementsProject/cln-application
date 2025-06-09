@@ -17,7 +17,7 @@ const FiatSelection = (props) => {
   const appConfig = useSelector(selectAppConfig);
   const fiatSymbol = FIAT_CURRENCIES.find((fiat => fiat.currency === fiatUnit))?.symbol;
 
-  const fiatChangeHandler = async (eventKey: any, event: any) => {
+  const fiatChangeHandler = async (eventKey: any) => {
     const updatedConfig = { ...appConfig, uiConfig: { ...appConfig.uiConfig, fiatUnit: eventKey } };
     await RootService.updateConfig(updatedConfig);
     const updatedFiatConfig = await RootService.getFiatConfig(eventKey);

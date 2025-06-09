@@ -70,9 +70,9 @@ const SetPasswordComponent = () => {
   };
   
   const touchFormControls = () => {
-    currPasswordBlurHandler(null);
-    newPasswordBlurHandler(null);
-    confirmNewPasswordBlurHandler(null);
+    currPasswordBlurHandler();
+    newPasswordBlurHandler();
+    confirmNewPasswordBlurHandler();
   };
 
   const resetFormValues = () => {
@@ -81,7 +81,7 @@ const SetPasswordComponent = () => {
     resetConfirmNewPassword();
   };
 
-  const resetPasswordHandler = async (event) => {
+  const resetPasswordHandler = async () => {
     touchFormControls();
     if (!formIsValid) { return; }
     setResponseStatus(CallStatus.PENDING);

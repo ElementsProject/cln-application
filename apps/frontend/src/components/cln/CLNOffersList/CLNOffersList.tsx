@@ -95,7 +95,7 @@ export const CLNOffersList = () => {
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const listOffers = useSelector(selectListOffers);
-  const initExpansions = (listOffers.offers?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const initExpansions = (listOffers.offers?.reduce((acc: boolean[]) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
   return (

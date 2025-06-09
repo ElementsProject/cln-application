@@ -45,14 +45,14 @@ const LoginComponent = () => {
   }
 
   const touchFormControls = () => {
-    passwordBlurHandler(null);
+    passwordBlurHandler();
   };
 
   const resetFormValues = () => {
     resetPassword();
   };
 
-  const loginHandler = async (event) => {
+  const loginHandler = async () => {
     touchFormControls();
     if (!formIsValid) {
       return;

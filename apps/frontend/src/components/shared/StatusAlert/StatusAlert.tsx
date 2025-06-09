@@ -13,8 +13,8 @@ import { useDispatch } from 'react-redux';
 const StatusAlert = props => {
   const dispatch = useDispatch();
 
-  const copyHandler = (event) => {
-    copyTextToClipboard(props.responseMessage).then((response) => {
+  const copyHandler = () => {
+    copyTextToClipboard(props.responseMessage).then(() => {
       dispatch(setShowToast({show: true, message: ('Response Copied Successfully!'), bg: 'success'}));
     }).catch((err) => {
       logger.error(err);

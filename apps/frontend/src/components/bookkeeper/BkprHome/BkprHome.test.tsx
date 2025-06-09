@@ -2,10 +2,6 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import Bookkeeper from './BkprHome';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockNodeInfo, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
-import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
-import { act } from 'react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { rootRouteConfig } from '../../../routes/router.config';
 import { setMockedLocation } from '../../../setupTests';
 
 describe('Bookkeeper Component', () => {

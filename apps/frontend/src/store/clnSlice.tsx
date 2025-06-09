@@ -94,7 +94,7 @@ const filterOnChainTransactions = (events: BkprTransaction[]) => {
   if (!events) {
     return [];
   } else {
-    return events.reduce((acc: any[], event, i) => {
+    return events.reduce((acc: any[], event) => {
       event = { ...event };
       if (event.account?.toLowerCase() === 'wallet' && (event.tag?.toLowerCase() === 'deposit' || event.tag?.toLowerCase() === 'withdrawal')) {
         event.credit_msat = event.credit_msat || 0;

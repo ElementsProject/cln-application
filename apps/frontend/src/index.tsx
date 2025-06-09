@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import { createRootRouter } from './routes/router.config';
 import { HttpService, RootService } from './services/http.service';
+import logger from './services/logger.service';
 import { appStore } from './store/appStore';
 import { defaultRootState } from './store/rootSelectors';
 import { setAuthStatus, setConfig, setFiatConfig, setShowModals } from './store/rootSlice';
@@ -13,6 +14,7 @@ export async function initializeAuth() {
     const data = await RootService.fetchAuthData();
     return data;
   } catch (error) {
+    logger.error('Error fetching auth data:', error);
     return {config: defaultRootState.appConfig, authStatus: defaultRootState.authStatus, fiatConfig: defaultRootState.fiatConfig};
   }
 }

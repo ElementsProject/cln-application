@@ -15,7 +15,7 @@ const QRCodeComponent = (props) => {
   const isDarkMode = useSelector(selectIsDarkMode);
 
   const copyHandler = () => {
-    copyTextToClipboard(props.message).then((response) => {
+    copyTextToClipboard(props.message).then(() => {
       dispatch(setShowToast({show: true, message: (props.toastMessage || props.message), bg: 'success'}));
     }).catch((err) => {
       logger.error(err);

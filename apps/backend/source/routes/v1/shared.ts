@@ -12,6 +12,7 @@ export class SharedRoutes extends CommonRoutesConfig {
   }
 
   configureRoutes() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.app.route(API_VERSION + SHARED_ROUTE + '/csrf/').get((req, res, next) => {
       res.send({
         csrfToken:

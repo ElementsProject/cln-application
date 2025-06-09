@@ -40,7 +40,7 @@ module.exports = [
       'react/display-name': 'off',
       'react-hooks/rules-of-hooks': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
     },
   },
 ];
