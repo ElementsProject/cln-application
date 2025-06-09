@@ -59,6 +59,7 @@ describe('Channels component ', () => {
           activeChannels: [],
           pendingChannels: [],
           inactiveChannels: [],
+          mergedChannels: [],
           isLoading: false
         }
       },

@@ -19,6 +19,10 @@ export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn'
 
 export const APP_WAIT_TIME = 15 * 1000; // 15 seconds
 export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
+export const TODAY = Math.floor(Date.now() / 1000);
+export const SCROLL_BATCH_SIZE = 20; // For infinite scroll, number of items to load per batch
+export const SCROLL_THRESHOLD = 120; // For infinite scroll, distance from bottom to trigger next batch
+
 export const BTC_MSAT = 100000000000;
 export const BTC_SATS = 100000000;
 export const SATS_MSAT = 1000;
