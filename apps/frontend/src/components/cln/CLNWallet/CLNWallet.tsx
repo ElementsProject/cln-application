@@ -87,7 +87,7 @@ const CLNWallet = (props) => {
                       <CLNTransactionsList />
                     </Suspense>
                   </Tab.Pane>
-                  <Tab.Pane eventKey="offers">
+                  <Tab.Pane className="h-100 list-scroll-container" eventKey="offers">
                     <Suspense fallback={<Loading />}>
                       <CLNOffersList />
                     </Suspense>

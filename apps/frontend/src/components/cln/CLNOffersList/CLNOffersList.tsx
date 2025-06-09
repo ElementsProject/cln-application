@@ -1,11 +1,12 @@
 import './CLNOffersList.scss';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
 import Offer from '../CLNOffer/CLNOffer';
-import { TRANSITION_DURATION } from '../../../utilities/constants';
+import { SCROLL_BATCH_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
 import { useSelector } from 'react-redux';
@@ -14,7 +15,7 @@ import { selectIsAuthenticated, selectIsDarkMode } from '../../../store/rootSele
 
 const OfferHeader = ({ offer }) => {
   return (
-    <Row data-testid='cln-offer-header' className="offer-list-item d-flex justify-content-between align-items-center">
+    <Row className="offer-list-item d-flex justify-content-between align-items-center">
       <Col xs={2}>
         <IncomingArrowSVG className="me-1" txStatus={offer.used ? 'used' : 'unused'} />
       </Col>
@@ -57,6 +58,7 @@ const CLNOffersAccordion = ({
   return (
     <>
       <motion.div
+        data-testid='cln-offer-header'
         className={'cln-offer-header ' + (expanded[i] ? 'expanded' : '')}
         initial={false}
         animate={{ backgroundColor: (isDarkMode ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
@@ -72,11 +74,11 @@ const CLNOffersAccordion = ({
         {expanded[i] && (
           <motion.div
             data-testid='cln-offer-details'
-            className="cln-offer-details"
-            key="content"
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
+            className='cln-offer-details'
+            key='content'
+            initial='collapsed'
+            animate='open'
+            exit='collapsed'
             variants={{
               open: { opacity: 1, height: 'auto' },
               collapsed: { opacity: 0, height: 0 },
@@ -98,6 +100,68 @@ export const CLNOffersList = () => {
   const initExpansions = (listOffers.offers?.reduce((acc: boolean[]) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
+  const [displayedOffers, setDisplayedOffers] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [allOffersLoaded, setAllOffersLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const setContainerRef = useCallback((ref: HTMLElement | null) => {
+    if (ref) {
+      (containerRef as React.MutableRefObject<HTMLElement | null>).current = ref;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (listOffers && listOffers.offers && listOffers.offers.length > 0) {
+      const initialBatch = listOffers.offers.slice(0, SCROLL_BATCH_SIZE);
+      setDisplayedOffers(initialBatch);
+      setCurrentIndex(SCROLL_BATCH_SIZE);
+      if (SCROLL_BATCH_SIZE >= listOffers?.offers?.length) {
+        setAllOffersLoaded(true);
+      }
+    }
+  }, [listOffers]);
+
+  const loadMoreTransactions = useCallback(() => {
+    if (isLoading || allOffersLoaded) return;
+    setIsLoading(true);
+    setTimeout(() => {
+      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
+      const newOffers = listOffers?.offers?.slice(
+        currentIndex,
+        nextIndex
+      ) || [];
+      setDisplayedOffers(prev => [...prev, ...newOffers]);
+      setCurrentIndex(nextIndex);
+
+      if (listOffers && listOffers.offers && nextIndex >= listOffers?.offers?.length) {
+        setAllOffersLoaded(true);
+      }
+
+      setIsLoading(false);
+    }, 300);
+  }, [currentIndex, isLoading, allOffersLoaded, listOffers]);
+
+  const handleScroll = useCallback((container) => {
+    if (!container || isLoading || allOffersLoaded) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const bottomOffset = scrollHeight - scrollTop - clientHeight;
+    
+    if (bottomOffset < SCROLL_THRESHOLD) {
+      loadMoreTransactions();
+    }
+  }, [isLoading, allOffersLoaded, loadMoreTransactions]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container?.addEventListener('scroll', handleScroll);
+      return () => container?.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
   return (
     isAuthenticated && listOffers.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
@@ -107,13 +171,28 @@ export const CLNOffersList = () => {
     listOffers.error ? 
       <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>{listOffers.error}</Alert> : 
       listOffers?.offers && listOffers?.offers.length && listOffers?.offers.length > 0 ?
-        <div className='cln-offers-list' data-testid='cln-offers-list'>
-          { 
-            listOffers?.offers?.map((offer, i) => (
-              <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} />
-            ))
+        <PerfectScrollbar
+        containerRef={setContainerRef}
+        onScrollY={handleScroll}
+        className='cln-offers-list'
+        data-testid='cln-offers-list'
+        options={{
+          suppressScrollX: true,
+          wheelPropagation: false
+        }}
+        >
+          {displayedOffers.map((offer, i) => (
+            <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} />
+          ))}
+          {isLoading && (
+            <Col xs={12} className='d-flex align-items-center justify-content-center mb-5'>
+              <Spinner animation='grow' variant='primary' />
+            </Col>
+          )}
+          {allOffersLoaded && listOffers?.offers.length > 100 && 
+            <h6 className='d-flex align-self-center py-4 text-muted'>No more offers to load!</h6>
           }
-        </div>
+        </PerfectScrollbar>
       :
         <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center mt-2'>
