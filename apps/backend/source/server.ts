@@ -71,6 +71,7 @@ routes.push(new LightningRoutes(app));
 
 // serve frontend
 app.use('/', express.static(join(directoryName, '..', '..', 'frontend', 'build')));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((req: express.Request, res: express.Response, next: any) => {
   res.sendFile(join(directoryName, '..', '..', 'frontend', 'build', 'index.html'));
 });

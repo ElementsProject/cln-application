@@ -58,8 +58,8 @@ const CLNSend = (props) => {
   }
 
   const touchFormControls = () => {
-    invoiceBlurHandler(null);
-    amountBlurHandler(null);
+    invoiceBlurHandler();
+    amountBlurHandler();
   };
 
   const resetFormValues = () => {

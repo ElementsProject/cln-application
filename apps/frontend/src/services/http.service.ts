@@ -27,9 +27,10 @@ async function executeRequests<T extends Record<string, Promise<any>>>(
   requests: T
 ): Promise<any> {
   const entries = Object.entries(requests) as [keyof T, T[keyof T]][];
-  const settledResults = await Promise.allSettled(
-    entries.map(([_, promise]) => promise)
-  );
+  const settledResults = await Promise.allSettled(entries.map(([item, promise]) => {
+    logger.info(item);
+    return promise;
+  }));
 
   return entries.reduce((acc, [name], index) => {
     const result = settledResults[index];

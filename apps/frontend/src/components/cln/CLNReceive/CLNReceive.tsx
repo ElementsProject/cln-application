@@ -59,8 +59,8 @@ const CLNReceive = (props) => {
   };
 
   const touchFormControls = () => {
-    descriptionBlurHandler(null);
-    amountBlurHandler(null);
+    descriptionBlurHandler();
+    amountBlurHandler();
   };
 
   const resetFormValues = () => {

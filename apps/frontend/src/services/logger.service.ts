@@ -10,7 +10,7 @@ export interface Logger {
   error: LogFn;
 }
 
-const NO_OP: LogFn = (message?: any, ...optionalParams: any[]) => {};
+const NO_OP: LogFn = () => {};
 
 export class ConsoleLogger implements Logger {
   readonly info: LogFn;

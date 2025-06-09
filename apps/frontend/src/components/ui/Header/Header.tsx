@@ -24,7 +24,7 @@ const Header = (props) => {
   const appConfig = useSelector(selectAppConfig);
   const currentScreenSize = useBreakpoint();
 
-  const modeChangeHandler = async (event: any) => {
+  const modeChangeHandler = async () => {
     const updatedConfig = {
       ...appConfig,
       uiConfig: {
@@ -36,7 +36,7 @@ const Header = (props) => {
     dispatch(setConfig(updatedConfig));
   };
 
-  const logoutHandler = (event: any) => {
+  const logoutHandler = () => {
     dispatch(setShowModals({ ...showModals, logoutModal: true }));
   }
 

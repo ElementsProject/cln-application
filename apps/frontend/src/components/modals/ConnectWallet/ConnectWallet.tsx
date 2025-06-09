@@ -81,7 +81,7 @@ const ConnectWallet = () => {
         textToCopy = connectUrl || '';
         break;
     }
-    copyTextToClipboard(textToCopy).then((response) => {
+    copyTextToClipboard(textToCopy).then(() => {
       dispatch(setShowToast({ show: true, message: (event.target.id + ' Copied Successfully!'), bg: 'success' }));
     }).catch((err) => {
       logger.error(err);
