@@ -1,6 +1,5 @@
 import './BTCWallet.scss';
 import { lazy, Suspense } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Alert, Card, Col, ButtonGroup } from 'react-bootstrap';
 const BTCTransactionsList = lazy(() => import('../BTCTransactionsList/BTCTransactionsList'));
 import { BitcoinWalletSVG } from '../../../svgs/BitcoinWallet';
@@ -55,9 +54,7 @@ const BTCWallet = (props) => {
         <Card.Body className="px-4 list-scroll-container">
           <div className="text-light btc-transactions-tabs">Transactions</div>
           <Suspense fallback={<Loading />}>
-            <PerfectScrollbar>
-              <BTCTransactionsList />
-            </PerfectScrollbar>
+            <BTCTransactionsList />
           </Suspense>
         </Card.Body>
       </Card.Body>
