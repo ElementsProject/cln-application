@@ -26,7 +26,7 @@ export const defaultRootState: RootState = {
   nodeInfo: { isLoading: true, alias: '', version: '', error: null },
   listFunds: { isLoading: true, channels: [], outputs: [] },
   listPeers: { isLoading: true, peers: [] },
-  listChannels: { isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: [] },
+  listChannels: { isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: [], mergedChannels: [] },
 };
 
 const selectRootState = (state: { root: RootState }) => state.root || defaultRootState;

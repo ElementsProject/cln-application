@@ -3,14 +3,12 @@ import { motion } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
 
 import { copyTextToClipboard, formatCurrency } from '../../../utilities/data-formatters';
-import { TRANSITION_DURATION, Units } from '../../../utilities/constants';
+import { TRANSITION_DURATION, Units, TODAY } from '../../../utilities/constants';
 import { CopySVG } from '../../../svgs/Copy';
 import DateBox from '../../shared/DateBox/DateBox';
 import logger from '../../../services/logger.service';
 import { setShowToast } from '../../../store/rootSlice';
 import { useDispatch } from 'react-redux';
-
-const TODAY = Math.floor(Date.now() / 1000);
 
 const Payment = ({ payment, copyHandler }) => {
   return (

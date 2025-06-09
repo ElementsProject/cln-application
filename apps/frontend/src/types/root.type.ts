@@ -261,6 +261,7 @@ export type ListPeerChannels = {
   activeChannels: PeerChannel[];
   pendingChannels: PeerChannel[];
   inactiveChannels: PeerChannel[];
+  mergedChannels: PeerChannel[];
   error?: any;
 };
 

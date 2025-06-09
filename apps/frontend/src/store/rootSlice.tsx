@@ -5,7 +5,7 @@ import { sortDescByKey } from '../utilities/data-formatters';
 import { defaultRootState } from './rootSelectors';
 
 const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[]) => {
-  const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [] };
+  const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [], mergedChannels: [] };
   if (!listPeerChannels || !listPeerChannels.channels) {
     return aggregatedChannels;
   }
@@ -33,6 +33,7 @@ const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[]) => {
     return aggregatedChannels;
   });
   aggregatedChannels.activeChannels = sortDescByKey(aggregatedChannels.activeChannels, 'total_msat')
+  aggregatedChannels.mergedChannels = [...aggregatedChannels.activeChannels, ...aggregatedChannels.pendingChannels, ...aggregatedChannels.inactiveChannels];
   return aggregatedChannels;
 };
 

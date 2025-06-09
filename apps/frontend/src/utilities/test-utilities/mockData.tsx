@@ -714,10 +714,15 @@ export const mockActiveChannel3 = {
   current_state: "ACTIVE"
 };
 
+export const mockActiveChannels = [mockActiveChannel1, mockActiveChannel2, mockActiveChannel3];
+export const mockPendingChannels = [];
+export const mockInactiveChannels = [];
+
 export const mockListChannels = {
-  activeChannels: [mockActiveChannel1, mockActiveChannel2, mockActiveChannel3],
-  pendingChannels: [],
-  inactiveChannels: [],
+  activeChannels: mockActiveChannels,
+  pendingChannels: mockPendingChannels,
+  inactiveChannels: mockInactiveChannels,
+  mergedChannels: [...mockActiveChannels, ...mockPendingChannels, ...mockInactiveChannels],
   isLoading: false
 };
 
