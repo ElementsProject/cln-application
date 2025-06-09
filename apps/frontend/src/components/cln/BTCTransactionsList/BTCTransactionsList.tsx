@@ -1,7 +1,8 @@
 import './BTCTransactionsList.scss';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner, Alert, Row, Col } from 'react-bootstrap';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
@@ -9,7 +10,7 @@ import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
 import DateBox from '../../shared/DateBox/DateBox';
 import FiatBox from '../../shared/FiatBox/FiatBox';
 import Transaction from '../BTCTransaction/BTCTransaction';
-import { TRANSITION_DURATION, Units } from '../../../utilities/constants';
+import { SCROLL_BATCH_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { NoBTCTransactionDarkSVG } from '../../../svgs/NoBTCTransactionDark';
 import { NoBTCTransactionLightSVG } from '../../../svgs/NoBTCTransactionLight';
 import { useSelector } from 'react-redux';
@@ -178,6 +179,68 @@ export const BTCTransactionsList = () => {
   const initExpansions = (listBitcoinTransactions.btcTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
+  const [displayedTransactions, setDisplayedTransactions] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [allTransactionsLoaded, setAllTransactionsLoaded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const setContainerRef = useCallback((ref: HTMLElement | null) => {
+    if (ref) {
+      (containerRef as React.MutableRefObject<HTMLElement | null>).current = ref;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (listBitcoinTransactions?.btcTransactions?.length > 0) {
+      const initialBatch = listBitcoinTransactions?.btcTransactions.slice(0, SCROLL_BATCH_SIZE);
+      setDisplayedTransactions(initialBatch);
+      setCurrentIndex(SCROLL_BATCH_SIZE);
+      if (SCROLL_BATCH_SIZE >= listBitcoinTransactions?.btcTransactions.length) {
+        setAllTransactionsLoaded(true);
+      }
+    }
+  }, [listBitcoinTransactions]);
+
+  const loadMoreTransactions = useCallback(() => {
+    if (isLoading || allTransactionsLoaded) return;
+    setIsLoading(true);
+    setTimeout(() => {
+      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
+      const newTransactions = listBitcoinTransactions?.btcTransactions.slice(
+        currentIndex,
+        nextIndex
+      );
+      setDisplayedTransactions(prev => [...prev, ...newTransactions]);
+      setCurrentIndex(nextIndex);
+
+      if (nextIndex >= listBitcoinTransactions?.btcTransactions.length) {
+        setAllTransactionsLoaded(true);
+      }
+
+      setIsLoading(false);
+    }, 300);
+  }, [currentIndex, isLoading, allTransactionsLoaded, listBitcoinTransactions]);
+
+  const handleScroll = useCallback((container) => {
+    if (!container || isLoading || allTransactionsLoaded) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const bottomOffset = scrollHeight - scrollTop - clientHeight;
+    
+    if (bottomOffset < SCROLL_THRESHOLD) {
+      loadMoreTransactions();
+    }
+  }, [isLoading, allTransactionsLoaded, loadMoreTransactions]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container?.addEventListener('scroll', handleScroll);
+      return () => container?.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
   return (
     isAuthenticated && listBitcoinTransactions.isLoading ?
       <span className='h-100 d-flex justify-content-center align-items-center'>
@@ -187,13 +250,28 @@ export const BTCTransactionsList = () => {
     listBitcoinTransactions.error ? 
       <Alert className='py-0 px-1 fs-7' variant='danger'>{listBitcoinTransactions.error}</Alert> : 
       listBitcoinTransactions?.btcTransactions && listBitcoinTransactions?.btcTransactions.length && listBitcoinTransactions?.btcTransactions.length > 0 ?
-        <div className='btc-transactions-list' data-testid='btc-transactions-list'>
-          { 
-            listBitcoinTransactions?.btcTransactions?.map((transaction, i) => (
-              <BTCTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} />
-            ))
+        <PerfectScrollbar
+          containerRef={setContainerRef}
+          onScrollY={handleScroll}
+          className='btc-transactions-list' 
+          data-testid='btc-transactions-list'
+          options={{
+            suppressScrollX: true,
+            wheelPropagation: false
+          }}
+        >
+          {displayedTransactions.map((transaction, i) => (
+            <BTCTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} />
+          ))}
+          {isLoading && (
+            <Col xs={12} className='d-flex align-items-center justify-content-center mb-5'>
+              <Spinner animation='grow' variant='primary' />
+            </Col>
+          )}
+          {allTransactionsLoaded && listBitcoinTransactions?.btcTransactions.length > 100 && 
+            <h6 className='d-flex align-self-center py-4 text-muted'>No more transactions to load!</h6>
           }
-        </div>
+        </PerfectScrollbar>
       :
         <Row className='text-light fs-6 h-75 mt-2 align-items-center justify-content-center'>
           <Row className='d-flex align-items-center justify-content-center'>
