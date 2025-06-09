@@ -12,7 +12,7 @@ import { setShowModals, setShowToast } from '../../../store/rootSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectShowModals } from '../../../store/rootSelectors';
 
-const SQLTerminal = (props) => {
+const SQLTerminal = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const showModals = useSelector(selectShowModals);
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ const SQLTerminal = (props) => {
       textToCopy = outputRef.current.innerText;
     }
     copyTextToClipboard(textToCopy)
-      .then(response => {
+      .then(() => {
         dispatch(setShowToast({
           show: true,
           message: e.target.id + ' Copied Successfully!',

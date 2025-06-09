@@ -14,6 +14,7 @@ function handleError(
   error: BaseError | APIError | BitcoindError | LightningError | ValidationError | GRPCError,
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next?: NextFunction,
 ) {
   const route = req.url || '';

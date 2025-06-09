@@ -57,8 +57,8 @@ const BTCWithdraw = (props) => {
   };
 
   const touchFormControls = () => {
-    addressBlurHandler(null);
-    amountBlurHandler(null);
+    addressBlurHandler();
+    amountBlurHandler();
   };
 
   const resetFormValues = () => {

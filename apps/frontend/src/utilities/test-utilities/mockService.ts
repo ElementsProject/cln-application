@@ -1,6 +1,6 @@
 import SHA256 from 'crypto-js/sha256';
 import { BookkeeperService, CLNService, RootService } from '../../services/http.service';
-import { mockAccountEventsData, mockAuthStatus, mockBKPRStoreData, mockDecodedInvoice, mockFetchInvoice, mockInvoiceRune, mockListChannels, mockListFunds, mockListPeers, mockNewAddr, mockNodeInfo, mockSatsFlowData, mockSendPayment, mockSQLResponse, mockVolumeData } from '../../utilities/test-utilities/mockData';
+import { mockAccountEventsData, mockAuthStatus, mockDecodedInvoice, mockFetchInvoice, mockInvoiceRune, mockListChannels, mockListFunds, mockListPeers, mockNewAddr, mockNodeInfo, mockSatsFlowData, mockSendPayment, mockSQLResponse, mockVolumeData } from '../../utilities/test-utilities/mockData';
 
 export const spyOnUserLogin = () => (
   jest.spyOn(RootService, 'userLogin').mockImplementation(async (password) => {

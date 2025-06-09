@@ -211,7 +211,7 @@ export const CLNTransactionsList = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const activeChannelsExist = useSelector(selectActiveChannelsExist);
   const listLightningTransactions = useSelector(selectListLightningTransactions);
-  const initExpansions = (listLightningTransactions.clnTransactions?.reduce((acc: boolean[], curr) => [...acc, false], []) || []);
+  const initExpansions = (listLightningTransactions.clnTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || []);
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
   return (
     isAuthenticated && listLightningTransactions.isLoading ?

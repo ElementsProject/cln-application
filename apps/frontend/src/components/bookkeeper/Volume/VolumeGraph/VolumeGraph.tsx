@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { selectIsDarkMode, selectUIConfigUnit } from '../../../../store/rootSelectors';
 import { selectVolumeForwards } from '../../../../store/bkprSelectors';
 
-const VolumeGraphTooltip = ({ active, payload, label, unit }: any) => {
+const VolumeGraphTooltip = ({ active, payload, unit }: any) => {
   if (active && payload && payload.length) {
     const forward = payload[0].payload;
     if (!forward) return null;
@@ -82,7 +82,7 @@ const VolumeGraph = () => {
   let pieColors: any[] = [];
   const RADIAN = Math.PI / 180;
 
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, data, isInner = false }) => {
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, data, isInner = false }) => {
     const entry = data[index];
     const radius = innerRadius + (outerRadius - innerRadius) * (isInner ? 0.5 : 1.4);
     const x = cx + radius * Math.cos(-midAngle * RADIAN);

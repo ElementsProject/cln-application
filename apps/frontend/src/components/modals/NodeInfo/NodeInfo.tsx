@@ -32,7 +32,7 @@ const NodeInfo = () => {
   }, [nodeInfo]);
 
   const copyHandler = () => {
-    copyTextToClipboard(nodeURI).then((response) => {
+    copyTextToClipboard(nodeURI).then(() => {
       dispatch(setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'}));
     }).catch((err) => {
       logger.error(err);

@@ -67,8 +67,8 @@ const ChannelOpen = (props) => {
   };
 
   const touchFormControls = () => {
-    pubkeyBlurHandler(null);
-    amountBlurHandler(null);
+    pubkeyBlurHandler();
+    amountBlurHandler();
   };
 
   const resetFormValues = () => {

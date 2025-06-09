@@ -13,7 +13,7 @@ const ToggleSwitch = props => {
   const [isSwitchOn, setIsSwitchOn] = useState(props.selValue === props.values[1]);
   const appConfig = useSelector(selectAppConfig);
  
-  const changeValueHandler = async(event) => {
+  const changeValueHandler = async() => {
     setIsSwitchOn((prevValue) => !prevValue);
     const currValue = isSwitchOn ? 0 : 1;
     const updatedConfig = { 

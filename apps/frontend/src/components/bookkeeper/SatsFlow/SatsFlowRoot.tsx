@@ -9,7 +9,7 @@ import { SatsFlowPeriod } from '../../../types/bookkeeper.type';
 import { useSelector } from 'react-redux';
 import { selectSatsFlowPeriods } from '../../../store/bkprSelectors';
 
-const SatsFlowRoot = props => {
+const SatsFlowRoot = () => {
   const navigate = useNavigate();
   const satsFlowPeriods = useSelector(selectSatsFlowPeriods);
   const [showZeroActivityPeriods, setShowZeroActivityPeriods] = useState<boolean>(false);

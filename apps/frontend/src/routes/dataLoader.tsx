@@ -3,7 +3,7 @@ import { BookkeeperService, CLNService, RootService } from "../services/http.ser
 import { appStore } from "../store/appStore";
 import { AppState } from "../store/store.type";
 
-export async function rootLoader({ request }: LoaderFunctionArgs) {
+export async function rootLoader({}: LoaderFunctionArgs) {
   const state = appStore.getState() as AppState;
   if (state.root.authStatus.isAuthenticated) {
     const [connectwalletData, rootData] = await Promise.all([
@@ -15,7 +15,7 @@ export async function rootLoader({ request }: LoaderFunctionArgs) {
   return null
 }
 
-export async function clnLoader({ request }: LoaderFunctionArgs) {
+export async function clnLoader({}: LoaderFunctionArgs) {
   const state = appStore.getState() as AppState;
   if (state.root.authStatus.isAuthenticated) {
     const clnData = await CLNService.fetchCLNData();
@@ -24,7 +24,7 @@ export async function clnLoader({ request }: LoaderFunctionArgs) {
   return null;
 }
 
-export async function bkprLoader({ request }: LoaderFunctionArgs) {
+export async function bkprLoader({}: LoaderFunctionArgs) {
   const state = appStore.getState() as AppState;
   if (state.root.authStatus.isAuthenticated) {
     const bkprData = await BookkeeperService.fetchBKPRData();
