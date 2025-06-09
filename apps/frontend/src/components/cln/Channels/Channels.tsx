@@ -16,7 +16,6 @@ const Channels = (props) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const uiConfigUnit = useSelector(selectUIConfigUnit);
   const listChannels = useSelector(selectListChannels);
-  const allChannelsMerged = [...listChannels.activeChannels, ...listChannels.pendingChannels, ...listChannels.inactiveChannels];
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
@@ -25,14 +24,14 @@ const Channels = (props) => {
         { isAuthenticated && listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
               <Spinner animation='grow' variant='primary' data-testid='channels-spinner'/>
-            </span> 
+            </span>
           :
           listChannels.error ? 
             <Alert className='fs-8' variant='danger' data-testid='channels-error'>{listChannels.error}</Alert> : 
-            allChannelsMerged && allChannelsMerged.length && allChannelsMerged.length > 0 ?
+            listChannels.mergedChannels && listChannels.mergedChannels.length && listChannels.mergedChannels.length > 0 ?
               <PerfectScrollbar>
                 <ListGroup as='ul' variant='flush' className='list-channels'>
-                  {allChannelsMerged.map((channel, idx) => (
+                  {listChannels.mergedChannels.map((channel, idx) => (
                     <motion.li
                       data-testid='list-item-channel'
                       key={channel.short_channel_id || channel.node_alias || idx}

@@ -20,6 +20,8 @@ const LogoutComponent = () => {
       dispatch(clearCLNStore())
       dispatch(clearBKPRStore())
       closeHandler(true);
+    } else {
+      closeHandler(false);
     }
   };
 
