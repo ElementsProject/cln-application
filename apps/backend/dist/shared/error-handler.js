@@ -1,6 +1,8 @@
 import { HttpStatusCode } from './consts.js';
 import { logger } from './logger.js';
-function handleError(error, req, res, next) {
+function handleError(error, req, res, 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+next) {
     const route = req.url || '';
     const message = error.message
         ? error.message
