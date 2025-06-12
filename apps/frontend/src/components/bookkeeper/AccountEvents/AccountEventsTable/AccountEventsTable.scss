@@ -1,6 +1,6 @@
 @import '../../../../styles/constants.scss';
 
-.account-events-table-container {
+.account-events-table {
   padding: 0 !important;
   border-radius: 1rem;
   overflow: hidden;
@@ -94,7 +94,7 @@
 }
 
 @include color-mode(dark) {
-  .account-events-table-container {
+  .account-events-table {
     border: 1px solid $border-color-dark;
     & .expandable-table {
       & tr.expandable-header-row {
