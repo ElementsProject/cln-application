@@ -11,8 +11,8 @@ import { selectIsDarkMode, selectUIConfigUnit } from '../../../../store/rootSele
 import { selectVolumeForwards } from '../../../../store/bkprSelectors';
 
 const VolumeGraphTooltip = ({ active, payload, unit }: any) => {
-  if (active && payload && payload.length) {
-    const forward = payload[0].payload;
+  if (active && payload && payload.length >= 0) {
+    const forward = payload[0]?.payload;
     if (!forward) return null;
     return (
       <div className='bkpr-tooltip p-3'>

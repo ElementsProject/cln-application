@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import { selectUIConfigUnit } from '../../../../store/rootSelectors';
 
 const SatsFlowGraphTooltip = ({ active, payload, label, unit, periods }: any) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length >= 0) {
     const period = periods.find(d => d.period_key === label);
     if (!period) return null;
     return (
@@ -35,7 +35,7 @@ const SatsFlowGraphTooltip = ({ active, payload, label, unit, periods }: any) =>
           if (entry.name !== 'net_inflow_msat') {
             return (
               <p className='ps-4' key={index} style={{ color: entry.color }}>
-                {titleCase(entry.name.replace('_', ' '))}: {formatCurrency(entry.payload[entry.name], Units.MSATS, unit, false, 0, 'string')}
+                {titleCase(entry.name.replace('_', ' '))}: {formatCurrency(entry?.payload[entry.name], Units.MSATS, unit, false, 0, 'string')}
               </p>
             );
           } else {
