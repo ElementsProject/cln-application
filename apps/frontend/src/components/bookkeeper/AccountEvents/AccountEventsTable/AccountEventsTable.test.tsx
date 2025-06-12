@@ -19,7 +19,7 @@ describe('Account Events Table component ', () => {
       preloadedState: mockAppStore,
       initialRoute: ['/bookkeeper/accountevents'],
     });
-    expect(await screen.findByTestId('account-events-table-container')).toBeInTheDocument();
+    expect(await screen.findByTestId('account-events-table')).toBeInTheDocument();
   });
 
   it('renders AccountEventsTable with correct data', async () => {

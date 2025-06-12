@@ -9,11 +9,11 @@ import { useSelector } from 'react-redux';
 import { selectUIConfigUnit } from '../../../../store/rootSelectors';
 
 const AccountEventsGraphTooltip = ({ active, payload, unit }: { active?: boolean; payload?: any[], unit?: Units }) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length >= 0) {
     const total = payload.reduce((sum, entry) => sum + (entry.value || 0), 0);
     return (
       <div className='bkpr-tooltip p-3'>
-        <p><strong>Period: </strong>{payload[0].payload.period_key}</p>
+        <p><strong>Period: </strong>{payload[0]?.payload?.period_key}</p>
         <p><strong>Total: </strong>{formatCurrency(total, Units.MSATS, unit, false, 0, 'string')}</p>
         <hr />
         {payload.map((entry, index) => (
@@ -43,19 +43,21 @@ const AccountEventsGraph = ({periods}: {periods: AccountEventsPeriod[]}) => {
           margin={{
             top: 20,
             right: 0,
-            left: 30,
+            left: periods && periods.length > 0 ? 30 : 0,
             bottom: 20,
           }}
         >
           <CartesianGrid strokeDasharray='3 3' />
           <XAxis dataKey='period_key' />
-          <YAxis 
-            tickFormatter={(value) => {
-              const formatted = formatCurrency(value, Units.MSATS, uiConfigUnit, false, 0, 'string');
-              return typeof formatted === 'string' ? formatted : String(formatted);
-            }}
-          />
           <Tooltip content={<AccountEventsGraphTooltip unit={uiConfigUnit} />} />
+          {periods && periods.length > 0 && (
+            <YAxis 
+              tickFormatter={(value) => {
+                const formatted = formatCurrency(value, Units.MSATS, uiConfigUnit, false, 0, 'string');
+                return typeof formatted === 'string' ? formatted : String(formatted);
+              }}
+            />
+          )}
           <Legend />
           {accountNames.map((account, index) => (
             <Bar

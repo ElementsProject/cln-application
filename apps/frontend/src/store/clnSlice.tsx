@@ -158,7 +158,7 @@ const clnSlice = createSlice({
         state.listBitcoinTransactions = { ...state.listBitcoinTransactions, error: action.payload.error };
         return;
       }
-      if (action.payload.events && action.payload.events.length) {
+      if (action.payload.events && action.payload.events.length >= 0) {
         const sorted = action.payload.events?.sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0)) ?? [];
         state.listBitcoinTransactions = {
           isLoading: false,
