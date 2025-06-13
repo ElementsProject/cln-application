@@ -1,16 +1,17 @@
 @import '../../../styles/constants.scss';
 
 .account-events-container {
-  height: 85vh;
-  max-height: 85vh;
+  padding: 0 1rem;
+  height: 80vh;
+  max-height: 80vh;
 }
 
 .account-events-graph-container {
-  height: 40vh;
-  max-height: 40vh;
+  height: 39vh;
+  max-height: 39vh;
 }
 
 .account-events-table-container {
-  height: 25vh;
-  max-height: 25vh;
+  height: 24vh;
+  max-height: 24vh;
 }

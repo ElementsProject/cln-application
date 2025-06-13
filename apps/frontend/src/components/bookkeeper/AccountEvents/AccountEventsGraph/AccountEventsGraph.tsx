@@ -43,7 +43,7 @@ const AccountEventsGraph = ({periods}: {periods: AccountEventsPeriod[]}) => {
           margin={{
             top: 20,
             right: 0,
-            left: periods && periods.length > 0 ? 30 : 0,
+            left: periods && periods.length > 0 ? 35 : 0,
             bottom: 20,
           }}
         >
