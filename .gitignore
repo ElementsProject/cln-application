@@ -6,3 +6,5 @@ application-cln.log
 .commando
 release
 env-local.sh
+apps/frontend/build
+apps/backend/dist
