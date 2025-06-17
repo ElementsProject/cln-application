@@ -1,4 +1,4 @@
-name: Build artifact and package
+name: Build and Release Pakage
 
 on:
   release:
@@ -6,34 +6,6 @@ on:
   workflow_dispatch:
   
 jobs:
-  artifact:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
-      - name: Cache build frontend
-        uses: actions/cache@v3
-        id: cache-build-frontend
-        with:
-          path: apps/frontend
-          key: ${{ runner.os }}-frontend-${{ github.sha }}
-
-      - name: Cache build backend
-        uses: actions/cache@v3
-        id: cache-build-backend
-        with:
-          path: apps/backend
-          key: ${{ runner.os }}-backend-${{ github.sha }}
-
-      - name: Compress files
-        run: tar -czf /tmp/clnapp.tar.gz apps/frontend/build apps/backend/dist package.json package-lock.json
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: clnapp-build$VERSION
-          path: /tmp/clnapp.tar.gz
-
   build:
     name: Build image
     runs-on: ubuntu-22.04
