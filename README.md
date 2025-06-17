@@ -39,11 +39,13 @@
       tar -xzf v0.0.1.tar.gz
       ```
 
-  - ### Dependency Installation
+  - ### Dependency Installation and Compile
 
     ```
     cd cln-application-0.0.1
-    npm install --force --omit=dev
+    npm install
+    npm run build
+    npm prune --omit=dev
     ```
 
   - ### Environment Variables
