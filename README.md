@@ -67,10 +67,11 @@
       - LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
       - HIDDEN_SERVICE_URL: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
       - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
-      - LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required; from cln's config.json; starting with `bind-addr=ws:`)
+      - LIGHTNING_WEBSOCKET_PROTOCOL: Core lightning's web socket or web socket proxy (valid values: ws/wss, default: ws)
+      - LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required with default APP_CONNECT; from cln's config.json; starting with `bind-addr=ws:`/`wss-bind-addr`)
       - LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)
       - LIGHTNING_REST_PORT: REST server port (required if APP_CONNECT is REST)
-      - LIGHTNING_CERTS_DIR: Path for core lightning certificates (Required if APP_CONNECT is REST/GRPC with PROTOCOL 'https')
+      - LIGHTNING_CERTS_DIR: Path for core lightning certificates (Required the PROTOCOL is 'https/wss')
       - LIGHTNING_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: http)
       - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (Required if APP_CONNECT is GRPC)
       ```
