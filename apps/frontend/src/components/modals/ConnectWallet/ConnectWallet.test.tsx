@@ -38,7 +38,7 @@ describe('ConnectWallet component ', () => {
     expect(screen.getByTestId('host')).toHaveValue('user.local');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://ws://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
     expect(screen.queryByTestId('invoice-rune-spinner')).not.toBeInTheDocument();
   });
 
@@ -51,10 +51,10 @@ describe('ConnectWallet component ', () => {
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('user.local');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
     expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://ws://user.local:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
   it('updates selected network and input fields on network change to LN Message (Tor)', async () => {
@@ -65,10 +65,10 @@ describe('ConnectWallet component ', () => {
     expect(screen.getByTestId('port')).toHaveValue('5001');
     expect(screen.getByTestId('host')).toHaveValue('oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion');
     expect(screen.getByTestId('rune')).toHaveValue('mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j');
-    expect(screen.queryByTestId('client-cert')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('ca-cert')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('client-cert')).toBeInTheDocument();
+    expect(screen.queryByTestId('client-key')).toBeInTheDocument();
     expect(screen.getByTestId('invoice-rune')).toHaveValue('aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
-    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
+    expect(screen.getByTestId('connect-url')).toHaveValue('ln-message://ws://oqaer4kd7ufryngx6dsztovs4pnlmaouwmtkofjsd2m7pkq8wd.onion:5001?rune=mRXhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb24j&invoiceRune=aHFhnFyVWrRQChA9eJ01RQT9W502daqrP0JA4BiHHw89MCZGb3IgQXBwbGljYXRpb2==');
   });
 
   it('updates selected network and input fields on network change to REST', async () => {

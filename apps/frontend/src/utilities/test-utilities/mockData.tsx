@@ -242,6 +242,7 @@ export const mockConnectWallet = {
   HIDDEN_SERVICE_URL: "http://oqaerkq7qd.onion",
   LIGHTNING_NODE_TYPE: "CLN",
   COMMANDO_CONFIG: "/home/network/.commando",
+  LIGHTNING_WS_PROTOCOL: "ws",
   LIGHTNING_WS_PORT: 5001,
   LIGHTNING_REST_PROTOCOL: "https",
   LIGHTNING_REST_PORT: 3001,
