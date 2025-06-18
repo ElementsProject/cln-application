@@ -23,7 +23,7 @@ const ConnectWallet = () => {
   const [networkTypes, setNetworkTypes] = useState<string[]>(['LN Message', 'LN Message (Tor)']);
   const [selNetwork, setSelNetwork] = useState('LN Message');
   const [connectUrl, setConnectUrl] = useState('');
-  const initialConnectValues: ConnectWalletFields = { port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } };
+  const initialConnectValues: ConnectWalletFields = { protocol: { title: 'WS Protocol', field: 'LIGHTNING_WS_PROTOCOL' }, port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } };
   const [connectValues, setConnectValues] = useState(initialConnectValues);
   const [isLoadingInvoiceRune, setIsLoadingInvoiceRune] = useState(false);
 
@@ -43,13 +43,16 @@ const ConnectWallet = () => {
     }
     setNetworkTypes(newNetworkTypes);
     if (selNetwork === 'LN Message') {
-      setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
+      setConnectUrl('ln-message://' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT : '') + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
     }
   }, [connectWallet, selNetwork]);
 
   const copyHandler = (event) => {
     let textToCopy = '';
     switch (event.target.id) {
+      case 'WS Protocol':
+        textToCopy = connectWallet.LIGHTNING_WS_PROTOCOL?.toString() || '';
+        break;
       case 'Websocket Port':
         textToCopy = connectWallet.LIGHTNING_WS_PORT?.toString() || '';
         break;
@@ -112,13 +115,13 @@ const ConnectWallet = () => {
     setSelNetwork(event.target.id);
     switch (event.target.id) {
       case 'LN Message':
-        setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
+        setConnectValues({ protocol: { title: 'WS Protocol', field: 'LIGHTNING_WS_PROTOCOL' }, port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setConnectUrl('ln-message://' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT : '') + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
 
       case 'LN Message (Tor)':
-        setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + connectWallet.TOR_SERVICE + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
+        setConnectValues({ protocol: { title: 'WS Protocol', field: 'LIGHTNING_WS_PROTOCOL' }, port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'TOR_SERVICE' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setConnectUrl('ln-message://' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + connectWallet.TOR_SERVICE + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT : '') + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
 
       case 'REST':
@@ -142,8 +145,8 @@ const ConnectWallet = () => {
         break;
 
       default:
-        setConnectValues({ port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
-        setConnectUrl('ln-message://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
+        setConnectValues({ protocol: { title: 'WS Protocol', field: 'LIGHTNING_WS_PROTOCOL' }, port: { title: 'Websocket Port', field: 'LIGHTNING_WS_PORT' }, host: { title: 'CLN Host', field: 'DEVICE_DOMAIN_NAME' }, clientKey: { title: 'Client Key', field: 'CLIENT_KEY' }, clientCert: { title: 'Client Cert', field: 'CLIENT_CERT' }, rune: { title: 'Rune', field: 'COMMANDO_RUNE' }, invoiceRune: { title: 'Invoice Rune', field: 'INVOICE_RUNE' }, connectUrl: { title: 'Lnmessage URL', field: '' } });
+        setConnectUrl('ln-message://' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + connectWallet.DEVICE_DOMAIN_NAME + ':' + connectWallet.LIGHTNING_WS_PORT + '?rune=' + connectWallet.COMMANDO_RUNE + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&clientKey=' + connectWallet.CLIENT_KEY + '&clientCert=' + connectWallet.CLIENT_CERT : '') + (connectWallet.INVOICE_RUNE !== '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : ''));
         break;
     }
   };
@@ -188,7 +191,7 @@ const ConnectWallet = () => {
             </h4>
           </Row>
           <Row className='d-flex align-items-start justify-content-center'>
-            <Col xs={selNetwork.includes('LN Message') ? 12 : 6}>
+            <Col xs={6}>
               <Form.Label className='text-light'>Network</Form.Label>
               <Dropdown className='dropdown-network mt-1 mb-2'>
                 <Dropdown.Toggle variant='secondary' id='network' className='w-100 d-flex align-items-center justify-content-between' data-testid='network-toggle'>
@@ -201,7 +204,7 @@ const ConnectWallet = () => {
                 </Dropdown.Menu>
               </Dropdown>
             </Col>
-            {!selNetwork.includes('LN Message') && connectValues.protocol ?
+            {connectValues.protocol ?
               <Col xs={6}>
                 <Form.Label className='text-light'>{connectValues.protocol.title}</Form.Label>
                 <InputGroup className='mb-2'>
@@ -315,8 +318,9 @@ const ConnectWallet = () => {
               </Col>
             </Row>
           )}
-          {(selNetwork.includes('REST') && connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https') || 
-            (selNetwork.includes('gRPC') && connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
+          {(connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' || 
+            connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' || 
+            connectWallet.LIGHTNING_GRPC_PROTOCOL?.toLowerCase() === 'https') ?
             <>
             <Row className='d-flex align-items-start justify-content-center'>
               <Col xs={12}>
