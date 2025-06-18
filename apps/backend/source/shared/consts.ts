@@ -1,5 +1,7 @@
 import * as crypto from 'crypto';
 import { join } from 'path';
+import WebSocket from 'ws';
+import fs from 'fs';
 
 export enum Environment {
   PRODUCTION = 'production',
@@ -54,6 +56,9 @@ export const APP_CONSTANTS = {
   HIDDEN_SERVICE_URL: process.env.HIDDEN_SERVICE_URL || '',
   LIGHTNING_NODE_TYPE: process.env.LIGHTNING_NODE_TYPE || NodeType.CLN,
   COMMANDO_CONFIG: process.env.COMMANDO_CONFIG || './.commando-env',
+  LIGHTNING_CERTS_DIR:
+    process.env.LIGHTNING_CERTS_DIR || process.env.APP_CORE_LIGHTNING_CERTS_DIR || './certs',
+  LIGHTNING_WS_PROTOCOL: process.env.LIGHTNING_WEBSOCKET_PROTOCOL || 'ws',
   LIGHTNING_WS_PORT: +(
     process.env.LIGHTNING_WEBSOCKET_PORT ||
     process.env.APP_CORE_LIGHTNING_WEBSOCKET_PORT ||
@@ -95,12 +100,37 @@ export const DEFAULT_CONFIG = {
   password: '',
 };
 
+class SecureWebSocket extends WebSocket {
+  constructor(url: string) {
+    const options = {
+      rejectUnauthorized: false,
+      cert: fs.readFileSync(APP_CONSTANTS.LIGHTNING_CERTS_DIR + '/client.pem'),
+      key: fs.readFileSync(APP_CONSTANTS.LIGHTNING_CERTS_DIR + '/client-key.pem'),
+    };
+    super(url, options);
+  }
+}
+
+if (
+  APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss' &&
+  typeof (globalThis as any).WebSocket === 'undefined'
+) {
+  (globalThis as any).WebSocket = SecureWebSocket;
+}
+
 export const LN_MESSAGE_CONFIG = {
   remoteNodePublicKey: '',
-  wsProxy: 'ws://' + APP_CONSTANTS.LIGHTNING_IP + ':' + APP_CONSTANTS.LIGHTNING_WS_PORT,
+  wsProxy:
+    APP_CONSTANTS.LIGHTNING_WS_PROTOCOL +
+    '://' +
+    APP_CONSTANTS.LIGHTNING_IP +
+    ':' +
+    APP_CONSTANTS.LIGHTNING_WS_PORT,
   ip: APP_CONSTANTS.LIGHTNING_IP,
   port: APP_CONSTANTS.LIGHTNING_WS_PORT,
   privateKey: crypto.randomBytes(32).toString('hex'),
+  socket: (url: string) =>
+    APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss' ? new SecureWebSocket(url) : new WebSocket(url),
   logger: {
     info: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.info,
     warn: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.warn,
