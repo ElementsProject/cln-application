@@ -162,3 +162,16 @@ export const isCompatibleVersion = (currentVersion: string, checkVersion: string
   }
   return false;
 };
+
+export const decodeCombinedCerts = (encodedValue) => {
+  try {
+    const base64Encoded = decodeURIComponent(encodedValue);
+    const originalString = atob(base64Encoded);
+    const keyMatch = originalString.match(/client_key:((?:.|\n)+?)(?=client_cert:|ca_cert:|$)/);
+    const certMatch = originalString.match(/client_cert:((?:.|\n)+?)(?=ca_cert:|$)/);
+    const caMatch = originalString.match(/ca_cert:((?:.|\n)+)/);
+    return `{\n"clientKey": "\n${keyMatch?.[1]?.trim()?.replace(/\n/g, '\n')}\n",\n"clientCert": "\n${certMatch?.[1]?.trim()?.replace(/\n/g, '\n')}\n",\n"caCert": "\n${caMatch?.[1]?.trim()?.replace(/\n/g, '\n')}\n"\n}`    
+  } catch (error) {
+    throw error;
+  }
+};

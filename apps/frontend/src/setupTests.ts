@@ -22,7 +22,10 @@ export const setMockedLocation = (location: Partial<Location>) => {
   mockedLocation = { ...mockedLocation, ...location };
 };
 
+window.prompt = jest.fn().mockImplementation(() => true);
+
 beforeEach(() => {
+  jest.clearAllMocks();
   jest.useFakeTimers();
   spyOnGetInfo();
   spyOnListNodes();

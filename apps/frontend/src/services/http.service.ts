@@ -225,7 +225,6 @@ export class RootService {
       listFunds: results.listFunds,
     };
   }
-
 }
 
 export class CLNService {

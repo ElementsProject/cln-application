@@ -126,7 +126,7 @@ const SetPasswordComponent = () => {
   return (
     <form className='h-100'>
       <Modal show={showModals.setPasswordModal} onHide={isValidPassword ? closeHandler : ()=>{}} centered className='modal-lg' data-testid='set-password-modal'>
-        <Modal.Header className='d-flex align-items-start justify-content-end pb-0'>
+        <Modal.Header className='d-flex align-items-start justify-content-end pb-0 border-0'>
           { isValidPassword
             ? <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
             : <></>
@@ -227,7 +227,7 @@ const SetPasswordComponent = () => {
           </Row>
           <StatusAlert responseStatus={responseStatus} responseMessage={responseMessage} />
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className='border-0'>
           <button tabIndex={3} type='button' className='btn-rounded bg-primary' onClick={resetPasswordHandler} disabled={responseStatus === CallStatus.PENDING}>
             { isValidPassword ? 'Reset Password' : 'Set Password' }
             {responseStatus === CallStatus.PENDING ? <Spinner className='mt-1 ms-2 text-white-dark' size='sm' /> : <ActionSVG className='ms-3' />}
