@@ -1,17 +1,24 @@
 import express from 'express';
 import { CommonRoutesConfig } from '../../shared/routes.config.js';
-import AuthController from '../../controllers/auth.js';
-import SharedController from '../../controllers/shared.js';
+import { AuthController } from '../../controllers/auth.js';
+import { SharedController } from '../../controllers/shared.js';
 import { API_VERSION } from '../../shared/consts.js';
+import { LightningService } from '../../service/lightning.service.js';
 
 const SHARED_ROUTE = '/shared';
 
 export class SharedRoutes extends CommonRoutesConfig {
-  constructor(app: express.Application) {
+  private clnService: LightningService;
+
+  constructor(app: express.Application, clnService: LightningService) {
     super(app, 'Shared Routes');
+    this.clnService = clnService;
   }
 
   configureRoutes() {
+    const authController = new AuthController();
+    const sharedController = new SharedController(this.clnService);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.app.route(API_VERSION + SHARED_ROUTE + '/csrf/').get((req, res, next) => {
       res.send({
@@ -21,19 +28,19 @@ export class SharedRoutes extends CommonRoutesConfig {
     });
     this.app
       .route(API_VERSION + SHARED_ROUTE + '/config/')
-      .get(SharedController.getApplicationSettings);
+      .get(sharedController.getApplicationSettings);
     this.app
       .route(API_VERSION + SHARED_ROUTE + '/config/')
-      .post(AuthController.isUserAuthenticated, SharedController.setApplicationSettings);
+      .post(authController.isUserAuthenticated, sharedController.setApplicationSettings);
     this.app
       .route(API_VERSION + SHARED_ROUTE + '/connectwallet/')
-      .get(AuthController.isUserAuthenticated, SharedController.getWalletConnectSettings);
+      .get(authController.isUserAuthenticated, sharedController.getWalletConnectSettings);
     this.app
       .route(API_VERSION + SHARED_ROUTE + '/rate/:fiatCurrency')
-      .get(SharedController.getFiatRate);
+      .get(sharedController.getFiatRate);
     this.app
       .route(API_VERSION + SHARED_ROUTE + '/saveinvoicerune/')
-      .post(AuthController.isUserAuthenticated, SharedController.saveInvoiceRune);
+      .post(authController.isUserAuthenticated, sharedController.saveInvoiceRune);
     return this.app;
   }
 }

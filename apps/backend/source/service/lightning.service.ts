@@ -1,10 +1,8 @@
-import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { join } from 'path';
 import https from 'https';
 import axios, { AxiosHeaders } from 'axios';
 import Lnmessage from 'lnmessage';
-import { GRPCError, LightningError } from '../models/errors.js';
+import { GRPCError, LightningError, ValidationError } from '../models/errors.js';
 import { GRPCService } from './grpc.service.js';
 import {
   HttpStatusCode,
@@ -15,33 +13,50 @@ import {
   GRPC_CONFIG,
 } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
-import { refreshEnvVariables } from '../shared/utils.js';
+import { setEnvVariables, validateEnvVariables } from '../shared/utils.js';
 
 export class LightningService {
   private clnService: any = null;
+  private axiosConfig: any = {
+    baseURL: '',
+    headers: {},
+    httpsAgent: null,
+  };
 
   constructor() {
     try {
-      logger.info('Getting Commando Rune');
-      if (fs.existsSync(APP_CONSTANTS.COMMANDO_CONFIG)) {
-        refreshEnvVariables();
-        switch (APP_CONSTANTS.APP_CONNECT) {
-          case AppConnect.REST:
-            logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
-            break;
-          case AppConnect.GRPC:
-            logger.info('GRPC connecting with config: ' + JSON.stringify(GRPC_CONFIG));
-            this.clnService = new GRPCService(GRPC_CONFIG);
-            break;
-          default:
-            logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
-            this.clnService = new Lnmessage(LN_MESSAGE_CONFIG);
-            this.clnService.connect();
-            break;
-        }
+      setEnvVariables();
+      validateEnvVariables();
+    } catch (error: any) {
+      throw new ValidationError(HttpStatusCode.INVALID_DATA, error);
+    }
+    try {
+      logger.info('Strating Lightning Service with APP_CONNECT: ' + APP_CONSTANTS.APP_CONNECT);
+      switch (APP_CONSTANTS.APP_CONNECT) {
+        case AppConnect.REST:
+          logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
+          const headers = new AxiosHeaders();
+          headers.set('rune', REST_CONFIG.rune);
+          this.axiosConfig = {
+            baseURL: REST_CONFIG.url + '/v1/',
+            headers,
+          };
+          if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https') {
+            this.axiosConfig.httpsAgent = new https.Agent({ ca: REST_CONFIG.restCaCert });
+          }
+          break;
+        case AppConnect.GRPC:
+          logger.info('GRPC connecting with config: ' + JSON.stringify(GRPC_CONFIG));
+          this.clnService = new GRPCService(GRPC_CONFIG);
+          break;
+        default:
+          logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
+          this.clnService = new Lnmessage(LN_MESSAGE_CONFIG);
+          this.clnService.connect();
+          break;
       }
     } catch (error: any) {
-      logger.error('Failed to read rune for Commando connection: ' + JSON.stringify(error));
+      logger.error('Failed to construct lightning service: ' + JSON.stringify(error));
       throw error;
     }
   }
@@ -53,21 +68,8 @@ export class LightningService {
   call = async (method: string, methodParams: any[]) => {
     switch (APP_CONSTANTS.APP_CONNECT) {
       case AppConnect.REST:
-        const headers = new AxiosHeaders();
-        headers.set('rune', APP_CONSTANTS.COMMANDO_RUNE);
-        const axiosConfig: any = {
-          baseURL: REST_CONFIG.url + '/v1/',
-          headers,
-        };
-        if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https') {
-          const caCert = fs.readFileSync(join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'ca.pem'));
-          const httpsAgent = new https.Agent({
-            ca: caCert,
-          });
-          axiosConfig.httpsAgent = httpsAgent;
-        }
         return axios
-          .post(method, methodParams, axiosConfig)
+          .post(method, methodParams, this.axiosConfig)
           .then((commandRes: any) => {
             logger.info('REST response for ' + method + ': ' + JSON.stringify(commandRes.data));
             return Promise.resolve(commandRes.data);
@@ -98,7 +100,7 @@ export class LightningService {
           .commando({
             method: method,
             params: methodParams,
-            rune: APP_CONSTANTS.COMMANDO_RUNE,
+            rune: APP_CONSTANTS.ADMIN_RUNE,
             reqId: crypto.randomBytes(8).toString('hex'),
             reqIdPrefix: 'clnapp',
           })
@@ -119,5 +121,3 @@ export class LightningService {
     }
   };
 }
-
-export const CLNService = new LightningService();
