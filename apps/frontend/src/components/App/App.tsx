@@ -12,6 +12,7 @@ import RouteTransition from '../ui/RouteTransition/RouteTransition';
 import { useSelector } from 'react-redux';
 import { selectAppMode, selectIsAuthenticated, selectIsDarkMode } from '../../store/rootSelectors';
 import SQLTerminal from '../modals/SQLTerminal/SQLTerminal';
+import QRCodeLarge from '../modals/QRCodeLarge/QRCodeLarge';
 
 export const App = () => {
   const currentScreenSize = useBreakpoint();
@@ -37,6 +38,7 @@ export const App = () => {
       <ToastMessage />
       <NodeInfo />
       <ConnectWallet />
+      <QRCodeLarge />
       <LoginComponent />
       <LogoutComponent />
       <SetPasswordComponent />
