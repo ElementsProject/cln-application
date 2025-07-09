@@ -16,18 +16,19 @@ import { AuthRoutes } from './routes/v1/auth.js';
 import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
+import { LightningService } from './service/lightning.service.js';
 
 const directoryName = dirname(fileURLToPath(import.meta.url));
 const routes: Array<CommonRoutesConfig> = [];
 
-const app: express.Application = express();
-const server: http.Server = http.createServer(app);
+export const app: express.Application = express();
+export const server: http.Server = http.createServer(app);
 
-const LIGHTNING_PORT = normalizePort(process.env.APP_PORT || '2103');
-const APP_IP = process.env.APP_IP || 'localhost';
+const APP_PORT = normalizePort(process.env.APP_PORT || '2103');
+const APP_HOST = process.env.APP_HOST || 'localhost';
 const APP_PROTOCOL = process.env.APP_PROTOCOL || 'http';
 
-function normalizePort(val: string) {
+export function normalizePort(val: string) {
   const port = parseInt(val, 10);
   if (isNaN(port)) {
     return val;
@@ -51,12 +52,13 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 const corsOptions = {
   methods: 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
   origin:
     APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
-      ? APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT
-      : APP_PROTOCOL + '://localhost:4300',
+      ? `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}`
+      : `${APP_PROTOCOL}://localhost:4300`,
   credentials: true,
   allowedHeaders: 'Content-Type, X-XSRF-TOKEN, XSRF-TOKEN',
 };
@@ -65,45 +67,81 @@ app.use(cors(corsOptions));
 app.use(expressWinston.logger(expressLogConfiguration));
 app.use(expressWinston.errorLogger(expressLogConfiguration));
 
-routes.push(new AuthRoutes(app));
-routes.push(new SharedRoutes(app));
-routes.push(new LightningRoutes(app));
-
-// serve frontend
-app.use('/', express.static(join(directoryName, '..', '..', 'frontend', 'build')));
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((req: express.Request, res: express.Response, next: any) => {
-  res.sendFile(join(directoryName, '..', '..', 'frontend', 'build', 'index.html'));
-});
-
-app.use((err: any, req: express.Request, res: express.Response, next: any) => {
-  return handleError(throwApiError(err), req, res, next);
-});
-
-const throwApiError = (err: any) => {
-  logger.error('Server error: ' + err);
+export const throwApiError = (err: any) => {
   switch (err.code) {
     case 'EACCES':
       return new APIError(
         HttpStatusCode.ACCESS_DENIED,
-        APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT + ' requires elevated privileges',
+        `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT} requires elevated privileges`,
       );
     case 'EADDRINUSE':
       return new APIError(
         HttpStatusCode.ADDR_IN_USE,
-        APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT + ' is already in use',
+        `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT} is already in use`,
       );
     case 'ECONNREFUSED':
       return new APIError(HttpStatusCode.UNAUTHORIZED, 'Server is down/locked');
     case 'EBADCSRFTOKEN':
       return new APIError(HttpStatusCode.BAD_CSRF_TOKEN, 'Invalid CSRF token. Form tempered.');
     default:
-      return new APIError(400, 'Default: ' + JSON.stringify(err));
+      return new APIError(HttpStatusCode.BAD_REQUEST, err?.message || err);
   }
 };
 
-server.on('error', throwApiError);
-server.on('listening', () =>
-  logger.warn('Server running at ' + APP_PROTOCOL + '://' + APP_IP + ':' + LIGHTNING_PORT),
-);
-server.listen({ port: LIGHTNING_PORT, host: APP_IP });
+async function startServer() {
+  try {
+    const clnService = new LightningService();
+
+    const authRoutes = new AuthRoutes(app);
+    const sharedRoutes = new SharedRoutes(app, clnService);
+    const lightningRoutes = new LightningRoutes(app, clnService);
+
+    authRoutes.configureRoutes();
+    sharedRoutes.configureRoutes();
+    lightningRoutes.configureRoutes();
+
+    routes.push(authRoutes, sharedRoutes, lightningRoutes);
+
+    // serve frontend
+    app.use('/', express.static(join(directoryName, '..', '..', 'frontend', 'build')));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    app.use((req: express.Request, res: express.Response, next: any) => {
+      res.sendFile(join(directoryName, '..', '..', 'frontend', 'build', 'index.html'));
+    });
+
+    // Global error handler for requests
+    app.use((err: any, req: express.Request, res: express.Response, next: any) => {
+      return handleError(throwApiError(err), req, res, next);
+    });
+
+    server.on('error', (err: any) => {
+      if (err.code) {
+        logger.error('On Server Error: ', err);
+      } else {
+        logger.error('On Server Error: ', throwApiError(err));
+      }
+      process.exit(1);
+    });
+
+    server.on('listening', () =>
+      logger.warn(`Server running at ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}`),
+    );
+
+    server.listen({ port: APP_PORT, host: APP_HOST });
+  } catch (err: any) {
+    if (err.code) {
+      logger.error('Server Startup Error: ', err);
+    } else {
+      logger.error('Server Startup Error: ', throwApiError(err));
+    }
+    process.exit(1);
+  }
+}
+
+startServer();
+
+process.on('uncaughtException', err => {
+  logger.error('I M HERE');
+  logger.error('Uncaught Exception:', err);
+  process.exit(1);
+});

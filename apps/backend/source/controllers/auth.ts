@@ -8,8 +8,8 @@ import handleError from '../shared/error-handler.js';
 import { verifyPassword, isAuthenticated, isValidPassword } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
-class AuthController {
-  userLogin(req: Request, res: Response, next: NextFunction) {
+export class AuthController {
+  userLogin = async (req: Request, res: Response, next: NextFunction) => {
     logger.info('Logging in');
     try {
       const vpRes = verifyPassword(req.body.password);
@@ -25,9 +25,9 @@ class AuthController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  userLogout(req: Request, res: Response, next: NextFunction) {
+  userLogout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Logging out');
       res.clearCookie('token');
@@ -35,9 +35,9 @@ class AuthController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  resetPassword(req: Request, res: Response, next: NextFunction) {
+  resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Resetting password');
       const isValid = req.body.isValid;
@@ -76,14 +76,14 @@ class AuthController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
+  isUserAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const uaRes = isAuthenticated(req.cookies.token);
       if (req.body.returnResponse) {
         // Frontend is asking if user is authenticated or not
-        if (APP_CONSTANTS.SINGLE_SIGN_ON === 'true') {
+        if (APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true') {
           return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
         } else {
           const vpRes = isValidPassword();
@@ -99,7 +99,7 @@ class AuthController {
         }
       } else {
         // Backend APIs are asking if user is authenticated or not
-        if (uaRes === true || APP_CONSTANTS.SINGLE_SIGN_ON === 'true') {
+        if (uaRes === true || APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true') {
           return next();
         } else {
           return res.status(401).json({ error: 'Unauthorized user' });
@@ -108,7 +108,5 @@ class AuthController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 }
-
-export default new AuthController();

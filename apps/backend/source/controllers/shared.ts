@@ -12,15 +12,24 @@ import {
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
-import { addServerConfig, refreshEnvVariables } from '../shared/utils.js';
-import { CLNService } from '../service/lightning.service.js';
+import { addServerConfig, setEnvVariables } from '../shared/utils.js';
 import { ShowRunes } from '../models/showrunes.type.js';
+import { LightningService } from '../service/lightning.service.js';
 
-class SharedController {
-  getApplicationSettings(req: Request, res: Response, next: NextFunction) {
+export class SharedController {
+  private clnService: LightningService;
+
+  constructor(clnService: LightningService) {
+    this.clnService = clnService;
+  }
+
+  getApplicationSettings = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Getting Application Settings from ' + APP_CONSTANTS.APP_CONFIG_FILE);
       if (!fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
+        logger.warning(
+          `Config file ${APP_CONSTANTS.APP_CONFIG_FILE} not found. Creating default config.`,
+        );
         fs.writeFileSync(
           APP_CONSTANTS.APP_CONFIG_FILE,
           JSON.stringify(DEFAULT_CONFIG, null, 2),
@@ -39,9 +48,9 @@ class SharedController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  setApplicationSettings(req: Request, res: Response, next: NextFunction) {
+  setApplicationSettings = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Updating Application Settings: ' + JSON.stringify(req.body));
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
@@ -55,19 +64,19 @@ class SharedController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  getWalletConnectSettings(req: Request, res: Response, next: NextFunction) {
+  getWalletConnectSettings = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Getting Connection Settings');
-      refreshEnvVariables();
+      setEnvVariables();
       res.status(200).json(APP_CONSTANTS);
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  getFiatRate(req: Request, res: Response, next: NextFunction) {
+  getFiatRate = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Getting Fiat Rate for: ' + req.params.fiatCurrency);
       const FIAT_VENUE = FIAT_VENUES.hasOwnProperty(req.params.fiatCurrency)
@@ -94,12 +103,12 @@ class SharedController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 
-  async saveInvoiceRune(req: Request, res: Response, next: NextFunction) {
+  saveInvoiceRune = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Saving Invoice Rune');
-      const showRunes: ShowRunes = await CLNService.call('showrunes', []);
+      const showRunes: ShowRunes = await this.clnService.call('showrunes', []);
       const invoiceRune = showRunes.runes.find(
         rune =>
           rune.restrictions.some(restriction =>
@@ -109,9 +118,9 @@ class SharedController {
             restriction.alternatives.some(alternative => alternative.value === 'listinvoices'),
           ),
       );
-      if (invoiceRune && fs.existsSync(APP_CONSTANTS.COMMANDO_CONFIG)) {
+      if (invoiceRune && fs.existsSync(APP_CONSTANTS.LIGHTNING_VARS_FILE)) {
         const invoiceRuneString = `INVOICE_RUNE="${invoiceRune.rune}"\n`;
-        fs.appendFileSync(APP_CONSTANTS.COMMANDO_CONFIG, invoiceRuneString, 'utf-8');
+        fs.appendFileSync(APP_CONSTANTS.LIGHTNING_VARS_FILE, invoiceRuneString, 'utf-8');
         res.status(201).send();
       } else {
         throw new Error('Invoice rune not found or .commando-env does not exist.');
@@ -119,7 +128,5 @@ class SharedController {
     } catch (error: any) {
       handleError(error, req, res, next);
     }
-  }
+  };
 }
-
-export default new SharedController();

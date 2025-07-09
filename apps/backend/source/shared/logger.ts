@@ -1,5 +1,13 @@
+import fs from 'fs';
+import path from 'path';
 import winston from 'winston';
 import { Environment, APP_CONSTANTS } from './consts.js';
+
+const logDir = path.dirname(APP_CONSTANTS.APP_LOG_FILE);
+
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
 export const enum LogLevel {
   ERROR = 'error',
@@ -19,6 +27,10 @@ export const logConfiguration = {
             ? LogLevel.DEBUG
             : LogLevel.INFO,
       format: winston.format.combine(
+        winston.format(info => {
+          if (info.stack) delete info.stack;
+          return info;
+        })(),
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.timestamp(),
         winston.format.align(),
@@ -27,13 +39,15 @@ export const logConfiguration = {
       ),
     }),
     new winston.transports.File({
-      filename: APP_CONSTANTS.APP_LOG_FILE,
+      filename: path.basename(APP_CONSTANTS.APP_LOG_FILE),
+      dirname: logDir,
+      maxsize: 5 * 1024 * 1024,
       level:
         APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
-          ? LogLevel.WARN
+          ? LogLevel.DEBUG
           : APP_CONSTANTS.APP_MODE === Environment.TESTING
             ? LogLevel.DEBUG
-            : LogLevel.INFO,
+            : LogLevel.DEBUG,
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.timestamp(),
