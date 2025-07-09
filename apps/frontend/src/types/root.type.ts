@@ -17,6 +17,7 @@ export type RootState = {
   showModals: ModalConfig;
   showToast: ToastConfig;
   connectWallet: WalletConnect;
+  connectionUrl: string;
   appConfig: ApplicationConfiguration;
   fiatConfig: FiatConfig;
   walletBalances: WalletBalances;
@@ -50,52 +51,49 @@ export type NodeInfo = {
   error?: any;
 };
 
-export type ConnectWalletFields = {
-  protocol?: { title: string; field: string; };
-  host: { title: string; field: string; };
-  port: { title: string; field: string; }; // REST, Websocket or gRPC
-  rune?: { title: string; field: string; };
-  invoiceRune?: { title: string; field: string; };
-  clientKey?: { title: string; field: string; };
-  clientCert?: { title: string; field: string; };
-  caCert?: { title: string; field: string; };
-  connectUrl?: { title: string; field: string; };
-}
-
 export type WalletConnect = {
   isLoading: boolean;
-  SINGLE_SIGN_ON?: boolean;
-  LOCAL_HOST?: string;
-  DEVICE_DOMAIN_NAME?: string;
-  BITCOIN_NODE_IP?: string;
+  APP_SINGLE_SIGN_ON?: boolean;
+  BITCOIN_HOST?: string;
   BITCOIN_NETWORK?: string;
+  APP_PROTOCOL?: string;
+  APP_HOST?: string;
+  APP_PORT?: string;
   APP_CONFIG_FILE?: string;
   APP_LOG_FILE?: string;
   APP_MODE?: string;
   APP_CONNECT?: string;
-  APP_PROTOCOL?: string;
-  APP_IP?: string;
-  APP_PORT?: string;
-  LIGHTNING_IP?: string;
-  LIGHTNING_PATH?: string;
-  HIDDEN_SERVICE_URL?: string;
-  TOR_SERVICE?: string;
-  LIGHTNING_NODE_TYPE?: string;
-  COMMANDO_CONFIG?: string;
+  LIGHTNING_DATA_DIR?: string;
+  LIGHTNING_HOST?: string;
+  LIGHTNING_TOR_HOST?: string;
+  LIGHTNING_VARS_FILE?: string;
   LIGHTNING_WS_PROTOCOL?: string;
   LIGHTNING_WS_PORT?: number;
+  LIGHTNING_WS_CLIENT_KEY_FILE?: string;
+  LIGHTNING_WS_CLIENT_CERT_FILE?: string;
+  LIGHTNING_WS_CA_CERT_FILE?: string;
   LIGHTNING_REST_PROTOCOL?: string;
+  LIGHTNING_REST_HOST?: string;
+  LIGHTNING_REST_TOR_HOST?: string;
   LIGHTNING_REST_PORT?: number;
-  LIGHTNING_CERTS_PATH?: string;
-  LIGHTNING_GRPC_PROTOCOL?: string;
+  LIGHTNING_REST_CLIENT_KEY_FILE?: string;
+  LIGHTNING_REST_CLIENT_CERT_FILE?: string;
+  LIGHTNING_REST_CA_CERT_FILE?: string;
+  LIGHTNING_GRPC_HOST?: string;
+  LIGHTNING_GRPC_TOR_HOST?: string;
   LIGHTNING_GRPC_PORT?: number;
+  LIGHTNING_GRPC_PROTO_PATH?: string;
+  LIGHTNING_GRPC_CLIENT_KEY_FILE?: string;
+  LIGHTNING_GRPC_CLIENT_CERT_FILE?: string;
+  LIGHTNING_GRPC_CA_CERT_FILE?: string;
+  // Not added by the user
   APP_VERSION?: string;
   NODE_PUBKEY?: string;
-  COMMANDO_RUNE?: string;
+  ADMIN_RUNE?: string;
   INVOICE_RUNE?: string;
-  CLIENT_KEY?: string;
-  CLIENT_CERT?: string;
-  CA_CERT?: string;
+  LIGHTNING_WS_TLS_CERTS?: string;
+  LIGHTNING_REST_TLS_CERTS?: string;
+  LIGHTNING_GRPC_TLS_CERTS?: string;
   error?: any;
 };
 
@@ -111,7 +109,6 @@ export type ApplicationConfiguration = {
     appPort?: string;
     appProtocol?: string;
     appVersion?: string;
-    lightningNodeType?: string;
     singleSignOn?: boolean;
   }
   error?: any;
@@ -132,6 +129,7 @@ export type ModalConfig = {
   logoutModal: boolean;
   setPasswordModal: boolean;
   sqlTerminalModal: boolean;
+  qrCodeLarge: boolean;
 };
 
 export type ToastConfig = {

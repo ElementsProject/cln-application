@@ -94,6 +94,9 @@ const rootSlice = createSlice({
     setConnectWallet(state, action: PayloadAction<RootState['connectWallet']>) {
       state.connectWallet = action.payload;
     },
+    setConnectionUrl(state, action: PayloadAction<RootState['connectionUrl']>) {
+      state.connectionUrl = action.payload;
+    },
     setConfig(state, action: PayloadAction<RootState['appConfig']>) {
       state.appConfig = action.payload;
     },
@@ -133,6 +136,7 @@ export const {
   setShowModals,
   setShowToast,
   setConnectWallet,
+  setConnectionUrl,
   setConfig,
   setFiatConfig,
   setNodeInfo,
