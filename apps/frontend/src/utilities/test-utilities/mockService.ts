@@ -38,10 +38,10 @@ export const spyOnExecuteSql = () => (
   jest.spyOn(RootService, 'executeSql').mockImplementation(async () => mockSQLResponse)
 )
 
-export const spyOnCreateInvoiceRune = () => {
+export const spyOnCreateInvoiceRune = (errorMsg?: string) => {
   return jest.spyOn(CLNService, 'createInvoiceRune').mockImplementation(() => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockInvoiceRune), 10);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => (errorMsg) ? reject(new Error(errorMsg)) : resolve(mockInvoiceRune), 4);
     });
   });
 };
