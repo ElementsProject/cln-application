@@ -1,0 +1,18 @@
+@import '../../../styles/constants.scss';
+
+.qr-container-large {
+  position: relative;
+  width: 440px;
+  padding-bottom: 1rem;
+  cursor: zoom-out;
+  & .qr-cln-logo {
+    position: absolute;
+    top: 40%;
+    left: 44%;
+    padding: 0;
+    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 3px solid $white;
+  }
+}
