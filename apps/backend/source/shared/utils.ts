@@ -1,8 +1,15 @@
 import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
-import { sep } from 'path';
 import { logger } from '../shared/logger.js';
-import { APP_CONSTANTS, GRPC_CONFIG, LN_MESSAGE_CONFIG, SECRET_KEY } from '../shared/consts.js';
+import {
+  APP_CONSTANTS,
+  GRPC_CONFIG,
+  REST_CONFIG,
+  LN_MESSAGE_CONFIG,
+  SECRET_KEY,
+  AppConnect,
+  DEFAULT_ENV_VALUES,
+} from '../shared/consts.js';
 
 export function addServerConfig(config: any) {
   config.serverConfig = {
@@ -10,8 +17,7 @@ export function addServerConfig(config: any) {
     appPort: APP_CONSTANTS.APP_PORT,
     appProtocol: APP_CONSTANTS.APP_PROTOCOL,
     appVersion: APP_CONSTANTS.APP_VERSION,
-    lightningNodeType: APP_CONSTANTS.LIGHTNING_NODE_TYPE,
-    singleSignOn: APP_CONSTANTS.SINGLE_SIGN_ON,
+    singleSignOn: APP_CONSTANTS.APP_SINGLE_SIGN_ON,
   };
   return config;
 }
@@ -87,46 +93,174 @@ function parseEnvFile(filePath: string): { [key: string]: string } {
   }
 }
 
-export function refreshEnvVariables() {
-  const envVars = parseEnvFile(APP_CONSTANTS.COMMANDO_CONFIG);
-  process.env.LIGHTNING_PUBKEY = envVars.LIGHTNING_PUBKEY;
-  process.env.COMMANDO_RUNE = envVars.LIGHTNING_RUNE;
-  process.env.INVOICE_RUNE = envVars.INVOICE_RUNE || '';
-  APP_CONSTANTS.NODE_PUBKEY = envVars.LIGHTNING_PUBKEY;
-  APP_CONSTANTS.COMMANDO_RUNE = envVars.LIGHTNING_RUNE;
-  APP_CONSTANTS.INVOICE_RUNE = envVars.INVOICE_RUNE || '';
-  LN_MESSAGE_CONFIG.remoteNodePublicKey = envVars.LIGHTNING_PUBKEY;
-  GRPC_CONFIG.pubkey = envVars.LIGHTNING_PUBKEY;
-  if (APP_CONSTANTS.LIGHTNING_CERTS_PATH === '') {
-    APP_CONSTANTS.LIGHTNING_CERTS_PATH =
-      APP_CONSTANTS.LIGHTNING_PATH + sep + APP_CONSTANTS.BITCOIN_NETWORK + sep;
+export function setEnvVariables() {
+  if (fs.existsSync(APP_CONSTANTS.LIGHTNING_VARS_FILE)) {
+    const configVars = parseEnvFile(APP_CONSTANTS.LIGHTNING_VARS_FILE);
+    process.env.NODE_PUBKEY = configVars.LIGHTNING_PUBKEY || '';
+    process.env.ADMIN_RUNE = configVars.LIGHTNING_RUNE || '';
+    process.env.INVOICE_RUNE = configVars.INVOICE_RUNE || '';
+    APP_CONSTANTS.NODE_PUBKEY = configVars.LIGHTNING_PUBKEY || '';
+    APP_CONSTANTS.ADMIN_RUNE = configVars.LIGHTNING_RUNE || '';
+    APP_CONSTANTS.INVOICE_RUNE = configVars.INVOICE_RUNE || '';
+    LN_MESSAGE_CONFIG.remoteNodePublicKey = configVars.LIGHTNING_PUBKEY || '';
+    GRPC_CONFIG.pubkey = configVars.LIGHTNING_PUBKEY;
+    REST_CONFIG.rune = configVars.LIGHTNING_RUNE || '';
   }
-  let clientKey = '';
-  let clientCert = '';
-  let caCert = '';
   if (fs.existsSync('package.json')) {
     const packageData = Buffer.from(fs.readFileSync('package.json')).toString();
     APP_CONSTANTS.APP_VERSION = JSON.parse(packageData).version;
   }
-  if (fs.existsSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'client-key.pem')) {
-    clientKey = fs.readFileSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'client-key.pem').toString();
-    APP_CONSTANTS.CLIENT_KEY = clientKey
-      .replace(/(\r\n|\n|\r)/gm, '')
-      .replace('-----BEGIN PRIVATE KEY-----', '')
-      .replace('-----END PRIVATE KEY-----', '');
+  try {
+    if (APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss') {
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_KEY_FILE)) {
+        LN_MESSAGE_CONFIG.wssClientKey = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_KEY_FILE)
+          .toString();
+      }
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_CERT_FILE)) {
+        LN_MESSAGE_CONFIG.wssClientCert = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_CERT_FILE)
+          .toString();
+      }
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_WS_CA_CERT_FILE)) {
+        LN_MESSAGE_CONFIG.wssCaCert = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_WS_CA_CERT_FILE)
+          .toString();
+      }
+    }
+    APP_CONSTANTS.LIGHTNING_WS_TLS_CERTS = encodeURIComponent(
+      btoa(
+        `client_key: ${LN_MESSAGE_CONFIG.wssClientKey}\nclient_cert: ${LN_MESSAGE_CONFIG.wssClientCert}\nca_cert: ${LN_MESSAGE_CONFIG.wssCaCert}`,
+      ),
+    );
+  } catch (error: any) {
+    logger.error('Error reading wss proxy certs: ', error);
   }
-  if (fs.existsSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'client.pem')) {
-    clientCert = fs.readFileSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'client.pem').toString();
-    APP_CONSTANTS.CLIENT_CERT = clientCert
-      .replace(/(\r\n|\n|\r)/gm, '')
-      .replace('-----BEGIN CERTIFICATE-----', '')
-      .replace('-----END CERTIFICATE-----', '');
+  try {
+    if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https') {
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_REST_CLIENT_KEY_FILE)) {
+        REST_CONFIG.restClientKey = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_REST_CLIENT_KEY_FILE)
+          .toString();
+      }
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_REST_CLIENT_CERT_FILE)) {
+        REST_CONFIG.restClientCert = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_REST_CLIENT_CERT_FILE)
+          .toString();
+      }
+      if (fs.existsSync(APP_CONSTANTS.LIGHTNING_REST_CA_CERT_FILE)) {
+        REST_CONFIG.restCaCert = fs
+          .readFileSync(APP_CONSTANTS.LIGHTNING_REST_CA_CERT_FILE)
+          .toString();
+      }
+      APP_CONSTANTS.LIGHTNING_REST_TLS_CERTS = encodeURIComponent(
+        btoa(
+          `client_key: ${REST_CONFIG.restClientKey}\nclient_cert: ${REST_CONFIG.restClientCert}\nca_cert: ${REST_CONFIG.restCaCert}`,
+        ),
+      );
+    }
+  } catch (error: any) {
+    logger.error('Error reading REST certs: ', error);
   }
-  if (fs.existsSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'ca.pem')) {
-    caCert = fs.readFileSync(APP_CONSTANTS.LIGHTNING_CERTS_PATH + 'ca.pem').toString();
-    APP_CONSTANTS.CA_CERT = caCert
-      .replace(/(\r\n|\n|\r)/gm, '')
-      .replace('-----BEGIN CERTIFICATE-----', '')
-      .replace('-----END CERTIFICATE-----', '');
+  try {
+    if (fs.existsSync(APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_KEY_FILE)) {
+      GRPC_CONFIG.grpcClientKey = fs
+        .readFileSync(APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_KEY_FILE)
+        .toString();
+    }
+    if (fs.existsSync(APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_CERT_FILE)) {
+      GRPC_CONFIG.grpcClientCert = fs
+        .readFileSync(APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_CERT_FILE)
+        .toString();
+    }
+    if (fs.existsSync(APP_CONSTANTS.LIGHTNING_GRPC_CA_CERT_FILE)) {
+      GRPC_CONFIG.grpcCaCert = fs
+        .readFileSync(APP_CONSTANTS.LIGHTNING_GRPC_CA_CERT_FILE)
+        .toString();
+    }
+    APP_CONSTANTS.LIGHTNING_GRPC_TLS_CERTS = encodeURIComponent(
+      btoa(
+        `client_key: ${GRPC_CONFIG.grpcClientKey}\nclient_cert: ${GRPC_CONFIG.grpcClientCert}\nca_cert: ${GRPC_CONFIG.grpcCaCert}`,
+      ),
+    );
+  } catch (error: any) {
+    logger.error('Error reading gRPC certs: ', error);
   }
+  logger.info('Environment variables set successfully');
+}
+
+export function validateCommandoConfig() {
+  if (LN_MESSAGE_CONFIG.remoteNodePublicKey === '') {
+    throw `Node Public Key is not set for Commando connection. Fix LIGHTNING_PUBKEY in ${APP_CONSTANTS.LIGHTNING_VARS_FILE}.`;
+  }
+  if (APP_CONSTANTS.ADMIN_RUNE === '') {
+    throw `Rune is not set for Commando connection. Fix LIGHTNING_RUNE in ${APP_CONSTANTS.LIGHTNING_VARS_FILE}.`;
+  }
+  if (APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss') {
+    if (LN_MESSAGE_CONFIG.wssClientKey === '') {
+      throw `Missing or Invalid WSS Client Key at ${APP_CONSTANTS.LIGHTNING_WS_CLIENT_KEY_FILE}.`;
+    }
+    if (LN_MESSAGE_CONFIG.wssClientCert === '') {
+      throw `Missing or Invalid WSS Client Certificate at ${APP_CONSTANTS.LIGHTNING_WS_CLIENT_CERT_FILE}.`;
+    }
+  }
+}
+
+export function validateRestConfig() {
+  if (APP_CONSTANTS.ADMIN_RUNE === '') {
+    throw `Rune is not set for REST connection. Fix LIGHTNING_RUNE in ${APP_CONSTANTS.LIGHTNING_VARS_FILE}.`;
+  }
+  if (APP_CONSTANTS.LIGHTNING_REST_PROTOCOL === 'https' && REST_CONFIG.restCaCert === '') {
+    throw `Missing or Invalid REST Ca Certificate at ${APP_CONSTANTS.LIGHTNING_REST_CA_CERT_FILE}.`;
+  }
+}
+
+export function validateGrpcConfig() {
+  if (GRPC_CONFIG.pubkey === '') {
+    throw `Node Public Key is not set for GRPC connection. Fix LIGHTNING_PUBKEY in ${APP_CONSTANTS.LIGHTNING_VARS_FILE}.`;
+  }
+  if (GRPC_CONFIG.grpcClientKey === '') {
+    throw `Missing or Invalid gRPC Client Key at ${APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_KEY_FILE}.`;
+  }
+  if (GRPC_CONFIG.grpcClientCert === '') {
+    throw `Missing or Invalid gRPC Client Certificate at ${APP_CONSTANTS.LIGHTNING_GRPC_CLIENT_CERT_FILE}.`;
+  }
+  if (GRPC_CONFIG.grpcCaCert === '') {
+    throw `Missing or Invalid gRPC Ca Certificate at ${APP_CONSTANTS.LIGHTNING_GRPC_CA_CERT_FILE}.`;
+  }
+}
+
+export function logDefaultValues() {
+  for (const [key, value] of Object.entries(DEFAULT_ENV_VALUES)) {
+    const envKey = key as keyof typeof APP_CONSTANTS;
+    if (!process.env[envKey] && APP_CONSTANTS[envKey] === value) {
+      logger.warn(
+        `${key} is defaulting to '${value}'. Configure as environment variable to override.`,
+      );
+    }
+  }
+}
+
+export function validateEnvVariables() {
+  if (!fs.existsSync(APP_CONSTANTS.LIGHTNING_VARS_FILE)) {
+    throw `LIGHTNING_VARS_FILE ${APP_CONSTANTS.LIGHTNING_VARS_FILE} does not exist. Create a file with the required variables LIGHTNING_PUBKEY and LIGHTNING_RUNE. See https://github.com/ElementsProject/cln-application?tab=readme-ov-file#commando-authentication for more details.`;
+  }
+  if (APP_CONSTANTS.NODE_PUBKEY === '') {
+    throw `LIGHTNING_PUBKEY is not set in ${APP_CONSTANTS.LIGHTNING_VARS_FILE} file.`;
+  }
+  if (APP_CONSTANTS.ADMIN_RUNE === '') {
+    throw `LIGHTNING_RUNE is not set in ${APP_CONSTANTS.LIGHTNING_VARS_FILE} file.`;
+  }
+  switch (APP_CONSTANTS.APP_CONNECT) {
+    case AppConnect.REST:
+      validateRestConfig();
+      break;
+    case AppConnect.GRPC:
+      validateGrpcConfig();
+      break;
+    default:
+      validateCommandoConfig();
+      break;
+  }
+  logDefaultValues();
 }

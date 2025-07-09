@@ -1,27 +1,36 @@
+import * as crypto from 'crypto';
 import axios, { AxiosHeaders } from 'axios';
-import * as path from 'path';
-import fs from 'fs';
 import https from 'https';
 import protobuf from 'protobufjs';
-import { HttpStatusCode, GRPC_CONFIG, APP_CONSTANTS } from '../shared/consts.js';
+import { HttpStatusCode } from '../shared/consts.js';
 import { GRPCError } from '../models/errors.js';
 import { logger } from '../shared/logger.js';
 
 export class GRPCService {
   private authPubkey: string;
   private authSignature: string;
-  private protoPath: string[];
-  private clnNode: protobuf.Root;
+  private clnNode!: protobuf.Root;
   private axiosConfig: any;
 
-  constructor(grpcConfig: { pubkey: string; url: string }) {
-    this.authSignature = 'A'.repeat(64);
+  constructor(grpcConfig: {
+    pubkey: string;
+    url: string;
+    protoPath: string;
+    grpcClientKey: string;
+    grpcClientCert: string;
+    grpcCaCert: string;
+  }) {
+    this.authSignature = crypto.randomBytes(32).toString('hex');
     this.authPubkey = Buffer.from(grpcConfig.pubkey, 'hex').toString('base64');
-    this.protoPath = [
-      path.resolve(process.cwd(), './proto/node.proto'),
-      path.resolve(process.cwd(), './proto/primitives.proto'),
-    ];
-    this.clnNode = protobuf.Root.fromJSON(protobuf.loadSync(this.protoPath).toJSON());
+    this.loadLightningProtos(grpcConfig.protoPath)
+      .then(protoRes => {
+        logger.info('gRPC Protos loaded successfully');
+        this.clnNode = protoRes;
+      })
+      .catch(error => {
+        logger.error('Failed to load gRPC Protos: ', error);
+        throw new GRPCError(HttpStatusCode.GRPC_UNKNOWN, 'Failed to load gRPC Protos');
+      });
     const headers = new AxiosHeaders();
     headers.set('content-type', 'application/grpc');
     headers.set('accept', 'application/grpc');
@@ -32,16 +41,47 @@ export class GRPCService {
       baseURL: `${grpcConfig.url}/cln.Node/`,
       headers,
     };
-    if (APP_CONSTANTS.LIGHTNING_GRPC_PROTOCOL === 'https') {
-      const httpsAgent = new https.Agent({
-        cert: fs.readFileSync(path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'client.pem')),
-        key: fs.readFileSync(
-          path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'client-key.pem'),
-        ),
-        ca: fs.readFileSync(path.join(APP_CONSTANTS.LIGHTNING_CERTS_PATH || '.', 'ca.pem')),
+    this.axiosConfig.httpsAgent = new https.Agent({
+      key: grpcConfig.grpcClientKey,
+      cert: grpcConfig.grpcClientCert,
+      ca: grpcConfig.grpcCaCert,
+    });
+  }
+
+  private loadLightningProtos(protoPath: string): Promise<protobuf.Root> {
+    return axios
+      .get(protoPath)
+      .then(response => {
+        const files = response.data;
+        const protoFiles = files.filter(
+          (file: any) => file.name.endsWith('.proto') && file.type === 'file',
+        );
+
+        if (protoFiles.length === 0) {
+          logger.error('No proto files found in the directory.');
+          throw new Error('No proto files found in the directory.');
+        }
+
+        return Promise.all(
+          protoFiles.map((file: any) =>
+            axios
+              .get(file.download_url)
+              .then(rawResponse => rawResponse.data)
+              .catch(error => {
+                logger.error(`Failed to fetch ${file.name}:`, error);
+                throw error;
+              }),
+          ),
+        );
+      })
+      .then(protoContents => {
+        const parsed = protobuf.parse(protoContents.join('\n'));
+        return protobuf.Root.fromJSON(parsed.root.toJSON());
+      })
+      .catch(error => {
+        logger.error('Failed to load proto files:', error);
+        throw error;
       });
-      this.axiosConfig.httpsAgent = httpsAgent;
-    }
   }
 
   private static getGrpcStatusMessages(method: string): Record<number, string> {
@@ -323,19 +363,8 @@ export class GRPCService {
 
   public async callMethod(methodName: string, reqPayload: object): Promise<any> {
     if (methodName?.toLowerCase() === 'bkpr-listaccountevents') {
-      let data = {};
-      if (
-        GRPC_CONFIG.pubkey === '0279da9a93e50b008a7ba6bd25355fb7132f5015b790a05ee9f41bc9fbdeb30d19'
-      ) {
-        data = JSON.parse(
-          await fs.readFileSync(path.join(process.cwd(), '../../data/dummy/node-1.json'), 'utf8'),
-        )['bkpr-listaccountevents'];
-      } else {
-        data = JSON.parse(
-          await fs.readFileSync(path.join(process.cwd(), '../../data/dummy/node-3.json'), 'utf8'),
-        )['bkpr-listaccountevents'];
-      }
-      return data;
+      // Bookkeeper is not available in gRPC, so we return an empty object till it is implemented
+      return {};
     } else {
       const [method, capitalizedMethod] = this.convertMethodName(methodName);
       reqPayload = this.transformPayload(capitalizedMethod, reqPayload);
