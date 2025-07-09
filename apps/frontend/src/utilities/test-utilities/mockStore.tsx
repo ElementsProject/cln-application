@@ -9,6 +9,7 @@ import bkprReducer from '../../store/bkprSlice';
 import { rootRouteConfig } from '../../routes/router.config';
 import { AppState, StoreWithManager } from '../../store/store.type';
 import { mockAppStore } from './mockData';
+import logger from '../../services/logger.service';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: AppState;
@@ -50,7 +51,7 @@ export function createMockStore(route: string, preloadedState?: AppState) {
 
     return store;
   } catch (error: any) {
-    console.error('FULL STORE CREATION ERROR:', {
+    logger.error('FULL STORE CREATION ERROR:', {
       error: error.message,
       stack: error.stack,
       reducers: Object.keys(reducers),
