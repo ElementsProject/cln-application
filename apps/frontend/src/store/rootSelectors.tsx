@@ -5,13 +5,14 @@ import { ApplicationModes, Units } from '../utilities/constants';
 
 export const defaultRootState: RootState = {
   authStatus: { isLoading: true, isAuthenticated: false, isValidPassword: true },
-  showModals: { nodeInfoModal: false, connectWalletModal: false, loginModal: false, logoutModal: false, setPasswordModal: false, sqlTerminalModal: false },
+  showModals: { nodeInfoModal: false, connectWalletModal: false, loginModal: false, logoutModal: false, setPasswordModal: false, sqlTerminalModal: false, qrCodeLarge: false, },
   showToast: { show: false, message: '' },
   connectWallet: { isLoading: true },
+  connectionUrl: '',
   appConfig: {
     isLoading: true,
     uiConfig: { unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.LIGHT },
-    serverConfig: { singleSignOn: false, lightningNodeType: 'CLN' },
+    serverConfig: { singleSignOn: false },
   },
   fiatConfig: { isLoading: true, symbol: faDollarSign, venue: '', rate: 1 },
   walletBalances: {
@@ -59,6 +60,11 @@ export const selectShowToast = createSelector(
 export const selectWalletConnect = createSelector(
   selectRootState,
   (root) => root.connectWallet
+);
+
+export const selectConnectionUrl = createSelector(
+  selectRootState,
+  (root) => root.connectionUrl
 );
 
 export const selectAppConfig = createSelector(
