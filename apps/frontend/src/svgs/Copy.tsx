@@ -6,7 +6,7 @@ export const CopySVG = props => {
     <OverlayTrigger
     placement='auto'
     delay={{ show: 250, hide: 250 }}
-    overlay={(props.showTooltip ? <Tooltip>{'Copy ' + (props.id || '')}</Tooltip> : <></>)}
+    overlay={(props.showTooltip ? <Tooltip>{props.tooltipText ? props.tooltipText : 'Copy ' + (props.id || '')}</Tooltip> : <></>)}
     >
       <svg id={props.id} className={props.className} width='22' height='20' viewBox='0 0 22 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
         <path id={props.id} className='stroke-light' d='M15.3164 6.4375H17.3789C17.7931 6.4375 18.1289 6.77329 18.1289 7.1875V17.6875C18.1289 18.1017 17.7931 18.4375 17.3789 18.4375H6.87891C6.46469 18.4375 6.12891 18.1017 6.12891 17.6875V15.625' strokeWidth='1.3' strokeLinecap='round' strokeLinejoin='round'/>
