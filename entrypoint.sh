@@ -1,7 +1,7 @@
 #!/bin/sh
 EXISTING_PUBKEY=""
 GETINFO_RESPONSE=""
-LIGHTNING_RPC=$LIGHTNING_PATH"/$BITCOIN_NETWORK""/lightning-rpc"
+LIGHTNING_RPC=$LIGHTNING_DATA_DIR"/$BITCOIN_NETWORK""/lightning-rpc"
 
 getinfo_request() {
   cat <<EOF
@@ -55,7 +55,7 @@ generate_new_rune() {
 
     if [ "$RUNE" != "" ] && [ "$RUNE" != "null" ]; then
       # Save rune in env file
-      echo "LIGHTNING_RUNE=\"$RUNE\"" >> "$COMMANDO_CONFIG"
+      echo "LIGHTNING_RUNE=\"$RUNE\"" >> "$LIGHTNING_VARS_FILE"
     fi
 
     if [ "$UNIQUE_ID" != "" ] &&  [ "$UNIQUE_ID" != "null" ]; then
@@ -69,9 +69,9 @@ generate_new_rune() {
 }
 
 # Read existing pubkey
-if [ -f "$COMMANDO_CONFIG" ]; then
-  EXISTING_PUBKEY=$(head -n1 "$COMMANDO_CONFIG")
-  EXISTING_RUNE=$(sed -n "2p" "$COMMANDO_CONFIG")
+if [ -f "$LIGHTNING_VARS_FILE" ]; then
+  EXISTING_PUBKEY=$(head -n1 "$LIGHTNING_VARS_FILE")
+  EXISTING_RUNE=$(sed -n "2p" "$LIGHTNING_VARS_FILE")
   echo "EXISTING_PUBKEY"
   echo "$EXISTING_PUBKEY"
   echo "EXISTING_RUNE"
@@ -97,8 +97,8 @@ if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" ] ||
   [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"null\"" ]; then
   # Pubkey changed or missing rune; rewrite new data on the file.
   echo "Pubkey mismatched or missing rune; Rewriting the data."
-  cat /dev/null > "$COMMANDO_CONFIG"
-  echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> "$COMMANDO_CONFIG"
+  cat /dev/null > "$LIGHTNING_VARS_FILE"
+  echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> "$LIGHTNING_VARS_FILE"
   generate_new_rune
 else
   echo "Pubkey matches with existing pubkey."

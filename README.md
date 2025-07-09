@@ -52,36 +52,53 @@
       This application accepts & depends upon these variables to be passed through environment:
 
       ```
-      - SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
-      - LOCAL_HOST: Device url for connect url links (optional; for connect wallet screen)
-      - DEVICE_DOMAIN_NAME: Device name/IP for lnmessage connect url feature (optional; for connect wallet screen)
-      - BITCOIN_NODE_IP: IP address of bitcoin node container (required)
-      - BITCOIN_NETWORK: Bitcoin network type (optional; for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest)
-      - APP_CONFIG_DIR: Path for cln-application's configuration file (required; config.json)
-      - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: production)
-      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: COMMANDO)
-      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: http)
-      - APP_IP: IP address of this application (cln-application) container (required)
-      - APP_PORT: Port on which this application should be served (required)
-      - LIGHTNING_IP: IP address of Core lightning node container (required)
-      - LIGHTNING_PATH: Path for core lightning (optional; required for entrypoint.sh)
-      - HIDDEN_SERVICE_URL: REST hidden service url (optional; for connect wallet screen; Used for Tor Domain also)
-      - COMMANDO_CONFIG: Full Path including file name for commando auth with PUBKEY & RUNE (required)
-      - LIGHTNING_WEBSOCKET_PROTOCOL: Core lightning's web socket or web socket proxy (valid values: ws/wss, default: ws)
-      - LIGHTNING_WEBSOCKET_PORT: Core lightning's websocket port (required with default APP_CONNECT; from cln's config.json; starting with `bind-addr=ws:`/`wss-bind-addr`)
-      - LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: https)
-      - LIGHTNING_REST_PORT: REST server port (required if APP_CONNECT is REST)
-      - LIGHTNING_CERTS_DIR: Path for core lightning certificates (Required the PROTOCOL is 'https/wss')
-      - LIGHTNING_GRPC_PROTOCOL: Core lightning's GRPC protocol (valid values: http/https, default: http)
-      - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (Required if APP_CONNECT is GRPC)
+      - BITCOIN_HOST: Hostname/IP address of bitcoin node container (configurable to run lightningd with `--bitcoin-rpcconnect`, default: `localhost`)
+      - BITCOIN_NETWORK: Bitcoin network type (for entrypoint.sh and lightningd with `--network`; valid values: bitcoin/signet/testnet/regtest; default: `bitcoin`)
+
+      - APP_SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
+      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: `http`)
+      - APP_HOST: Hostname/IP address of cln-application's container (default: `localhost`)
+      - APP_PORT: Port on which this application should be served (default: `2103`)
+
+      - APP_CONFIG_FILE: Path for cln-application's configuration file (default: `./config.json`)
+      - APP_LOG_FILE: Path for cln-application's log file (default: `./application-cln.log`)
+      - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: `production`)
+      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: `COMMANDO`)
+
+      - LIGHTNING_DATA_DIR: Path for core lightning (used by entrypoint.sh, default: ``)
+      - LIGHTNING_HOST: IP address of Core lightning node container (used for `COMMANDO` APP_CONNECT, default: `localhost`)
+      - LIGHTNING_TOR_HOST: REST hidden service url (default: ``)
+      
+      - LIGHTNING_VARS_FILE: Full Path including the file name for connection auth with LIGHTNING_PUBKEY & LIGHTNING_RUNE (defult: `./.commando-env`)
+      - LIGHTNING_WS_PROTOCOL: Core lightning's web socket is serving on ws or serving via WSSProxy (valid values: ws/wss, default: `ws`)
+      - LIGHTNING_WS_PORT: Core lightning's websocket port (used by `COMMANDO` APP_CONNECT; with `bind-addr=ws:`/`wss-bind-addr` in CLN config; default: `5001`)
+      - LIGHTNING_WS_CLIENT_KEY_FILE: Client key file path including file name for websocket TLS authentication (used by `COMMANDO` APP_CONNECT and `wss` LIGHTNING_WS_PROTOCOL; default: `./client-key.pem`)
+      - LIGHTNING_WS_CLIENT_CERT_FILE: Client certificate file path including file name for websocket TLS authentication (used by `COMMANDO` APP_CONNECT and `wss` LIGHTNING_WS_PROTOCOL; default: `./client.pem`)
+      - LIGHTNING_WS_CA_CERT_FILE: CA certificate file path including file name for websocket TLS authentication (default: `./ca.pem`)
+
+      - LIGHTNING_REST_PROTOCOL: Protocol on which REST is served (valid values: http/https, default: `https`)
+      - LIGHTNING_REST_HOST: IP address/hostname of Core Lightning REST interface (used if APP_CONNECT is `REST`, default: `localhost`)
+      - LIGHTNING_REST_TOR_HOST: Tor hidden service URL for Core Lightning REST interface (default: ``)
+      - LIGHTNING_REST_PORT: REST server port (used if APP_CONNECT is `REST`; default: `3010`)
+      - LIGHTNING_REST_CLIENT_KEY_FILE: Client key file path including file name for REST TLS authentication (default: `./client-key.pem`)
+      - LIGHTNING_REST_CLIENT_CERT_FILE: Client certificate file path including file name for REST TLS authentication (default: `./client.pem`)
+      - LIGHTNING_REST_CA_CERT_FILE: CA certificate file path including file name for REST TLS authentication (used by `REST` APP_CONNECT and `https` LIGHTNING_REST_PROTOCOL; default: `./ca.pem`)
+
+      - LIGHTNING_GRPC_HOST: IP address/hostname of Core Lightning GRPC interface (used if APP_CONNECT is `GRPC`, default: `localhost`)
+      - LIGHTNING_GRPC_TOR_HOST: Tor hidden service URL for Core Lightning GRPC interface (default: ``)
+      - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (used if APP_CONNECT is `GRPC`; default: `9736`)
+      - LIGHTNING_GRPC_PROTO_PATH: URL to directory containing CLN gRPC protocol definitions (default: `https://github.com/ElementsProject/lightning/tree/master/cln-grpc/proto`)
+      - LIGHTNING_GRPC_CLIENT_KEY_FILE: Client key file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client-key.pem`)
+      - LIGHTNING_GRPC_CLIENT_CERT_FILE: Client certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client.pem`)
+      - LIGHTNING_GRPC_CA_CERT_FILE: CA certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./ca.pem`)
       ```
 
       Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
-      Important Note: Environment variables take precedence over config.json variables. Like `SINGLE_SIGN_ON` will take higher precedence over 
+      Important Note: Environment variables take precedence over config.json variables. Like `APP_SINGLE_SIGN_ON` will take higher precedence over 
       `singleSignOn` from config.json.
 
   - ### Application Configuration
-      This is the config.json file which is required by application's frontend. If the file named `config.json` is missing at `APP_CONFIG_DIR` location, one like below will be auto created:
+      This is the default `config.json` file which is required by application's frontend. If the file `APP_CONFIG_FILE` is missing at the location, one like below will be auto created:
 
       ```
         {
@@ -97,8 +114,8 @@
 
   - ### Commando Authentication
       - This application utilizes [lnmessage](https://github.com/aaronbarnardsound/lnmessage) and [commando](https://docs.corelightning.org/reference/lightning-commando) for connecting with core lightning node. The connection is trustless and end-to-end encrypted. Commando manages authentication and authorization through runes, which can grant either full or fine-grained permissions. 
-      - The backend server reads `LIGHTNING_PUBKEY` & `LIGHTNING_RUNE` from the `COMMANDO_CONFIG` file for this communication. 
-      - Values can either be set manually or script `entrypoint.sh` can be used to call `getinfo` and `createrune` methods and save values in `COMMANDO_CONFIG`.
+      - The backend server reads `LIGHTNING_PUBKEY` & `LIGHTNING_RUNE` from the `LIGHTNING_VARS_FILE` file for this communication. 
+      - Values can either be set manually or script `entrypoint.sh` can be used to call `getinfo` and `createrune` methods and save values in `LIGHTNING_VARS_FILE`.
       - `entrypoint.sh` can only run for the locally installed lightning. If `cln-application` is running remotely then pubkey and 
       rune can be set manually.
       - Sample commando config should look like:
