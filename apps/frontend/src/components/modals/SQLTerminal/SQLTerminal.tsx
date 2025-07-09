@@ -94,7 +94,7 @@ const SQLTerminal = () => {
 
   return (
     <Modal ref={containerRef} show={showModals.sqlTerminalModal} onHide={closeHandler} centered className='modal-xl' data-testid='sql-terminal'>
-      <Modal.Header className='d-flex align-items-start justify-content-between pb-0 mx-2'>
+      <Modal.Header className='d-flex align-items-start justify-content-between pb-0 mx-2 border-0'>
         <h4>SQL Terminal</h4>
         <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
       </Modal.Header>

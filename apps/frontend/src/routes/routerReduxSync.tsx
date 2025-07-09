@@ -11,6 +11,7 @@ import { RootLoaderData } from '../types/root.type';
 import { CLNLoaderData } from '../types/cln.type';
 import { BKPRLoaderData } from '../types/bookkeeper.type';
 import { selectAuthStatus } from '../store/rootSelectors';
+import logger from '../services/logger.service';
 
 export function RootRouterReduxSync() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export function RootRouterReduxSync() {
           dispatch(setListPeers(rootData?.listPeers));
           dispatch(setListFunds(rootData?.listFunds));
         } catch (error) {
-          console.error('Error fetching root data:', error);
+          logger.error('Error fetching root data:', error);
         }
       }
     }, APP_WAIT_TIME);

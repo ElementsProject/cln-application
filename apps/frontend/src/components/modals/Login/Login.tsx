@@ -86,7 +86,7 @@ const LoginComponent = () => {
   return (
     <form className='h-100'>
       <Modal show={showModals.loginModal} centered className='modal-lg' data-testid='login-modal'>
-        <Modal.Header className='d-flex align-items-start justify-content-start pb-0'></Modal.Header>
+        <Modal.Header className='d-flex align-items-start justify-content-start pb-0 border-0'></Modal.Header>
         <Modal.Body className='py-0'>
           <Row className='d-flex align-items-start justify-content-center'>
             <Col xs={12}>
@@ -127,7 +127,7 @@ const LoginComponent = () => {
           </Row>
           <StatusAlert responseStatus={responseStatus} responseMessage={responseMessage} />
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className='border-0'>
           <button
             tabIndex={2}
             type="button"

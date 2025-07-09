@@ -6,13 +6,6 @@
   }
 }
 
-.modal-content {
-  & .modal-header,
-  & .modal-footer {
-    border: none;
-  }
-}
-
 @include color-mode(dark) {
   .fa-circle-xmark {
     & path {
