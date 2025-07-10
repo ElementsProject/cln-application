@@ -1,6 +1,6 @@
 {
   "name": "cln-application-backend",
-  "version": "0.0.8",
+  "version": "25.07",
   "description": "Core lightning application backend",
   "private": true,
   "license": "MIT",

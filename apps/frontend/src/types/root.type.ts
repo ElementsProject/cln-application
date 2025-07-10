@@ -54,7 +54,6 @@ export type NodeInfo = {
 export type WalletConnect = {
   isLoading: boolean;
   APP_SINGLE_SIGN_ON?: boolean;
-  BITCOIN_HOST?: string;
   BITCOIN_NETWORK?: string;
   APP_PROTOCOL?: string;
   APP_HOST?: string;
