@@ -226,7 +226,6 @@ export const mockShowToast = {
 export const mockConnectWallet = {
   isLoading: false,
   APP_SINGLE_SIGN_ON: false,
-  BITCOIN_HOST: "localhost",
   BITCOIN_NETWORK: "regtest",
   APP_PROTOCOL: "http",
   APP_HOST: "localhost",
@@ -258,7 +257,7 @@ export const mockConnectWallet = {
   LIGHTNING_GRPC_CLIENT_KEY_FILE: "/home/network/regtest/grpc/client-key.pem",
   LIGHTNING_GRPC_CLIENT_CERT_FILE: "/home/network/regtest/grpc/client.pem",
   LIGHTNING_GRPC_CA_CERT_FILE: "/home/network/regtest/grpc/ca.pem",
-  APP_VERSION: "0.0.8",
+  APP_VERSION: "25.07",
   NODE_PUBKEY: "nodepubkey123456nodepubkey123456nodepubkey123456nodepubkey123456",
   ADMIN_RUNE: "adminrune==",
   INVOICE_RUNE: mockInvoiceRune.rune,
