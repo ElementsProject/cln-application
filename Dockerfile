@@ -1,5 +1,5 @@
 # Build Stage
-FROM node:18-buster AS cln-app-builder
+FROM node:20-bookworm AS cln-app-builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -29,7 +29,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Final image
-FROM node:18-buster-slim AS cln-app-final
+FROM node:20-bookworm-slim AS cln-app-final
 
 # Install jq for JSON parsing in entrypoint.sh
 RUN apt-get update && apt-get install -y jq socat
