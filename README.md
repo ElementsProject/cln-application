@@ -35,15 +35,15 @@
 - ## Standalone
   - ### Get latest release
       ```
-      wget https://github.com/ElementsProject/cln-application/archive/refs/tags/v0.0.1.tar.gz
-      tar -xzf v0.0.1.tar.gz
+      wget https://github.com/ElementsProject/cln-application/archive/refs/tags/v25.07.tar.gz
+      tar -xzf v25.07.tar.gz
       ```
 
   - ### Dependency Installation and Compile
 
     ```
-    cd cln-application-0.0.1
-    npm install
+    cd cln-application-25.07
+    npm ci
     npm run build
     npm prune --omit=dev
     ```
