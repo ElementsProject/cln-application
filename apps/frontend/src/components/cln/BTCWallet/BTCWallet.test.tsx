@@ -1,5 +1,4 @@
-import { screen, within } from '@testing-library/react';
-import { act } from 'react';
+import { screen, within, act } from '@testing-library/react';
 import { APP_ANIMATION_DURATION, Units } from '../../../utilities/constants';
 import { mockAppConfig, mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockRootStoreData, mockUIConfig } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';

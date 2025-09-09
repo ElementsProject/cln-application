@@ -1,11 +1,10 @@
-import { screen, render } from '@testing-library/react';
+import { screen, render, act } from '@testing-library/react';
 import DateBox from './DateBox';
 import { mockAppStore, mockInvoice } from '../../../utilities/test-utilities/mockData';
 import { convertIntoDateFormat } from '../../../utilities/data-formatters';
 import { createMockStore } from '../../../utilities/test-utilities/mockStore';
 import { Provider } from 'react-redux';
 import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
-import { act } from 'react';
 
 describe('DateBox component ', () => {
   it('format date', async () => {

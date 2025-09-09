@@ -1,11 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import moment from 'moment';
 import { Provider } from 'react-redux';
 import DataFilterOptions from './DataFilterOptions';
 import { TimeGranularity } from '../../../utilities/constants';
 import { createMockStore } from '../../../utilities/test-utilities/mockStore';
 import { mockAppStore } from '../../../utilities/test-utilities/mockData';
-import { act } from 'react';
 import { spyOnBKPRGetSatsFlow } from '../../../utilities/test-utilities/mockService';
 
 describe('DataFilterOptions', () => {

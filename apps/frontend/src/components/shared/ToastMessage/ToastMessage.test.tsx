@@ -1,5 +1,4 @@
-import { screen, render } from '@testing-library/react';
-import { act } from 'react';
+import { screen, render, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createMockStore } from '../../../utilities/test-utilities/mockStore';
 import { mockAppStore } from '../../../utilities/test-utilities/mockData';

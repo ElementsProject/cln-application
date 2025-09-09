@@ -1,5 +1,4 @@
-import { screen } from '@testing-library/react';
-import { act } from 'react';
+import { screen, act } from '@testing-library/react';
 import { TRANSITION_DURATION } from '../../../utilities/constants';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import RouteTransition from './RouteTransition';

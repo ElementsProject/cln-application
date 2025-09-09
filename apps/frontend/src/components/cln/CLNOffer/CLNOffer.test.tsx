@@ -1,5 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { act } from 'react';
+import { fireEvent, screen, waitFor, act } from '@testing-library/react';
 import { mockAppStore, mockOffer1 } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNOffer from './CLNOffer';

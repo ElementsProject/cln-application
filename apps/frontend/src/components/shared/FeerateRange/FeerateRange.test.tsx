@@ -1,5 +1,4 @@
-import { screen, render } from '@testing-library/react';
-import { act } from 'react';
+import { screen, render, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
 import { createMockStore } from '../../../utilities/test-utilities/mockStore';

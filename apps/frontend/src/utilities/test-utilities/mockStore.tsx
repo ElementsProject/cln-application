@@ -1,6 +1,6 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
-import { PropsWithChildren, act } from 'react';
+import { render, RenderOptions, RenderResult, act } from '@testing-library/react';
+import { PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import rootReducer from '../../store/rootSlice';
