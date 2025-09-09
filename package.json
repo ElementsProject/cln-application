@@ -1,6 +1,6 @@
 {
   "name": "cln-application",
-  "version": "25.07",
+  "version": "25.07.1",
   "description": "Core lightning application",
   "private": true,
   "license": "MIT",

@@ -20,7 +20,7 @@ COPY package.json ./
 COPY package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Build assets
 RUN npm run build
