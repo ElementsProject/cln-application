@@ -1,5 +1,4 @@
-import React, { act } from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, act } from '@testing-library/react';
 import { mockBKPRStoreData, mockCLNStoreData, mockRootStoreData, mockShowModals } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import ConnectWallet from '../ConnectWallet/ConnectWallet';

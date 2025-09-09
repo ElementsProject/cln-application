@@ -1,9 +1,8 @@
-import { screen, within } from '@testing-library/react';
+import { screen, within, act } from '@testing-library/react';
 import CLNWallet from './CLNWallet';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import { APP_ANIMATION_DURATION, Units } from '../../../utilities/constants';
 import { mockAppConfig, mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockRootStoreData, mockUIConfig } from '../../../utilities/test-utilities/mockData';
-import { act } from 'react';
 
 describe('CLNWallet component ', () => {
   it('should be in the document', async () => {

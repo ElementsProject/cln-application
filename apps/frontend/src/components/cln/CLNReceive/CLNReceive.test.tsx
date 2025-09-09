@@ -1,5 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { act } from 'react';
+import { fireEvent, screen, waitFor, act } from '@testing-library/react';
 import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
 import { mockAppStore } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';

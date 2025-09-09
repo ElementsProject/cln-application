@@ -1,5 +1,4 @@
-import React, { act } from 'react';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { CLNService } from '../../../../services/http.service';
 import { mockBKPRStoreData, mockCLNStoreData, mockConnectWallet, mockRootStoreData, mockShowModals } from '../../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../../utilities/test-utilities/mockStore';

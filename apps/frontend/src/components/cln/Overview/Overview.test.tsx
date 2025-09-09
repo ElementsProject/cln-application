@@ -1,5 +1,4 @@
-import { screen, within } from '@testing-library/react';
-import { act } from 'react';
+import { screen, within, act } from '@testing-library/react';
 import { APP_ANIMATION_DURATION, COUNTUP_DURATION, Units } from '../../../utilities/constants';
 import { formatCurrency } from '../../../utilities/data-formatters';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListChannels, mockRootStoreData, mockWalletBalances } from '../../../utilities/test-utilities/mockData';
