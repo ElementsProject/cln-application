@@ -136,6 +136,8 @@
       ```
         npm run start
       ```
+- ## Docker
+  - For a minimal Docker setup to run the application with a remote Core Lightning node, see our [Docker Setup Guide](./.github/docs/Docker-Setup.md).
 
 - ## Stores/Marketplaces
   - This application is also available on Umbrel App Store and Start9 OS with one click install.
