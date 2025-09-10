@@ -1,6 +1,6 @@
 {
   "name": "cln-application-backend",
-  "version": "25.07.1",
+  "version": "25.07.2",
   "description": "Core lightning application backend",
   "private": true,
   "license": "MIT",
@@ -23,7 +23,8 @@
     "lnmessage": "0.2.6",
     "protobufjs": "7.4.0",
     "ts-node": "10.9.1",
-    "winston": "3.11.0"
+    "winston": "3.11.0",
+    "ws": "8.18.3"
   },
   "devDependencies": {
     "@eslint/js": "9.22.0",
