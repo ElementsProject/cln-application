@@ -51,7 +51,7 @@ export function verifyPassword(password: string) {
       return error;
     }
   } else {
-    return 'Config file does not exist';
+    return 'Config file does not exist to verify the password';
   }
 }
 
@@ -68,7 +68,7 @@ export function isValidPassword() {
       return error;
     }
   } else {
-    return 'Config file does not exist';
+    return 'Config file does not exist to validate the password';
   }
 }
 
