@@ -108,7 +108,7 @@ export type ApplicationConfiguration = {
     appPort?: string;
     appProtocol?: string;
     appVersion?: string;
-    singleSignOn?: boolean;
+    singleSignOn?: boolean | string;
   }
   error?: any;
 };

@@ -868,7 +868,7 @@ export const mockFeeRate = {
 
 export const mockCLNStoreData = {
   listInvoices: mockListInvoices,
-  listPayments: mockListInvoices,
+  listPayments: mockListPayments,
   listOffers: mockListOffers,
   listLightningTransactions: mockListLightningTransactions,
   listBitcoinTransactions: mockListBitcoinTransactions,

@@ -62,7 +62,7 @@ const Header = (props) => {
             <div className="d-flex align-items-center">
               <Menu compact={true} />
               <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              {serverConfig.singleSignOn === true ?
+              {serverConfig.singleSignOn === true || serverConfig.singleSignOn === "true" ?
                 <span className='mx-3'></span>
                 :
                 <div onClick={logoutHandler}>
@@ -131,7 +131,7 @@ const Header = (props) => {
               <div className='d-flex align-items-center'>
                 <Menu />
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
-                {serverConfig.singleSignOn === true ?
+                {serverConfig.singleSignOn === true || serverConfig.singleSignOn === "true" ?
                   <span className='mx-3'></span>
                   :
                   <div onClick={logoutHandler}>
@@ -193,7 +193,7 @@ const Header = (props) => {
           <div className="d-flex align-items-center">
             <Menu />
             <Settings onShowConnectWallet={props.onShowConnectWallet} />
-            {serverConfig.singleSignOn === true ?
+            {serverConfig.singleSignOn === true || serverConfig.singleSignOn === "true" ?
               <span className='mx-3'></span>
               :
               <div onClick={logoutHandler}>
