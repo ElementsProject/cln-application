@@ -27,7 +27,7 @@ export class SharedController {
     try {
       logger.info('Getting Application Settings from ' + APP_CONSTANTS.APP_CONFIG_FILE);
       if (!fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
-        logger.warning(
+        logger.warn(
           `Config file ${APP_CONSTANTS.APP_CONFIG_FILE} not found. Creating default config.`,
         );
         fs.writeFileSync(
