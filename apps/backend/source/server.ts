@@ -141,7 +141,6 @@ async function startServer() {
 startServer();
 
 process.on('uncaughtException', err => {
-  logger.error('I M HERE');
   logger.error('Uncaught Exception:', err);
   process.exit(1);
 });
