@@ -26,7 +26,7 @@ const ConnectWallet = () => {
 
   useEffect(() => {
     let newNetworkTypes: string[] = ['Commando'];
-    if (connectWallet.LIGHTNING_WS_PORT && connectWallet.LIGHTNING_TOR_HOST && connectWallet.LIGHTNING_TOR_HOST !== '') {
+    if (connectWallet.LIGHTNING_WS_PORT && connectWallet.LIGHTNING_WS_TOR_HOST && connectWallet.LIGHTNING_WS_TOR_HOST !== '') {
       newNetworkTypes.push('Commando (Tor)');
     }
     if (connectWallet.LIGHTNING_REST_PORT) {
@@ -56,7 +56,7 @@ const ConnectWallet = () => {
   const setConnectUrlOnChange = () => {
     let newConnectUrl = '';
     if (selNetwork === 'Commando' || selNetwork === 'Commando (Tor)') {
-      newConnectUrl = 'commando+' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + (selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_TOR_HOST : connectWallet.LIGHTNING_HOST) + ':' + connectWallet.LIGHTNING_WS_PORT + '?pubkey=' + connectWallet.NODE_PUBKEY + '&rune=' + connectWallet.ADMIN_RUNE + (connectWallet.INVOICE_RUNE != '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : '') + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&certs=' + connectWallet.LIGHTNING_WS_TLS_CERTS : '');
+      newConnectUrl = 'commando+' + connectWallet.LIGHTNING_WS_PROTOCOL + '://' + (selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_WS_TOR_HOST : connectWallet.LIGHTNING_WS_HOST) + ':' + connectWallet.LIGHTNING_WS_PORT + '?pubkey=' + connectWallet.NODE_PUBKEY + '&rune=' + connectWallet.ADMIN_RUNE + (connectWallet.INVOICE_RUNE != '' ? '&invoiceRune=' + connectWallet.INVOICE_RUNE : '') + (connectWallet.LIGHTNING_WS_PROTOCOL?.toLowerCase() === 'wss' ? '&certs=' + connectWallet.LIGHTNING_WS_TLS_CERTS : '');
     } else if (selNetwork === 'REST' || selNetwork === 'REST (Tor)') {
       newConnectUrl = 'clnrest+' + connectWallet.LIGHTNING_REST_PROTOCOL + '://' + (selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_REST_TOR_HOST : connectWallet.LIGHTNING_REST_HOST) + ':' + connectWallet.LIGHTNING_REST_PORT + '?rune=' + connectWallet.ADMIN_RUNE + (connectWallet.LIGHTNING_REST_PROTOCOL?.toLowerCase() === 'https' ? '&certs=' + connectWallet.LIGHTNING_REST_TLS_CERTS : '');
     } else if (selNetwork === 'gRPC' || selNetwork === 'gRPC (Tor)') {
