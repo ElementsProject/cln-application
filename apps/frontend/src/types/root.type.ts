@@ -67,6 +67,8 @@ export type WalletConnect = {
   LIGHTNING_TOR_HOST?: string;
   LIGHTNING_VARS_FILE?: string;
   LIGHTNING_WS_PROTOCOL?: string;
+  LIGHTNING_WS_HOST?: string;
+  LIGHTNING_WS_TOR_HOST?: string;
   LIGHTNING_WS_PORT?: number;
   LIGHTNING_WS_CLIENT_KEY_FILE?: string;
   LIGHTNING_WS_CLIENT_CERT_FILE?: string;

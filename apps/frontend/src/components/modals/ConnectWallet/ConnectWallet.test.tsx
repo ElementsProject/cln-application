@@ -57,7 +57,15 @@ describe('ConnectWallet component', () => {
   it('updates the connection URL when network is changed', async () => {
     await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     const initialUrl = screen.getByTestId('connect-url');
-    expect(initialUrl).toHaveValue('commando+wss://'+ mockConnectWallet.LIGHTNING_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
+    expect(initialUrl).toHaveValue('commando+wss://'+ mockConnectWallet.LIGHTNING_WS_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('network-toggle'));
+    });
+    const commandoTorSelect = screen.getAllByTestId('network-item')[1];
+    await act(async () => {
+      fireEvent.click(commandoTorSelect);
+    });
+    expect(initialUrl).toHaveValue('commando+wss://'+ mockConnectWallet.LIGHTNING_WS_TOR_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
     await act(async () => {
       fireEvent.click(screen.getByTestId('network-toggle'));
     });
@@ -76,7 +84,7 @@ describe('ConnectWallet component', () => {
     await act(async () => {
       fireEvent.click(copyClick);
     });
-    expect(copyTextToClipboard).toHaveBeenCalledWith('commando+wss://'+ mockConnectWallet.LIGHTNING_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
+    expect(copyTextToClipboard).toHaveBeenCalledWith('commando+wss://'+ mockConnectWallet.LIGHTNING_WS_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
   });
 
   it('displays the correct form based on selected network', async () => {
@@ -116,7 +124,7 @@ describe('ConnectWallet component', () => {
     await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     
     const connectUrl = screen.getByTestId('connect-url');
-    expect(connectUrl).toHaveValue('commando+wss://'+ mockConnectWallet.LIGHTNING_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
+    expect(connectUrl).toHaveValue('commando+wss://'+ mockConnectWallet.LIGHTNING_WS_HOST + ':' + mockConnectWallet.LIGHTNING_WS_PORT + '?pubkey=' + mockConnectWallet.NODE_PUBKEY + '&rune=' + mockConnectWallet.ADMIN_RUNE + '&invoiceRune=' + mockConnectWallet.INVOICE_RUNE + '&certs=' + mockConnectWallet.LIGHTNING_WS_TLS_CERTS);
   });
 
   it('does not include invoice rune in URL when not available', async () => {
