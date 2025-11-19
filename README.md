@@ -67,12 +67,14 @@
       - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: `COMMANDO`)
 
       # Core lightning Values
-      - LIGHTNING_HOST: IP address of Core lightning node container (used for `COMMANDO` APP_CONNECT, default: `localhost`)
-      - LIGHTNING_TOR_HOST: REST hidden service url (default: ``)
+      - LIGHTNING_HOST: IP address of Core lightning node (default: `localhost`)
+      - LIGHTNING_TOR_HOST: Tor Hidden Service url (default: ``)
       - LIGHTNING_VARS_FILE: Full Path including the file name for connection auth with LIGHTNING_PUBKEY & LIGHTNING_RUNE (defult: `./.commando-env`)
 
       # CLN Commando (WS) Values
       - LIGHTNING_WS_PROTOCOL: Core lightning's web socket is serving on ws or serving via WSSProxy (valid values: ws/wss, default: `ws`)
+      - LIGHTNING_WS_HOST: Core lightning's IP address where commando can connect (default: `localhost`)
+      - LIGHTNING_WS_TOR_HOST: Core lightning's Tor address where commando can connect (default: ``)
       - LIGHTNING_WS_PORT: Core lightning's websocket port (used by `COMMANDO` APP_CONNECT; with `bind-addr=ws:`/`wss-bind-addr` in CLN config; default: `5001`)
       - LIGHTNING_WS_CLIENT_KEY_FILE: Client key file path including file name for websocket TLS authentication (used by `COMMANDO` APP_CONNECT and `wss` LIGHTNING_WS_PROTOCOL; default: `./client-key.pem`)
       - LIGHTNING_WS_CLIENT_CERT_FILE: Client certificate file path including file name for websocket TLS authentication (used by `COMMANDO` APP_CONNECT and `wss` LIGHTNING_WS_PROTOCOL; default: `./client.pem`)

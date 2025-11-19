@@ -66,6 +66,8 @@ docker run -d \
   -e LIGHTNING_HOST="cln-node" \
   -e LIGHTNING_VARS_FILE="/app/.commando" \
   -e LIGHTNING_WS_PROTOCOL="ws" \
+  -e LIGHTNING_WS_HOST="cln-node" \
+  -e LIGHTNING_WS_TOR_HOST="tor.onion" \
   -e LIGHTNING_WS_PORT=5018 \
   ghcr.io/elementsproject/cln-application:25.07.2 npm run start
 ```

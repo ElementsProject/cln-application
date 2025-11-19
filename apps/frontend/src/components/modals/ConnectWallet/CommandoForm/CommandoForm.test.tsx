@@ -51,7 +51,7 @@ describe('CommandoForm Component', () => {
   it('displays correct values for Commando network', async () => {
     await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     expect(screen.getByTestId('ws-protocol')).toHaveValue(mockConnectWallet.LIGHTNING_WS_PROTOCOL);
-    expect(screen.getByTestId('ws-host')).toHaveValue(mockConnectWallet.LIGHTNING_HOST);
+    expect(screen.getByTestId('ws-host')).toHaveValue(mockConnectWallet.LIGHTNING_WS_HOST);
     expect(screen.getByTestId('ws-port')).toHaveValue(mockConnectWallet.LIGHTNING_WS_PORT.toString());
     expect(screen.getByTestId('node-pubkey')).toHaveValue(mockConnectWallet.NODE_PUBKEY);
     expect(screen.getByTestId('rune')).toHaveValue(mockConnectWallet.ADMIN_RUNE);
@@ -68,7 +68,7 @@ describe('CommandoForm Component', () => {
     await act(async () => {
       fireEvent.click(commandoTorSelect);
     });
-    expect(screen.getByTestId('ws-host')).toHaveValue(mockConnectWallet.LIGHTNING_TOR_HOST);
+    expect(screen.getByTestId('ws-host')).toHaveValue(mockConnectWallet.LIGHTNING_WS_TOR_HOST);
   });
 
   it('copies field values to clipboard when clicked', async () => {
@@ -76,7 +76,7 @@ describe('CommandoForm Component', () => {
     await renderWithProviders(<ConnectWallet />, { preloadedState: customMockStore });
     const fieldsToTest = [
       { id: 'WS Protocol', testId: 'ws-protocol', expected: mockConnectWallet.LIGHTNING_WS_PROTOCOL },
-      { id: 'WS Host', testId: 'ws-host', expected: mockConnectWallet.LIGHTNING_HOST },
+      { id: 'WS Host', testId: 'ws-host', expected: mockConnectWallet.LIGHTNING_WS_HOST },
       { id: 'WS Port', testId: 'ws-port', expected: mockConnectWallet.LIGHTNING_WS_PORT.toString() },
       { id: 'Node Public Key', testId: 'node-pubkey', expected: mockConnectWallet.NODE_PUBKEY },
       { id: 'Rune', testId: 'rune', expected: mockConnectWallet.ADMIN_RUNE },
