@@ -26,7 +26,7 @@ const CommandoForm = ({ selNetwork }) => {
         textToCopy = connectWallet.LIGHTNING_WS_PROTOCOL || '';
         break;
       case 'WS Host':
-        textToCopy = (selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_TOR_HOST : connectWallet.LIGHTNING_HOST) || '';
+        textToCopy = (selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_WS_TOR_HOST : connectWallet.LIGHTNING_WS_HOST) || '';
         break;
       case 'WS Port':
         textToCopy = connectWallet.LIGHTNING_WS_PORT?.toString() || '';
@@ -108,8 +108,8 @@ const CommandoForm = ({ selNetwork }) => {
             <Form.Control
               onClick={copyHandler}
               id='WS Host'
-              value={selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_TOR_HOST : connectWallet.LIGHTNING_HOST}
-              aria-label={selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_TOR_HOST : connectWallet.LIGHTNING_HOST}
+              value={selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_WS_TOR_HOST : connectWallet.LIGHTNING_WS_HOST}
+              aria-label={selNetwork.includes('(Tor)') ? connectWallet.LIGHTNING_WS_TOR_HOST : connectWallet.LIGHTNING_WS_HOST}
               aria-describedby='copy-addon-host'
               className='form-control-left'
               data-testid='ws-host'
