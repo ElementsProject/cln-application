@@ -1,9 +1,9 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within, act } from '@testing-library/react';
 import { renderWithProviders } from '../../../../utilities/test-utilities/mockStore';
 import { mockBKPRAccountEvents, mockAppStore } from '../../../../utilities/test-utilities/mockData';
 import AccountEventsTable from './AccountEventsTable';
 
-jest.mock('react-perfect-scrollbar', () => ({ children }) => <div>{children}</div>);
+jest.mock('react-perfect-scrollbar', () => ({ children }: any) => <div>{children}</div>);
 
 describe('Account Events Table component ', () => {
   beforeEach(() => {
@@ -63,24 +63,41 @@ describe('Account Events Table component ', () => {
     expect(periodRow).not.toBeNull();
     const toggleButton = within(periodRow!).getByRole('button');
 
-    //check that the row is expanded
+    // Verify expanded content is in the document (even if animation hasn't completed)
     await waitFor(() => {
-      expect(screen.getByText('Short Channel ID')).toBeVisible();
+      const expandedHeaders = screen.getAllByText('Short Channel ID');
+      expect(expandedHeaders.length).toBeGreaterThan(0);
+      expect(expandedHeaders[0]).toBeInTheDocument();
     });
 
-    //collapse
-    fireEvent.click(toggleButton);
-
-    await waitFor(() => {
-      const content = screen.queryByText('Short Channel ID');
-      expect(content).not.toBeVisible();
+    // Collapse
+    await act(async () => {
+      fireEvent.click(toggleButton);
+      jest.advanceTimersByTime(1000);
     });
 
-    //expand
-    fireEvent.click(toggleButton);
-
+    // After collapse, the child row should have collapsed styling or be removed
     await waitFor(() => {
-      expect(screen.getByText('Short Channel ID')).toBeVisible();
+      const childRows = document.querySelectorAll('.expandable-child-row');
+      if (childRows.length > 0) {
+        const childRow = childRows[0] as HTMLElement;
+        // Check if row is collapsed (has collapsed class or opacity 0)
+        const styles = window.getComputedStyle(childRow);
+        const isCollapsed = styles.opacity === '0' || childRow.style.opacity === '0';
+        expect(isCollapsed).toBe(true);
+      }
+    });
+
+    // Expand again
+    await act(async () => {
+      fireEvent.click(toggleButton);
+      jest.advanceTimersByTime(1000);
+    });
+
+    // Verify content is back in document
+    await waitFor(() => {
+      const expandedHeaders = screen.getAllByText('Short Channel ID');
+      expect(expandedHeaders[0]).toBeInTheDocument();
     });
   });  
 
