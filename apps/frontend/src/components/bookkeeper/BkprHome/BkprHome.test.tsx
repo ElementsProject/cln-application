@@ -2,7 +2,6 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import Bookkeeper from './BkprHome';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockNodeInfo, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
-import { setMockedLocation } from '../../../setupTests';
 
 describe('Bookkeeper Component', () => {
   beforeEach(() => {
@@ -14,13 +13,11 @@ describe('Bookkeeper Component', () => {
   });
 
   it('should render the dashboard container', async () => {
-    setMockedLocation({ pathname: '/bookkeeper' });
     await renderWithProviders(<Bookkeeper />, { preloadedState: mockAppStore, initialRoute: ['/bookkeeper'] });
     expect(await screen.findByTestId('bookkeeper-dashboard-container')).toBeInTheDocument();
   });
 
   it('should render the subcomponents when path is /bookkeeper', async () => {
-    setMockedLocation({ pathname: '/bookkeeper' });
     await renderWithProviders(<Bookkeeper />, {
       initialRoute: ['/bookkeeper'],
       preloadedState: mockAppStore,
@@ -31,7 +28,6 @@ describe('Bookkeeper Component', () => {
   });
 
   it('should not render overview/cards if path is not /bookkeeper', async () => {
-    setMockedLocation({ pathname: '/bookkeeper/satsflow' });
     await renderWithProviders(<Bookkeeper />, { preloadedState: mockAppStore, initialRoute: ['/bookkeeper/satsflow'] });
     expect(screen.queryByTestId('account-event-info-container')).not.toBeInTheDocument();
     expect(screen.queryByTestId('satsflow-info-container')).not.toBeInTheDocument();
