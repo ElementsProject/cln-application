@@ -82,7 +82,7 @@ const VolumeGraph = () => {
   let pieColors: any[] = [];
   const RADIAN = Math.PI / 180;
 
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, data, isInner = false }) => {
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, data, isInner = false }: any) => {
     const entry = data[index];
     const radius = innerRadius + (outerRadius - innerRadius) * (isInner ? 0.5 : 1.4);
     const x = cx + radius * Math.cos(-midAngle * RADIAN);

@@ -81,7 +81,7 @@ export class AuthController {
   isUserAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const uaRes = isAuthenticated(req.cookies.token);
-      if (req.body.returnResponse) {
+      if (req.body?.returnResponse || false) {
         // Frontend is asking if user is authenticated or not
         if (APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true') {
           return res.status(201).json({ isAuthenticated: true, isValidPassword: true });
