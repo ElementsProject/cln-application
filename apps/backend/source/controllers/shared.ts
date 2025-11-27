@@ -82,7 +82,9 @@ export class SharedController {
       const FIAT_VENUE = FIAT_VENUES.hasOwnProperty(req.params.fiatCurrency)
         ? FIAT_VENUES[req.params.fiatCurrency]
         : 'COINGECKO';
-      logger.info('Fiat URL: ' + FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency);
+      logger.info(
+        'Fiat URL: ' + FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency,
+      );
       return axios
         .get(FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency)
         .then((response: any) => {
@@ -100,11 +102,11 @@ export class SharedController {
         })
         .catch(err => {
           logger.error('Fiat Error Response: ' + JSON.stringify(err));
-          res.status(200).json({ venue: "NONE", rate: "0" });
+          res.status(200).json({ venue: 'NONE', rate: '0' });
         });
     } catch (error: any) {
       logger.error('Error from Fiat Rate: ' + JSON.stringify(error));
-      res.status(200).json({ venue: "NONE", rate: "0" });
+      res.status(200).json({ venue: 'NONE', rate: '0' });
     }
   };
 
