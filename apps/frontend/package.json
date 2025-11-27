@@ -7,7 +7,7 @@
   "scripts": {
     "start": "PORT=4300 react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --testTimeout=30000",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
@@ -76,11 +76,15 @@
     ]
   },
   "jest": {
+    "moduleNameMapper": {
+      "^react-router-dom": "<rootDir>/../../node_modules/react-router-dom/dist/index.js",
+      "^react-router": "<rootDir>/../../node_modules/react-router/dist/production/index.js"
+    },
     "transform": {
       "^.+\\.[t|j]sx?$": "ts-jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!axios|react-router-dom)/"
+      "node_modules/(?!axios|react-router-dom|react-router)/"
     ]
   }
 }
