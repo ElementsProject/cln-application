@@ -108,7 +108,7 @@ git push --tags
 
 ```sh
 mkdir -p ./release
-git archive --format zip --output ./release/cln-application-${VERSION}.zip main
+git archive --format zip --prefix=cln-application-${VERSION}/ --output ./release/cln-application-${VERSION}.zip main
 cd release
 sha256sum cln* > SHA256SUMS
 gpg -sb --armor -o SHA256SUMS.asc SHA256SUMS
