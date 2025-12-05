@@ -20,6 +20,7 @@ export const rootRouteConfig = [
           <RootRouterReduxSync />
       </Suspense>
     ),
+    HydrateFallback: () => <Loading />,
     loader: rootLoader,
     children: [
       {
@@ -78,6 +79,7 @@ export function createRootRouter() {
       v7_relativeSplatPath: true,
       v7_normalizeFormMethod: true,
       v7_startTransition: true,
+      v7_partialHydration: true,
     } as any
   });
 }

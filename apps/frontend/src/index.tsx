@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
+import { Loading } from './components/ui/Loading/Loading';
 import { createRootRouter } from './routes/router.config';
 import { HttpService, RootService } from './services/http.service';
 import logger from './services/logger.service';
@@ -38,7 +39,10 @@ async function bootstrapApp() {
   const root = ReactDOM.createRoot(document.getElementById('root')!);
   root.render(
     <Provider store={appStore}>
-      <RouterProvider router={rootRouter} />
+      <RouterProvider 
+        router={rootRouter} 
+        fallbackElement={<Loading />}
+      />
     </Provider>
   );
 }
