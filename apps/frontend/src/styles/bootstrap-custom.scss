@@ -1,4 +1,4 @@
-@import 'constants';
+@use 'constants' as *;
 
 $theme-colors: (
   primary: $primary,
@@ -10,4 +10,4 @@ $theme-colors: (
   light: $light,
 );
 
-@import '~bootstrap';
+@use 'bootstrap/scss/bootstrap';

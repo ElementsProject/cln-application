@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 [data-screensize='SM'],
 [data-screensize='XS'] {

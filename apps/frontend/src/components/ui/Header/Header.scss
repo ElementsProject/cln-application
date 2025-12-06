@@ -1,5 +1,5 @@
 @use 'sass:math';
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .header {
   & .header-info-logo {

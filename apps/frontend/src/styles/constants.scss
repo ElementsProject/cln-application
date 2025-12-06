@@ -1,8 +1,10 @@
-@import './fonts.scss';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins';
+// ALL @use rules MUST come first, before anything else
+@use 'sass:color';
+@use './fonts.scss';
 @import 'react-perfect-scrollbar/dist/css/styles.css';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
 
 $transition-time: 300ms;
 $theme-transition: 500ms;
@@ -51,8 +53,8 @@ $btn-padding-x: 0.625rem;
 
 $form-check-input-checked-bg-color: $primary;
 $form-check-input-checked-border-color: $primary;
-$form-check-input-focus-border: lighten($primary, 10%);
-$form-check-input-focus-box-shadow: 0 0 0 0.25rem rgba(lighten($primary, 10%), 0.25);
+$form-check-input-focus-border: color.adjust($primary, $lightness: 10%);
+$form-check-input-focus-box-shadow: 0 0 0 0.25rem rgba(color.adjust($primary, $lightness: 10%), 0.25);
 
 $card-border-width: 0.5px;
 $card-border-color: rgba($light, 0.1);
@@ -74,6 +76,6 @@ $form-range-thumb-border: 0.5px solid $gray-300;
 $form-range-thumb-focus-box-shadow:
   0 0 0 1px $body-bg,
   $primary;
-$form-range-thumb-active-bg: tint-color($primary, 70%);
+$form-range-thumb-active-bg: color.scale($primary, $lightness: 70%);
 
 $toast-max-width: 25rem;
