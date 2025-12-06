@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .cln-transaction-placeholder {
   transform-origin: top left;

@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .satsflow-container {
   padding: 0 1rem;

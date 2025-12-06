@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .channel-scroll-container {
   max-height: 53vh;

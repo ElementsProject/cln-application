@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .menu-dropdown.dropdown {
   & .dropdown-toggle.btn-menu {

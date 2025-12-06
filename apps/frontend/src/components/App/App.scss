@@ -1,5 +1,5 @@
-@import '../../styles/bootstrap-custom';
-@import '../../styles/constants';
+@use '../../styles/constants' as *;
+@use '../../styles/bootstrap-custom' as *;
 @import '../../styles/shared';
 
 .list-scroll-container {

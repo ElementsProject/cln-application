@@ -1,4 +1,6 @@
-@import 'constants';
+@use 'sass:color';
+@use './constants' as *;
+@import 'bootstrap/scss/mixins';
 
 @include color-mode(dark) {
   .text-light {
