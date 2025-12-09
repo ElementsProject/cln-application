@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/constants' as *;
 
 .btc-transaction-placeholder {
@@ -13,7 +14,7 @@
     cursor: pointer;
     &:hover {
       svg path {
-        stroke: darken($primary, 10%);
+        stroke: color.adjust($primary, $lightness: -10%);
       }
     }
   }
@@ -24,7 +25,7 @@
     cursor: pointer;
     &:hover {
       svg path {
-        fill: darken($primary, 10%);
+        fill: color.adjust($primary, $lightness: -10%);
       }
     }
   }

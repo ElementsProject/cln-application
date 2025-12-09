@@ -1,6 +1,7 @@
 @use '../../../styles/constants' as *;
 
 .menu-dropdown.dropdown {
+  text-decoration: none;  
   & .dropdown-toggle.btn-menu {
     background-color: $primary;
     width: 8rem;
