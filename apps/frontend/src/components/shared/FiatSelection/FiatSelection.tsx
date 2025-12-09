@@ -45,14 +45,14 @@ const FiatSelection = (props) => {
           <div className='fiat-dropdown-scroller fs-7'>
           {FIAT_CURRENCIES.map((fiat, i) => 
             <Dropdown.Item className='d-flex justify-content-between align-items-center' as='div' eventKey={fiat.currency} key={i}>
-              <Col xs={4}>
+              <Col xs={3}>
                 { fiat.symbol ? 
                   <FontAwesomeIcon className='fa-md' icon={fiat.symbol} />
                   :
                   <CurrencySVG className='svg-currency' fiat={fiat.currency || 'USD'}></CurrencySVG>
                 }
               </Col>
-              <Col xs={6}>
+              <Col xs={7}>
                 <span>{fiat.currency}</span>
               </Col>
             </Dropdown.Item>
