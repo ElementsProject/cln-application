@@ -19,7 +19,7 @@ const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Blockheight
           </Col>
-          <Col xs={12} className="fs-7 overflow-x-ellipsis">
+          <Col xs={12} className="fs-7 text-dark overflow-x-ellipsis">
             {transaction.blockheight}
           </Col>
         </Row>
@@ -31,7 +31,7 @@ const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Description
           </Col>
-          <Col xs={12} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={12} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {transaction.description}
           </Col>
         </Row>
@@ -43,7 +43,7 @@ const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Transaction ID
           </Col>
-          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={10} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {transaction.txid}
           </Col>
           <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Transaction ID">
@@ -61,7 +61,7 @@ const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Payment ID
           </Col>
-          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={10} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {transaction.payment_id}
           </Col>
           <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Payment ID">
@@ -79,7 +79,7 @@ const TransactionDetail = ({ transaction, copyHandler, openLinkHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Outpoint
           </Col>
-          <Col xs={10} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={10} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {transaction.outpoint}
           </Col>
           <Col xs={1} onClick={copyHandler} className="btc-transaction-copy" id="Outpoint">

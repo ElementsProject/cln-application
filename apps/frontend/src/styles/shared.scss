@@ -341,7 +341,7 @@ button.btn-rounded {
 
 svg {
   & circle,
-  & path:not(.path-settings),
+  & path,
   & line,
   & defs > linearGradient > stop {
     transition:
@@ -421,24 +421,6 @@ svg {
     &:focus {
       box-shadow: 0 0 0 0.2rem rgba($success, 0.25);
     }
-  }
-}
-
-.card {
-  transition:
-    background-color $theme-transition ease,
-    box-shadow $theme-transition ease;
-  border: none;
-  & .card-header {
-    transition: all $theme-transition ease;
-    border-bottom: none;
-  }
-  & .card-body {
-    transition: all $theme-transition ease;
-  }
-  & .card-footer {
-    transition: all $theme-transition ease;
-    border-top: none;
   }
 }
 
@@ -681,11 +663,18 @@ label.form-label {
   }
 }
 
-.wallet-card {
+.card.wallet-card {
   border-top-left-radius: $border-radius;
   border-top-right-radius: $border-radius;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  border: none;
+}
+
+.card.overview-balance-card {
+  padding-left: 0.5rem !important;
+  background-color: $primary;
+  flex-grow: 1 !important;
 }
 
 .information-svg {

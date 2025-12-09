@@ -17,7 +17,7 @@ const OfferDetail = ({ offer, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Bolt 12
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {offer.bolt12}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-offer-copy" id="Bolt12">

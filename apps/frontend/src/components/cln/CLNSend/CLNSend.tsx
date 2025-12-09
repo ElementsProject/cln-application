@@ -287,7 +287,7 @@ const CLNSend = (props) => {
                     <Row>
                       <Col
                         xs={8}
-                        className="d-flex align-items-start justify-content-start overflow-x-ellipsis"
+                        className="d-flex align-items-start justify-content-start text-dark overflow-x-ellipsis"
                       >
                         {decodeResponse.description}
                       </Col>

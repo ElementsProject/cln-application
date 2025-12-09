@@ -8,6 +8,7 @@ import { convertArrayToAccountEventsObj, convertArrayToSatsFlowObj, convertArray
 import { defaultRootState } from '../store/rootSelectors';
 import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
+import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -97,7 +98,7 @@ export class HttpService {
     }
   }
 
-  static async clnCall(method: string, params: Record<string, any> = {}) {
+  static async clnCall<T>(method: string, params: Record<string, any> = {}): Promise<T> {
     try {
       return await this.post('/cln/call', { method, params });
     } catch (error) {
@@ -335,7 +336,7 @@ export class CLNService {
 export class BookkeeperService {
   static async getAccountEvents() {
     try {
-      const accountEvents = await HttpService.clnCall('sql', [AccountEventsSQL]);
+      const accountEvents = await HttpService.clnCall('sql', [AccountEventsSQL]) as { events: AccountEventsAccount[], rows?: [], error?: any };
       if (accountEvents.rows) {
         accountEvents.events = convertArrayToAccountEventsObj(accountEvents.rows);
         delete accountEvents.rows;
@@ -349,7 +350,7 @@ export class BookkeeperService {
 
   static async getSatsFlow(startTimestamp: number, endTimestamp: number) {
     try {
-      const satsFlow = await HttpService.clnCall('sql', [SatsFlowSQL(startTimestamp, endTimestamp)]);
+      const satsFlow = await HttpService.clnCall('sql', [SatsFlowSQL(startTimestamp, endTimestamp)]) as { satsFlowEvents: SatsFlowEvent[], rows?: [], error?: any };
       if (satsFlow.rows) {
         satsFlow.satsFlowEvents = convertArrayToSatsFlowObj(satsFlow.rows);
         delete satsFlow.rows;
@@ -363,7 +364,7 @@ export class BookkeeperService {
 
   static async getVolume() {
     try {
-      const volume = await HttpService.clnCall('sql', [VolumeSQL]);
+      const volume = await HttpService.clnCall('sql', [VolumeSQL]) as { forwards: VolumeRow[], rows?: [], error?: any };
       if (volume.rows) {
         volume.forwards = convertArrayToVolumeObj(volume.rows);
         delete volume.rows;

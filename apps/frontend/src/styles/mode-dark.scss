@@ -31,17 +31,32 @@
   }
 
   .card {
+    color: $text-dark;
     background-color: $card-bg-dark;
-    box-shadow: none;
+    border: none;
+    transition:
+      background-color $theme-transition ease,
+      box-shadow $theme-transition ease;
     &.bg-primary {
       color: $text-dark;
     }
     & .card-header {
       background-color: $card-bg-dark;
+      transition: all $theme-transition ease;
+      border-bottom: none;
+    }
+    & .card-body {
+      transition: all $theme-transition ease;
     }
     & .card-footer {
       background-color: $card-bg-dark;
+      transition: all $theme-transition ease;
+      border-top: none;
     }
+  }
+
+  .inner-box-shadow {
+    box-shadow: 1px 1px 2px 2px rgba($light-dark, 0.20);
   }
 
   .list-group-item,
@@ -96,6 +111,10 @@
 
   .stroke-white-primary {
     stroke: $primary;
+  }
+
+  .card.overview-balance-card {
+    box-shadow: 1px 1px 2px 2px rgba($light-dark, 0.20);
   }
 
   span.span-close-svg {

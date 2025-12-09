@@ -55,7 +55,7 @@ const SQLTerminal = () => {
   const handleExecute = useCallback(async () => {
     const formattedQuery = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
     try {
-      const result = await RootService.executeSql(formattedQuery);
+      const result: any = await RootService.executeSql(formattedQuery);
       setOutput(JSON.stringify(result.rows, null, 2) + '\n\n');
       setOutput(formattedQuery + '\n' + JSON.stringify(result.rows, null, 2) + '\n\n');
     } catch (error: any) {

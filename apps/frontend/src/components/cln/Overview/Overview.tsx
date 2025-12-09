@@ -50,7 +50,7 @@ const Overview = () => {
   return (
     <Row className='mx-1 align-items-stretch'>
       <Col xs={12} lg={3} className='d-lg-flex d-xl-flex mb-4'>
-        <Card className='ps-2 bg-primary flex-grow-1 inner-box-shadow' data-testid='overview-balance-card'>
+        <Card className='card overview-balance-card' data-testid='overview-balance-card'>
           <Card.Body className='d-flex align-items-center'>
             <Row className='flex-fill'>
               <Col xs={6} lg={8} xxl={6} data-testid='overview-total-balance-col'>
