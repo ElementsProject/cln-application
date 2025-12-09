@@ -3,6 +3,14 @@
 
 .channels-scroll-container {
   overflow: hidden;
+  & .scrollbar-container.ps.ps--active-y .list-channels {
+    & .list-item-channel {
+      margin-right: 0.5rem;
+      & .list-item-div {
+        padding-right: 0.5rem;
+      }
+    }
+  }
   & .list-channels {
     transition: background-color $theme-transition ease;
     & .list-item-channel {

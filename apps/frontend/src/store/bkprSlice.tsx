@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TimeGranularity } from '../utilities/constants';
-import { AccountEvents, SatsFlow, VolumeData } from '../types/bookkeeper.type';
+import { AccountEvents, SatsFlowEvent, VolumeData } from '../types/bookkeeper.type';
 import { transformAccountEventsByPeriods, transformSatsFlowByPeriods, transformVolumeData } from '../services/data-transform.service';
 import { defaultBKPRState } from './bkprSelectors';
 
@@ -35,7 +35,7 @@ const bkprSlice = createSlice({
     setSatsFlow: (
       state,
       action: PayloadAction<{
-        satsFlow: SatsFlow;
+        satsFlow: { satsFlowEvents: SatsFlowEvent[], error?: any };
         timeGranularity: TimeGranularity;
         startTimestamp: number;
         endTimestamp: number;

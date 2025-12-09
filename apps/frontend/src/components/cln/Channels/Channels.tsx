@@ -19,7 +19,7 @@ const Channels = (props) => {
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
-      <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
+      <Card.Header className='px-1 pb-2 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
         { isAuthenticated && listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
@@ -39,7 +39,7 @@ const Channels = (props) => {
                       variants={props.newlyOpenedChannelId === channel.channel_id ? STAGERRED_SPRING_VARIANTS_3 : {}} initial='hidden' animate='visible' exit='hidden' custom={0}
                       onClick={() => (props.onChannelClick(channel))}
                     >
-                      <div className='flex-fill text-dark'>
+                      <div className='list-item-div flex-fill text-dark'>
                         <>
                           <div className='fw-bold'>
                             <OverlayTrigger

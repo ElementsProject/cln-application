@@ -29,7 +29,7 @@ const WithdrawHeader = ({ withdraw }) => {
       <Col xs={10}>
         <Row className="d-flex justify-content-between align-items-center">
           <Col xs={7} className="ps-2 d-flex align-items-center">
-            <span className="text-dark fw-bold overflow-x-ellipsis">{titleCase(withdraw.tag)}</span>
+            <span className="text-dark fw-bold text-dark overflow-x-ellipsis">{titleCase(withdraw.tag)}</span>
           </Col>
           <Col
             xs={5}
@@ -82,7 +82,7 @@ const DepositHeader = ({ deposit }) => {
       <Col xs={10}>
         <Row className="d-flex justify-content-between align-items-center">
           <Col xs={7} className="ps-2 d-flex align-items-center">
-            <span className="text-dark fw-bold overflow-x-ellipsis">{titleCase(deposit.tag)}</span>
+            <span className="text-dark fw-bold text-dark overflow-x-ellipsis">{titleCase(deposit.tag)}</span>
           </Col>
           <Col
             xs={5}

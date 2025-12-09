@@ -25,7 +25,6 @@
 
 @include color-mode(light) {
   .settings-menu.dropdown {
-    margin-left: 0.5rem;
     & .dropdown-toggle.btn-settings-menu {
       color: $white;
       & svg path {
