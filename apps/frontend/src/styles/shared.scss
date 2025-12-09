@@ -1,5 +1,8 @@
+@use 'sass:color';
+@import './constants';
 @import './mode-dark.scss';
 @import './mode-light.scss';
+@import 'bootstrap/scss/mixins';
 @import 'react-perfect-scrollbar/dist/css/styles.css';
 @import 'react-datepicker/dist/react-datepicker.css';
 
@@ -135,6 +138,7 @@ a {
 }
 
 .btn.btn-primary {
+  background-color: $primary;
   transition: color $theme-transition ease;
   color: var(--bs-body-color);
   font-weight: 600;
@@ -148,8 +152,8 @@ a {
   &:hover,
   &:focus-visible {
     outline: none;
-    background-color: darken($primary, 8%);
-    border-color: darken($primary, 8%);
+    background-color: color.adjust($primary, $lightness: -8%);
+    border-color: color.adjust($primary, $lightness: -8%);
   }
 }
 
@@ -165,7 +169,7 @@ a {
   &:focus-visible {
     outline: none;
     transform: scale(1.01);
-    color: darken($primary, 10%);
+    color: color.adjust($primary, $lightness: -10%);
   }
 
 }
@@ -210,8 +214,8 @@ button.btn-rounded {
     &:hover,
     &:focus-visible {
       outline: none;
-      background-color: darken($primary, 8%) !important;
-      border-color: darken($primary, 8%) !important;
+      background-color: color.adjust($primary, $lightness: -8%) !important;
+      border-color: color.adjust($primary, $lightness: -8%) !important;
     }
   }
   &.btn-primary,
@@ -219,8 +223,8 @@ button.btn-rounded {
     &:hover,
     &:focus-visible {
       outline: none;
-      background-color: darken($primary, 8%) !important;
-      border-color: darken($primary, 8%) !important;
+      background-color: color.adjust($primary, $lightness: -8%) !important;
+      border-color: color.adjust($primary, $lightness: -8%) !important;
     }
   }
   &:disabled {
@@ -359,18 +363,23 @@ svg {
     display: inline-flex;
     &.fa-xl {
       height: 1.25rem;
+      width: 1.25rem;
     }
     &.fa-lg {
       height: 1rem;
+      width: 1rem;
     }
     &.fa-md {
       height: 0.75rem;
+      width: 0.75rem;
     }
     &.fa-sm {
       height: 0.5rem;
+      width: 0.5rem;
     }
     &.fa-xs {
       height: 0.25rem;
+      width: 0.25rem;
     }
   }
 }
@@ -389,7 +398,7 @@ svg {
   border-radius: 1.25rem;
   padding: 0.25rem;
   background-color: $white;
-  border: 1px solid lighten($light, 20%);
+  border: 1px solid  color.adjust($light, $lightness: 20%);
 
   & .handle {
     background-color: $light;
@@ -405,7 +414,7 @@ svg {
   &[data-isswitchon='true'] {
     justify-content: flex-end;
     background-color: $success;
-    border: 1px solid lighten($success, 20%);
+    border: 1px solid color.adjust($success, $lightness: 20%);
     & .handle {
       background-color: $white;
     }
@@ -421,12 +430,14 @@ svg {
     box-shadow $theme-transition ease;
   border: none;
   & .card-header {
+    transition: all $theme-transition ease;
     border-bottom: none;
   }
   & .card-body {
-    transition: color $theme-transition ease;
+    transition: all $theme-transition ease;
   }
   & .card-footer {
+    transition: all $theme-transition ease;
     border-top: none;
   }
 }
@@ -463,6 +474,10 @@ svg {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.ps > .ps__rail-y {
+  transition: background-color $theme-transition ease;
 }
 
 .ps.ps--active-y > .ps__rail-y {
@@ -571,10 +586,10 @@ label.form-label {
       }
       &:hover {
         svg path {
-          stroke: darken($primary, 10%);
+          stroke: color.adjust($primary, $lightness: -10%);
           &.svg-add {
             stroke: none;
-            fill: darken($primary, 10%);
+            fill: color.adjust($primary, $lightness: -10%);
           }
         }
       }
@@ -586,7 +601,7 @@ label.form-label {
         }
         &:hover {
           & path {
-            fill: darken($primary, 10%);
+            fill: color.adjust($primary, $lightness: -10%);
           }
         }
       }

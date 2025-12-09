@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/constants' as *;
 
 .toast-container {
@@ -26,7 +27,7 @@
       }
       &:hover {
         & svg path {
-          stroke: darken($light, 15%);
+          stroke: color.adjust($light, $lightness: -15%);
         }
       }
     }
@@ -74,7 +75,7 @@
     span.btn-toast-close {
       &:hover {
         & svg path {
-          stroke: lighten($light-dark, 15%);
+          stroke: color.adjust($light-dark, $lightness: 15%);
         }
       }
     }

@@ -1,5 +1,4 @@
 @use 'sass:color';
-@use './constants' as *;
 @import 'bootstrap/scss/mixins';
 
 @include color-mode(dark) {
@@ -36,6 +35,12 @@
     box-shadow: none;
     &.bg-primary {
       color: $text-dark;
+    }
+    & .card-header {
+      background-color: $card-bg-dark;
+    }
+    & .card-footer {
+      background-color: $card-bg-dark;
     }
   }
 
@@ -102,7 +107,7 @@
     &:hover, &:focus-visible {
       outline: none;
       & svg path {
-        stroke: lighten($light-dark, 15%);
+        stroke:  color.adjust($light-dark, $lightness: 15%);
       }
     }
   }
@@ -207,7 +212,7 @@
   }
 
   .switch {
-    border: 1px solid lighten($white, 20%);
+    border: 1px solid  color.adjust($white, $lightness: 20%);
 
     & .handle {
       background-color: $dark;
@@ -218,7 +223,7 @@
     }
 
     &[data-isswitchon='true'] {
-      border: 1px solid darken($success, 10%);
+      border: 1px solid color.adjust($success, $lightness: -20%);;
     }
   }
 
@@ -277,6 +282,10 @@
         }
       }
     }
+  }
+
+  .modal-content {
+    background-color: $card-bg-dark;
   }
 
   .ps.ps--active-y > .ps__rail-y {

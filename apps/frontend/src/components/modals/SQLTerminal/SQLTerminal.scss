@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/constants' as *;
 
 .terminal-container {
@@ -40,10 +41,10 @@
   &:focus-visible {
     outline: none;
     svg path {
-      stroke: darken($primary, 10%);
+      stroke: color.adjust($primary, $lightness: -10%);
       &.svg-add {
         stroke: none;
-        fill: darken($primary, 10%);
+        fill: color.adjust($primary, $lightness: -10%);
       }
     }
   }
