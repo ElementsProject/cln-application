@@ -1,4 +1,4 @@
-export const ListPeerChannelsSQL = "SELECT n.alias, n.color, pc.* FROM peerchannels pc LEFT JOIN nodes n ON pc.peer_id = n.nodeid;";
+export const ListPeerChannelsSQL = "SELECT n.alias as node_alias, pc.peer_id, pc.channel_id, pc.short_channel_id, pc.state, pc.peer_connected, pc.to_us_msat, pc.total_msat, pc.their_to_self_delay, pc.opener, pc.private, pc.dust_limit_msat, pc.spendable_msat, pc.receivable_msat, pc.funding_txid FROM peerchannels pc LEFT JOIN nodes n ON pc.peer_id = n.nodeid;";
 
 export const listBTCTransactionsSQL = (offset) => "WITH unique_timestamps AS (SELECT DISTINCT timestamp FROM bkpr_accountevents WHERE account = 'wallet' AND (tag = 'deposit' OR tag = 'withdrawal') ORDER BY timestamp LIMIT 10 OFFSET " + offset + ") SELECT e.tag, e.blockheight, e.timestamp, e.credit_msat, e.debit_msat, e.outpoint, e.txid FROM bkpr_accountevents e INNER JOIN unique_timestamps ut ON e.timestamp = ut.timestamp WHERE e.account = 'wallet' AND (e.tag = 'deposit' OR e.tag = 'withdrawal') ORDER BY e.timestamp DESC;";
 

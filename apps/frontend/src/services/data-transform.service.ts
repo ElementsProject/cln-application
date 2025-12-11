@@ -10,6 +10,7 @@ import {
   BkprSummaryInfo,
   SummaryRoute,
 } from '../types/bookkeeper.type';
+import { PeerChannel } from '../types/root.type';
 import { getPeriodKey, getTimestampFromPeriodKey, getTimestampWithGranularity, secondsForTimeGranularity, TimeGranularity } from '../utilities/constants';
 
 export function calculateAllPeriodKeys(
@@ -358,8 +359,8 @@ const mapToAccountEventsAccounts = (row: (string | null | number)[]): AccountEve
   balance_msat: 0 as number,
 });
 
-export const convertArrayToAccountEventsObj = (raw: any[]): AccountEventsAccount[] => {
-  return raw.map(mapToAccountEventsAccounts).sort((a, b) => a.timestamp - b.timestamp);
+export const convertArrayToAccountEventsObj = (row: any[]): AccountEventsAccount[] => {
+  return row.map(mapToAccountEventsAccounts).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 const mapToSatsFlowEvents = (row: (string | number)[]): SatsFlowEvent => ({
@@ -375,8 +376,8 @@ const mapToSatsFlowEvents = (row: (string | number)[]): SatsFlowEvent => ({
   payment_id: row[9] as string,
 });
 
-export const convertArrayToSatsFlowObj = (raw: any[]): SatsFlowEvent[] => {
-  return raw.map(mapToSatsFlowEvents).sort((a, b) => a.timestamp - b.timestamp);
+export const convertArrayToSatsFlowObj = (row: any[]): SatsFlowEvent[] => {
+  return row.map(mapToSatsFlowEvents).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 const mapToVolume = (row: (string | number)[]): VolumeRow => ({
@@ -391,6 +392,32 @@ const mapToVolume = (row: (string | number)[]): VolumeRow => ({
   fee_msat: row[8] as number,
 });
 
-export const convertArrayToVolumeObj = (raw: any[]): VolumeRow[] => {
-  return raw.map(mapToVolume).sort((a, b) => a.fee_msat - b.fee_msat);
+export const convertArrayToVolumeObj = (row: any[]): VolumeRow[] => {
+  return row.map(mapToVolume).sort((a, b) => a.fee_msat - b.fee_msat);
+};
+
+export const convertArrayToPeerChannelsObj = (rows: any[]): PeerChannel[] => {
+  const channels = rows.map((row: any[]) => ({
+    node_alias: row[0],
+    peer_id: row[1],
+    channel_id: row[2],
+    short_channel_id: row[3],
+    state: row[4],
+    peer_connected: row[5],
+    to_us_msat: row[6],
+    total_msat: row[7],
+    their_to_self_delay: row[8],
+    opener: row[9],
+    private: row[10],
+    dust_limit_msat: row[11],
+    spendable_msat: row[12],
+    receivable_msat: row[13],
+    funding_txid: row[14],
+    current_state: '',
+    total_sat: Math.floor((row[7] || 0) / 1000),
+    to_us_sat: Math.floor((row[6] || 0) / 1000),
+    to_them_sat: Math.floor(((row[7] || 0) - (row[6] || 0)) / 1000)
+  }));
+  
+  return channels;
 };
