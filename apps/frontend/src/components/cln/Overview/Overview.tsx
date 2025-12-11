@@ -25,7 +25,7 @@ const Overview = () => {
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (listChannels.activeChannels?.length > 0 && countChannels.prev === 0) {
+    if (listChannels.activeChannels?.length > 0 && (countChannels.prev === 0 || countChannels.prev === undefined)) {
       countChannels.current = 0;
       countChannels.prev = 0;
       const animationChannels = animate(countChannels, listChannels.activeChannels?.length, { duration: COUNTUP_DURATION });
@@ -38,11 +38,14 @@ const Overview = () => {
   }, [listChannels.activeChannels, countChannels]);
 
   useEffect(() => {
-    if (listPeers.peers && listPeers.peers.length && listPeers.peers.length > 0
-      && countPeers.prev === 0) {
+    if (listPeers.peers && listPeers.peers.length && listPeers.peers.length > 0 && (countPeers.prev === 0 || countPeers.prev === undefined)) {
       countPeers.current = 0;
       countPeers.prev = 0;
       const animationPeers = animate(countPeers, listPeers.peers.length, { duration: COUNTUP_DURATION });
+      return animationPeers.stop;
+    } else {
+      countPeers.current = listPeers.peers?.length;
+      const animationPeers = animate(countPeers, listPeers.peers?.length, { duration: COUNTUP_DURATION });
       return animationPeers.stop;
     }
   }, [listPeers.peers, countPeers]);
