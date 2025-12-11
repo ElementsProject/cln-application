@@ -4,11 +4,12 @@ import { ApplicationConfiguration, AuthResponse } from '../types/root.type';
 import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT } from '../utilities/constants';
 import { AccountEventsSQL, SatsFlowSQL, VolumeSQL } from '../utilities/bookkeeper-sql';
 import logger from './logger.service';
-import { convertArrayToAccountEventsObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
+import { convertArrayToAccountEventsObj, convertArrayToPeerChannelsObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
 import { defaultRootState } from '../store/rootSelectors';
 import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
 import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
+import { ListPeerChannelsSQL } from '../utilities/cln-sql';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -171,7 +172,7 @@ export class RootService {
   }
 
   static async listChannels() {
-    return HttpService.clnCall('listpeerchannels');
+    return HttpService.clnCall('sql', { query: ListPeerChannelsSQL });
   }
 
   static async listNodes() {
@@ -218,9 +219,10 @@ export class RootService {
       listPeers: this.listPeers(),
       listFunds: this.listFunds(),
     });
+    console.warn(results);
     return {
       nodeInfo: nodeResult.nodeInfo,
-      listChannels: results.listChannels,
+      listChannels: { ...results.listChannels, channels: convertArrayToPeerChannelsObj(results.listChannels.rows) },
       listNodes: results.listNodes,
       listPeers: results.listPeers,
       listFunds: results.listFunds,
