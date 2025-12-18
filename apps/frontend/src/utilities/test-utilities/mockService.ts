@@ -18,10 +18,6 @@ export const spyOnGetInfo = () => (
   jest.spyOn(RootService, 'getNodeInfo').mockImplementation(async () => mockNodeInfo)
 );
 
-export const spyOnListNodes = () => (
-  jest.spyOn(RootService, 'listNodes').mockImplementation(async () => {})
-);
-
 export const spyOnListChannels = () => (
   jest.spyOn(RootService, 'listChannels').mockImplementation(async () => mockListChannels)
 );

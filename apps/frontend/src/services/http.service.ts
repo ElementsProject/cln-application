@@ -175,10 +175,6 @@ export class RootService {
     return HttpService.clnCall('sql', { query: ListPeerChannelsSQL });
   }
 
-  static async listNodes() {
-    return HttpService.clnCall('listnodes');
-  }
-
   static async listPeers() {
     return HttpService.clnCall('listpeers');
   }
@@ -215,15 +211,12 @@ export class RootService {
     });
     const results = await executeRequests({
       listChannels: this.listChannels(),
-      listNodes: this.listNodes(),
       listPeers: this.listPeers(),
       listFunds: this.listFunds(),
     });
-    console.warn(results);
     return {
       nodeInfo: nodeResult.nodeInfo,
       listChannels: { ...results.listChannels, channels: convertArrayToPeerChannelsObj(results.listChannels.rows) },
-      listNodes: results.listNodes,
       listPeers: results.listPeers,
       listFunds: results.listFunds,
     };
