@@ -27,11 +27,8 @@ export function RootRouterReduxSync() {
       if (rootData.nodeInfo) {
         dispatch(setNodeInfo(rootData.nodeInfo));
       }
-      if (rootData.listChannels && rootData.listNodes) {
-        dispatch(setListChannels({
-          listChannels: rootData.listChannels,
-          listNodes: rootData.listNodes
-        }));
+      if (rootData.listChannels) {
+        dispatch(setListChannels(rootData.listChannels));
       }
       if (rootData.listPeers) {
         dispatch(setListPeers(rootData.listPeers));
@@ -54,7 +51,7 @@ export function RootRouterReduxSync() {
         try {
           const rootData = await RootService.fetchRootData();
           dispatch(setNodeInfo(rootData?.nodeInfo));
-          dispatch(setListChannels({listChannels: rootData?.listChannels, listNodes: rootData?.listNodes}));
+          dispatch(setListChannels(rootData?.listChannels));
           dispatch(setListPeers(rootData?.listPeers));
           dispatch(setListFunds(rootData?.listFunds));
         } catch (error) {

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { spyOnBKPRGetAccountEvents, spyOnBKPRGetSatsFlow, spyOnBKPRGetVolume, spyOnGetInfo, spyOnListChannels, spyOnListFunds, spyOnListNodes, spyOnListPeers } from './utilities/test-utilities/mockService';
+import { spyOnBKPRGetAccountEvents, spyOnBKPRGetSatsFlow, spyOnBKPRGetVolume, spyOnGetInfo, spyOnListChannels, spyOnListFunds, spyOnListPeers } from './utilities/test-utilities/mockService';
 
 import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
@@ -19,7 +19,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.useFakeTimers();
   spyOnGetInfo();
-  spyOnListNodes();
   spyOnListChannels();
   spyOnListPeers();
   spyOnListFunds();

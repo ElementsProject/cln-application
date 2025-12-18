@@ -6,7 +6,6 @@ export interface RootLoaderData {
   fiatConfig: FiatConfig;
   nodeInfo: NodeInfo;
   listChannels: ListPeerChannels;
-  listNodes: ListNodes;
   listPeers: ListPeers;
   listFunds: Fund;
   connectWallet: WalletConnect;
@@ -310,24 +309,5 @@ export type Fund = {
   isLoading: boolean;
   channels?: FundChannel[];
   outputs?: FundOutput[];
-  error?: any;
-};
-
-/**
- * Node from ListNodes.
- */
-export type Node = {
-  nodeid: string;
-  last_timestamp?: number;
-  alias?: string;
-  color?: string;
-  features?: string[];
-  addresses?: Address[];
-  option_will_fund?: LiquidityAd;
-};
-
-export type ListNodes = {
-  isLoading: boolean;
-  nodes: Node[];
   error?: any;
 };
