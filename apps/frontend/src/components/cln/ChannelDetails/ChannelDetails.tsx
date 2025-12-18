@@ -16,6 +16,7 @@ import { CLNService } from '../../../services/http.service';
 import { setShowToast } from '../../../store/rootSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectNodeInfo, selectShowToast, selectUIConfigUnit } from '../../../store/rootSelectors';
+import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 
 const ChannelDetails = (props) => {
   const dispatch = useDispatch();
@@ -128,10 +129,10 @@ const ChannelDetails = (props) => {
                   </ProgressBar>
                   <Row className='text-light d-flex align-items-end justify-content-between'>
                     <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                      {formatCurrency(props.selChannel.to_us_sat, Units.SATS, uiConfigUnit, false, 5, 'string')} {uiConfigUnit}
+                      <CurrencyBox value={props.selChannel.to_us_sat} shorten={false} rootClasses='d-inline-flex flex-row' currencyClasses='fs-7' unitClasses='ms-1 fs-7'></CurrencyBox>
                     </Col>
                     <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                      {formatCurrency(props.selChannel.to_them_sat, Units.SATS, uiConfigUnit, false, 5, 'string')} {uiConfigUnit}
+                      <CurrencyBox value={props.selChannel.to_them_sat} shorten={false} rootClasses='d-inline-flex flex-row' currencyClasses='fs-7' unitClasses='ms-1 fs-7'></CurrencyBox>
                     </Col>
                   </Row>
                 </Col>
