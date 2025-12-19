@@ -9,7 +9,7 @@ import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
 import DateBox from '../../shared/DateBox/DateBox';
 import FiatBox from '../../shared/FiatBox/FiatBox';
 import Transaction from '../CLNTransaction/CLNTransaction';
-import { TRANSITION_DURATION, Units, TODAY, SCROLL_BATCH_SIZE, SCROLL_THRESHOLD } from '../../../utilities/constants';
+import { TRANSITION_DURATION, Units, TODAY, SCROLL_PAGE_SIZE, SCROLL_THRESHOLD } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
 import { useSelector } from 'react-redux';
@@ -226,10 +226,9 @@ export const CLNTransactionsList = () => {
 
   useEffect(() => {
     if (listLightningTransactions?.clnTransactions?.length > 0) {
-      const initialBatch = listLightningTransactions.clnTransactions.slice(0, SCROLL_BATCH_SIZE);
-      setDisplayedTransactions(initialBatch);
-      setCurrentIndex(SCROLL_BATCH_SIZE);
-      if (SCROLL_BATCH_SIZE >= listLightningTransactions.clnTransactions.length) {
+      setDisplayedTransactions(listLightningTransactions.clnTransactions);
+      setCurrentIndex(SCROLL_PAGE_SIZE);
+      if (SCROLL_PAGE_SIZE >= listLightningTransactions.clnTransactions.length) {
         setAllTransactionsLoaded(true);
       }
     }
@@ -239,7 +238,7 @@ export const CLNTransactionsList = () => {
     if (isLoading || allTransactionsLoaded) return;
     setIsLoading(true);
     setTimeout(() => {
-      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
+      const nextIndex = currentIndex + SCROLL_PAGE_SIZE;
       const newTransactions = listLightningTransactions.clnTransactions.slice(
         currentIndex,
         nextIndex

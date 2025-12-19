@@ -1,23 +1,20 @@
 export interface CLNLoaderData {
-  listInvoices: ListInvoices;
-  listSendPays: ListPayments;
+  listLightningTransactions: ListLightningTransactions;
   listOffers: ListOffers;
-  listAccountEvents: AccountEvents;
+  listBitcoinTransactions: ListBitcoinTransactions;
   feeRates: NodeFeeRate;
 }
 
 export type CLNState = {
-  listInvoices: ListInvoices;
-  listPayments: ListPayments;
+  listLightningTransactions: ListLightningTransactions;
   listOffers: ListOffers;
-  listLightningTransactions: any;
-  listBitcoinTransactions: any;
+  listBitcoinTransactions: ListBitcoinTransactions;
   feeRate: NodeFeeRate;
 };
 
 export type AccountEvents = {
   isLoading: boolean;
-  events: BkprTransaction[];
+  events: BTCTransaction[];
   error?: any;
 }
 export type Invoice = {
@@ -42,12 +39,6 @@ export type Invoice = {
   // For backward compatibility: End
 };
 
-export type ListInvoices = {
-  isLoading: boolean;
-  invoices?: Invoice[];
-  error?: any;
-};
-
 export type Payment = {
   is_group: boolean;
   is_expanded: boolean;
@@ -66,16 +57,11 @@ export type Payment = {
   bolt12?: string;
   payment_preimage?: string;
   erroronion?: string;
+  mpps?: any[];
   // For backward compatibility: Start
   msatoshi?: number;
   msatoshi_sent?: number;
   // For backward compatibility: End
-};
-
-export type ListPayments = {
-  isLoading: boolean;
-  payments?: Payment[];
-  error?: any;
 };
 
 export type LightningTransaction = {
@@ -88,20 +74,29 @@ export type LightningTransaction = {
   description?: string;
   bolt12?: string;
   payment_preimage?: string;
-  // Payment
+  created_index?: number;
+  updated_index?: number;
+  amount_msat?: number;
+  // Payment specific
   created_at?: number;
   destination?: string;
-  // Invoice
-  created_index?: number;
+  groupid?: number;
+  partid?: number;
+  amount_sent_msat?: number;
+  completed_at?: number;
+  // Invoice specific
   expires_at?: number;
   paid_at?: number;
-  amount_msat?: number;
   amount_received_msat?: number;
+  pay_index?: number;
+  local_offer_id?: string;
+  paid_outpoint_txid?: string;
+  paid_outpoint_outnum?: number;
 };
 
 export type ListLightningTransactions = {
   isLoading: boolean;
-  clnTransactions?: LightningTransaction[];
+  clnTransactions: LightningTransaction[];
   error?: any;
 };
 
@@ -156,7 +151,7 @@ export type btcWithdraw = {
   description?: string;
 };
 
-export type BkprTransaction = {
+export type BTCTransaction = {
   account: string;
   type?: string; // 'onchain_fee', 'chain', 'channel'
   credit_msat?: string | number;
@@ -177,7 +172,7 @@ export type BkprTransaction = {
 
 export type ListBitcoinTransactions = {
   isLoading: boolean;
-  btcTransactions?: BkprTransaction[];
+  btcTransactions: BTCTransaction[];
   error?: any;
 };
 
@@ -226,7 +221,6 @@ export type Offer = {
   single_use?: boolean;
   used?: boolean;
   label?: string;
-  valid?: boolean;
 };
 
 export type ListOffers = {

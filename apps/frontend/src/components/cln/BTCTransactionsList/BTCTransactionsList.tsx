@@ -10,7 +10,7 @@ import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
 import DateBox from '../../shared/DateBox/DateBox';
 import FiatBox from '../../shared/FiatBox/FiatBox';
 import Transaction from '../BTCTransaction/BTCTransaction';
-import { SCROLL_BATCH_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION, Units } from '../../../utilities/constants';
+import { SCROLL_PAGE_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION, Units } from '../../../utilities/constants';
 import { NoBTCTransactionDarkSVG } from '../../../svgs/NoBTCTransactionDark';
 import { NoBTCTransactionLightSVG } from '../../../svgs/NoBTCTransactionLight';
 import { useSelector } from 'react-redux';
@@ -193,10 +193,10 @@ export const BTCTransactionsList = () => {
 
   useEffect(() => {
     if (listBitcoinTransactions?.btcTransactions?.length > 0) {
-      const initialBatch = listBitcoinTransactions?.btcTransactions.slice(0, SCROLL_BATCH_SIZE);
+      const initialBatch = listBitcoinTransactions?.btcTransactions.slice(0, SCROLL_PAGE_SIZE);
       setDisplayedTransactions(initialBatch);
-      setCurrentIndex(SCROLL_BATCH_SIZE);
-      if (SCROLL_BATCH_SIZE >= listBitcoinTransactions?.btcTransactions.length) {
+      setCurrentIndex(SCROLL_PAGE_SIZE);
+      if (SCROLL_PAGE_SIZE >= listBitcoinTransactions?.btcTransactions.length) {
         setAllTransactionsLoaded(true);
       }
     }
@@ -206,7 +206,7 @@ export const BTCTransactionsList = () => {
     if (isLoading || allTransactionsLoaded) return;
     setIsLoading(true);
     setTimeout(() => {
-      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
+      const nextIndex = currentIndex + SCROLL_PAGE_SIZE;
       const newTransactions = listBitcoinTransactions?.btcTransactions.slice(
         currentIndex,
         nextIndex

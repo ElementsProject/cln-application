@@ -1,5 +1,5 @@
 import { ApplicationModes, TimeGranularity, Units } from '../constants';
-import { Offer, LightningTransaction, Invoice, BkprTransaction, Rune } from '../../types/cln.type';
+import { Offer, LightningTransaction, Invoice, BTCTransaction, Rune } from '../../types/cln.type';
 import { AccountEvents, BkprSummaryInfo, SatsFlow, VolumeData } from '../../types/bookkeeper.type';
 import { PeerChannel } from '../../types/root.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
@@ -80,7 +80,6 @@ export const mockOffer: Offer = {
   bolt12:
     'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q',
   used: true,
-  valid: true,
 };
 
 export const mockClnTransaction: LightningTransaction = {
@@ -96,7 +95,7 @@ export const mockClnTransaction: LightningTransaction = {
   created_index: 4,
 };
 
-export const mockBTCTransaction: BkprTransaction = {
+export const mockBTCTransaction: BTCTransaction = {
   account: 'wallet',
   type: 'chain',
   tag: 'deposit',
@@ -797,8 +796,6 @@ export const mockFeeRate = {
 };
 
 export const mockCLNStoreData = {
-  listInvoices: mockListInvoices,
-  listPayments: mockListPayments,
   listOffers: mockListOffers,
   listLightningTransactions: mockListLightningTransactions,
   listBitcoinTransactions: mockListBitcoinTransactions,

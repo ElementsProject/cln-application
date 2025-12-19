@@ -32,6 +32,7 @@ describe('CLNOffersList component ', () => {
         ...mockCLNStoreData,
         listOffers: {
           isLoading: false,
+          pageNumber: 0,
           offers: [],
           error: 'error message'
         }
@@ -57,6 +58,7 @@ describe('CLNOffersList component ', () => {
         ...mockCLNStoreData,
         listOffers: {
           isLoading: false,
+          pageNumber: 0,
           offers: [],
         }
       },
