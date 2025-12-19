@@ -11,6 +11,7 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: true,
+          pageNumber: 0,
           clnTransactions: []
         }
       },
@@ -32,6 +33,7 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          pageNumber: 0,
           clnTransactions: [],
           error: 'error message'
         }
@@ -63,6 +65,7 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          pageNumber: 0,
           clnTransactions: []
         }
       },
@@ -85,6 +88,7 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          pageNumber: 0,
           clnTransactions: []
         }
       },

@@ -6,7 +6,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { IncomingArrowSVG } from '../../../svgs/IncomingArrow';
 import Offer from '../CLNOffer/CLNOffer';
-import { SCROLL_BATCH_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION } from '../../../utilities/constants';
+import { SCROLL_PAGE_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
 import { useSelector } from 'react-redux';
@@ -114,10 +114,10 @@ export const CLNOffersList = () => {
 
   useEffect(() => {
     if (listOffers && listOffers.offers && listOffers.offers.length > 0) {
-      const initialBatch = listOffers.offers.slice(0, SCROLL_BATCH_SIZE);
+      const initialBatch = listOffers.offers.slice(0, SCROLL_PAGE_SIZE);
       setDisplayedOffers(initialBatch);
-      setCurrentIndex(SCROLL_BATCH_SIZE);
-      if (SCROLL_BATCH_SIZE >= listOffers?.offers?.length) {
+      setCurrentIndex(SCROLL_PAGE_SIZE);
+      if (SCROLL_PAGE_SIZE >= listOffers?.offers?.length) {
         setAllOffersLoaded(true);
       }
     }
@@ -127,7 +127,7 @@ export const CLNOffersList = () => {
     if (isLoading || allOffersLoaded) return;
     setIsLoading(true);
     setTimeout(() => {
-      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
+      const nextIndex = currentIndex + SCROLL_PAGE_SIZE;
       const newOffers = listOffers?.offers?.slice(
         currentIndex,
         nextIndex

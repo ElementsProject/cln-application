@@ -1,15 +1,15 @@
 import axios from 'axios';
 import moment from 'moment';
 import { ApplicationConfiguration, AuthResponse } from '../types/root.type';
-import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT } from '../utilities/constants';
+import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT, SCROLL_PAGE_SIZE } from '../utilities/constants';
 import { AccountEventsSQL, SatsFlowSQL, VolumeSQL } from '../utilities/bookkeeper-sql';
 import logger from './logger.service';
-import { convertArrayToAccountEventsObj, convertArrayToPeerChannelsObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
+import { convertArrayToAccountEventsObj, convertArrayToBTCTransactionsObj, convertArrayToLightningTransactionsObj, convertArrayToOffersObj, convertArrayToPeerChannelsObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
 import { defaultRootState } from '../store/rootSelectors';
 import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
 import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
-import { ListPeerChannelsSQL } from '../utilities/cln-sql';
+import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL, ListPeerChannelsSQL } from '../utilities/cln-sql';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -172,14 +172,17 @@ export class RootService {
   }
 
   static async listChannels() {
+    // No pagination, need full data for active, pending and inactive channels calculations
     return HttpService.clnCall('sql', { query: ListPeerChannelsSQL });
   }
 
   static async listPeers() {
+    // To get the total number of connected peers (with/without channel)
     return HttpService.clnCall('listpeers');
   }
 
   static async listFunds() {
+    // No pagination, need full data for balance calculations
     return HttpService.clnCall('listfunds');
   }
 
@@ -216,7 +219,10 @@ export class RootService {
     });
     return {
       nodeInfo: nodeResult.nodeInfo,
-      listChannels: { ...results.listChannels, channels: convertArrayToPeerChannelsObj(results.listChannels.rows) },
+      listChannels: {
+        isLoading: results.listChannels.isLoading,
+        ...(results.listChannels.rows && { channels: convertArrayToPeerChannelsObj(results.listChannels.rows) }),
+        ...(results.listChannels.error && { error: results.listChannels.error }) },
       listPeers: results.listPeers,
       listFunds: results.listFunds,
     };
@@ -224,20 +230,16 @@ export class RootService {
 }
 
 export class CLNService {
-  static async listInvoices() {
-    return HttpService.clnCall('listinvoices');
+  static async listLightningTransactions(offset: number) {
+    return HttpService.clnCall('sql', { query: listLightningTransactionsSQL(SCROLL_PAGE_SIZE, offset) });
   }
 
-  static async listSendPays() {
-    return HttpService.clnCall('listsendpays');
+  static async listOffers(offset: number) {
+    return HttpService.clnCall('sql', { query: ListOffersSQL(SCROLL_PAGE_SIZE, offset) });
   }
 
-  static async listOffers() {
-    return HttpService.clnCall('listoffers');
-  }
-
-  static async listAccountEvents() {
-    return HttpService.clnCall('bkpr-listaccountevents');
+  static async listBTCTransactions(offset: number) {
+    return HttpService.clnCall('sql', { query: listBTCTransactionsSQL(SCROLL_PAGE_SIZE, offset) });
   }
 
   static async getFeeRates() {
@@ -309,18 +311,25 @@ export class CLNService {
     const state = appStore.getState() as AppState;
     if (state.root.authStatus.isAuthenticated) {
       const results = await executeRequests({
-        listInvoices: this.listInvoices(),
-        listSendPays: this.listSendPays(),
-        listOffers: this.listOffers(),
-        listAccountEvents: this.listAccountEvents(),
+        listLightningTransactions: this.listLightningTransactions(0),
+        listOffers: this.listOffers(0),
+        listBtcTransactions: this.listBTCTransactions(0),
         feeRates: this.getFeeRates()
       });
 
       return {
-        listInvoices: results.listInvoices,
-        listSendPays: results.listSendPays,
-        listOffers: results.listOffers,
-        listAccountEvents: results.listAccountEvents,
+        listLightningTransactions: {
+          isLoading: results.listLightningTransactions.isLoading,
+          ...(results.listLightningTransactions.rows && { clnTransactions: convertArrayToLightningTransactionsObj(results.listLightningTransactions.rows) }),
+          ...(results.listLightningTransactions.error && { error: results.listLightningTransactions.error }) },
+        listOffers: {
+          isLoading: results.listOffers.isLoading,
+          ...(results.listOffers.rows && { offers: convertArrayToOffersObj(results.listOffers.rows) }),
+          ...(results.listOffers.error && { error: results.listOffers.error }) },
+        listBitcoinTransactions: {
+          isLoading: results.listBtcTransactions.isLoading,
+          ...(results.listBtcTransactions.rows && { btcTransactions: convertArrayToBTCTransactionsObj(results.listBtcTransactions.rows) }),
+          ...(results.listBtcTransactions.error && { error: results.listBtcTransactions.error }) },
         feeRates: results.feeRates,
       };
     }

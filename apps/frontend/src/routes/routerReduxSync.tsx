@@ -2,7 +2,7 @@ import { useLoaderData } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { clearBKPRStore, setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
-import { clearCLNStore, setFeeRate, setListBitcoinTransactions, setListInvoices, setListOffers, setListPayments } from '../store/clnSlice';
+import { clearCLNStore, setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setListChannels, setListFunds, setListPeers, setNodeInfo, setConnectWallet } from '../store/rootSlice';
 import { APP_WAIT_TIME } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
@@ -94,17 +94,14 @@ export function CLNRouterReduxSync() {
   useEffect(() => {
     if (!clnData) return;
     if (authStatus.isAuthenticated && authStatus.isValidPassword) {
-      if (clnData.listInvoices) {
-        dispatch(setListInvoices(clnData.listInvoices));
-      }
-      if (clnData.listSendPays) {
-        dispatch(setListPayments(clnData.listSendPays));
+      if (clnData.listLightningTransactions) {
+        dispatch(setListLightningTransactions(clnData.listLightningTransactions));
       }
       if (clnData.listOffers) {
         dispatch(setListOffers(clnData.listOffers));
       }
-      if (clnData.listAccountEvents) {
-        dispatch(setListBitcoinTransactions(clnData.listAccountEvents));
+      if (clnData.listBitcoinTransactions) {
+        dispatch(setListBitcoinTransactions(clnData.listBitcoinTransactions));
       }
       if (clnData.feeRates) {
         dispatch(setFeeRate(clnData.feeRates));
