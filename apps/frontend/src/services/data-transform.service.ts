@@ -499,46 +499,35 @@ export const convertArrayToLightningTransactionsObj = (rows: any[]): LightningTr
     if (type === 'INVOICE') {
       return {
         type: 'INVOICE',
-        created_index: row[1],
-        updated_index: row[2],
-        pay_index: row[3],
-        local_offer_id: row[4],
-        payment_hash: row[5],
-        label: row[6],
-        description: row[7],
-        bolt11: row[8],
-        bolt12: row[9],
-        payment_preimage: row[10],
-        status: row[11],
-        amount_msat: row[12],
-        amount_received_msat: row[13],
-        paid_outpoint_txid: row[14],
-        paid_outpoint_outnum: row[15],
-        paid_at: row[16],
-        expires_at: row[17],
-        created_at: row[18], // NULL for invoices
+        payment_hash: row[1],
+        status: row[2],
+        label: row[3],
+        description: row[4],
+        bolt11: row[5],
+        bolt12: row[6],
+        payment_preimage: row[7],
+        amount_msat: row[8],
+        amount_received_msat: row[9],
+        expires_at: row[10],
+        paid_at: row[11],
       } as LightningTransaction;
     } else {
       return {
         type: 'PAYMENT',
-        created_index: row[1],
-        updated_index: row[2],
-        groupid: row[3],
-        partid: row[4],
-        payment_hash: row[5],
-        label: row[6],
-        description: row[7],
-        bolt11: row[8],
-        bolt12: row[9],
-        payment_preimage: row[10],
-        status: row[11],
+        payment_hash: row[1],
+        status: row[2],
+        label: row[3],
+        description: row[4],
+        bolt11: row[5],
+        bolt12: row[6],
+        payment_preimage: row[7],
+        amount_msat: row[8],
+        amount_sent_msat: row[9],
+        created_at: row[10],
+        completed_at: row[11],
         destination: row[12],
-        amount_msat: row[13],
-        amount_sent_msat: row[14],
-        paid_at: row[15], // NULL for payments
-        expires_at: row[16], // NULL for payments
-        completed_at: row[17],
-        created_at: row[18],
+        groupid: row[13],
+        partid: row[14],
       } as LightningTransaction;
     }
   });
@@ -554,7 +543,8 @@ export const convertArrayToOffersObj = (rows: any[]): Offer[] => {
     single_use: row[2],
     bolt12: row[3],
     used: row[4],
-    label: row[5]
+    label: row[5],
+    description: row[6],
   }));
   
   return offers;
