@@ -70,28 +70,22 @@ export type LightningTransaction = {
   payment_hash?: string;
   status?: string;
   label?: string;
-  bolt11?: string;
   description?: string;
+  bolt11?: string;
   bolt12?: string;
   payment_preimage?: string;
-  created_index?: number;
-  updated_index?: number;
   amount_msat?: number;
+  // Invoice specific
+  amount_received_msat?: number;
+  expires_at?: number;
+  paid_at?: number;
   // Payment specific
+  amount_sent_msat?: number;
   created_at?: number;
+  completed_at?: number;
   destination?: string;
   groupid?: number;
   partid?: number;
-  amount_sent_msat?: number;
-  completed_at?: number;
-  // Invoice specific
-  expires_at?: number;
-  paid_at?: number;
-  amount_received_msat?: number;
-  pay_index?: number;
-  local_offer_id?: string;
-  paid_outpoint_txid?: string;
-  paid_outpoint_outnum?: number;
 };
 
 export type ListLightningTransactions = {
@@ -225,6 +219,7 @@ export type Offer = {
   single_use?: boolean;
   used?: boolean;
   label?: string;
+  description?: string;
 };
 
 export type ListOffers = {

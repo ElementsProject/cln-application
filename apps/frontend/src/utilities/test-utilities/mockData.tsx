@@ -80,6 +80,7 @@ export const mockOffer: Offer = {
   bolt12:
     'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q',
   used: true,
+  description: 'Mock Offer'
 };
 
 export const mockClnTransaction: LightningTransaction = {
@@ -92,7 +93,6 @@ export const mockClnTransaction: LightningTransaction = {
   status: 'unpaid',
   description: 'Breakfast',
   expires_at: Date.now() + 3600000, // 1hr from now,
-  created_index: 4,
 };
 
 export const mockBTCTransaction: BTCTransaction = {
@@ -724,7 +724,8 @@ export const mockOffer1 = {
   active: true,
   single_use: false,
   bolt12: "lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q",
-  used: false
+  used: false,
+  description: 'Fish Sale!'
 };
 
 export const mockListOffers = {
