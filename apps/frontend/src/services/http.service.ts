@@ -316,7 +316,7 @@ export class CLNService {
         listBtcTransactions: this.listBTCTransactions(0),
         feeRates: this.getFeeRates()
       });
-
+      const btcTxsObj = convertArrayToBTCTransactionsObj(results.listBtcTransactions.rows);
       return {
         listLightningTransactions: {
           isLoading: results.listLightningTransactions.isLoading,
@@ -328,7 +328,9 @@ export class CLNService {
           ...(results.listOffers.error && { error: results.listOffers.error }) },
         listBitcoinTransactions: {
           isLoading: results.listBtcTransactions.isLoading,
-          ...(results.listBtcTransactions.rows && { btcTransactions: convertArrayToBTCTransactionsObj(results.listBtcTransactions.rows) }),
+          page: 1,
+          hasMore: btcTxsObj.length >= SCROLL_PAGE_SIZE, // Could be greater also due to unique_timestamps aggregation
+          ...(results.listBtcTransactions.rows && { btcTransactions: btcTxsObj }),
           ...(results.listBtcTransactions.error && { error: results.listBtcTransactions.error }) },
         feeRates: results.feeRates,
       };

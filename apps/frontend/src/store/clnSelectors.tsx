@@ -4,7 +4,7 @@ import { CLNState } from '../types/cln.type';
 export const defaultCLNState: CLNState = {
   listOffers: { isLoading: true, offers: [] },
   listLightningTransactions: { isLoading: true, clnTransactions: [] },
-  listBitcoinTransactions: { isLoading: true, btcTransactions: [] },
+  listBitcoinTransactions: { isLoading: true, page: 0, hasMore: true, btcTransactions: [] },
   feeRate: { isLoading: true },
 };
 
