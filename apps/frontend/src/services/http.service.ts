@@ -316,15 +316,21 @@ export class CLNService {
         listBtcTransactions: this.listBTCTransactions(0),
         feeRates: this.getFeeRates()
       });
+      const offersObj = convertArrayToOffersObj(results.listOffers.rows);
+      const clnTxsObj = convertArrayToLightningTransactionsObj(results.listLightningTransactions.rows);
       const btcTxsObj = convertArrayToBTCTransactionsObj(results.listBtcTransactions.rows);
       return {
         listLightningTransactions: {
           isLoading: results.listLightningTransactions.isLoading,
-          ...(results.listLightningTransactions.rows && { clnTransactions: convertArrayToLightningTransactionsObj(results.listLightningTransactions.rows) }),
+          page: 1,
+          hasMore: clnTxsObj.length >= SCROLL_PAGE_SIZE, // Could be greater also due to payment_hash aggregation
+          ...(results.listLightningTransactions.rows && { clnTransactions: clnTxsObj }),
           ...(results.listLightningTransactions.error && { error: results.listLightningTransactions.error }) },
         listOffers: {
           isLoading: results.listOffers.isLoading,
-          ...(results.listOffers.rows && { offers: convertArrayToOffersObj(results.listOffers.rows) }),
+          page: 1,
+          hasMore: offersObj.length === SCROLL_PAGE_SIZE,
+          ...(results.listOffers.rows && { offers: offersObj }),
           ...(results.listOffers.error && { error: results.listOffers.error }) },
         listBitcoinTransactions: {
           isLoading: results.listBtcTransactions.isLoading,

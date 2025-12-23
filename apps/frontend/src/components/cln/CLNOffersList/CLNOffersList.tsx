@@ -1,5 +1,5 @@
 import './CLNOffersList.scss';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -9,9 +9,13 @@ import Offer from '../CLNOffer/CLNOffer';
 import { SCROLL_PAGE_SIZE, SCROLL_THRESHOLD, TRANSITION_DURATION } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectListOffers } from '../../../store/clnSelectors';
 import { selectIsAuthenticated, selectIsDarkMode } from '../../../store/rootSelectors';
+import { ListOffers } from '../../../types/cln.type';
+import { setListOffers, setListOffersLoading } from '../../../store/clnSlice';
+import { convertArrayToOffersObj } from '../../../services/data-transform.service';
+import { CLNService } from '../../../services/http.service';
 
 const OfferHeader = ({ offer }) => {
   return (
@@ -94,115 +98,152 @@ const CLNOffersAccordion = ({
 };
 
 export const CLNOffersList = () => {
+  const dispatch = useDispatch();
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const listOffers = useSelector(selectListOffers);
-  const initExpansions = (listOffers.offers?.reduce((acc: boolean[]) => [...acc, false], []) || []);
+  const { offers, isLoading, page, hasMore, error } = useSelector(selectListOffers);
+  
+  const initExpansions = offers?.reduce((acc: boolean[]) => [...acc, false], []) || [];
   const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
 
-  const [displayedOffers, setDisplayedOffers] = useState<any[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [allOffersLoaded, setAllOffersLoaded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Load more offers from API
+  const loadMoreOffers = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    
+    dispatch(setListOffersLoading(true));
+    
+    try {
+      const offset = page * SCROLL_PAGE_SIZE;
+      const listOffersRes: any = await CLNService.listOffers(offset);
+      
+      if (listOffersRes.error) {
+        dispatch(setListOffers({ 
+          error: listOffersRes.error 
+        } as ListOffers));
+        return;
+      }
 
-  const setContainerRef = useCallback((ref: HTMLElement | null) => {
-    if (ref) {
-      (containerRef as React.MutableRefObject<HTMLElement | null>).current = ref;
+      const latestOffers = convertArrayToOffersObj(listOffersRes.rows);
+      
+      dispatch(setListOffers({ 
+        offers: latestOffers,
+        page: page + 1,
+        hasMore: latestOffers.length >= SCROLL_PAGE_SIZE,
+        isLoading: false,
+        error: undefined
+      } as ListOffers));
+      
+    } catch (error: any) {
+      dispatch(setListOffers({ 
+        error: error.message || 'Failed to load offers'
+      } as ListOffers));
+    } finally {
+      dispatch(setListOffersLoading(false));
     }
-  }, []);
+  }, [isLoading, hasMore, page, dispatch]);
 
+  // Update expanded state when offers change
   useEffect(() => {
-    if (listOffers && listOffers.offers && listOffers.offers.length > 0) {
-      const initialBatch = listOffers.offers.slice(0, SCROLL_PAGE_SIZE);
-      setDisplayedOffers(initialBatch);
-      setCurrentIndex(SCROLL_PAGE_SIZE);
-      if (SCROLL_PAGE_SIZE >= listOffers?.offers?.length) {
-        setAllOffersLoaded(true);
-      }
+    const newExpansions = offers?.reduce((acc: boolean[]) => [...acc, false], []) || [];
+    if (newExpansions.length !== expanded.length) {
+      setExpanded(newExpansions);
     }
-  }, [listOffers]);
+  }, [offers.length]);
 
-  const loadMoreTransactions = useCallback(() => {
-    if (isLoading || allOffersLoaded) return;
-    setIsLoading(true);
-    setTimeout(() => {
-      const nextIndex = currentIndex + SCROLL_PAGE_SIZE;
-      const newOffers = listOffers?.offers?.slice(
-        currentIndex,
-        nextIndex
-      ) || [];
-      setDisplayedOffers(prev => [...prev, ...newOffers]);
-      setCurrentIndex(nextIndex);
-
-      if (listOffers && listOffers.offers && nextIndex >= listOffers?.offers?.length) {
-        setAllOffersLoaded(true);
-      }
-
-      setIsLoading(false);
-    }, 300);
-  }, [currentIndex, isLoading, allOffersLoaded, listOffers]);
-
-  const handleScroll = useCallback((container) => {
-    if (!container || isLoading || allOffersLoaded) return;
+  // Scroll handler
+  const handleScroll = useCallback((container: HTMLElement) => {
+    if (!container || isLoading || !hasMore) return;
     
     const { scrollTop, scrollHeight, clientHeight } = container;
     const bottomOffset = scrollHeight - scrollTop - clientHeight;
     
     if (bottomOffset < SCROLL_THRESHOLD) {
-      loadMoreTransactions();
+      loadMoreOffers();
     }
-  }, [isLoading, allOffersLoaded, loadMoreTransactions]);
+  }, [isLoading, hasMore, loadMoreOffers]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container?.addEventListener('scroll', handleScroll);
-      return () => container?.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
-
-  return (
-    isAuthenticated && listOffers.isLoading ?
+  // Render initial loading state
+  if (isAuthenticated && isLoading && offers.length === 0) {
+    return (
       <span className='h-100 d-flex justify-content-center align-items-center'>
-        <Spinner animation='grow' variant='primary' data-testid='cln-offers-list-spinner'/>
-      </span> 
-    : 
-    listOffers.error ? 
-      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>{listOffers.error}</Alert> : 
-      listOffers?.offers && listOffers?.offers.length && listOffers?.offers.length > 0 ?
-        <PerfectScrollbar
-        containerRef={setContainerRef}
-        onScrollY={handleScroll}
-        className='cln-offers-list'
-        data-testid='cln-offers-list'
-        options={{
-          suppressScrollX: true,
-          wheelPropagation: false
-        }}
-        >
-          {displayedOffers.map((offer, i) => (
-            <CLNOffersAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} offer={offer} />
-          ))}
-          {isLoading && (
-            <Col xs={12} className='d-flex align-items-center justify-content-center mb-5'>
-              <Spinner animation='grow' variant='primary' />
-            </Col>
-          )}
-          {allOffersLoaded && listOffers?.offers.length > 100 && 
-            <h6 className='d-flex align-self-center py-4 text-muted'>No more offers to load!</h6>
+        <Spinner animation='grow' variant='primary' data-testid='cln-offers-list-spinner' />
+      </span>
+    );
+  }
+
+  // Render error state
+  if (error && offers.length === 0) {
+    return (
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-offers-list-error'>
+        {error}
+      </Alert>
+    );
+  }
+
+  // Render empty state
+  if (!offers || offers.length === 0) {
+    return (
+      <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
+        <Row className='d-flex align-items-center justify-content-center mt-2'>
+          {isDarkMode ? 
+            <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
+            <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
           }
-        </PerfectScrollbar>
-      :
-        <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
-          <Row className='d-flex align-items-center justify-content-center mt-2'>
-            { isDarkMode ? 
-              <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
-              <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
-            }
-            <Row className='text-center'>No offer found. Click receive to generate new offer!</Row>
+          <Row className='text-center'>
+            No offer found. Click receive to generate new offer!
           </Row>
         </Row>
+      </Row>
+    );
+  }
+
+  // Render offers list
+  return (
+    <PerfectScrollbar
+      onScrollY={handleScroll}
+      className='cln-offers-list'
+      data-testid='cln-offers-list'
+      options={{
+        suppressScrollX: true,
+        wheelPropagation: false
+      }}
+    >
+      {offers.map((offer, i) => (
+        <CLNOffersAccordion 
+          key={`offer-${i}-${offer.offer_id}`}
+          i={i} 
+          expanded={expanded} 
+          setExpanded={setExpanded} 
+          initExpansions={initExpansions} 
+          offer={offer} 
+        />
+      ))}
+      
+      {isLoading && (
+        <Col xs={12} className='d-flex align-items-center justify-content-center my-3'>
+          <Spinner animation='grow' variant='primary' size='sm' />
+          <span className='ms-2 text-muted'>Loading more offers...</span>
+        </Col>
+      )}
+      
+      {!hasMore && offers.length > 0 && (
+        <h6 className='d-flex align-self-center py-4 text-muted text-center'>
+          No more offers to load!
+        </h6>
+      )}
+      
+      {error && offers.length > 0 && (
+        <Alert className='mx-3 my-2 py-2 px-3 fs-7' variant='warning'>
+          {error}
+          <button 
+            className='btn btn-link btn-sm p-0 ms-2'
+            onClick={loadMoreOffers}
+          >
+            Retry
+          </button>
+        </Alert>
+      )}
+    </PerfectScrollbar>
   );
 };
 

@@ -96,6 +96,8 @@ export type LightningTransaction = {
 
 export type ListLightningTransactions = {
   isLoading: boolean;
+  page: number;
+  hasMore: boolean;
   clnTransactions: LightningTransaction[];
   error?: any;
 };
@@ -227,7 +229,9 @@ export type Offer = {
 
 export type ListOffers = {
   isLoading: boolean;
-  offers?: Offer[];
+  page: number;
+  hasMore: boolean;
+  offers: Offer[];
   error?: any;
 };
 

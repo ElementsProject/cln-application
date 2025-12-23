@@ -11,15 +11,41 @@ const clnSlice = createSlice({
         state.listLightningTransactions = { ...state.listLightningTransactions, error: action.payload.error };
         return;
       }
-      state.listLightningTransactions = action.payload;
+      state.listLightningTransactions = {
+        ...state.listLightningTransactions,
+        ...action.payload,
+        clnTransactions: [
+          ...state.listLightningTransactions.clnTransactions,
+          ...action.payload.clnTransactions,
+        ],
+      };
+    },
+    setListLightningTransactionsLoading(state, action: PayloadAction<boolean>) {
+      state.listLightningTransactions.isLoading = action.payload;
+    },
+    resetListLightningTransactions(state) {
+      state.listLightningTransactions = defaultCLNState.listLightningTransactions;
     },
     setListOffers(state, action: PayloadAction<ListOffers>) {
       if (action.payload.error) {
         state.listOffers = { ...state.listOffers, error: action.payload.error };
         return;
       }
-      state.listOffers = action.payload;
+      state.listOffers = {
+        ...state.listOffers,
+        ...action.payload,
+        offers: [
+          ...(state.listOffers.offers ?? []),
+          ...(action.payload.offers ?? []),
+        ],
+      };
     },    
+    setListOffersLoading(state, action: PayloadAction<boolean>) {
+      state.listOffers.isLoading = action.payload;
+    },
+    resetListOffers(state) {
+      state.listOffers = defaultCLNState.listOffers;
+    },
     setListBitcoinTransactions(state, action: PayloadAction<ListBitcoinTransactions>) {
       if (action.payload.error) {
         state.listBitcoinTransactions = { ...state.listBitcoinTransactions, error: action.payload.error };
@@ -54,8 +80,12 @@ const clnSlice = createSlice({
 });
 
 export const {
+  setListLightningTransactionsLoading,
   setListLightningTransactions,
+  resetListLightningTransactions,
+  setListOffersLoading,
   setListOffers,
+  resetListOffers,
   setListBitcoinTransactionsLoading,
   setListBitcoinTransactions,
   resetListBitcoinTransactions,
