@@ -172,6 +172,8 @@ export type BTCTransaction = {
 
 export type ListBitcoinTransactions = {
   isLoading: boolean;
+  page: number;
+  hasMore: boolean;
   btcTransactions: BTCTransaction[];
   error?: any;
 };

@@ -750,6 +750,8 @@ export const mockListLightningTransactions = {
 
 export const mockListBitcoinTransactions = {
   isLoading: false,
+  page: 1,
+  hasMore: false,
   btcTransactions: [
     {
       account: "wallet",

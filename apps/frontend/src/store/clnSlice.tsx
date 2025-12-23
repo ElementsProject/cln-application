@@ -25,7 +25,20 @@ const clnSlice = createSlice({
         state.listBitcoinTransactions = { ...state.listBitcoinTransactions, error: action.payload.error };
         return;
       }
-      state.listBitcoinTransactions = action.payload;
+      state.listBitcoinTransactions = {
+        ...state.listBitcoinTransactions,
+        ...action.payload,
+        btcTransactions: [
+          ...state.listBitcoinTransactions.btcTransactions,
+          ...action.payload.btcTransactions,
+        ],
+      };
+    },
+    setListBitcoinTransactionsLoading(state, action: PayloadAction<boolean>) {
+      state.listBitcoinTransactions.isLoading = action.payload;
+    },
+    resetListBitcoinTransactions(state) {
+      state.listBitcoinTransactions = defaultCLNState.listBitcoinTransactions;
     },
     setFeeRate(state, action: PayloadAction<NodeFeeRate>) {
       if (action.payload.error) {
@@ -43,7 +56,9 @@ const clnSlice = createSlice({
 export const {
   setListLightningTransactions,
   setListOffers,
+  setListBitcoinTransactionsLoading,
   setListBitcoinTransactions,
+  resetListBitcoinTransactions,
   setFeeRate,
   clearCLNStore
 } = clnSlice.actions;
