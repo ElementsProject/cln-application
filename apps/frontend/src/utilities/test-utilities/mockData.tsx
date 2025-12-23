@@ -728,12 +728,16 @@ export const mockOffer1 = {
 };
 
 export const mockListOffers = {
-  offers: [mockOffer1],
-  isLoading: false
+  isLoading: false,
+  page: 1,
+  hasMore: false,
+  offers: [mockOffer1]
 };
 
 export const mockListLightningTransactions = {
   isLoading: false,
+  page: 1,
+  hasMore: false,
   clnTransactions: [
     {
       type: "INVOICE",
