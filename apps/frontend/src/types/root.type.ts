@@ -6,7 +6,6 @@ export interface RootLoaderData {
   fiatConfig: FiatConfig;
   nodeInfo: NodeInfo;
   listChannels: ListPeerChannels;
-  listPeers: ListPeers;
   listFunds: Fund;
   connectWallet: WalletConnect;
 }
@@ -22,7 +21,6 @@ export type RootState = {
   walletBalances: WalletBalances;
   nodeInfo: NodeInfo;
   listFunds: Fund;
-  listPeers: ListPeers;
   listChannels: ListPeerChannels;
 };
 
@@ -34,7 +32,7 @@ export type NodeInfo = {
   id?: string;
   alias?: string;
   color?: string;
-  num_peers?: number;
+  num_peers: number;
   num_pending_channels?: number;
   num_active_channels?: number;
   num_inactive_channels?: number;
@@ -171,12 +169,6 @@ export type Peer = {
   features?: string;
   addresses?: Address[];
   option_will_fund?: LiquidityAd;
-};
-
-export type ListPeers = {
-  isLoading: boolean;
-  peers?: Peer[];
-  error?: any;
 };
 
 export type ChannelType = {

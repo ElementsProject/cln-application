@@ -109,9 +109,6 @@ const rootSlice = createSlice({
       state.walletBalances = calculateBalances(action.payload);
       state.listFunds = action.payload;
     },
-    setListPeers(state, action: PayloadAction<RootState['listPeers']>) {
-      state.listPeers = action.payload;
-    },
     setListChannels(
       state,
       action: PayloadAction<any>
@@ -140,7 +137,6 @@ export const {
   setFiatConfig,
   setNodeInfo,
   setListFunds,
-  setListPeers,
   setListChannels,
   clearRootStore,
 } = rootSlice.actions;

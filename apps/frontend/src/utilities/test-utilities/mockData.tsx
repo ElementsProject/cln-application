@@ -320,26 +320,6 @@ export const mockListFunds = {
   isLoading: false
 };
 
-export const mockListPeers = {
-  peers: [
-    {
-      connected: true,
-      features: "08a0880a8a59a1",
-      id: "03fbdd0a9ddba420be1ec9146802c9b95f6233b1a36c5e2c223884fde157be7ff5",
-      netaddr: ["127.0.0.1:7171"],
-      num_channels: 2
-    },
-    {
-      connected: true,
-      features: "08a0880a8a59a1",
-      id: "020371140f2ec44c4d6cea50c018310e9409c97c410c56fbc120de3e85b0358d02",
-      netaddr: ["127.0.0.1:58232"],
-      num_channels: 1
-    }
-  ],
-  isLoading: false
-};
-
 // Channel type definition
 export const mockChannelType = {
   bits: [12, 22],
@@ -675,7 +655,6 @@ export const mockRootStoreData = {
   listFunds: mockListFunds,
   appConfig: mockAppConfig,
   fiatConfig: mockFiatConfig,
-  listPeers: mockListPeers,
   listChannels: mockListChannels,
 };
 
