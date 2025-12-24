@@ -1,5 +1,5 @@
 import './CLNTransactionsList.scss';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -163,7 +163,6 @@ const CLNTransactionsAccordion = ({
   i,
   expanded,
   setExpanded,
-  initExpansions,
   transaction,
 }) => {
   const isDarkMode = useSelector(selectIsDarkMode);
@@ -176,8 +175,7 @@ const CLNTransactionsAccordion = ({
         animate={{ backgroundColor: (isDarkMode ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => {
-          initExpansions[i] = !expanded[i];
-          return setExpanded(initExpansions);
+          setExpanded(expanded.map((_, idx) => idx === i ? !expanded[i] : false));
         }}
       >
         {transaction.type?.toLowerCase() === 'payment' ? (
@@ -214,9 +212,7 @@ export const CLNTransactionsList = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const activeChannelsExist = useSelector(selectActiveChannelsExist);
   const { clnTransactions, isLoading, page, hasMore, error } = useSelector(selectListLightningTransactions);
-  
-  const initExpansions = clnTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-  const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
+  const [expanded, setExpanded] = useState<boolean[]>(new Array(clnTransactions.length).fill(false));
 
   // Load more transactions from API
   const loadMoreTransactions = useCallback(async () => {
@@ -236,7 +232,9 @@ export const CLNTransactionsList = () => {
       }
 
       const latestClnTransactions = convertArrayToLightningTransactionsObj(listClnTransactionsRes.rows);
-      
+
+      setExpanded(prev => [...prev, ...new Array(latestClnTransactions.length).fill(false)]);
+
       dispatch(setListLightningTransactions({ 
         clnTransactions: latestClnTransactions,
         page: page + 1,
@@ -253,14 +251,6 @@ export const CLNTransactionsList = () => {
       dispatch(setListLightningTransactionsLoading(false));
     }
   }, [isLoading, hasMore, page, dispatch]);
-
-  // Update expanded state when transactions change
-  useEffect(() => {
-    const newExpansions = clnTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-    if (newExpansions.length !== expanded.length) {
-      setExpanded(newExpansions);
-    }
-  }, [clnTransactions.length]);
 
   // Scroll handler
   const handleScroll = useCallback((container: HTMLElement) => {
@@ -329,7 +319,6 @@ export const CLNTransactionsList = () => {
           i={i} 
           expanded={expanded} 
           setExpanded={setExpanded} 
-          initExpansions={initExpansions} 
           transaction={transaction} 
         />
       ))}

@@ -1,5 +1,5 @@
 import './BTCTransactionsList.scss';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner, Alert, Row, Col } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -131,7 +131,6 @@ const BTCTransactionsAccordion = ({
   i,
   expanded,
   setExpanded,
-  initExpansions,
   transaction,
 }) => {
   const isDarkMode = useSelector(selectIsDarkMode);
@@ -144,8 +143,7 @@ const BTCTransactionsAccordion = ({
         animate={{ backgroundColor: (isDarkMode ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => {
-          initExpansions[i] = !expanded[i];
-          return setExpanded(initExpansions);
+          setExpanded(expanded.map((_, idx) => idx === i ? !expanded[i] : false));
         }}
       >
         {transaction?.tag?.toLowerCase() === 'withdrawal' ? (
@@ -181,9 +179,7 @@ export const BTCTransactionsList = () => {
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const { btcTransactions, isLoading, page, hasMore, error } = useSelector(selectListBitcoinTransactions);
-  
-  const initExpansions = btcTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-  const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
+  const [expanded, setExpanded] = useState<boolean[]>(new Array(btcTransactions.length).fill(false));
 
   const loadMoreTransactions = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -202,7 +198,9 @@ export const BTCTransactionsList = () => {
       }
 
       const latestBtcTransactions = convertArrayToBTCTransactionsObj(listBtcTransactionsRes.rows);
-      
+
+      setExpanded(prev => [...prev, ...new Array(latestBtcTransactions.length).fill(false)]);
+
       dispatch(setListBitcoinTransactions({ 
         btcTransactions: latestBtcTransactions,
         page: page + 1,
@@ -219,13 +217,6 @@ export const BTCTransactionsList = () => {
       dispatch(setListBitcoinTransactionsLoading(false));
     }
   }, [isLoading, hasMore, page, dispatch]);
-
-  useEffect(() => {
-    const newExpansions = btcTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-    if (newExpansions.length !== expanded.length) {
-      setExpanded(newExpansions);
-    }
-  }, [btcTransactions.length]);
 
   const handleScroll = useCallback((container: HTMLElement) => {
     if (!container || isLoading || !hasMore) return;
@@ -282,7 +273,6 @@ export const BTCTransactionsList = () => {
           i={i} 
           expanded={expanded} 
           setExpanded={setExpanded} 
-          initExpansions={initExpansions} 
           transaction={transaction} 
         />
       ))}
