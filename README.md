@@ -64,7 +64,7 @@
       - APP_CONFIG_FILE: Path for cln-application's configuration file (default: `./config.json`)
       - APP_LOG_FILE: Path for cln-application's log file (default: `./application-cln.log`)
       - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: `production`)
-      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST/GRPC, default: `COMMANDO`)
+      - APP_CONNECT: Choose how to connect to CLN (valid values: COMMANDO/REST, default: `COMMANDO`)
 
       # Core lightning Values
       - LIGHTNING_HOST: IP address of Core lightning node (default: `localhost`)
@@ -90,9 +90,9 @@
       - LIGHTNING_REST_CA_CERT_FILE: CA certificate file path including file name for REST TLS authentication (used by `REST` APP_CONNECT and `https` LIGHTNING_REST_PROTOCOL; default: `./ca.pem`)
 
       # CLN gRPC Values
-      - LIGHTNING_GRPC_HOST: IP address/hostname of Core Lightning GRPC interface (used if APP_CONNECT is `GRPC`, default: `localhost`)
+      - LIGHTNING_GRPC_HOST: IP address/hostname of Core Lightning GRPC interface (default: `localhost`)
       - LIGHTNING_GRPC_TOR_HOST: Tor hidden service URL for Core Lightning GRPC interface (default: ``)
-      - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (used if APP_CONNECT is `GRPC`; default: `9736`)
+      - LIGHTNING_GRPC_PORT: Core lightning's GRPC port (default: `9736`)
       - LIGHTNING_GRPC_PROTO_PATH: URL to directory containing CLN gRPC protocol definitions (default: `https://github.com/ElementsProject/lightning/tree/master/cln-grpc/proto`)
       - LIGHTNING_GRPC_CLIENT_KEY_FILE: Client key file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client-key.pem`)
       - LIGHTNING_GRPC_CLIENT_CERT_FILE: Client certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client.pem`)
