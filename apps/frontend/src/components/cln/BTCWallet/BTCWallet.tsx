@@ -6,13 +6,51 @@ import { BitcoinWalletSVG } from '../../../svgs/BitcoinWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectWalletBalances } from '../../../store/rootSelectors';
 import { Loading } from '../../ui/Loading/Loading';
+import { RefreshSVG } from '../../../svgs/Refresh';
+import { resetListBitcoinTransactions, setListBitcoinTransactions, setListBitcoinTransactionsLoading } from '../../../store/clnSlice';
+import { CLNService } from '../../../services/http.service';
+import { ListBitcoinTransactions } from '../../../types/cln.type';
+import { convertArrayToBTCTransactionsObj } from '../../../services/data-transform.service';
+import { SCROLL_PAGE_SIZE } from '../../../utilities/constants';
 
 const BTCWallet = (props) => {
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const walletBalances = useSelector(selectWalletBalances);
+
+  const refreshHandler = async () => {
+    dispatch(setListBitcoinTransactionsLoading(true));
+    dispatch(resetListBitcoinTransactions());
+    try {
+      const offset = 0;
+      const listBtcTransactionsRes: any = await CLNService.listBTCTransactions(offset);
+      
+      if (listBtcTransactionsRes.error) {
+        dispatch(setListBitcoinTransactions({ 
+          error: listBtcTransactionsRes.error 
+        } as ListBitcoinTransactions));
+        return;
+      }
+
+      const latestBtcTransactions = convertArrayToBTCTransactionsObj(listBtcTransactionsRes.rows);
+      dispatch(setListBitcoinTransactions({ 
+        btcTransactions: latestBtcTransactions,
+        page: 1,
+        hasMore: latestBtcTransactions.length >= SCROLL_PAGE_SIZE,
+        isLoading: false,
+        error: undefined
+      } as ListBitcoinTransactions));
+    } catch (error: any) {
+      dispatch(setListBitcoinTransactions({ 
+        error: error.message || 'Failed to load transactions'
+      } as ListBitcoinTransactions));
+    } finally {
+      dispatch(setListBitcoinTransactionsLoading(false));
+    }
+  }
 
   return (
     <Card className="h-100 d-flex align-items-stretch" data-testid="btc-wallet">
@@ -52,7 +90,11 @@ const BTCWallet = (props) => {
           </ButtonGroup>
         </Card>
         <Card.Body className="px-4 list-scroll-container">
-          <div className="text-light btc-transactions-tabs">Transactions</div>
+          <div className="text-light btc-transactions-tabs">Transactions
+            <span className="ms-2 span-refresh" onClick={refreshHandler} >
+              <RefreshSVG />
+            </span>
+          </div>
           <Suspense fallback={<Loading />}>
             <BTCTransactionsList />
           </Suspense>

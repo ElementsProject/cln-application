@@ -384,6 +384,19 @@ svg {
   }
 }
 
+.span-refresh {
+  cursor: pointer;
+  & .svg-refresh {
+    transition: transform $transition-time ease;
+    &:hover {
+      transform: rotate(0.5turn);
+      & > path {
+        fill: $primary;
+      }
+    }
+  }
+}
+
 .svg-fill-disabled path.fill-contrast {
   fill: $gray-600;
 }

@@ -8,15 +8,86 @@ import { LightningWalletSVG } from '../../../svgs/LightningWallet';
 import { WithdrawSVG } from '../../../svgs/Withdraw';
 import { DepositSVG } from '../../../svgs/Deposit';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
-import { TRANSITION_DURATION } from '../../../utilities/constants';
-import { useSelector } from 'react-redux';
+import { SCROLL_PAGE_SIZE, TRANSITION_DURATION } from '../../../utilities/constants';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectWalletBalances } from '../../../store/rootSelectors';
 import { Loading } from '../../ui/Loading/Loading';
+import { RefreshSVG } from '../../../svgs/Refresh';
+import { resetListLightningTransactions, resetListOffers, setListLightningTransactions, setListLightningTransactionsLoading, setListOffers, setListOffersLoading } from '../../../store/clnSlice';
+import { CLNService } from '../../../services/http.service';
+import { ListLightningTransactions, ListOffers } from '../../../types/cln.type';
+import { convertArrayToLightningTransactionsObj, convertArrayToOffersObj } from '../../../services/data-transform.service';
 
 const CLNWallet = (props) => {
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const walletBalances = useSelector(selectWalletBalances);
   const [selectedTab, setSelectedTab] = useState('transactions');
+
+  const refreshHandler = async (calledBy) => {
+    console.warn(calledBy);
+    if(calledBy === 'OFFERS') {
+      dispatch(setListOffersLoading(true));
+      dispatch(resetListOffers());
+      
+      try {
+        const offset = 0;
+        const listOffersRes: any = await CLNService.listOffers(offset);
+        
+        if (listOffersRes.error) {
+          dispatch(setListOffers({ 
+            error: listOffersRes.error 
+          } as ListOffers));
+          return;
+        }
+
+        const latestOffers = convertArrayToOffersObj(listOffersRes.rows);
+        dispatch(setListOffers({ 
+          offers: latestOffers,
+          page: 1,
+          hasMore: latestOffers.length >= SCROLL_PAGE_SIZE,
+          isLoading: false,
+          error: undefined
+        } as ListOffers));
+        
+      } catch (error: any) {
+        dispatch(setListOffers({ 
+          error: error.message || 'Failed to load offers'
+        } as ListOffers));
+      } finally {
+        dispatch(setListOffersLoading(false));
+      }
+    } else {
+      dispatch(setListLightningTransactionsLoading(true));
+      dispatch(resetListLightningTransactions());
+      try {
+        const offset = 0;
+        const listClnTransactionsRes: any = await CLNService.listLightningTransactions(offset);
+        
+        if (listClnTransactionsRes.error) {
+          dispatch(setListLightningTransactions({ 
+            error: listClnTransactionsRes.error 
+          } as ListLightningTransactions));
+          return;
+        }
+
+        const latestClnTransactions = convertArrayToLightningTransactionsObj(listClnTransactionsRes.rows);
+        dispatch(setListLightningTransactions({ 
+          clnTransactions: latestClnTransactions,
+          page: 1,
+          hasMore: latestClnTransactions.length >= SCROLL_PAGE_SIZE,
+          isLoading: false,
+          error: undefined
+        } as ListLightningTransactions));
+      } catch (error: any) {
+        dispatch(setListLightningTransactions({ 
+          error: error.message || 'Failed to load transactions'
+        } as ListLightningTransactions));
+      } finally {
+        dispatch(setListLightningTransactionsLoading(false));
+      }
+    }
+  }
 
   return (
     <Card className="h-100 d-flex align-items-stretch" data-testid="cln-wallet">
@@ -64,12 +135,20 @@ const CLNWallet = (props) => {
             <Nav className="flex-row cln-transactions-tabs">
               <Nav.Item>
                 <Nav.Link eventKey="transactions">
-                  <span>Transactions</span>
+                  <span>Transactions
+                    <span className="ms-2 span-refresh" onClick={() => refreshHandler('CLNTXS')} >
+                      <RefreshSVG />
+                    </span>
+                  </span>
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="offers">
-                  <span>Offers</span>
+                  <span>Offers
+                    <span className="ms-2 span-refresh" onClick={() => refreshHandler('OFFERS')} >
+                      <RefreshSVG />
+                    </span>
+                  </span>
                 </Nav.Link>
               </Nav.Item>
             </Nav>
