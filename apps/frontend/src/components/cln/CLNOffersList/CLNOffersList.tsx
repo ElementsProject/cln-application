@@ -1,5 +1,5 @@
 import './CLNOffersList.scss';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -55,7 +55,6 @@ const CLNOffersAccordion = ({
   i,
   expanded,
   setExpanded,
-  initExpansions,
   offer,
 }) => {
   const isDarkMode = useSelector(selectIsDarkMode);
@@ -68,8 +67,7 @@ const CLNOffersAccordion = ({
         animate={{ backgroundColor: (isDarkMode ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => {
-          initExpansions[i] = !expanded[i];
-          return setExpanded(initExpansions);
+          setExpanded(expanded.map((_, idx) => idx === i ? !expanded[i] : false));
         }}
       >
         <OfferHeader offer={offer} />
@@ -102,9 +100,7 @@ export const CLNOffersList = () => {
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const { offers, isLoading, page, hasMore, error } = useSelector(selectListOffers);
-  
-  const initExpansions = offers?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-  const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
+  const [expanded, setExpanded] = useState<boolean[]>(new Array(offers.length).fill(false));
 
   // Load more offers from API
   const loadMoreOffers = useCallback(async () => {
@@ -124,7 +120,9 @@ export const CLNOffersList = () => {
       }
 
       const latestOffers = convertArrayToOffersObj(listOffersRes.rows);
-      
+
+      setExpanded(prev => [...prev, ...new Array(latestOffers.length).fill(false)]);
+
       dispatch(setListOffers({ 
         offers: latestOffers,
         page: page + 1,
@@ -141,14 +139,6 @@ export const CLNOffersList = () => {
       dispatch(setListOffersLoading(false));
     }
   }, [isLoading, hasMore, page, dispatch]);
-
-  // Update expanded state when offers change
-  useEffect(() => {
-    const newExpansions = offers?.reduce((acc: boolean[]) => [...acc, false], []) || [];
-    if (newExpansions.length !== expanded.length) {
-      setExpanded(newExpansions);
-    }
-  }, [offers.length]);
 
   // Scroll handler
   const handleScroll = useCallback((container: HTMLElement) => {
@@ -214,7 +204,6 @@ export const CLNOffersList = () => {
           i={i} 
           expanded={expanded} 
           setExpanded={setExpanded} 
-          initExpansions={initExpansions} 
           offer={offer} 
         />
       ))}
