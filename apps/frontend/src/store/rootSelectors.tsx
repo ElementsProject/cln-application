@@ -24,9 +24,8 @@ export const defaultRootState: RootState = {
     btcSpendableBalance: 0,
     btcReservedBalance: 0,
   },
-  nodeInfo: { isLoading: true, alias: '', version: '', error: null },
+  nodeInfo: { isLoading: true, alias: '', version: '', num_peers: 0, error: null },
   listFunds: { isLoading: true, channels: [], outputs: [] },
-  listPeers: { isLoading: true, peers: [] },
   listChannels: { isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: [], mergedChannels: [] },
 };
 
@@ -87,9 +86,9 @@ export const selectListFunds = createSelector(
   (root) => root.listFunds
 );
 
-export const selectListPeers = createSelector(
+export const selectNumPeers = createSelector(
   selectRootState,
-  (root) => root.listPeers
+  (root) => root.nodeInfo.num_peers
 );
 
 export const selectListChannels = createSelector(

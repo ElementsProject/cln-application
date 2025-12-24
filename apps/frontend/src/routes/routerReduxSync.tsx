@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { clearBKPRStore, setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
 import { clearCLNStore, setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
-import { setListChannels, setListFunds, setListPeers, setNodeInfo, setConnectWallet } from '../store/rootSlice';
+import { setListChannels, setListFunds, setNodeInfo, setConnectWallet } from '../store/rootSlice';
 import { APP_WAIT_TIME } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootService } from '../services/http.service';
@@ -30,9 +30,6 @@ export function RootRouterReduxSync() {
       if (rootData.listChannels) {
         dispatch(setListChannels(rootData.listChannels));
       }
-      if (rootData.listPeers) {
-        dispatch(setListPeers(rootData.listPeers));
-      }
       if (rootData.listFunds) {
         dispatch(setListFunds(rootData.listFunds));
       }
@@ -52,7 +49,6 @@ export function RootRouterReduxSync() {
           const rootData = await RootService.fetchRootData();
           dispatch(setNodeInfo(rootData?.nodeInfo));
           dispatch(setListChannels(rootData?.listChannels));
-          dispatch(setListPeers(rootData?.listPeers));
           dispatch(setListFunds(rootData?.listFunds));
         } catch (error) {
           logger.error('Error fetching root data:', error);

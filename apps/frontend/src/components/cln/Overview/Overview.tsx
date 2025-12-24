@@ -11,12 +11,12 @@ import { CapacitySVG } from '../../../svgs/Capacity';
 import { ChannelsSVG } from '../../../svgs/Channels';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 import { useSelector } from 'react-redux';
-import { selectIsAuthenticated, selectListChannels, selectListPeers, selectWalletBalances } from '../../../store/rootSelectors';
+import { selectIsAuthenticated, selectListChannels, selectNumPeers, selectWalletBalances } from '../../../store/rootSelectors';
 
 const Overview = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const walletBalances = useSelector(selectWalletBalances);
-  const listPeers = useSelector(selectListPeers);
+  const numPeers = useSelector(selectNumPeers);
   const listChannels = useSelector(selectListChannels);
   const currentScreenSize = useBreakpoint();
   const countChannels: any = useMotionValue(0);
@@ -38,17 +38,17 @@ const Overview = () => {
   }, [listChannels.activeChannels, countChannels]);
 
   useEffect(() => {
-    if (listPeers.peers && listPeers.peers.length && listPeers.peers.length > 0 && (countPeers.prev === 0 || countPeers.prev === undefined)) {
+    if (numPeers && numPeers > 0 && (countPeers.prev === 0 || countPeers.prev === undefined)) {
       countPeers.current = 0;
       countPeers.prev = 0;
-      const animationPeers = animate(countPeers, listPeers.peers.length, { duration: COUNTUP_DURATION });
+      const animationPeers = animate(countPeers, numPeers, { duration: COUNTUP_DURATION });
       return animationPeers.stop;
     } else {
-      countPeers.current = listPeers.peers?.length;
-      const animationPeers = animate(countPeers, listPeers.peers?.length, { duration: COUNTUP_DURATION });
+      countPeers.current = numPeers;
+      const animationPeers = animate(countPeers, numPeers, { duration: COUNTUP_DURATION });
       return animationPeers.stop;
     }
-  }, [listPeers.peers, countPeers]);
+  }, [numPeers, countPeers]);
 
   return (
     <Row className='mx-1 align-items-stretch'>

@@ -176,11 +176,6 @@ export class RootService {
     return HttpService.clnCall('sql', { query: ListPeerChannelsSQL });
   }
 
-  static async listPeers() {
-    // To get the total number of connected peers (with/without channel)
-    return HttpService.clnCall('listpeers');
-  }
-
   static async listFunds() {
     // No pagination, need full data for balance calculations
     return HttpService.clnCall('listfunds');
@@ -214,7 +209,6 @@ export class RootService {
     });
     const results = await executeRequests({
       listChannels: this.listChannels(),
-      listPeers: this.listPeers(),
       listFunds: this.listFunds(),
     });
     return {
@@ -223,7 +217,6 @@ export class RootService {
         isLoading: results.listChannels.isLoading,
         ...(results.listChannels.rows && { channels: convertArrayToPeerChannelsObj(results.listChannels.rows) }),
         ...(results.listChannels.error && { error: results.listChannels.error }) },
-      listPeers: results.listPeers,
       listFunds: results.listFunds,
     };
   }
