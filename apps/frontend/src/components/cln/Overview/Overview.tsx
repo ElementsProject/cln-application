@@ -1,4 +1,3 @@
-import './Overview.scss';
 import { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap';

@@ -1,4 +1,3 @@
-import './StatusAlert.scss';
 import { motion } from 'framer-motion';
 import { Spinner, Col } from 'react-bootstrap';
 
