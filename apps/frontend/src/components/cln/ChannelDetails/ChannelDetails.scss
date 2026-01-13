@@ -1,4 +1,5 @@
-@import '../../../styles/constants.scss';
+@use 'sass:color';
+@use '../../../styles/constants' as *;
 
 .channel-scroll-container {
   max-height: 53vh;
@@ -12,7 +13,7 @@
     cursor: pointer;
     &:hover {
       svg path {
-        stroke: darken($primary, 10%);
+        stroke: color.adjust($primary, $lightness: -10%);
       }
     }
   }
@@ -23,7 +24,7 @@
     cursor: pointer;
     &:hover {
       svg path {
-        fill: darken($primary, 10%);
+        fill: color.adjust($primary, $lightness: -10%);
       }
     }
   }

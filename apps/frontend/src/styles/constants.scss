@@ -1,9 +1,9 @@
-@import './fonts.scss';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins';
+@use 'sass:color';
+@use './fonts.scss';
 @import 'react-perfect-scrollbar/dist/css/styles.css';
+@import 'bootstrap/scss/functions';
 
+// define custom variables BEFORE importing Bootstrap variables
 $transition-time: 300ms;
 $theme-transition: 500ms;
 $color-mode-type: data;
@@ -15,16 +15,57 @@ $font-family-base: -apple-system, BlinkMacSystemFont, 'Inter', 'DM Sans', 'Helve
   'Segoe UI', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
   'Segoe UI Symbol', 'Noto Color Emoji';
 
-$font-size-base: 14px;
+$font-size-base: 0.875rem;
 $font-weight-base: 500;
-$btn-font-size: 14px;
+$btn-font-size: 0.875rem;
 
+// Define theme colors BEFORE importing Bootstrap variables
+$white: #ffffff;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
 $primary: #e1ba2d;
-$primary-darker: #cca103;
-$secondary: $gray-100;
+$secondary: #ffffff;
 $success: #33db95;
 $warning: #fe8e02;
 $danger: #dc3545;
+$btn-bg: $primary; 
+
+$theme-colors: (
+  primary: $primary,
+  secondary: $secondary,
+  success: $success,
+  warning: $warning,
+  danger: $danger,
+  dark: #3a4247,
+  light: #9f9f9f,
+);
+
+$border-radius: 1.25rem;
+$btn-link-color: $primary;
+$btn-padding-x: 0.625rem;
+
+$form-check-input-checked-bg-color: $primary;
+$form-check-input-checked-border-color: $primary;
+$form-check-input-focus-border: color.adjust($primary, $lightness: 10%);
+$form-check-input-focus-box-shadow: 0 0 0 0.25rem rgba(color.adjust($primary, $lightness: 10%), 0.25);
+
+$card-border-width: 0.5px;
+$card-border-radius: $border-radius;
+$card-cap-bg: transparent;
+
+$dropdown-min-width: 5rem;
+$dropdown-box-shadow: none;
+$dropdown-border-radius: 0.5rem;
+
+$modal-backdrop-opacity: 0.2;
+   
+$form-range-track-height: 0.25rem;
+$form-range-track-bg: $success;
+
+$toast-max-width: 25rem;
+
+// Custom variables that depend on Bootstrap variables
+$primary-darker: #cca103;
 $blue: #1b2559;
 $darker-blue: #141c44;
 $light: #9f9f9f;
@@ -45,35 +86,15 @@ $body-tertiary-bg: $white;
 $body-bg-dark: #0c0c0f;
 $body-color-dark: $white;
 
-$border-radius: 1.25rem;
-$btn-link-color: $primary;
-$btn-padding-x: 0.625rem;
-
-$form-check-input-checked-bg-color: $primary;
-$form-check-input-checked-border-color: $primary;
-$form-check-input-focus-border: lighten($primary, 10%);
-$form-check-input-focus-box-shadow: 0 0 0 0.25rem rgba(lighten($primary, 10%), 0.25);
-
-$card-border-width: 0.5px;
-$card-border-color: rgba($light, 0.1);
-$card-border-radius: $border-radius;
-$card-cap-bg: transparent;
-
-$dropdown-min-width: 5rem;
-$dropdown-box-shadow: none;
-$dropdown-border-radius: 0.5rem;
-
-$input-color: $dark;
-$input-disabled-bg: $gray-200;
-$modal-backdrop-opacity: 0.2;
-
-$form-range-track-height: 0.25rem;
-$form-range-track-bg: $success;
 $form-range-thumb-bg: $white;
 $form-range-thumb-border: 0.5px solid $gray-300;
 $form-range-thumb-focus-box-shadow:
   0 0 0 1px $body-bg,
   $primary;
-$form-range-thumb-active-bg: tint-color($primary, 70%);
+$form-range-thumb-active-bg: color.scale($primary, $lightness: 70%);
 
-$toast-max-width: 25rem;
+$input-color: $dark;
+$input-disabled-bg: $gray-200;
+
+// Import Bootstrap
+@import 'bootstrap/scss/bootstrap';

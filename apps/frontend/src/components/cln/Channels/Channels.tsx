@@ -3,23 +3,23 @@ import { motion } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Card, Row, Col, ListGroup, Alert, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { formatCurrency, titleCase } from '../../../utilities/data-formatters';
+import { titleCase } from '../../../utilities/data-formatters';
 import { ActionSVG } from '../../../svgs/Action';
-import { STAGERRED_SPRING_VARIANTS_3, Units } from '../../../utilities/constants';
+import { STAGERRED_SPRING_VARIANTS_3 } from '../../../utilities/constants';
 import { NoChannelLightSVG } from '../../../svgs/NoChannelLight';
 import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
 import { useSelector } from 'react-redux';
-import { selectIsAuthenticated, selectIsDarkMode, selectListChannels, selectUIConfigUnit } from '../../../store/rootSelectors';
+import { selectIsAuthenticated, selectIsDarkMode, selectListChannels } from '../../../store/rootSelectors';
+import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 
 const Channels = (props) => {
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const uiConfigUnit = useSelector(selectUIConfigUnit);
   const listChannels = useSelector(selectListChannels);
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='channels'>
-      <Card.Header className='px-1 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
+      <Card.Header className='px-1 pb-2 fs-18px p-0 fw-bold text-dark'>Payment Channels</Card.Header>
       <Card.Body className='py-0 px-1 channels-scroll-container'>
         { isAuthenticated && listChannels.isLoading ? 
             <span className='h-100 d-flex justify-content-center align-items-center'>
@@ -39,7 +39,7 @@ const Channels = (props) => {
                       variants={props.newlyOpenedChannelId === channel.channel_id ? STAGERRED_SPRING_VARIANTS_3 : {}} initial='hidden' animate='visible' exit='hidden' custom={0}
                       onClick={() => (props.onChannelClick(channel))}
                     >
-                      <div className='flex-fill text-dark'>
+                      <div className='list-item-div flex-fill text-dark'>
                         <>
                           <div className='fw-bold'>
                             <OverlayTrigger
@@ -59,10 +59,10 @@ const Channels = (props) => {
                           </ProgressBar>
                           <Row className='text-light d-flex align-items-end justify-content-between'>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
-                              {formatCurrency(channel.to_us_sat, Units.SATS, uiConfigUnit, false, 5, 'string')} {uiConfigUnit}
+                              <CurrencyBox value={channel.to_us_sat} shorten={false} rootClasses='d-inline-flex flex-row' currencyClasses='fs-7' unitClasses='ms-1 fs-7'></CurrencyBox>
                             </Col>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-end'>
-                              {formatCurrency(channel.to_them_sat, Units.SATS, uiConfigUnit, false, 5, 'string')} {uiConfigUnit}
+                              <CurrencyBox value={channel.to_them_sat} shorten={false} rootClasses='d-inline-flex flex-row' currencyClasses='fs-7' unitClasses='ms-1 fs-7'></CurrencyBox>
                             </Col>
                           </Row>
                         </>

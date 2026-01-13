@@ -17,11 +17,26 @@ const OfferDetail = ({ offer, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Bolt 12
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {offer.bolt12}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-offer-copy" id="Bolt12">
             <CopySVG id="Bolt12" showTooltip={true} />
+          </Col>
+        </Row>
+      ) : (
+        <></>
+      )}
+      {offer.description ? (
+        <Row className="cln-offer-detail" data-testid="cln-offer-description">
+          <Col xs={12} className="fs-7 text-light">
+            Description
+          </Col>
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
+            {offer.description}
+          </Col>
+          <Col xs={1} onClick={copyHandler} className="cln-offer-copy" id="Description">
+            <CopySVG id="Description" showTooltip={true} />
           </Col>
         </Row>
       ) : (
@@ -39,6 +54,9 @@ const CLNOffer = (props) => {
     switch (event.target.id) {
       case 'Bolt12':
         textToCopy = props.offer.bolt12;
+        break;
+      case 'Description':
+        textToCopy = props.offer.description;
         break;
       default:
         textToCopy = props.offer.bolt12;

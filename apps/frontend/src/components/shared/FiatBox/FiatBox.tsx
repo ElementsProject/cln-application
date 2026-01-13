@@ -1,4 +1,3 @@
-import './FiatBox.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { formatFiatValue } from '../../../utilities/data-formatters';

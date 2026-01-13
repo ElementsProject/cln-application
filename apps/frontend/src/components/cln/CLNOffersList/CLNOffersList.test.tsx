@@ -1,5 +1,5 @@
 import { screen, within } from '@testing-library/react';
-import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListOffers, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
+import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNOffersList from './CLNOffersList';
 
@@ -10,8 +10,10 @@ describe('CLNOffersList component ', () => {
       cln: {
         ...mockCLNStoreData,
         listOffers: {
-          ...mockListOffers,
-          isLoading: true
+          isLoading: true,
+          page: 1,
+          hasMore: true,
+          offers: []
         }
       },
       bkpr: mockBKPRStoreData
@@ -32,6 +34,8 @@ describe('CLNOffersList component ', () => {
         ...mockCLNStoreData,
         listOffers: {
           isLoading: false,
+          page: 1,
+          hasMore: true,
           offers: [],
           error: 'error message'
         }
@@ -57,6 +61,8 @@ describe('CLNOffersList component ', () => {
         ...mockCLNStoreData,
         listOffers: {
           isLoading: false,
+          page: 1,
+          hasMore: true,
           offers: [],
         }
       },

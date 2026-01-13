@@ -130,9 +130,9 @@ async function startServer() {
     server.listen({ port: APP_PORT, host: APP_HOST });
   } catch (err: any) {
     if (err.code) {
-      logger.error('Server Startup Error: ', err);
+      logger.error('Server Startup Error:', err);
     } else {
-      logger.error('Server Startup Error: ', throwApiError(err));
+      logger.error('Server Startup Error:', throwApiError(err));
     }
     process.exit(1);
   }

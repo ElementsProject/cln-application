@@ -1,5 +1,5 @@
 import { ApplicationModes, TimeGranularity, Units } from '../constants';
-import { Offer, LightningTransaction, Invoice, BkprTransaction, Rune } from '../../types/cln.type';
+import { Offer, LightningTransaction, Invoice, BTCTransaction, Rune } from '../../types/cln.type';
 import { AccountEvents, BkprSummaryInfo, SatsFlow, VolumeData } from '../../types/bookkeeper.type';
 import { PeerChannel } from '../../types/root.type';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
@@ -80,7 +80,7 @@ export const mockOffer: Offer = {
   bolt12:
     'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q',
   used: true,
-  valid: true,
+  description: 'Mock Offer'
 };
 
 export const mockClnTransaction: LightningTransaction = {
@@ -93,10 +93,9 @@ export const mockClnTransaction: LightningTransaction = {
   status: 'unpaid',
   description: 'Breakfast',
   expires_at: Date.now() + 3600000, // 1hr from now,
-  created_index: 4,
 };
 
-export const mockBTCTransaction: BkprTransaction = {
+export const mockBTCTransaction: BTCTransaction = {
   account: 'wallet',
   type: 'chain',
   tag: 'deposit',
@@ -109,97 +108,25 @@ export const mockBTCTransaction: BkprTransaction = {
 };
 
 export const mockSelectedChannel: PeerChannel = {
-  peer_id: '024244c0c7d23d1b411578a1a2376fb4cebf5526449e1a83241fd4a12801034c5b',
-  peer_connected: false,
-  current_state: 'ACTIVE',
   node_alias: 'CLNReg2',
-  channel_type: {
-    bits: [12],
-    names: ['static_remotekey/even'],
-  },
-  ignore_fee_limits: true,
-  updates: {
-    local: {
-      htlc_minimum_msat: 0,
-      htlc_maximum_msat: 1485000000,
-      cltv_expiry_delta: 6,
-      fee_base_msat: 1,
-      fee_proportional_millionths: 10,
-    },
-  },
-  state: 'CHANNELD_NORMAL',
-  scratch_txid: '4fe207694ae089014b9008f2463dbf438553e26a2ad94ba2e455357c84692400',
-  last_tx_fee_msat: 183000,
-  lost_state: false,
-  feerate: {
-    perkw: 253,
-    perkb: 1012,
-  },
-  short_channel_id: '185x1x1',
-  direction: 1,
+  peer_id: '024244c0c7d23d1b411578a1a2376fb4cebf5526449e1a83241fd4a12801034c5b',
   channel_id: 'e84435b002a67feedbe958aeb01710cb0d832fd20281e63a2e9943c5c4c4d7e1',
-  funding_txid: 'caef9fceb32991981ca39501d8cd807c7f4d4732de46c1381aac5b3027bd75ee',
-  funding_outnum: 1,
-  close_to_addr: 'bcrt1pns2fct20yudt54v8ta5jxqq909lwelu82gpwp2ym59ffelzcp7rqg0w646',
-  close_to: '51209c149c2d4f271aba55875f69230005797eecff875202e0a89ba1529cfc580f86',
-  private: false,
-  opener: 'remote',
-  alias: {
-    local: '13947255x7038877x61250',
-  },
-  features: ['option_static_remotekey'],
-  funding: {
-    local_funds_msat: 0,
-    remote_funds_msat: 1500000000,
-    pushed_msat: 0,
-  },
-  to_us_sat: 0,
-  to_them_sat: 1500000,
-  total_sat: 1500000,
+  short_channel_id: '185x1x1',
+  state: 'CHANNELD_NORMAL',
+  peer_connected: false,
   to_us_msat: 0,
-  min_to_us_msat: 0,
-  max_to_us_msat: 0,
   total_msat: 1500000000,
-  fee_base_msat: 1,
-  fee_proportional_millionths: 10,
+  their_to_self_delay: 6,
+  opener: 'remote',
+  private: false,
   dust_limit_msat: 546000,
-  max_total_htlc_in_msat: 18446744073709551615,
-  their_reserve_msat: 15000000,
-  our_reserve_msat: 15000000,
   spendable_msat: 0,
   receivable_msat: 1484460000,
-  minimum_htlc_in_msat: 0,
-  minimum_htlc_out_msat: 0,
-  maximum_htlc_out_msat: 1485000000,
-  their_to_self_delay: 6,
-  our_to_self_delay: 6,
-  max_accepted_htlcs: 483,
-  state_changes: [
-    {
-      timestamp: '2023-09-14T17:53:38.684Z',
-      old_state: 'DUALOPEND_OPEN_COMMITTED',
-      new_state: 'DUALOPEND_AWAITING_LOCKIN',
-      cause: 'remote',
-      message: 'Sigs exchanged, waiting for lock-in',
-    },
-    {
-      timestamp: '2023-09-14T17:56:31.918Z',
-      old_state: 'DUALOPEND_AWAITING_LOCKIN',
-      new_state: 'CHANNELD_NORMAL',
-      cause: 'remote',
-      message: 'Lockin complete',
-    },
-  ],
-  status: ['CHANNELD_NORMAL:Will attempt reconnect in 300 seconds'],
-  in_payments_offered: 0,
-  in_offered_msat: 0,
-  in_payments_fulfilled: 0,
-  in_fulfilled_msat: 0,
-  out_payments_offered: 0,
-  out_offered_msat: 0,
-  out_payments_fulfilled: 0,
-  out_fulfilled_msat: 0,
-  htlcs: [],
+  funding_txid: 'caef9fceb32991981ca39501d8cd807c7f4d4732de46c1381aac5b3027bd75ee',
+  current_state: 'ACTIVE',
+  total_sat: 1500000,
+  to_us_sat: 0,
+  to_them_sat: 1500000,
 };
 
 export const mockAuthStatus = {
@@ -388,26 +315,6 @@ export const mockListFunds = {
       scriptpubkey: "512010007e669d1f7e4a1cbe865a2368d0f3bafe26c516928b6df19ccc50c60a9ed1",
       status: "confirmed",
       txid: "fce6a18f61309b3bb7925862cdbc25790f21d0b7c075342462a2dcdeef6228a9"
-    }
-  ],
-  isLoading: false
-};
-
-export const mockListPeers = {
-  peers: [
-    {
-      connected: true,
-      features: "08a0880a8a59a1",
-      id: "03fbdd0a9ddba420be1ec9146802c9b95f6233b1a36c5e2c223884fde157be7ff5",
-      netaddr: ["127.0.0.1:7171"],
-      num_channels: 2
-    },
-    {
-      connected: true,
-      features: "08a0880a8a59a1",
-      id: "020371140f2ec44c4d6cea50c018310e9409c97c410c56fbc120de3e85b0358d02",
-      netaddr: ["127.0.0.1:58232"],
-      num_channels: 1
     }
   ],
   isLoading: false
@@ -729,6 +636,11 @@ export const mockActiveChannels = [mockActiveChannel1, mockActiveChannel2, mockA
 export const mockPendingChannels = [];
 export const mockInactiveChannels = [];
 
+export const mockListChannelsAPIRes = {
+  channels: [...mockActiveChannels, ...mockPendingChannels, ...mockInactiveChannels],
+  isLoading: false
+};
+
 export const mockListChannels = {
   activeChannels: mockActiveChannels,
   pendingChannels: mockPendingChannels,
@@ -748,7 +660,6 @@ export const mockRootStoreData = {
   listFunds: mockListFunds,
   appConfig: mockAppConfig,
   fiatConfig: mockFiatConfig,
-  listPeers: mockListPeers,
   listChannels: mockListChannels,
 };
 
@@ -797,16 +708,21 @@ export const mockOffer1 = {
   active: true,
   single_use: false,
   bolt12: "lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrcgq3rcdrqqpgg5uethwvs8xatzwd3hy6tsw35k7mskyyp68zdn5tm65mulfnxpnu4a0ght4q6ev6v7s6m3tj4259rlcdlnz3q",
-  used: false
+  used: false,
+  description: 'Fish Sale!'
 };
 
 export const mockListOffers = {
-  offers: [mockOffer1],
-  isLoading: false
+  isLoading: false,
+  page: 1,
+  hasMore: false,
+  offers: [mockOffer1]
 };
 
 export const mockListLightningTransactions = {
   isLoading: false,
+  page: 1,
+  hasMore: false,
   clnTransactions: [
     {
       type: "INVOICE",
@@ -823,6 +739,8 @@ export const mockListLightningTransactions = {
 
 export const mockListBitcoinTransactions = {
   isLoading: false,
+  page: 1,
+  hasMore: false,
   btcTransactions: [
     {
       account: "wallet",
@@ -869,8 +787,6 @@ export const mockFeeRate = {
 };
 
 export const mockCLNStoreData = {
-  listInvoices: mockListInvoices,
-  listPayments: mockListPayments,
   listOffers: mockListOffers,
   listLightningTransactions: mockListLightningTransactions,
   listBitcoinTransactions: mockListBitcoinTransactions,

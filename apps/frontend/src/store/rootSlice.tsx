@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Node, Fund, FundChannel, FundOutput, RootState } from '../types/root.type';
+import { Fund, FundChannel, FundOutput, RootState } from '../types/root.type';
 import { SATS_MSAT } from '../utilities/constants';
 import { sortDescByKey } from '../utilities/data-formatters';
 import { defaultRootState } from './rootSelectors';
 
-const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[]) => {
+const aggregatePeerChannels = (listPeerChannels: any) => {
   const aggregatedChannels: any = { activeChannels: [], pendingChannels: [], inactiveChannels: [], mergedChannels: [] };
   if (!listPeerChannels || !listPeerChannels.channels) {
     return aggregatedChannels;
@@ -12,7 +12,6 @@ const aggregatePeerChannels = (listPeerChannels: any, listNodes: Node[]) => {
   listPeerChannels.channels.forEach((peerChannel: any) => {
     peerChannel = {
       ...peerChannel,
-      node_alias: listNodes.find((node) => node?.nodeid === peerChannel.peer_id)?.alias?.replace(/-\d+-.*$/, '') || 'Unknown',
       to_us_sat: Math.floor((peerChannel.to_us_msat || 0) / SATS_MSAT),
       total_sat: Math.floor((peerChannel.total_msat || 0) / SATS_MSAT),
       to_them_sat: Math.floor(((peerChannel.total_msat || 0) - (peerChannel.to_us_msat || 0)) / SATS_MSAT),
@@ -110,19 +109,16 @@ const rootSlice = createSlice({
       state.walletBalances = calculateBalances(action.payload);
       state.listFunds = action.payload;
     },
-    setListPeers(state, action: PayloadAction<RootState['listPeers']>) {
-      state.listPeers = action.payload;
-    },
     setListChannels(
       state,
-      action: PayloadAction<{ listChannels: any; listNodes: any }>
+      action: PayloadAction<any>
     ) {
-      const { listChannels, listNodes } = action.payload;
-      if (listChannels.error || listNodes.error) {
-        state.listChannels = { ...state.listChannels, error: (listChannels.error || listNodes.error) };
+      const listChannels = action.payload;
+      if (listChannels.error) {
+        state.listChannels = { ...state.listChannels, error: listChannels.error };
         return;
       }
-      const aggr = aggregatePeerChannels(listChannels, listNodes.nodes);
+      const aggr = aggregatePeerChannels(listChannels);
       state.listChannels = { ...aggr, isLoading: false };
     },
     clearRootStore(state) {
@@ -141,7 +137,6 @@ export const {
   setFiatConfig,
   setNodeInfo,
   setListFunds,
-  setListPeers,
   setListChannels,
   clearRootStore,
 } = rootSlice.actions;

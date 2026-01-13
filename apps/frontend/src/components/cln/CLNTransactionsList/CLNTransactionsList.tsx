@@ -1,5 +1,5 @@
 import './CLNTransactionsList.scss';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col, Spinner, Alert } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -9,12 +9,15 @@ import { OutgoingArrowSVG } from '../../../svgs/OutgoingArrow';
 import DateBox from '../../shared/DateBox/DateBox';
 import FiatBox from '../../shared/FiatBox/FiatBox';
 import Transaction from '../CLNTransaction/CLNTransaction';
-import { TRANSITION_DURATION, Units, TODAY, SCROLL_BATCH_SIZE, SCROLL_THRESHOLD } from '../../../utilities/constants';
+import { TRANSITION_DURATION, Units, TODAY, SCROLL_PAGE_SIZE, SCROLL_THRESHOLD } from '../../../utilities/constants';
 import { NoCLNTransactionLightSVG } from '../../../svgs/NoCLNTransactionLight';
 import { NoCLNTransactionDarkSVG } from '../../../svgs/NoCLNTransactionDark';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectActiveChannelsExist, selectFiatConfig, selectFiatUnit, selectIsAuthenticated, selectIsDarkMode, selectUIConfigUnit } from '../../../store/rootSelectors';
 import { selectListLightningTransactions } from '../../../store/clnSelectors';
+import { setListLightningTransactions, setListLightningTransactionsLoading } from '../../../store/clnSlice';
+import { CLNService } from '../../../services/http.service';
+import { ListLightningTransactions } from '../../../types/cln.type';
 
 const PaymentHeader = ({ payment }) => {
   const fiatUnit = useSelector(selectFiatUnit);
@@ -159,7 +162,6 @@ const CLNTransactionsAccordion = ({
   i,
   expanded,
   setExpanded,
-  initExpansions,
   transaction,
 }) => {
   const isDarkMode = useSelector(selectIsDarkMode);
@@ -172,8 +174,7 @@ const CLNTransactionsAccordion = ({
         animate={{ backgroundColor: (isDarkMode ? (expanded[i] ? '#0C0C0F' : '#2A2A2C') : (expanded[i] ? '#EBEFF9' : '#FFFFFF')) }}
         transition={{ duration: TRANSITION_DURATION }}
         onClick={() => {
-          initExpansions[i] = !expanded[i];
-          return setExpanded(initExpansions);
+          setExpanded(expanded.map((_, idx) => idx === i ? !expanded[i] : false));
         }}
       >
         {transaction.type?.toLowerCase() === 'payment' ? (
@@ -205,58 +206,46 @@ const CLNTransactionsAccordion = ({
 };
 
 export const CLNTransactionsList = () => {
+  const dispatch = useDispatch();
   const isDarkMode = useSelector(selectIsDarkMode);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const activeChannelsExist = useSelector(selectActiveChannelsExist);
-  const listLightningTransactions = useSelector(selectListLightningTransactions);
-  const initExpansions = (listLightningTransactions.clnTransactions?.reduce((acc: boolean[]) => [...acc, false], []) || []);
-  const [expanded, setExpanded] = useState<boolean[]>(initExpansions);
+  const { clnTransactions, isLoading, page, hasMore, error } = useSelector(selectListLightningTransactions);
+  const [expanded, setExpanded] = useState<boolean[]>(new Array(clnTransactions.length).fill(false));
 
-  const [displayedTransactions, setDisplayedTransactions] = useState<any[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [allTransactionsLoaded, setAllTransactionsLoaded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const setContainerRef = useCallback((ref: HTMLElement | null) => {
-    if (ref) {
-      (containerRef as React.MutableRefObject<HTMLElement | null>).current = ref;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (listLightningTransactions?.clnTransactions?.length > 0) {
-      const initialBatch = listLightningTransactions.clnTransactions.slice(0, SCROLL_BATCH_SIZE);
-      setDisplayedTransactions(initialBatch);
-      setCurrentIndex(SCROLL_BATCH_SIZE);
-      if (SCROLL_BATCH_SIZE >= listLightningTransactions.clnTransactions.length) {
-        setAllTransactionsLoaded(true);
+  // Load more transactions from API
+  const loadMoreTransactions = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    
+    dispatch(setListLightningTransactionsLoading(true));
+    
+    try {
+      const offset = page * SCROLL_PAGE_SIZE;
+      const listClnTransactionsRes: any = await CLNService.listLightningTransactions(offset);
+      if (listClnTransactionsRes.error) {
+        dispatch(setListLightningTransactions({ 
+          error: listClnTransactionsRes.error 
+        } as ListLightningTransactions));
+        return;
       }
+      setExpanded(prev => [...prev, ...new Array(listClnTransactionsRes.clnTransactions?.length).fill(false)]);
+      dispatch(setListLightningTransactions({
+        ...listClnTransactionsRes,
+        page: page + 1,
+        hasMore: listClnTransactionsRes.clnTransactions?.length >= SCROLL_PAGE_SIZE, // Could be greater also due to unique_timestamps aggregation
+      } as ListLightningTransactions));
+    } catch (error: any) {
+      dispatch(setListLightningTransactions({ 
+        error: error.message || 'Failed to load transactions'
+      } as ListLightningTransactions));
+    } finally {
+      dispatch(setListLightningTransactionsLoading(false));
     }
-  }, [listLightningTransactions]);
+  }, [isLoading, hasMore, page, dispatch]);
 
-  const loadMoreTransactions = useCallback(() => {
-    if (isLoading || allTransactionsLoaded) return;
-    setIsLoading(true);
-    setTimeout(() => {
-      const nextIndex = currentIndex + SCROLL_BATCH_SIZE;
-      const newTransactions = listLightningTransactions.clnTransactions.slice(
-        currentIndex,
-        nextIndex
-      );
-      setDisplayedTransactions(prev => [...prev, ...newTransactions]);
-      setCurrentIndex(nextIndex);
-
-      if (nextIndex >= listLightningTransactions.clnTransactions.length) {
-        setAllTransactionsLoaded(true);
-      }
-
-      setIsLoading(false);
-    }, 300);
-  }, [currentIndex, isLoading, allTransactionsLoaded, listLightningTransactions]);
-
-  const handleScroll = useCallback((container) => {
-    if (!container || isLoading || allTransactionsLoaded) return;
+  // Scroll handler
+  const handleScroll = useCallback((container: HTMLElement) => {
+    if (!container || isLoading || !hasMore) return;
     
     const { scrollTop, scrollHeight, clientHeight } = container;
     const bottomOffset = scrollHeight - scrollTop - clientHeight;
@@ -264,62 +253,92 @@ export const CLNTransactionsList = () => {
     if (bottomOffset < SCROLL_THRESHOLD) {
       loadMoreTransactions();
     }
-  }, [isLoading, allTransactionsLoaded, loadMoreTransactions]);
+  }, [isLoading, hasMore, loadMoreTransactions]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container?.addEventListener('scroll', handleScroll);
-      return () => container?.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
-
-  return (
-    isAuthenticated && listLightningTransactions.isLoading ?
+  // Render initial loading state
+  if (isAuthenticated && isLoading && clnTransactions.length === 0) {
+    return (
       <span className='h-100 d-flex justify-content-center align-items-center'>
         <Spinner animation='grow' variant='primary' data-testid='cln-transactions-list-spinner' />
       </span>
-      :
-      listLightningTransactions.error ?
-        <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-transactions-list-error'>{listLightningTransactions.error}</Alert> :
-      listLightningTransactions?.clnTransactions && listLightningTransactions?.clnTransactions.length && listLightningTransactions?.clnTransactions.length > 0 ?
-        <PerfectScrollbar
-          containerRef={setContainerRef}
-          onScrollY={handleScroll}
-          className='cln-transactions-list' 
-          data-testid='cln-transactions-list'
-          options={{
-            suppressScrollX: true,
-            wheelPropagation: false
-          }}
-        >
-          {displayedTransactions.map((transaction, i) => (
-            <CLNTransactionsAccordion key={i} i={i} expanded={expanded} setExpanded={setExpanded} initExpansions={initExpansions} transaction={transaction} />
-          ))}
-          {isLoading && (
-            <Col xs={12} className='d-flex align-items-center justify-content-center mb-5'>
-              <Spinner animation='grow' variant='primary' />
-            </Col>
-          )}
-          {allTransactionsLoaded && listLightningTransactions?.clnTransactions.length > 100 && 
-            <h6 className='d-flex align-self-center py-4 text-muted'>No more transactions to load!</h6>
+    );
+  }
+
+  // Render error state
+  if (error && clnTransactions.length === 0) {
+    return (
+      <Alert className='py-0 px-1 fs-7' variant='danger' data-testid='cln-transactions-list-error'>
+        {error}
+      </Alert>
+    );
+  }
+
+  // Render empty state
+  if (!clnTransactions || clnTransactions.length === 0) {
+    return (
+      <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
+        <Row className='d-flex align-items-center justify-content-center mt-2'>
+          {isDarkMode ?
+            <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
+            <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
           }
-        </PerfectScrollbar>
-        :
-        <Row className='text-light fs-6 h-75 mt-5 align-items-center justify-content-center'>
-          <Row className='d-flex align-items-center justify-content-center mt-2'>
-            {isDarkMode ?
-              <NoCLNTransactionDarkSVG className='no-clntx-dark pb-1' /> :
-              <NoCLNTransactionLightSVG className='no-clntx-light pb-1' />
+          <Row className='text-center'>
+            {activeChannelsExist ?
+              'No transaction found. Click send/receive to start!' :
+              'No channel found. Open channel to start!'
             }
-            <Row className='text-center'>
-              {activeChannelsExist ?
-                'No transaction found. Click send/receive to start!' :
-                'No transaction found. Open channel to start!'
-              }
-            </Row>
           </Row>
         </Row>
+      </Row>
+    );
+  }
+
+  // Render transactions list
+  return (
+    <PerfectScrollbar
+      onScrollY={handleScroll}
+      className='cln-transactions-list' 
+      data-testid='cln-transactions-list'
+      options={{
+        suppressScrollX: true,
+        wheelPropagation: false
+      }}
+    >
+      {clnTransactions.map((transaction, i) => (
+        <CLNTransactionsAccordion 
+          key={`tx-${i}-${transaction.payment_hash}`}
+          i={i} 
+          expanded={expanded} 
+          setExpanded={setExpanded} 
+          transaction={transaction} 
+        />
+      ))}
+      
+      {isLoading && (
+        <Col xs={12} className='d-flex align-items-center justify-content-center my-3'>
+          <Spinner animation='grow' variant='primary' size='sm' />
+          <span className='ms-2 text-muted'>Loading more transactions...</span>
+        </Col>
+      )}
+      
+      {!hasMore && clnTransactions.length > 0 && (
+        <h6 className='d-flex align-self-center py-4 text-muted text-center'>
+          No more transactions to load!
+        </h6>
+      )}
+      
+      {error && clnTransactions.length > 0 && (
+        <Alert className='mx-3 my-2 py-2 px-3 fs-7' variant='warning'>
+          {error}
+          <button 
+            className='btn btn-link btn-sm p-0 ms-2'
+            onClick={loadMoreTransactions}
+          >
+            Retry
+          </button>
+        </Alert>
+      )}
+    </PerfectScrollbar>
   );
 };
 

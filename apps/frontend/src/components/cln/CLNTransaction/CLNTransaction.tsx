@@ -18,7 +18,7 @@ const Payment = ({ payment, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Transaction Fee (mSats)
           </Col>
-          <Col xs={11} className="fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="fs-7 text-dark overflow-x-ellipsis">
             {payment.amount_sent_msat
               ? formatCurrency(
                   payment.amount_sent_msat - payment.amount_msat,
@@ -39,7 +39,7 @@ const Payment = ({ payment, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Invoice
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {payment.bolt11 || payment.bolt12}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-transaction-copy">
@@ -54,7 +54,7 @@ const Payment = ({ payment, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Preimage
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {payment.payment_preimage}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-transaction-copy">
@@ -76,7 +76,7 @@ const Invoice = ({ invoice, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Valid till
           </Col>
-          <Col xs={11} className="fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="fs-7 text-dark overflow-x-ellipsis">
             <DateBox dataValue={invoice.expires_at} dataType={''} showTooltip={false} />
           </Col>
         </Row>
@@ -88,7 +88,7 @@ const Invoice = ({ invoice, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Invoice
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {invoice.bolt11 || invoice.bolt12}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-transaction-copy">
@@ -103,7 +103,7 @@ const Invoice = ({ invoice, copyHandler }) => {
           <Col xs={12} className="fs-7 text-light">
             Preimage
           </Col>
-          <Col xs={11} className="pe-1 fs-7 overflow-x-ellipsis">
+          <Col xs={11} className="pe-1 fs-7 text-dark overflow-x-ellipsis">
             {invoice.payment_preimage}
           </Col>
           <Col xs={1} onClick={copyHandler} className="cln-transaction-copy">

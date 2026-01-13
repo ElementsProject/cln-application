@@ -10,7 +10,10 @@ import {
   BkprSummaryInfo,
   SummaryRoute,
 } from '../types/bookkeeper.type';
+import { BTCTransaction, LightningTransaction, Offer } from '../types/cln.type';
+import { PeerChannel } from '../types/root.type';
 import { getPeriodKey, getTimestampFromPeriodKey, getTimestampWithGranularity, secondsForTimeGranularity, TimeGranularity } from '../utilities/constants';
+import { sortDescByKey } from '../utilities/data-formatters';
 
 export function calculateAllPeriodKeys(
   calculateFor: string,
@@ -358,8 +361,8 @@ const mapToAccountEventsAccounts = (row: (string | null | number)[]): AccountEve
   balance_msat: 0 as number,
 });
 
-export const convertArrayToAccountEventsObj = (raw: any[]): AccountEventsAccount[] => {
-  return raw.map(mapToAccountEventsAccounts).sort((a, b) => a.timestamp - b.timestamp);
+export const convertArrayToAccountEventsObj = (row: any[]): AccountEventsAccount[] => {
+  return row.map(mapToAccountEventsAccounts).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 const mapToSatsFlowEvents = (row: (string | number)[]): SatsFlowEvent => ({
@@ -375,8 +378,8 @@ const mapToSatsFlowEvents = (row: (string | number)[]): SatsFlowEvent => ({
   payment_id: row[9] as string,
 });
 
-export const convertArrayToSatsFlowObj = (raw: any[]): SatsFlowEvent[] => {
-  return raw.map(mapToSatsFlowEvents).sort((a, b) => a.timestamp - b.timestamp);
+export const convertArrayToSatsFlowObj = (row: any[]): SatsFlowEvent[] => {
+  return row.map(mapToSatsFlowEvents).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 const mapToVolume = (row: (string | number)[]): VolumeRow => ({
@@ -391,6 +394,188 @@ const mapToVolume = (row: (string | number)[]): VolumeRow => ({
   fee_msat: row[8] as number,
 });
 
-export const convertArrayToVolumeObj = (raw: any[]): VolumeRow[] => {
-  return raw.map(mapToVolume).sort((a, b) => a.fee_msat - b.fee_msat);
+export const convertArrayToVolumeObj = (row: any[]): VolumeRow[] => {
+  return row.map(mapToVolume).sort((a, b) => a.fee_msat - b.fee_msat);
+};
+
+export const convertArrayToPeerChannelsObj = (rows: any[]): PeerChannel[] => {
+  const channels = rows.map((row: any[]) => ({
+    node_alias: row[0],
+    peer_id: row[1],
+    channel_id: row[2],
+    short_channel_id: row[3],
+    state: row[4],
+    peer_connected: row[5],
+    to_us_msat: row[6],
+    total_msat: row[7],
+    their_to_self_delay: row[8],
+    opener: row[9],
+    private: row[10],
+    dust_limit_msat: row[11],
+    spendable_msat: row[12],
+    receivable_msat: row[13],
+    funding_txid: row[14],
+    current_state: '',
+    total_sat: Math.floor((row[7] || 0) / 1000),
+    to_us_sat: Math.floor((row[6] || 0) / 1000),
+    to_them_sat: Math.floor(((row[7] || 0) - (row[6] || 0)) / 1000)
+  }));
+  
+  return channels;
+};
+
+const paymentReducer = (accumulator, currentLightningTx) => {
+  const currPayHash = currentLightningTx.payment_hash;
+  currentLightningTx = { ...currentLightningTx };
+  if(currentLightningTx.type === 'PAYMENT') {
+    if (!currentLightningTx.partid) { currentLightningTx.partid = 0; }
+    if (!accumulator[currPayHash]) {
+      accumulator[currPayHash] = [currentLightningTx];
+    } else {
+      accumulator[currPayHash].push(currentLightningTx);
+    }
+  } else {
+    accumulator[currPayHash] = [currentLightningTx];
+  }
+  return accumulator;
+};
+
+const summaryReducer = (accumulator, mpp) => {
+  if (mpp.status?.toLowerCase() === 'complete') {
+    accumulator.amount_msat = accumulator.amount_msat + mpp.amount_msat;
+    accumulator.amount_sent_msat = accumulator.amount_sent_msat + mpp.amount_sent_msat;
+    accumulator.status = mpp.status;
+  }
+  if (mpp.bolt11 && !accumulator.bolt11) { accumulator.bolt11 = mpp.bolt11; }
+  if (mpp.bolt12 && !accumulator.bolt12) { accumulator.bolt12 = mpp.bolt12; }
+  if (mpp.label && !accumulator.label) { accumulator.label = mpp.label; }
+  if (mpp.description && !accumulator.description) { accumulator.description = mpp.description; }
+  if (mpp.payment_preimage && !accumulator.payment_preimage) { accumulator.payment_preimage = mpp.payment_preimage; }
+  return accumulator;
+};
+
+const groupBy = (lightningTxs) => {
+  const lightningTxsInGroups = lightningTxs?.reduce(paymentReducer, {});
+  const lightningTxsGrpArray = Object.keys(lightningTxsInGroups)?.map((key) => (
+      lightningTxsInGroups[key][0].type === 'PAYMENT'
+      && lightningTxsInGroups[key].length
+      && lightningTxsInGroups[key].length > 1)
+    ? sortDescByKey(lightningTxsInGroups[key], 'partid') : lightningTxsInGroups[key]);
+  return lightningTxsGrpArray?.reduce((acc, curr) => {
+    let temp: any = {};
+    if (curr.length && curr.length === 1) {
+      // For PAYMENT & INVOICE both
+      temp = JSON.parse(JSON.stringify(curr[0]));
+      if (curr[0].type === 'PAYMENT') {
+        temp.is_group = false;
+        temp.is_expanded = false;
+        temp.total_parts = 1;
+        delete temp.partid;
+      }
+    } else {
+      // Only applies on MPP PAYMENTS
+      const paySummary = curr?.reduce(summaryReducer, { amount_msat: 0, amount_sent_msat: 0, status: (curr[0] && curr[0].status) ? curr[0].status : 'failed' });
+      temp = {
+        type: 'PAYMENT', is_group: true, is_expanded: false, total_parts: (curr.length ? curr.length : 0), status: paySummary.status, payment_hash: curr[0].payment_hash,
+        destination: curr[0].destination, amount_msat: paySummary.amount_msat, amount_sent_msat: paySummary.amount_sent_msat, created_at: curr[0].created_at,
+        mpps: curr
+      };
+      if (paySummary.bolt11) { temp.bolt11 = paySummary.bolt11; }
+      if (paySummary.bolt12) { temp.bolt12 = paySummary.bolt12; }
+      if (paySummary.bolt11 && !temp.bolt11) { temp.bolt11 = paySummary.bolt11; }
+      if (paySummary.bolt12 && !temp.bolt12) { temp.bolt12 = paySummary.bolt12; }
+      if (paySummary.label && !temp.label) { temp.label = paySummary.label; }
+      if (paySummary.description && !temp.description) { temp.description = paySummary.description; }
+      if (paySummary.payment_preimage && !temp.payment_preimage) { temp.payment_preimage = paySummary.payment_preimage; }
+    }
+    return acc.concat(temp);
+  }, []);
+};
+
+export const convertArrayToLightningTransactionsObj = (rows: any[]): LightningTransaction[] => {
+  if (!rows || rows.length === 0) { return []; }
+  const lightningTransactions = rows.map((row: any[]) => {
+    const type = row[0];
+    if (type === 'INVOICE') {
+      return {
+        type: 'INVOICE',
+        payment_hash: row[1],
+        status: row[2],
+        label: row[3],
+        description: row[4],
+        bolt11: row[5],
+        bolt12: row[6],
+        payment_preimage: row[7],
+        amount_msat: row[8],
+        amount_received_msat: row[9],
+        expires_at: row[10],
+        paid_at: row[11],
+      } as LightningTransaction;
+    } else {
+      return {
+        type: 'PAYMENT',
+        payment_hash: row[1],
+        status: row[2],
+        label: row[3],
+        description: row[4],
+        bolt11: row[5],
+        bolt12: row[6],
+        payment_preimage: row[7],
+        amount_msat: row[8],
+        amount_sent_msat: row[9],
+        created_at: row[10],
+        completed_at: row[11],
+        destination: row[12],
+        groupid: row[13],
+        partid: row[14],
+      } as LightningTransaction;
+    }
+  });
+  const lightningTransactionsAfterGroupedPayments = groupBy(lightningTransactions);
+  return lightningTransactionsAfterGroupedPayments;
+};
+
+export const convertArrayToOffersObj = (rows: any[]): Offer[] => {
+  if (!rows || rows.length === 0) { return []; }
+  const offers = rows.map((row: any[]) => ({
+    offer_id: row[0],
+    active: row[1],
+    single_use: row[2],
+    bolt12: row[3],
+    used: row[4],
+    label: row[5],
+    description: row[6],
+  }));
+  
+  return offers;
+};
+
+export const convertArrayToBTCTransactionsObj = (rows: any[]): BTCTransaction[] => {
+  if (!rows || rows.length === 0) { return []; }
+  const transactions: BTCTransaction[] = rows.map((row: any[]) => ({
+    account: 'wallet',
+    blockheight: row[0],
+    credit_msat: row[1] || 0,
+    currency: 'bcrt',
+    debit_msat: row[2] || 0,
+    outpoint: row[3],
+    tag: row[4],
+    timestamp: row[5],
+    txid: row[6],
+    type: 'chain'
+  }));
+
+  // Merge change outputs with their withdrawal transactions
+  return transactions.reduce((acc: BTCTransaction[], tx) => {
+    const lastTx = acc[acc.length - 1];
+    // Check if this deposit is change from the previous withdrawal
+    const isChangeOutput = lastTx && lastTx.tag?.toLowerCase() === 'withdrawal' && tx.tag?.toLowerCase() === 'deposit' && lastTx.timestamp === tx.timestamp && tx.outpoint?.includes(lastTx.txid || '');
+    if (isChangeOutput) {
+      // Subtract change from withdrawal to get net amount
+      lastTx.debit_msat = (lastTx.debit_msat as number) - (tx.credit_msat as number);
+    } else {
+      acc.push(tx);
+    }
+    return acc;
+  }, []);
 };

@@ -1,36 +1,25 @@
 import '@testing-library/jest-dom';
-import { spyOnBKPRGetAccountEvents, spyOnBKPRGetSatsFlow, spyOnBKPRGetVolume, spyOnGetInfo, spyOnListChannels, spyOnListFunds, spyOnListNodes, spyOnListPeers } from './utilities/test-utilities/mockService';
+import { spyOnBKPRGetAccountEvents, spyOnBKPRGetSatsFlow, spyOnBKPRGetVolume, spyOnGetInfo, spyOnListChannels, spyOnListFunds } from './utilities/test-utilities/mockService';
 
-let mockedLocation = {
-  pathname: '/',
-  search: '',
-  hash: '',
-  state: null,
-  key: 'default',
-};
-
-jest.mock('react-router-dom', () => {
-  const actual = jest.requireActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => jest.fn(),
-    useLocation: () => mockedLocation,
-  };
-});
-
-export const setMockedLocation = (location: Partial<Location>) => {
-  mockedLocation = { ...mockedLocation, ...location };
-};
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder as any;
 
 window.prompt = jest.fn().mockImplementation(() => true);
+
+jest.mock('recharts', () => {
+  const OriginalModule = jest.requireActual('recharts');
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({ children }: any) => children,
+  };
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
   jest.useFakeTimers();
   spyOnGetInfo();
-  spyOnListNodes();
   spyOnListChannels();
-  spyOnListPeers();
   spyOnListFunds();
   spyOnBKPRGetAccountEvents();
   spyOnBKPRGetSatsFlow();
@@ -39,7 +28,11 @@ beforeEach(() => {
   jest.spyOn(console, 'warn').mockImplementation((msg, ...args) => {
     if (
       typeof msg === 'string' &&
-      msg.includes('React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7')
+      (msg.includes('React Router Future Flag Warning') ||
+       msg.includes('HydrateFallback') ||
+       msg.includes('width') ||
+       msg.includes('height') ||
+       msg.includes('chart should be greater than 0'))
     ) {
       return;
     }

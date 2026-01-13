@@ -1,17 +1,22 @@
 import axios from 'axios';
 import moment from 'moment';
-import { ApplicationConfiguration, AuthResponse } from '../types/root.type';
-import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT } from '../utilities/constants';
+import { ApplicationConfiguration, AuthResponse, Peer } from '../types/root.type';
+import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT, SCROLL_PAGE_SIZE } from '../utilities/constants';
 import { AccountEventsSQL, SatsFlowSQL, VolumeSQL } from '../utilities/bookkeeper-sql';
 import logger from './logger.service';
-import { convertArrayToAccountEventsObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
+import { convertArrayToAccountEventsObj, convertArrayToBTCTransactionsObj, convertArrayToLightningTransactionsObj, convertArrayToOffersObj, convertArrayToSatsFlowObj, convertArrayToVolumeObj } from './data-transform.service';
 import { defaultRootState } from '../store/rootSelectors';
 import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
+import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
+import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL } from '../utilities/cln-sql';
+import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '../store/rootSlice';
+import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
+import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
-  timeout: APP_WAIT_TIME * 5,
+  timeout: APP_WAIT_TIME * 10,
   withCredentials: true,
 });
 
@@ -24,18 +29,42 @@ function handleAxiosError(error) {
 }
 
 async function executeRequests<T extends Record<string, Promise<any>>>(
-  requests: T
+  requests: T,
+  onEachComplete?: (key: keyof T, data: any) => void
 ): Promise<any> {
   const entries = Object.entries(requests) as [keyof T, T[keyof T]][];
-  const settledResults = await Promise.allSettled(entries.map(([item, promise]) => {
-    logger.info(item);
-    return promise;
-  }));
+  const settledResults = await Promise.allSettled(
+    entries.map(([key, promise]) => {
+      logger.info(key);
+      
+      return promise
+        .then((value) => {
+          if (onEachComplete) {
+            onEachComplete(key, {
+              ...value,
+              error: null,
+              isLoading: false,
+            });
+          }
+          return value;
+        })
+        .catch((error) => {
+          if (onEachComplete) {
+            onEachComplete(key, {
+              error: handleAxiosError(error),
+              isLoading: false,
+            });
+          }
+          throw error;
+        });
+    })
+  );
 
+  // Still return the combined results for the caller
   return entries.reduce((acc, [name], index) => {
     const result = settledResults[index];
     acc[name] = {
-      ...result.status === 'fulfilled' ? result.value : null,
+      ...(result.status === 'fulfilled' ? result.value : null),
       error: result.status === 'rejected' ? handleAxiosError(result.reason) : null,
       isLoading: false,
     };
@@ -97,7 +126,7 @@ export class HttpService {
     }
   }
 
-  static async clnCall(method: string, params: Record<string, any> = {}) {
+  static async clnCall<T>(method: string, params: Record<string, any> = {}): Promise<T> {
     try {
       return await this.post('/cln/call', { method, params });
     } catch (error) {
@@ -170,18 +199,26 @@ export class RootService {
   }
 
   static async listChannels() {
-    return HttpService.clnCall('listpeerchannels');
-  }
-
-  static async listNodes() {
-    return HttpService.clnCall('listnodes');
-  }
-
-  static async listPeers() {
-    return HttpService.clnCall('listpeers');
+    const [peerChannels, nodes]: [any, any] = await Promise.all([
+      HttpService.clnCall('listpeerchannels'),
+      HttpService.clnCall('listnodes')
+    ]);
+    const nodesMap = new Map<string, Peer>(
+      nodes.nodes?.map(node => [node.nodeid, node]) || []
+    );
+    const merged = peerChannels.channels?.map(channel => ({
+      ...channel,
+      node_alias: nodesMap.get(channel.peer_id)?.alias ?? ''
+    })) || [];
+    return { channels: merged };
+    // // No pagination, need full data for active, pending and inactive channels calculations
+    // // Un-comment after sql plugin improvements
+    // const listChannelsArr: any = await HttpService.clnCall('sql', { query: ListPeerChannelsSQL });
+    // return { channels: convertArrayToPeerChannelsObj(listChannelsArr.rows ? listChannelsArr.rows : []) };
   }
 
   static async listFunds() {
+    // No pagination, need full data for balance calculations
     return HttpService.clnCall('listfunds');
   }
 
@@ -208,40 +245,56 @@ export class RootService {
   }
 
   static async fetchRootData() {
-    const nodeResult = await executeRequests({
-      nodeInfo: this.getNodeInfo(),
-    });
     const results = await executeRequests({
-      listChannels: this.listChannels(),
-      listNodes: this.listNodes(),
-      listPeers: this.listPeers(),
-      listFunds: this.listFunds(),
+      nodeInfo: this.getNodeInfo(),
+      connectWallet: this.getConnectWallet(),
+    },
+    (key, data) => {
+      switch(key) {
+        case 'nodeInfo':
+          appStore.dispatch(setNodeInfo(data));
+          break;
+        case 'connectWallet':
+          appStore.dispatch(setConnectWallet(data));
+          break;
+      }
     });
-    return {
-      nodeInfo: nodeResult.nodeInfo,
-      listChannels: results.listChannels,
-      listNodes: results.listNodes,
-      listPeers: results.listPeers,
-      listFunds: results.listFunds,
-    };
+    return results;
+  }
+
+  static async refreshData() {
+    const results = await executeRequests({
+      listFunds: this.listFunds(),
+      listChannels: this.listChannels(),
+    },
+    (key, data) => {
+      switch(key) {
+        case 'listFunds':
+          appStore.dispatch(setListFunds(data));
+          break;
+        case 'listChannels':
+          appStore.dispatch(setListChannels(data));
+          break;
+      }
+    });
+    return results;
   }
 }
 
 export class CLNService {
-  static async listInvoices() {
-    return HttpService.clnCall('listinvoices');
+  static async listLightningTransactions(offset: number) {
+    const listCLNTransactionsArr: any = await HttpService.clnCall('sql', { query: listLightningTransactionsSQL(SCROLL_PAGE_SIZE, offset) });
+    return { clnTransactions: convertArrayToLightningTransactionsObj(listCLNTransactionsArr.rows ? listCLNTransactionsArr.rows : []) };
   }
 
-  static async listSendPays() {
-    return HttpService.clnCall('listsendpays');
+  static async listOffers(offset: number) {
+    const listOffersArr: any = await HttpService.clnCall('sql', { query: ListOffersSQL(SCROLL_PAGE_SIZE, offset) });
+    return { offers: convertArrayToOffersObj(listOffersArr.rows ? listOffersArr.rows : []) };
   }
 
-  static async listOffers() {
-    return HttpService.clnCall('listoffers');
-  }
-
-  static async listAccountEvents() {
-    return HttpService.clnCall('bkpr-listaccountevents');
+  static async listBTCTransactions(offset: number) {
+    const listBTCTransactionsArr: any = await HttpService.clnCall('sql', { query: listBTCTransactionsSQL(SCROLL_PAGE_SIZE, offset) });
+    return { btcTransactions: convertArrayToBTCTransactionsObj(listBTCTransactionsArr.rows ? listBTCTransactionsArr.rows : []) };
   }
 
   static async getFeeRates() {
@@ -312,30 +365,69 @@ export class CLNService {
   static async fetchCLNData() {
     const state = appStore.getState() as AppState;
     if (state.root.authStatus.isAuthenticated) {
-      const results = await executeRequests({
-        listInvoices: this.listInvoices(),
-        listSendPays: this.listSendPays(),
-        listOffers: this.listOffers(),
-        listAccountEvents: this.listAccountEvents(),
-        feeRates: this.getFeeRates()
-      });
-
+      const results = await executeRequests(
+        {
+          feeRates: this.getFeeRates(),
+          listBtcTransactions: this.listBTCTransactions(0),
+          listOffers: this.listOffers(0),
+          listLightningTransactions: this.listLightningTransactions(0),
+        },
+        (key, data) => {
+          switch(key) {
+            case 'feeRates':
+              appStore.dispatch(setFeeRate(data));
+              break;
+            case 'listBtcTransactions':
+              appStore.dispatch(setListBitcoinTransactions({
+                ...data,
+                page: 1,
+                hasMore: data.btcTransactions?.length >= SCROLL_PAGE_SIZE, // Could be greater also due to payment_hash aggregation
+              }));
+              break;
+            case 'listOffers':
+              appStore.dispatch(setListOffers({
+                ...data,
+                page: 1,
+                hasMore: data.offers?.length === SCROLL_PAGE_SIZE,
+              }));
+              break;
+            case 'listLightningTransactions':
+              appStore.dispatch(setListLightningTransactions({
+                ...data,
+                page: 1,
+                hasMore: data.clnTransactions?.length >= SCROLL_PAGE_SIZE, // Could be greater also due to unique_timestamps aggregation
+              }));
+              break;
+          }
+        }
+      );
+      
       return {
-        listInvoices: results.listInvoices,
-        listSendPays: results.listSendPays,
-        listOffers: results.listOffers,
-        listAccountEvents: results.listAccountEvents,
         feeRates: results.feeRates,
+        listBitcoinTransactions: {
+          ...results.listBtcTransactions,
+          page: 1,
+          hasMore: results.listBtcTransactions.btcTransactions?.length >= SCROLL_PAGE_SIZE,
+        },
+        listOffers: {
+          ...results.listOffers,
+          page: 1,
+          hasMore: results.listOffers.offers?.length === SCROLL_PAGE_SIZE,
+        },
+        listLightningTransactions: {
+          ...results.listLightningTransactions,
+          page: 1,
+          hasMore: results.listLightningTransactions.clnTransactions?.length >= SCROLL_PAGE_SIZE,
+        }
       };
     }
   }
-
 }
 
 export class BookkeeperService {
   static async getAccountEvents() {
     try {
-      const accountEvents = await HttpService.clnCall('sql', [AccountEventsSQL]);
+      const accountEvents = await HttpService.clnCall('sql', { query: AccountEventsSQL }) as { events: AccountEventsAccount[], rows?: [], error?: any };
       if (accountEvents.rows) {
         accountEvents.events = convertArrayToAccountEventsObj(accountEvents.rows);
         delete accountEvents.rows;
@@ -349,7 +441,7 @@ export class BookkeeperService {
 
   static async getSatsFlow(startTimestamp: number, endTimestamp: number) {
     try {
-      const satsFlow = await HttpService.clnCall('sql', [SatsFlowSQL(startTimestamp, endTimestamp)]);
+      const satsFlow = await HttpService.clnCall('sql', { query: SatsFlowSQL(startTimestamp, endTimestamp) }) as { satsFlowEvents: SatsFlowEvent[], rows?: [], error?: any };
       if (satsFlow.rows) {
         satsFlow.satsFlowEvents = convertArrayToSatsFlowObj(satsFlow.rows);
         delete satsFlow.rows;
@@ -363,7 +455,7 @@ export class BookkeeperService {
 
   static async getVolume() {
     try {
-      const volume = await HttpService.clnCall('sql', [VolumeSQL]);
+      const volume = await HttpService.clnCall('sql', { query: VolumeSQL }) as { forwards: VolumeRow[], rows?: [], error?: any };
       if (volume.rows) {
         volume.forwards = convertArrayToVolumeObj(volume.rows);
         delete volume.rows;
@@ -383,12 +475,36 @@ export class BookkeeperService {
       const oneMonthBack = moment(currentDate).subtract(1, 'month').add(1, 'day').toDate();
       const startTimestamp = getTimestampWithGranularity(timeGranularity, oneMonthBack, 'start');
       const endTimestamp = getTimestampWithGranularity(timeGranularity, currentDate, 'end');
-
-      const results = await executeRequests({
-        accountEvents: this.getAccountEvents(),
-        satsFlow: this.getSatsFlow(startTimestamp, endTimestamp),
-        volume: this.getVolume()
-      });
+      const results = await executeRequests(
+        {
+          accountEvents: this.getAccountEvents(),
+          satsFlow: this.getSatsFlow(startTimestamp, endTimestamp),
+          volume: this.getVolume()
+        },
+        (key, data) => {
+          switch(key) {
+            case 'accountEvents':
+              appStore.dispatch(setAccountEvents({
+                accountEvents: data,
+                timeGranularity,
+                startTimestamp,
+                endTimestamp
+              }));
+              break;
+            case 'satsFlow':
+              appStore.dispatch(setSatsFlow({
+                satsFlow: data,
+                timeGranularity,
+                startTimestamp,
+                endTimestamp
+              }));
+              break;
+            case 'volume':
+              appStore.dispatch(setVolume({ volume: data }));
+              break;
+          }
+        }
+      );
       
       return {
         timeGranularity,
@@ -400,5 +516,5 @@ export class BookkeeperService {
       };
     }
   }
-
+  
 }

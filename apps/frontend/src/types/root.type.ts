@@ -6,8 +6,6 @@ export interface RootLoaderData {
   fiatConfig: FiatConfig;
   nodeInfo: NodeInfo;
   listChannels: ListPeerChannels;
-  listNodes: ListNodes;
-  listPeers: ListPeers;
   listFunds: Fund;
   connectWallet: WalletConnect;
 }
@@ -23,7 +21,6 @@ export type RootState = {
   walletBalances: WalletBalances;
   nodeInfo: NodeInfo;
   listFunds: Fund;
-  listPeers: ListPeers;
   listChannels: ListPeerChannels;
 };
 
@@ -35,7 +32,7 @@ export type NodeInfo = {
   id?: string;
   alias?: string;
   color?: string;
-  num_peers?: number;
+  num_peers: number;
   num_pending_channels?: number;
   num_active_channels?: number;
   num_inactive_channels?: number;
@@ -174,86 +171,33 @@ export type Peer = {
   option_will_fund?: LiquidityAd;
 };
 
-export type ListPeers = {
-  isLoading: boolean;
-  peers?: Peer[];
-  error?: any;
-};
-
 export type ChannelType = {
   bits?: number[];
   names?: string[];
 };
 
 export type PeerChannel = {
+  node_alias: string;
   peer_id: string;
-  peer_connected: boolean;
+  channel_id: string;
+  short_channel_id?: string;
   state: string;
+  peer_connected: boolean;
+  to_us_msat: number;
+  total_msat: number;
+  their_to_self_delay?: number;
+  opener?: string;
+  private?: boolean;
+  dust_limit_msat?: number;
+  spendable_msat?: number;
+  receivable_msat?: number;
+  funding_txid?: string;
   // Added for UI: Start
   current_state: string;
-  node_alias: string;
   total_sat: number;
   to_us_sat: number;
   to_them_sat: number;
   // Added for UI: End
-  reestablished?: boolean;
-  scratch_txid?: string;
-  last_tx_fee_msat?: number;
-  direction?: number;
-  close_to_addr?: string;
-  channel_type?: ChannelType;
-  updates?: { local?: any; remote?: any };
-  ignore_fee_limits?: boolean;
-  lost_state?: boolean;
-  feerate?: ChannelFeeRate;
-  owner?: string;
-  short_channel_id?: string;
-  channel_id?: string;
-  funding_txid?: string;
-  funding_outnum?: number;
-  initial_feerate?: string;
-  last_feerate?: string;
-  next_feerate?: string;
-  next_fee_step?: number;
-  inflight?: Inflight[];
-  close_to?: string;
-  private?: boolean;
-  opener?: string;
-  closer?: string;
-  features?: string[];
-  funding?: Funding;
-  total_msat?: number;
-  to_us_msat?: number;
-  to_them_msat?: number;
-  min_to_us_msat?: number;
-  max_to_us_msat?: number;
-  fee_base_msat?: number;
-  fee_proportional_millionths?: number;
-  dust_limit_msat?: number;
-  max_total_htlc_in_msat?: number;
-  their_reserve_msat?: number;
-  our_reserve_msat?: number;
-  spendable_msat?: number;
-  receivable_msat?: number;
-  minimum_htlc_in_msat?: number;
-  minimum_htlc_out_msat?: number;
-  maximum_htlc_out_msat?: number;
-  their_to_self_delay?: number;
-  our_to_self_delay?: number;
-  max_accepted_htlcs?: number;
-  alias?: Alias;
-  state_changes?: StateChange[];
-  status?: string[];
-  in_payments_offered?: number;
-  in_offered_msat?: number;
-  in_payments_fulfilled?: number;
-  in_fulfilled_msat?: number;
-  out_payments_offered?: number;
-  out_offered_msat?: number;
-  out_payments_fulfilled?: number;
-  out_fulfilled_msat?: number;
-  last_stable_connection?: number;
-  htlcs?: HTLC[];
 };
 
 export type ListPeerChannels = {
@@ -357,24 +301,5 @@ export type Fund = {
   isLoading: boolean;
   channels?: FundChannel[];
   outputs?: FundOutput[];
-  error?: any;
-};
-
-/**
- * Node from ListNodes.
- */
-export type Node = {
-  nodeid: string;
-  last_timestamp?: number;
-  alias?: string;
-  color?: string;
-  features?: string[];
-  addresses?: Address[];
-  option_will_fund?: LiquidityAd;
-};
-
-export type ListNodes = {
-  isLoading: boolean;
-  nodes: Node[];
   error?: any;
 };

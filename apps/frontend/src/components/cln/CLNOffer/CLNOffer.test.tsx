@@ -5,26 +5,31 @@ import CLNOffer from './CLNOffer';
 
 describe('CLNOffer component ', () => {
   it('should be in the document', async () => {
-    await renderWithProviders(<CLNOffer />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await renderWithProviders(<CLNOffer />, { 
+      preloadedState: mockAppStore, 
+      initialRoute: ['/cln'] 
+    });
+
+    // Advance timers for initial render animations
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
 
     // Initial state
     expect(screen.getByTestId('cln-offers-list')).toBeInTheDocument();
 
     // Click to expand
-    const expandDiv = await screen.getByTestId('cln-offer-header');
-    fireEvent.click(expandDiv);
-
+    const expandDiv = screen.getByTestId('cln-offer-header');
+    
     await act(async () => {
-      let safety = 0;
-      while (jest.getTimerCount() > 0 && safety++ < 100) {
-        jest.runOnlyPendingTimers();
-        await Promise.resolve();
-      }
+      fireEvent.click(expandDiv);
+      // Advance timers for expand animation
+      jest.advanceTimersByTime(1000);
     });
 
     await waitFor(() => {
       expect(screen.getByTestId('cln-offer-detail')).toBeInTheDocument();
       expect(screen.getByText(mockOffer1.bolt12)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 });

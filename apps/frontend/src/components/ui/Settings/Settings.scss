@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .settings-menu.dropdown {
   & .dropdown-toggle.btn-settings-menu {
@@ -25,7 +25,6 @@
 
 @include color-mode(light) {
   .settings-menu.dropdown {
-    margin-left: 0.5rem;
     & .dropdown-toggle.btn-settings-menu {
       color: $white;
       & svg path {

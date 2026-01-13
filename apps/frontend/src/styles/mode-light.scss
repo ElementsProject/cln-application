@@ -1,4 +1,5 @@
-@import 'constants';
+@use 'sass:color';
+@import 'bootstrap/scss/mixins';
 
 @include color-mode(light) {
   .text-contrast {
@@ -7,6 +8,10 @@
 
   .text-white-dark {
     color: $white;
+  }
+
+  .text-light {
+    color: $light !important;
   }
 
   .text-light-white {
@@ -64,10 +69,36 @@
     stroke: $white;
   }
 
+  .bg-light {
+    background-color: $light !important;
+  }
+
   .card {
+    border: none;
+    transition:
+      background-color $theme-transition ease,
+      box-shadow $theme-transition ease;
     &.bg-primary {
       color: $white;
     }
+    & .card-header {
+      background-color: $card-bg;
+      transition: all $theme-transition ease;
+      border-bottom: none;
+    }
+    & .card-body {
+      transition: all $theme-transition ease;
+    }
+    & .card-footer {
+      background-color: $card-bg;
+      transition: all $theme-transition ease;
+      border-top: none;
+    }
+  }
+
+  .card.overview-balance-card {
+    box-shadow: 0px 4px 8px 0px $gray-400;
+    color: $white;
   }
 
   .list-group-item,
@@ -84,7 +115,7 @@
     &:hover, &:focus-visible {
       outline: none;
       & svg path {
-        stroke: darken($light, 15%);
+        stroke: color.adjust($light, $lightness: -15%);;
       }
     }
   }

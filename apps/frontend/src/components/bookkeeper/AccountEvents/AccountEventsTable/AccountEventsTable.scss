@@ -1,4 +1,4 @@
-@import '../../../../styles/constants.scss';
+@use '../../../../styles/constants' as *;
 
 .account-events-table {
   padding: 0 !important;

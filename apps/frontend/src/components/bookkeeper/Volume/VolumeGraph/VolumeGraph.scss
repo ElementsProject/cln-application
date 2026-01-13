@@ -1,4 +1,4 @@
-@import '../../../../styles/constants.scss';
+@use '../../../../styles/constants' as *;
 
 .volume-graph {
   width: 100%;
@@ -48,5 +48,8 @@
     border: 1px solid $card-bg-dark;
     color: $light-dark;
     background-color: $tooltip-bg-dark;
+  }
+  .volume-graph-legend {
+    color: $light-dark;
   }
 }

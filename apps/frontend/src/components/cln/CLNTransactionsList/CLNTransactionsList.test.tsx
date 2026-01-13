@@ -11,6 +11,8 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: true,
+          page: 1,
+          hasMore: true,
           clnTransactions: []
         }
       },
@@ -32,6 +34,8 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          page: 1,
+          hasMore: true,
           clnTransactions: [],
           error: 'error message'
         }
@@ -63,13 +67,15 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          page: 1,
+          hasMore: true,
           clnTransactions: []
         }
       },
       bkpr: mockBKPRStoreData
     };
     await renderWithProviders(<CLNTransactionsList />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
-    expect(screen.getByText('No transaction found. Open channel to start!')).toBeInTheDocument();
+    expect(screen.getByText('No channel found. Open channel to start!')).toBeInTheDocument();
   });
 
   it('if there are are active channels, show the text saying to use a channel', async () => {
@@ -85,6 +91,8 @@ describe('CLNTransactionsList component ', () => {
         ...mockCLNStoreData,
         listLightningTransactions: {
           isLoading: false,
+          page: 1,
+          hasMore: true,
           clnTransactions: []
         }
       },

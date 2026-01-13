@@ -1,4 +1,3 @@
-import './Overview.scss';
 import { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap';
@@ -11,12 +10,12 @@ import { CapacitySVG } from '../../../svgs/Capacity';
 import { ChannelsSVG } from '../../../svgs/Channels';
 import CurrencyBox from '../../shared/CurrencyBox/CurrencyBox';
 import { useSelector } from 'react-redux';
-import { selectIsAuthenticated, selectListChannels, selectListPeers, selectWalletBalances } from '../../../store/rootSelectors';
+import { selectIsAuthenticated, selectListChannels, selectNumPeers, selectWalletBalances } from '../../../store/rootSelectors';
 
 const Overview = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const walletBalances = useSelector(selectWalletBalances);
-  const listPeers = useSelector(selectListPeers);
+  const numPeers = useSelector(selectNumPeers);
   const listChannels = useSelector(selectListChannels);
   const currentScreenSize = useBreakpoint();
   const countChannels: any = useMotionValue(0);
@@ -25,7 +24,7 @@ const Overview = () => {
   const roundedPeers: any = useTransform(countPeers, Math.round);
 
   useEffect(() => {
-    if (listChannels.activeChannels?.length > 0 && countChannels.prev === 0) {
+    if (listChannels.activeChannels?.length > 0 && (countChannels.prev === 0 || countChannels.prev === undefined)) {
       countChannels.current = 0;
       countChannels.prev = 0;
       const animationChannels = animate(countChannels, listChannels.activeChannels?.length, { duration: COUNTUP_DURATION });
@@ -38,19 +37,22 @@ const Overview = () => {
   }, [listChannels.activeChannels, countChannels]);
 
   useEffect(() => {
-    if (listPeers.peers && listPeers.peers.length && listPeers.peers.length > 0
-      && countPeers.prev === 0) {
+    if (numPeers && numPeers > 0 && (countPeers.prev === 0 || countPeers.prev === undefined)) {
       countPeers.current = 0;
       countPeers.prev = 0;
-      const animationPeers = animate(countPeers, listPeers.peers.length, { duration: COUNTUP_DURATION });
+      const animationPeers = animate(countPeers, numPeers, { duration: COUNTUP_DURATION });
+      return animationPeers.stop;
+    } else {
+      countPeers.current = numPeers;
+      const animationPeers = animate(countPeers, numPeers, { duration: COUNTUP_DURATION });
       return animationPeers.stop;
     }
-  }, [listPeers.peers, countPeers]);
+  }, [numPeers, countPeers]);
 
   return (
     <Row className='mx-1 align-items-stretch'>
       <Col xs={12} lg={3} className='d-lg-flex d-xl-flex mb-4'>
-        <Card className='ps-2 bg-primary flex-grow-1 inner-box-shadow' data-testid='overview-balance-card'>
+        <Card className='card overview-balance-card' data-testid='overview-balance-card'>
           <Card.Body className='d-flex align-items-center'>
             <Row className='flex-fill'>
               <Col xs={6} lg={8} xxl={6} data-testid='overview-total-balance-col'>

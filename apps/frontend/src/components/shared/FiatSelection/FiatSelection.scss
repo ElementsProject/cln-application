@@ -1,10 +1,11 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .fiat-dropdown.dropdown {
   & .svg-curr-symbol {
     margin-top: 3px;
   }
   & .dropdown-menu {
+    min-width: 5.5rem;
     & .dropdown-item {
       & .svg-currency {
         fill: $dark;
@@ -17,8 +18,8 @@
       }
     }
     & .fiat-dropdown-scroller {
-      max-height: 200px;
-      height: 200px;
+      max-height: 12rem;
+      height: 12rem;
     }
   }
   & button.dropdown-toggle {

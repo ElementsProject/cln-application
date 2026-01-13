@@ -8,6 +8,7 @@ import {
   faShekelSign,
   faLiraSign,
 } from '@fortawesome/free-solid-svg-icons';
+import { cubicBezier, spring } from 'framer-motion';
 import moment from 'moment';
 
 export const HOST = process.env.NODE_ENV !== 'production' ? 'localhost' : window.location.hostname;
@@ -17,11 +18,11 @@ export const API_BASE_URL = PROTOCOL + '//' + HOST + ':' + PORT;
 export const API_VERSION = '/v1';
 export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn';
 
-export const APP_WAIT_TIME = 15 * 1000; // 15 seconds
+export const APP_WAIT_TIME = 30 * 1000; // 30 seconds
 export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
 export const TODAY = Math.floor(Date.now() / 1000);
-export const SCROLL_BATCH_SIZE = 20; // For infinite scroll, number of items to load per batch
-export const SCROLL_THRESHOLD = 120; // For infinite scroll, distance from bottom to trigger next batch
+export const SCROLL_PAGE_SIZE = 100; // For infinite scroll, number of items to load per page
+export const SCROLL_THRESHOLD = 200; // For infinite scroll, distance from bottom in pixels (px) to trigger next page load.
 
 export const BTC_MSAT = 100000000000;
 export const BTC_SATS = 100000000;
@@ -325,30 +326,38 @@ export const ANIMATION_FINAL_STATE = { opacity: 1, scale: 1 };
 export const ANIMATION_TRANSITION = {
   duration: COUNTUP_DURATION,
   delay: 0,
-  ease: [0, 0.71, 0.2, 1.01],
+  ease: cubicBezier(0, 0.71, 0.2, 1.01),
 };
 export const ANIMATION_DELAYED_TRANSITION = {
   duration: COUNTUP_DURATION,
   delay: 0.5,
-  ease: [0, 0.71, 0.2, 1.01],
+  ease: cubicBezier(0, 0.71, 0.2, 1.01),
 };
 
 export const OPACITY_VARIANTS = { visible: { opacity: 1 }, hidden: { opacity: 0 } };
-export const SPRING_VARIANTS = { type: 'spring', stiffness: 400, damping: 25 };
-export const BOUNCY_SPRING_VARIANTS_1 = { type: 'spring', stiffness: 600, damping: 20 };
-export const BOUNCY_SPRING_VARIANTS_2 = { type: 'spring', stiffness: 700, damping: 10 };
-export const BOUNCY_SPRING_VARIANTS_3 = { type: 'spring', stiffness: 400, damping: 8, delay: 0.2 };
-export const BOUNCY_SPRING_VARIANTS_4 = { type: 'spring', stiffness: 250, damping: 15 };
+export const SPRING_VARIANTS = { type: spring, stiffness: 400, damping: 25 };
+export const BOUNCY_SPRING_VARIANTS_1 = { type: spring, stiffness: 600, damping: 20 };
+export const BOUNCY_SPRING_VARIANTS_2 = { type: spring, stiffness: 700, damping: 10 };
+export const BOUNCY_SPRING_VARIANTS_3 = { type: spring, stiffness: 400, damping: 8, delay: 0.2 };
+export const BOUNCY_SPRING_VARIANTS_4 = { type: spring, stiffness: 250, damping: 15 };
 export const STAGERRED_SPRING_VARIANTS_1 = {
   hidden: { pathLength: 0, opacity: 0 },
-  visible: i => {
-    const delay = 0 + i * 0.5;
+  visible: (i: number) => {
+    const delay = i * 0.5;
     return {
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { delay, type: 'spring', duration: COUNTUP_DURATION, bounce: 0 },
-        opacity: { delay, duration: 0.02 },
+        pathLength: {
+          delay,
+          type: spring,
+          duration: COUNTUP_DURATION,
+          bounce: 0,
+        },
+        opacity: {
+          delay,
+          duration: 0.02,
+        },
       },
     };
   },
@@ -360,7 +369,7 @@ export const STAGERRED_SPRING_VARIANTS_2 = {
     return {
       x: 0,
       transition: {
-        x: { delay, type: 'spring', stiffness: 700, damping: 10 },
+        x: { delay, type: spring, stiffness: 700, damping: 10 },
       },
     };
   },
@@ -368,12 +377,12 @@ export const STAGERRED_SPRING_VARIANTS_2 = {
 
 export const STAGERRED_SPRING_VARIANTS_3 = {
   hidden: { y: -10 },
-  visible: i => {
+  visible: (i: number) => {
     const delay = 0 + i * 0.5;
     return {
       y: 0,
       transition: {
-        y: { delay, type: 'spring', stiffness: 700, damping: 4 },
+        y: { delay, type: spring, stiffness: 700, damping: 4 },
       },
     };
   },
@@ -386,7 +395,7 @@ export const STAGERRED_SPRING_VARIANTS_4 = {
     return {
       opacity: 1,
       transition: {
-        opacity: { delay, type: 'spring', stiffness: 500, damping: 3 },
+        opacity: { delay, type: spring, stiffness: 500, damping: 3 },
       },
     };
   },
@@ -403,4 +412,4 @@ export const STAGERRED_COLOR_DRAIN = {
       },
     };
   },
-};
+} as const;

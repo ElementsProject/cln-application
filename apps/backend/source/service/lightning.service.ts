@@ -3,14 +3,12 @@ import https from 'https';
 import axios, { AxiosHeaders } from 'axios';
 import Lnmessage from 'lnmessage';
 import { GRPCError, LightningError, ValidationError } from '../models/errors.js';
-import { GRPCService } from './grpc.service.js';
 import {
   HttpStatusCode,
   APP_CONSTANTS,
   AppConnect,
   LN_MESSAGE_CONFIG,
   REST_CONFIG,
-  GRPC_CONFIG,
 } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import { setEnvVariables, validateEnvVariables } from '../shared/utils.js';
@@ -46,8 +44,13 @@ export class LightningService {
           }
           break;
         case AppConnect.GRPC:
-          logger.info('GRPC connecting with config: ' + JSON.stringify(GRPC_CONFIG));
-          this.clnService = new GRPCService(GRPC_CONFIG);
+          this.clnService = null;
+          throw new ValidationError(
+            HttpStatusCode.INVALID_DATA,
+            'gRPC connection to the Lightning node is not supported. Please use the COMMANDO or REST options for APP_CONNECT.',
+          );
+          // logger.info('GRPC connecting with config: ' + JSON.stringify(GRPC_CONFIG));
+          // this.clnService = new GRPCService(GRPC_CONFIG);
           break;
         default:
           logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
@@ -71,8 +74,13 @@ export class LightningService {
         return axios
           .post(method, methodParams, this.axiosConfig)
           .then((commandRes: any) => {
-            logger.info('REST response for ' + method + ': ' + JSON.stringify(commandRes.data));
-            return Promise.resolve(commandRes.data);
+            logger.info(
+              'REST response for ' +
+                method +
+                ': ' +
+                JSON.stringify(commandRes.data || commandRes.rows),
+            );
+            return Promise.resolve(commandRes.data || commandRes.rows);
           })
           .catch((err: any) => {
             logger.error('REST lightning error from ' + method + ' command');

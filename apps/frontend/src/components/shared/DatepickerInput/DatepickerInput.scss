@@ -1,4 +1,4 @@
-@import '../../../styles/constants.scss';
+@use '../../../styles/constants' as *;
 
 .react-datepicker-wrapper {
   width: 6.5rem;
