@@ -636,6 +636,11 @@ export const mockActiveChannels = [mockActiveChannel1, mockActiveChannel2, mockA
 export const mockPendingChannels = [];
 export const mockInactiveChannels = [];
 
+export const mockListChannelsAPIRes = {
+  channels: [...mockActiveChannels, ...mockPendingChannels, ...mockInactiveChannels],
+  isLoading: false
+};
+
 export const mockListChannels = {
   activeChannels: mockActiveChannels,
   pendingChannels: mockPendingChannels,

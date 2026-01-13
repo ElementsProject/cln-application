@@ -75,7 +75,7 @@ describe('CLNTransactionsList component ', () => {
       bkpr: mockBKPRStoreData
     };
     await renderWithProviders(<CLNTransactionsList />, { preloadedState: customMockStore, initialRoute: ['/cln'] });
-    expect(screen.getByText('No transaction found. Open channel to start!')).toBeInTheDocument();
+    expect(screen.getByText('No channel found. Open channel to start!')).toBeInTheDocument();
   });
 
   it('if there are are active channels, show the text saying to use a channel', async () => {
