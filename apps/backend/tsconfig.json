@@ -15,5 +15,5 @@
     "lib": ["ES2022"]
   },
   "files": ["./source/server.ts"],
-  "include": ["./source/**/*.d.ts"]
+  "include": ["./source/**/*.ts"]
 }
