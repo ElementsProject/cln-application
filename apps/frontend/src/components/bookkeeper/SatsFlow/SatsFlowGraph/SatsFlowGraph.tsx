@@ -55,9 +55,9 @@ const SatsFlowGraphLegend = (props: any) => {
       {payload
         .filter((entry: any) => entry.value !== 'net_inflow_msat')
         .map((entry: any, index: number) => (
-          <Col key={`item-${index}`} xs='auto' className='d-flex align-items-center'>
+          <Col key={`item-${index}`} xs='auto' className='col-sats-flow-lagend d-flex align-items-center'>
             <div className='sats-flow-lagend-bullet' style={{ backgroundColor: entry.color }}/>
-            <span>{titleCase(entry.value.replace(/_/g, ' '))}</span>
+            <span className='span-sats-flow-lagend'>{titleCase(entry.value.replace(/_/g, ' '))}</span>
           </Col>
         ))
       }
