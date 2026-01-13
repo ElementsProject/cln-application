@@ -8,7 +8,7 @@
   box-shadow: 0px 4px 8px 0px rgba($gray-400, 0.16);
 }
 
-.sats-flow-lagend-bullet {
+.col-sats-flow-lagend .sats-flow-lagend-bullet {
   width: 12px;
   height: 12px;
   margin-right: 6px;
@@ -36,5 +36,8 @@
     border: 1px solid $card-bg-dark;
     color: $light-dark;
     background-color: $tooltip-bg-dark;
+  }
+  .col-sats-flow-lagend .span-sats-flow-lagend {
+    color: $light-dark;
   }
 }
