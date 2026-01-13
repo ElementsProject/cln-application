@@ -11,14 +11,23 @@ const clnSlice = createSlice({
         state.listLightningTransactions = { ...state.listLightningTransactions, error: action.payload.error };
         return;
       }
-      state.listLightningTransactions = {
-        ...state.listLightningTransactions,
-        ...action.payload,
-        clnTransactions: [
-          ...state.listLightningTransactions.clnTransactions,
-          ...action.payload.clnTransactions,
-        ],
-      };
+      if (action.payload.page === 1) {
+        // Replace array for page 1
+        state.listLightningTransactions = {
+          ...state.listLightningTransactions,
+          ...action.payload,
+        };
+      } else {
+        // Append to existing array for page > 1
+        state.listLightningTransactions = {
+          ...state.listLightningTransactions,
+          ...action.payload,
+          clnTransactions: [
+            ...state.listLightningTransactions.clnTransactions,
+            ...action.payload.clnTransactions,
+          ],
+        };
+      }
     },
     setListLightningTransactionsLoading(state, action: PayloadAction<boolean>) {
       state.listLightningTransactions.isLoading = action.payload;
@@ -31,15 +40,25 @@ const clnSlice = createSlice({
         state.listOffers = { ...state.listOffers, error: action.payload.error };
         return;
       }
-      state.listOffers = {
-        ...state.listOffers,
-        ...action.payload,
-        offers: [
-          ...(state.listOffers.offers ?? []),
-          ...(action.payload.offers ?? []),
-        ],
-      };
-    },    
+      
+      if (action.payload.page === 1) {
+        // Replace array for page 1
+        state.listOffers = {
+          ...state.listOffers,
+          ...action.payload,
+        };
+      } else {
+        // Append to existing array for page > 1
+        state.listOffers = {
+          ...state.listOffers,
+          ...action.payload,
+          offers: [
+            ...state.listOffers.offers,
+            ...action.payload.offers,
+          ],
+        };
+      }
+    },
     setListOffersLoading(state, action: PayloadAction<boolean>) {
       state.listOffers.isLoading = action.payload;
     },
@@ -51,14 +70,24 @@ const clnSlice = createSlice({
         state.listBitcoinTransactions = { ...state.listBitcoinTransactions, error: action.payload.error };
         return;
       }
-      state.listBitcoinTransactions = {
-        ...state.listBitcoinTransactions,
-        ...action.payload,
-        btcTransactions: [
-          ...state.listBitcoinTransactions.btcTransactions,
-          ...action.payload.btcTransactions,
-        ],
-      };
+      
+      if (action.payload.page === 1) {
+        // Replace array for page 1
+        state.listBitcoinTransactions = {
+          ...state.listBitcoinTransactions,
+          ...action.payload,
+        };
+      } else {
+        // Append to existing array for page > 1
+        state.listBitcoinTransactions = {
+          ...state.listBitcoinTransactions,
+          ...action.payload,
+          btcTransactions: [
+            ...state.listBitcoinTransactions.btcTransactions,
+            ...action.payload.btcTransactions,
+          ],
+        };
+      }
     },
     setListBitcoinTransactionsLoading(state, action: PayloadAction<boolean>) {
       state.listBitcoinTransactions.isLoading = action.payload;

@@ -14,7 +14,6 @@ import { selectListOffers } from '../../../store/clnSelectors';
 import { selectIsAuthenticated, selectIsDarkMode } from '../../../store/rootSelectors';
 import { ListOffers } from '../../../types/cln.type';
 import { setListOffers, setListOffersLoading } from '../../../store/clnSlice';
-import { convertArrayToOffersObj } from '../../../services/data-transform.service';
 import { CLNService } from '../../../services/http.service';
 
 const OfferHeader = ({ offer }) => {
@@ -111,26 +110,18 @@ export const CLNOffersList = () => {
     try {
       const offset = page * SCROLL_PAGE_SIZE;
       const listOffersRes: any = await CLNService.listOffers(offset);
-      
       if (listOffersRes.error) {
         dispatch(setListOffers({ 
           error: listOffersRes.error 
         } as ListOffers));
         return;
       }
-
-      const latestOffers = convertArrayToOffersObj(listOffersRes.rows);
-
-      setExpanded(prev => [...prev, ...new Array(latestOffers.length).fill(false)]);
-
+      setExpanded(prev => [...prev, ...new Array(listOffersRes.offers.length).fill(false)]);
       dispatch(setListOffers({ 
-        offers: latestOffers,
+        ...listOffersRes,
         page: page + 1,
-        hasMore: latestOffers.length >= SCROLL_PAGE_SIZE,
-        isLoading: false,
-        error: undefined
+        hasMore: listOffersRes.offers.length >= SCROLL_PAGE_SIZE,
       } as ListOffers));
-      
     } catch (error: any) {
       dispatch(setListOffers({ 
         error: error.message || 'Failed to load offers'
