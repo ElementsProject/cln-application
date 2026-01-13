@@ -1,4 +1,11 @@
 import './App.scss';
+import '../shared/FiatBox/FiatBox.scss';
+import '../shared/CurrencyBox/CurrencyBox.scss';
+import '../shared/ToastMessage/ToastMessage.scss';
+import '../shared/InvalidInputMessage/InvalidInputMessage.scss';
+import '../shared/StatusAlert/StatusAlert.scss';
+import '../cln/Overview/Overview.scss';
+
 import { Container } from 'react-bootstrap';
 
 import useBreakpoint from '../../hooks/use-breakpoint';
