@@ -13,7 +13,6 @@ import { RefreshSVG } from '../../../svgs/Refresh';
 import { resetListBitcoinTransactions, setListBitcoinTransactions, setListBitcoinTransactionsLoading } from '../../../store/clnSlice';
 import { CLNService } from '../../../services/http.service';
 import { ListBitcoinTransactions } from '../../../types/cln.type';
-import { convertArrayToBTCTransactionsObj } from '../../../services/data-transform.service';
 import { SCROLL_PAGE_SIZE } from '../../../utilities/constants';
 
 const BTCWallet = (props) => {
@@ -27,21 +26,16 @@ const BTCWallet = (props) => {
     try {
       const offset = 0;
       const listBtcTransactionsRes: any = await CLNService.listBTCTransactions(offset);
-      
       if (listBtcTransactionsRes.error) {
         dispatch(setListBitcoinTransactions({ 
           error: listBtcTransactionsRes.error 
         } as ListBitcoinTransactions));
         return;
       }
-
-      const latestBtcTransactions = convertArrayToBTCTransactionsObj(listBtcTransactionsRes.rows);
       dispatch(setListBitcoinTransactions({ 
-        btcTransactions: latestBtcTransactions,
+        ...listBtcTransactionsRes,
         page: 1,
-        hasMore: latestBtcTransactions.length >= SCROLL_PAGE_SIZE,
-        isLoading: false,
-        error: undefined
+        hasMore: listBtcTransactionsRes.btcTransactions.length >= SCROLL_PAGE_SIZE,
       } as ListBitcoinTransactions));
     } catch (error: any) {
       dispatch(setListBitcoinTransactions({ 

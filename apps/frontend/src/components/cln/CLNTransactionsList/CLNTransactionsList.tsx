@@ -18,7 +18,6 @@ import { selectListLightningTransactions } from '../../../store/clnSelectors';
 import { setListLightningTransactions, setListLightningTransactionsLoading } from '../../../store/clnSlice';
 import { CLNService } from '../../../services/http.service';
 import { ListLightningTransactions } from '../../../types/cln.type';
-import { convertArrayToLightningTransactionsObj } from '../../../services/data-transform.service';
 
 const PaymentHeader = ({ payment }) => {
   const fiatUnit = useSelector(selectFiatUnit);
@@ -223,26 +222,18 @@ export const CLNTransactionsList = () => {
     try {
       const offset = page * SCROLL_PAGE_SIZE;
       const listClnTransactionsRes: any = await CLNService.listLightningTransactions(offset);
-      
       if (listClnTransactionsRes.error) {
         dispatch(setListLightningTransactions({ 
           error: listClnTransactionsRes.error 
         } as ListLightningTransactions));
         return;
       }
-
-      const latestClnTransactions = convertArrayToLightningTransactionsObj(listClnTransactionsRes.rows);
-
-      setExpanded(prev => [...prev, ...new Array(latestClnTransactions.length).fill(false)]);
-
-      dispatch(setListLightningTransactions({ 
-        clnTransactions: latestClnTransactions,
+      setExpanded(prev => [...prev, ...new Array(listClnTransactionsRes.clnTransactions?.length).fill(false)]);
+      dispatch(setListLightningTransactions({
+        ...listClnTransactionsRes,
         page: page + 1,
-        hasMore: latestClnTransactions.length >= SCROLL_PAGE_SIZE,
-        isLoading: false,
-        error: undefined
+        hasMore: listClnTransactionsRes.clnTransactions?.length >= SCROLL_PAGE_SIZE, // Could be greater also due to unique_timestamps aggregation
       } as ListLightningTransactions));
-      
     } catch (error: any) {
       dispatch(setListLightningTransactions({ 
         error: error.message || 'Failed to load transactions'

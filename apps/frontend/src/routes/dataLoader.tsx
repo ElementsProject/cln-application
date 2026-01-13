@@ -6,13 +6,11 @@ import { AppState } from "../store/store.type";
 export async function rootLoader({}: LoaderFunctionArgs) {
   const state = appStore.getState() as AppState;
   if (state.root.authStatus.isAuthenticated) {
-    const [connectwalletData, rootData] = await Promise.all([
-      RootService.getConnectWallet(),
-      RootService.fetchRootData()
-    ]);
-    return { ...rootData, connectWallet: connectwalletData };
+    const rootData = await RootService.fetchRootData();
+    const refreshData = await RootService.refreshData();
+    return [rootData, refreshData];
   }
-  return null
+  return null;
 }
 
 export async function clnLoader({}: LoaderFunctionArgs) {

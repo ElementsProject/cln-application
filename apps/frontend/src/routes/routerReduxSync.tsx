@@ -1,44 +1,19 @@
-import { useLoaderData } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { clearBKPRStore, setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
-import { clearCLNStore, setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
-import { setListChannels, setListFunds, setNodeInfo, setConnectWallet } from '../store/rootSlice';
+import { clearBKPRStore } from '../store/bkprSlice';
+import { clearCLNStore } from '../store/clnSlice';
 import { APP_WAIT_TIME } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootService } from '../services/http.service';
-import { RootLoaderData } from '../types/root.type';
-import { CLNLoaderData } from '../types/cln.type';
-import { BKPRLoaderData } from '../types/bookkeeper.type';
+import { BookkeeperService, CLNService, RootService } from '../services/http.service';
 import { selectAuthStatus } from '../store/rootSelectors';
 import logger from '../services/logger.service';
 
 export function RootRouterReduxSync() {
   const navigate = useNavigate();
-  const rootData = useLoaderData() as RootLoaderData;
   const dispatch = useDispatch();
   const { pathname } = useLocation();
   const authStatus = useSelector(selectAuthStatus);
-
-  useEffect(() => {
-    if (!rootData) return;
-
-    if (authStatus.isAuthenticated && authStatus.isValidPassword) {
-      if (rootData.nodeInfo) {
-        dispatch(setNodeInfo(rootData.nodeInfo));
-      }
-      if (rootData.listChannels) {
-        dispatch(setListChannels(rootData.listChannels));
-      }
-      if (rootData.listFunds) {
-        dispatch(setListFunds(rootData.listFunds));
-      }
-      if (rootData.connectWallet) {
-        dispatch(setConnectWallet(rootData.connectWallet));
-      }
-    }
-  }, [authStatus.isAuthenticated, authStatus.isValidPassword, rootData, dispatch, pathname]);
-
+  
   // Handle polling
   useEffect(() => {
     if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
@@ -46,10 +21,7 @@ export function RootRouterReduxSync() {
     const interval = setInterval(async () => {
       if (document.visibilityState === 'visible' && authStatus?.isAuthenticated) {
         try {
-          const rootData = await RootService.fetchRootData();
-          dispatch(setNodeInfo(rootData?.nodeInfo));
-          dispatch(setListChannels(rootData?.listChannels));
-          dispatch(setListFunds(rootData?.listFunds));
+          await RootService.refreshData();
         } catch (error) {
           logger.error('Error fetching root data:', error);
         }
@@ -61,7 +33,24 @@ export function RootRouterReduxSync() {
 
   // Handle navigation for authenticated users
   useEffect(() => {
+    const fetchRouteData = async () => {
+      if (pathname.includes('/cln')) {
+        try {
+          await CLNService.fetchCLNData();
+        } catch (error) {
+          logger.error('Error fetching CLN data:', error);
+        }
+      }
+      else if (pathname.includes('/bookkeeper')) {
+        try {
+          await BookkeeperService.fetchBKPRData();
+        } catch (error) {
+          logger.error('Error fetching BKPR data:', error);
+        }
+      }
+    };
     const targetPath = pathname.includes('/bookkeeper') ? pathname : '/cln';
+    fetchRouteData();
     if (pathname !== targetPath) {
       navigate(targetPath, { replace: true });
     }
@@ -78,65 +67,6 @@ export function RootRouterReduxSync() {
       }
     };
   }, [pathname, dispatch]);
-
-  return null;
-}
-
-export function CLNRouterReduxSync() {
-  const clnData = useLoaderData() as CLNLoaderData;
-  const dispatch = useDispatch();
-  const authStatus = useSelector(selectAuthStatus);
-
-  useEffect(() => {
-    if (!clnData) return;
-    if (authStatus.isAuthenticated && authStatus.isValidPassword) {
-      if (clnData.listLightningTransactions) {
-        dispatch(setListLightningTransactions(clnData.listLightningTransactions));
-      }
-      if (clnData.listOffers) {
-        dispatch(setListOffers(clnData.listOffers));
-      }
-      if (clnData.listBitcoinTransactions) {
-        dispatch(setListBitcoinTransactions(clnData.listBitcoinTransactions));
-      }
-      if (clnData.feeRates) {
-        dispatch(setFeeRate(clnData.feeRates));
-      }
-    }
-  }, [authStatus.isAuthenticated, authStatus.isValidPassword, clnData, dispatch]);
-
-  return null;
-}
-
-export function BKPRRouterReduxSync() {
-  const bkprData = useLoaderData() as BKPRLoaderData;
-  const dispatch = useDispatch();
-  const authStatus = useSelector(selectAuthStatus);
-
-  useEffect(() => {
-    if (!bkprData) return;
-    if (authStatus.isAuthenticated && authStatus.isValidPassword) {
-      if (bkprData.satsFlow) {
-        dispatch(setSatsFlow({
-          satsFlow: bkprData.satsFlow,
-          timeGranularity: bkprData.timeGranularity,
-          startTimestamp: bkprData.startTimestamp,
-          endTimestamp: bkprData.endTimestamp
-        }));
-      }
-      if (bkprData.accountEvents) {
-        dispatch(setAccountEvents({
-          accountEvents: bkprData.accountEvents,
-          timeGranularity: bkprData.timeGranularity,
-          startTimestamp: bkprData.startTimestamp,
-          endTimestamp: bkprData.endTimestamp
-        }));
-      }
-      if (bkprData.volume) {
-        dispatch(setVolume({ volume: bkprData.volume }));
-      }
-    }
-  }, [authStatus.isAuthenticated, authStatus.isValidPassword, bkprData, dispatch]);
 
   return null;
 }

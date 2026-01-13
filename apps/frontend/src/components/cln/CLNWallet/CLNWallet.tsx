@@ -16,7 +16,6 @@ import { RefreshSVG } from '../../../svgs/Refresh';
 import { resetListLightningTransactions, resetListOffers, setListLightningTransactions, setListLightningTransactionsLoading, setListOffers, setListOffersLoading } from '../../../store/clnSlice';
 import { CLNService } from '../../../services/http.service';
 import { ListLightningTransactions, ListOffers } from '../../../types/cln.type';
-import { convertArrayToLightningTransactionsObj, convertArrayToOffersObj } from '../../../services/data-transform.service';
 
 const CLNWallet = (props) => {
   const dispatch = useDispatch();
@@ -25,7 +24,6 @@ const CLNWallet = (props) => {
   const [selectedTab, setSelectedTab] = useState('transactions');
 
   const refreshHandler = async (calledBy) => {
-    console.warn(calledBy);
     if(calledBy === 'OFFERS') {
       dispatch(setListOffersLoading(true));
       dispatch(resetListOffers());
@@ -33,23 +31,17 @@ const CLNWallet = (props) => {
       try {
         const offset = 0;
         const listOffersRes: any = await CLNService.listOffers(offset);
-        
         if (listOffersRes.error) {
           dispatch(setListOffers({ 
             error: listOffersRes.error 
           } as ListOffers));
           return;
         }
-
-        const latestOffers = convertArrayToOffersObj(listOffersRes.rows);
         dispatch(setListOffers({ 
-          offers: latestOffers,
+          ...listOffersRes,
           page: 1,
-          hasMore: latestOffers.length >= SCROLL_PAGE_SIZE,
-          isLoading: false,
-          error: undefined
+          hasMore: listOffersRes.offers.length >= SCROLL_PAGE_SIZE,
         } as ListOffers));
-        
       } catch (error: any) {
         dispatch(setListOffers({ 
           error: error.message || 'Failed to load offers'
@@ -63,21 +55,16 @@ const CLNWallet = (props) => {
       try {
         const offset = 0;
         const listClnTransactionsRes: any = await CLNService.listLightningTransactions(offset);
-        
         if (listClnTransactionsRes.error) {
           dispatch(setListLightningTransactions({ 
             error: listClnTransactionsRes.error 
           } as ListLightningTransactions));
           return;
         }
-
-        const latestClnTransactions = convertArrayToLightningTransactionsObj(listClnTransactionsRes.rows);
-        dispatch(setListLightningTransactions({ 
-          clnTransactions: latestClnTransactions,
+        dispatch(setListLightningTransactions({
+          ...listClnTransactionsRes,
           page: 1,
-          hasMore: latestClnTransactions.length >= SCROLL_PAGE_SIZE,
-          isLoading: false,
-          error: undefined
+          hasMore: listClnTransactionsRes.clnTransactions?.length >= SCROLL_PAGE_SIZE, // Could be greater also due to unique_timestamps aggregation
         } as ListLightningTransactions));
       } catch (error: any) {
         dispatch(setListLightningTransactions({ 

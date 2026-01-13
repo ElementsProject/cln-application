@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectFiatConfig, selectFiatUnit, selectIsAuthenticated, selectIsDarkMode, selectUIConfigUnit } from '../../../store/rootSelectors';
 import { selectListBitcoinTransactions } from '../../../store/clnSelectors';
 import { CLNService } from '../../../services/http.service';
-import { convertArrayToBTCTransactionsObj } from '../../../services/data-transform.service';
 import { setListBitcoinTransactions, setListBitcoinTransactionsLoading } from '../../../store/clnSlice';
 import { ListBitcoinTransactions } from '../../../types/cln.type';
 
@@ -189,26 +188,18 @@ export const BTCTransactionsList = () => {
     try {
       const offset = page * SCROLL_PAGE_SIZE;
       const listBtcTransactionsRes: any = await CLNService.listBTCTransactions(offset);
-      
       if (listBtcTransactionsRes.error) {
         dispatch(setListBitcoinTransactions({ 
           error: listBtcTransactionsRes.error 
         } as ListBitcoinTransactions));
         return;
       }
-
-      const latestBtcTransactions = convertArrayToBTCTransactionsObj(listBtcTransactionsRes.rows);
-
-      setExpanded(prev => [...prev, ...new Array(latestBtcTransactions.length).fill(false)]);
-
+      setExpanded(prev => [...prev, ...new Array(listBtcTransactionsRes.btcTransactions.length).fill(false)]);
       dispatch(setListBitcoinTransactions({ 
-        btcTransactions: latestBtcTransactions,
+        ...listBtcTransactionsRes,
         page: page + 1,
-        hasMore: latestBtcTransactions.length >= SCROLL_PAGE_SIZE,
-        isLoading: false,
-        error: undefined
+        hasMore: listBtcTransactionsRes.btcTransactions.length >= SCROLL_PAGE_SIZE,
       } as ListBitcoinTransactions));
-      
     } catch (error: any) {
       dispatch(setListBitcoinTransactions({ 
         error: error.message || 'Failed to load transactions'

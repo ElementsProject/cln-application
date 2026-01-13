@@ -4,8 +4,8 @@ import { Loading } from '../components/ui/Loading/Loading';
 import AccountEventsRoot from '../components/bookkeeper/AccountEvents/AccountEventsRoot';
 import SatsFlowRoot from '../components/bookkeeper/SatsFlow/SatsFlowRoot';
 import VolumeRoot from '../components/bookkeeper/Volume/VolumeRoot';
-import { bkprLoader, clnLoader, rootLoader } from './dataLoader';
-import { RootRouterReduxSync, CLNRouterReduxSync, BKPRRouterReduxSync } from './routerReduxSync';
+import { rootLoader } from './dataLoader';
+import { RootRouterReduxSync } from './routerReduxSync';
 
 const App = lazy(() => import('../components/App/App'));
 const CLNHome = lazy(() => import('../components/cln/CLNHome/CLNHome'));
@@ -28,20 +28,16 @@ export const rootRouteConfig = [
         element: (
           <Suspense fallback={<Loading />}>
             <CLNHome />
-            <CLNRouterReduxSync />
           </Suspense>
         ),
-        loader: clnLoader,
       },
       {
         path: 'bookkeeper',
         element: (
           <Suspense fallback={<Loading />}>
             <Bookkeeper />
-            <BKPRRouterReduxSync />
           </Suspense>
         ),
-        loader: bkprLoader,
         children: [
           {
             path: 'accountevents',
