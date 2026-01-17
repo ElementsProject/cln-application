@@ -9,10 +9,11 @@ import { defaultRootState } from '../store/rootSelectors';
 import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
 import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
-import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL } from '../utilities/cln-sql';
+import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL, ListOffersSQLWithoutDesc } from '../utilities/cln-sql';
 import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '../store/rootSlice';
 import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
+import { isCompatibleVersion } from '../utilities/data-formatters';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
@@ -287,9 +288,23 @@ export class CLNService {
     return { clnTransactions: convertArrayToLightningTransactionsObj(listCLNTransactionsArr.rows ? listCLNTransactionsArr.rows : []) };
   }
 
-  static async listOffers(offset: number) {
-    const listOffersArr: any = await HttpService.clnCall('sql', { query: ListOffersSQL(SCROLL_PAGE_SIZE, offset) });
-    return { offers: convertArrayToOffersObj(listOffersArr.rows ? listOffersArr.rows : []) };
+  static async listOffers(offset: number, store = appStore) {
+    const state = store.getState() as AppState;
+    const nodeInfo = state.root.nodeInfo;
+    const isCompatible = isCompatibleVersion(nodeInfo.version || '', '26.04');
+    const primaryQuery = isCompatible ? ListOffersSQL(SCROLL_PAGE_SIZE, offset) : ListOffersSQLWithoutDesc(SCROLL_PAGE_SIZE, offset);
+    try {
+      const listOffersArr: any = await HttpService.clnCall('sql', { query: primaryQuery });
+      return { offers: convertArrayToOffersObj(listOffersArr.rows ?? []) };
+    } catch (err: any) {
+      // Fallback ONLY for older nodes missing `description`
+      if (isCompatible && typeof err?.message === 'string' && err.message.includes('no such column: description')) {
+        const fallbackQuery = ListOffersSQLWithoutDesc(SCROLL_PAGE_SIZE, offset);
+        const listOffersArr: any = await HttpService.clnCall('sql', { query: fallbackQuery });
+        return { offers: convertArrayToOffersObj(listOffersArr.rows ?? []) };
+      }
+      throw err; // Throw all other errors
+    }
   }
 
   static async listBTCTransactions(offset: number) {
