@@ -16,7 +16,8 @@
     "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",
     "start": "npm run serve -w cln-application-backend",
-    "lint": "npm run backend:lint && npm run frontend:lint"
+    "lint": "npm run backend:lint && npm run frontend:lint",
+    "update-version": "node -e \"const fs=require('fs'),v=process.env.VERSION;if(!v)throw new Error('VERSION env required');const cleanVersion=v.replace(/^v/, '');['./package.json','./apps/backend/package.json','./apps/frontend/package.json'].forEach(f=>{if(fs.existsSync(f)){const content=fs.readFileSync(f,'utf8');const p=JSON.parse(content);p.version=cleanVersion;fs.writeFileSync(f,JSON.stringify(p,null,2));}});console.log('Updated to',cleanVersion)\" && npm install --package-lock-only --silent"
   },
   "keywords": [
     "cln application",

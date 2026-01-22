@@ -85,6 +85,16 @@ git push fork feat/your-feature-name
 Release Process
 ----------------
 
+- Update package version and push on Release-yy.mm.n (if not updated till now)
+
+```sh
+export VERSION=vyy.mm.n
+npm run update-version
+git add apps/backend/package.json apps/frontend/package.json package-lock.json package.json
+git commit -m "Update Version"
+git push
+```
+
 - Merge the release branch into main:
 
 ```sh
