@@ -27,7 +27,7 @@ const LoginComponent = () => {
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
-  const isValidPassword = value => value.trim() !== '';
+  const isValidPassword = value => value && value.trim() !== '';
 
   const {
     value: passwordValue,
