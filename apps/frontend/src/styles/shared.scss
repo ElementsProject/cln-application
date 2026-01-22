@@ -3,8 +3,6 @@
 @import './mode-dark.scss';
 @import './mode-light.scss';
 @import 'bootstrap/scss/mixins';
-@import 'react-perfect-scrollbar/dist/css/styles.css';
-@import 'react-datepicker/dist/react-datepicker.css';
 
 body {
   &[data-screensize='XL'],

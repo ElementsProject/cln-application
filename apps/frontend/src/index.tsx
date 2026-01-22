@@ -1,3 +1,6 @@
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
