@@ -17,7 +17,10 @@ const MONTH_NAMES = [
 ];
 
 export const convertIntoDateFormat = dataValue => {
+  if (!dataValue || isNaN(dataValue)) { return 'Unknown'; }
   let newDate = new Date(dataValue * 1000);
+  if (isNaN(newDate.getTime())) { return 'Unknown'; }
+
   return (
     newDate.getDate().toString().padStart(2, '0') +
     ' ' +
