@@ -29,7 +29,7 @@ source env-local.sh
 
 #### Set up Commando authentication:
 - Manually update `LIGHTNING_PUBKEY` and `LIGHTNING_RUNE` in your `LIGHTNING_VARS_FILE`
-- OR Run the setup script:
+- OR Run the setup script. Note that it requires `socat` and `jq` to run successfully:
 
 ```sh
 source entrypoint.sh

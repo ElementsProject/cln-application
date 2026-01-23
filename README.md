@@ -124,6 +124,7 @@
       - Values can either be set manually or script `entrypoint.sh` can be used to call `getinfo` and `createrune` methods and save values in `LIGHTNING_VARS_FILE`.
       - `entrypoint.sh` can only run for the locally installed lightning. If `cln-application` is running remotely then pubkey and 
       rune can be set manually.
+      - The script requires `socat` and `jq` to run successfully.
       - Sample commando config should look like:
 
         ```
