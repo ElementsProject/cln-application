@@ -213,9 +213,5 @@ export const GRPC_CONFIG = {
 };
 
 export const API_VERSION = '/v1';
-export const FIAT_RATE_API = 'https://green-bitcoin-mainnet.blockstream.com/prices/v0/venues/';
-export const FIAT_VENUES: any = {
-  USD: 'KRAKEN',
-  EUR: 'KRAKEN',
-  NZD: 'KIWICOIN',
-};
+export const FIAT_RATE_API =
+  'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=';

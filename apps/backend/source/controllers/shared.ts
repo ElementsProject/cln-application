@@ -2,13 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import {
-  APP_CONSTANTS,
-  DEFAULT_CONFIG,
-  FIAT_RATE_API,
-  FIAT_VENUES,
-  HttpStatusCode,
-} from '../shared/consts.js';
+import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, HttpStatusCode } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
@@ -79,18 +73,14 @@ export class SharedController {
   getFiatRate = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Getting Fiat Rate for: ' + req.params.fiatCurrency);
-      const FIAT_VENUE = FIAT_VENUES.hasOwnProperty(req.params.fiatCurrency)
-        ? FIAT_VENUES[req.params.fiatCurrency]
-        : 'COINGECKO';
-      logger.info(
-        'Fiat URL: ' + FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency,
-      );
+      logger.info('Fiat URL: ' + FIAT_RATE_API + req.params.fiatCurrency);
       return axios
-        .get(FIAT_RATE_API + FIAT_VENUE + '/pairs/XBT/' + req.params.fiatCurrency)
+        .get(FIAT_RATE_API + req.params.fiatCurrency)
         .then((response: any) => {
           logger.info('Fiat Response: ' + JSON.stringify(response?.data));
-          if (response.data?.rate) {
-            return res.status(200).json({ venue: FIAT_VENUE, rate: response.data?.rate });
+          const fiatLowerCase = req.params.fiatCurrency.toLowerCase();
+          if (response.data?.bitcoin && response.data?.bitcoin[fiatLowerCase]) {
+            return res.status(200).json({ rate: response.data?.bitcoin[fiatLowerCase] });
           } else {
             return handleError(
               new APIError(HttpStatusCode.NOT_FOUND, 'Price Not Found'),
@@ -102,11 +92,11 @@ export class SharedController {
         })
         .catch(err => {
           logger.error('Fiat Error Response: ' + JSON.stringify(err));
-          res.status(200).json({ venue: 'NONE', rate: '0' });
+          res.status(200).json({ rate: 0 });
         });
     } catch (error: any) {
       logger.error('Error from Fiat Rate: ' + JSON.stringify(error));
-      res.status(200).json({ venue: 'NONE', rate: '0' });
+      res.status(200).json({ rate: 0 });
     }
   };
 

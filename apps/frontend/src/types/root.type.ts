@@ -113,7 +113,6 @@ export type ApplicationConfiguration = {
 };
 
 export type FiatConfig = {
-  venue?: string;
   rate?: number;
   isLoading: boolean;
   symbol: any;

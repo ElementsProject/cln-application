@@ -5,7 +5,6 @@ import {
   faSterlingSign,
   faIndianRupeeSign,
   faRubleSign,
-  faShekelSign,
   faLiraSign,
 } from '@fortawesome/free-solid-svg-icons';
 import { cubicBezier, spring } from 'framer-motion';
@@ -23,6 +22,7 @@ export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
 export const TODAY = Math.floor(Date.now() / 1000);
 export const SCROLL_PAGE_SIZE = 100; // For infinite scroll, number of items to load per page
 export const SCROLL_THRESHOLD = 200; // For infinite scroll, distance from bottom in pixels (px) to trigger next page load.
+export const TOTAL_LABELS = 24;
 
 export const BTC_MSAT = 100000000000;
 export const BTC_SATS = 100000000;
@@ -69,7 +69,6 @@ export const FIAT_CURRENCIES = [
   { currency: 'GBP', symbol: faSterlingSign },
   { currency: 'HKD', symbol: faDollarSign },
   { currency: 'IDR', symbol: null },
-  { currency: 'ILS', symbol: faShekelSign },
   { currency: 'INR', symbol: faIndianRupeeSign },
   { currency: 'JPY', symbol: faYenSign },
   { currency: 'MXN', symbol: faDollarSign },

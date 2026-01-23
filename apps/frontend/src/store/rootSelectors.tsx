@@ -14,7 +14,7 @@ export const defaultRootState: RootState = {
     uiConfig: { unit: Units.SATS, fiatUnit: 'USD', appMode: ApplicationModes.LIGHT },
     serverConfig: { singleSignOn: false },
   },
-  fiatConfig: { isLoading: true, symbol: faDollarSign, venue: '', rate: 1 },
+  fiatConfig: { isLoading: true, symbol: faDollarSign, rate: 1 },
   walletBalances: {
     isLoading: true,
     clnLocalBalance: 0,

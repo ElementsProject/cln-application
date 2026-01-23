@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect, memo } from 'react';
 import { ResponsiveContainer, Cell, PieChart, Pie, Tooltip, Legend } from 'recharts';
 import './VolumeGraph.scss';
-import { getBarColors, Units } from '../../../../utilities/constants';
+import { getBarColors, TOTAL_LABELS, Units } from '../../../../utilities/constants';
 import { formatCurrency } from '../../../../utilities/data-formatters';
 import { transformVolumeGraphData } from '../../../../services/data-transform.service';
 import { Badge, Row, Col } from 'react-bootstrap';
@@ -111,7 +111,7 @@ const VolumeGraph = () => {
     );
   };
 
-  const { inbound, outbound } = useMemo(() => {
+  const { inbound, outbound }: any = useMemo(() => {
     return transformVolumeGraphData(volumeForwards);
   }, [volumeForwards]);
 
@@ -162,8 +162,8 @@ const VolumeGraph = () => {
               cy='50%'
               innerRadius='80%'
               outerRadius='98%'
-              label={(props) => renderLabel({ ...props, data: outbound, isInner: false })}
-              labelLine={true}
+              label={(props) => (outbound[props.index].show_label) ? renderLabel({ ...props, data: outbound, isInner: false }) : null}
+              labelLine={outbound.length <= TOTAL_LABELS}
               isAnimationActive={true}
               animationBegin={200}
               animationDuration={1000}

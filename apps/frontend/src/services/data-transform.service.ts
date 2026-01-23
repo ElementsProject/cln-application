@@ -12,7 +12,7 @@ import {
 } from '../types/bookkeeper.type';
 import { BTCTransaction, LightningTransaction, Offer } from '../types/cln.type';
 import { PeerChannel } from '../types/root.type';
-import { getPeriodKey, getTimestampFromPeriodKey, getTimestampWithGranularity, secondsForTimeGranularity, TimeGranularity } from '../utilities/constants';
+import { getPeriodKey, getTimestampFromPeriodKey, getTimestampWithGranularity, secondsForTimeGranularity, TimeGranularity, TOTAL_LABELS } from '../utilities/constants';
 import { sortDescByKey } from '../utilities/data-formatters';
 
 export function calculateAllPeriodKeys(
@@ -311,8 +311,10 @@ export function transformSatsFlowGraphData(periods: SatsFlowPeriod[]) {
 }
 
 export function transformVolumeGraphData(forwards: VolumeRow[]) {
+  let totalFees = 0;
   let tempInbound: any[] = [];
   forwards.reduce((acc, curr) => {
+    totalFees += curr.fee_msat;
     const found = acc.find(f => f.in_channel_scid === curr.in_channel_scid);
     if (found) {
       found.fee_msat += curr.fee_msat;
@@ -348,8 +350,28 @@ export function transformVolumeGraphData(forwards: VolumeRow[]) {
       }))
   );
 
-  return { inbound: tempInbound, outbound: tempOutbound };
-};
+  // Calculate cumulative fees and add show_label for segment boundaries
+  let cumulativeFee = 0;
+  const segmentSize = totalFees / TOTAL_LABELS;
+  let currentSegment = -1;
+
+  const outboundWithShowLabels = tempOutbound.map((item) => {
+    cumulativeFee += item.fee_msat;
+    const newSegment = Math.floor(cumulativeFee / segmentSize);
+    const showLabel = newSegment > currentSegment;
+    if (showLabel) {
+      currentSegment = newSegment;
+    }
+    return {
+      ...item,
+      cumulative_fee_msat: cumulativeFee,
+      segment: newSegment,
+      show_label: showLabel
+    };
+  });
+
+  return { inbound: tempInbound, outbound: outboundWithShowLabels };
+}
 
 const mapToAccountEventsAccounts = (row: (string | null | number)[]): AccountEventsAccount => ({
   short_channel_id: row[0] as string,

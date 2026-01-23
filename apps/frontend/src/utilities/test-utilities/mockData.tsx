@@ -217,7 +217,6 @@ export const mockAppConfig = {
 
 export const mockFiatConfig = {
   isLoading: false,
-  venue: "BULLBITCOIN",
   rate: 134770.88948787062,
   symbol: faDollarSign
 };
