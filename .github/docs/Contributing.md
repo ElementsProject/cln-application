@@ -32,7 +32,7 @@ source env-local.sh
 - OR Run the setup script. Note that it requires `socat` and `jq` to run successfully:
 
 ```sh
-source entrypoint.sh
+source ./scripts/entrypoint.sh
 ```
 
 Running the Application
@@ -100,6 +100,7 @@ git push
 ```sh
 git checkout main
 git merge Release-yy.mm.n
+git push
 ```
 - Create versioned tag:
 

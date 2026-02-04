@@ -157,6 +157,8 @@
 
 - Click [here](./.github/docs/Contributing.md) for instructions on how to run it in development mode.
 
+- Follow the steps outlined in [troubleshooting](./.github/docs/Troubleshooting.md) to verify that your Commando connection is successfully established with your current environment setup.
+
 ---
 
 # Acknowledgements
