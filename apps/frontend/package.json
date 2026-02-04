@@ -1,6 +1,6 @@
 {
   "name": "cln-application-frontend",
-  "version": "26.01.2",
+  "version": "26.04",
   "description": "Core lightning application frontend",
   "private": true,
   "license": "MIT",
