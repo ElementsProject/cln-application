@@ -4,6 +4,7 @@
   "description": "Core lightning application",
   "private": true,
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "frontend:dev": "npm run start -w cln-application-frontend",
     "frontend:build": "npm run build -w cln-application-frontend",
