@@ -78,16 +78,18 @@ export class SharedController {
         .get(FIAT_RATE_API + req.params.fiatCurrency)
         .then((response: any) => {
           logger.info('Fiat Response: ' + JSON.stringify(response?.data));
-          const fiatLowerCase = req.params.fiatCurrency.toLowerCase();
-          if (response.data?.bitcoin && response.data?.bitcoin[fiatLowerCase]) {
-            return res.status(200).json({ rate: response.data?.bitcoin[fiatLowerCase] });
-          } else {
-            return handleError(
-              new APIError(HttpStatusCode.NOT_FOUND, 'Price Not Found'),
-              req,
-              res,
-              next,
-            );
+          if (response.data?.bitcoin) {
+            const bitcoinValues = Object.values(response.data.bitcoin);
+            const rate = bitcoinValues[0];
+            if (rate === undefined) {
+              return handleError(
+                new APIError(HttpStatusCode.NOT_FOUND, 'Price value not found'),
+                req,
+                res,
+                next,
+              );
+            }
+            return res.status(200).json({ rate });
           }
         })
         .catch(err => {
