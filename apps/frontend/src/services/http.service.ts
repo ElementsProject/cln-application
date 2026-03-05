@@ -320,8 +320,11 @@ export class CLNService {
     return HttpService.clnCall('fundchannel', { id: pubkey, amount, feerate: feeRate, announce });
   }
 
-  static async closeChannel(id: string) {
-    return HttpService.clnCall('close', { id });
+  static async closeChannel(id: string, force: boolean = false) {
+    return HttpService.clnCall('close', {
+      id,
+      ...(force && { unilateraltimeout: 1 }),
+    });
   }
 
   static async btcWithdraw(destination: string, satoshi: string, feerate: string) {
