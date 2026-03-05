@@ -229,13 +229,14 @@ const BTCWithdraw = (props) => {
               <AnimatePresence mode="wait">
                 {showCustomFeeRate ? (
                   <motion.div
-                    key="custom"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    key="custom-fee-rate"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ width: '100%' }}
                   >
-                    <Col xs={12} style={{ display: showCustomFeeRate ? 'block' : 'none' }}>
+                    <Col xs={12}>
                       <Form.Label className='text-dark'>Fee Rate*</Form.Label>
                       <InputGroup className={(feeRateHasError ? 'invalid ' : '')}>
                         <InputGroup.Text className='form-control-addon form-control-addon-left'>
@@ -252,9 +253,10 @@ const BTCWithdraw = (props) => {
                           value={feeRateValue}
                           onChange={feeRateChangeHandler}
                           onBlur={feeRateBlurHandler}
+                          data-testid='fee-rate-input'
                         />
                         <InputGroup.Text data-testid='fee-rate-unit' id='Fee Rate Unit' className='form-control-addon form-control-addon-right text-light'>
-                          perkw
+                          Sat/vB
                         </InputGroup.Text>
                       </InputGroup>
                       {(feeRateHasError) ?
@@ -264,13 +266,14 @@ const BTCWithdraw = (props) => {
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="range"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    key="fee-rate-range"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ width: '100%' }}
                   >
-                    <Col xs={12} style={{ display: showCustomFeeRate ? 'none' : 'block' }}>
+                    <Col xs={12}>
                       <FeerateRange tabIndex={4} selFeeRate={selFeeRate} selFeeRateChangeHandler={selFeeRateChangeHandler} />
                     </Col>
                   </motion.div>
