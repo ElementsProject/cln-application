@@ -52,6 +52,22 @@ export enum ApplicationModes {
   DARK = 'DARK',
 }
 
+export const channelStateMap: Record<string, string> = {
+  OPENINGD: "Opening",
+  CHANNELD_AWAITING_LOCKIN: "Awaiting Lock-In",
+  CHANNELD_SHUTTING_DOWN: "Shutting Down",
+  CLOSINGD_SIGEXCHANGE: "Closing Signature Exchange",
+  CLOSINGD_COMPLETE: "Closing Complete",
+  AWAITING_UNILATERAL: "Awaiting Unilateral",
+  FUNDING_SPEND_SEEN: "Funding Spend Seen",
+  ONCHAIN: "On-Chain",
+  DUALOPEND_OPEN_INIT: "Dual Open Initialized",
+  DUALOPEND_AWAITING_LOCKIN: "Dual Open Awaiting Lock-In",
+  CHANNELD_AWAITING_SPLICE: "Awaiting Splice",
+  DUALOPEND_OPEN_COMMITTED: "Dual Open Committed",
+  DUALOPEND_OPEN_COMMIT_READY: "Dual Open Commit Ready",
+};
+
 export const CURRENCY_UNITS = ['SATS', 'BTC'];
 
 export const CURRENCY_UNIT_FORMATS = { Sats: '1.0-0', BTC: '1.6-6', OTHER: '1.2-2' };
