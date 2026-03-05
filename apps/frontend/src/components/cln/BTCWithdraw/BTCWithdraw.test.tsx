@@ -66,7 +66,7 @@ describe('BTCWithdraw component', () => {
     await waitFor(() => {
       expect(checkbox).toBeChecked();
       expect(screen.getByLabelText('feeRate')).toBeInTheDocument();
-      expect(screen.getByTestId('fee-rate-unit')).toHaveTextContent('perkw');
+      expect(screen.getByTestId('fee-rate-unit')).toHaveTextContent('Sat/vB');
     });
   });
 
