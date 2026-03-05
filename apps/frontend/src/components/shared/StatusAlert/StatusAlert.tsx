@@ -22,6 +22,7 @@ const StatusAlert = props => {
 
   return props.responseStatus !== CallStatus.NONE ? (
     <motion.div
+      data-testid="status-alert"
       className={
         'w-100 d-flex align-items-start justify-content-center alert alert-' +
         (props.responseStatus === CallStatus.ERROR
@@ -52,7 +53,7 @@ const StatusAlert = props => {
           />
         )}
       </Col>
-      <Col xs={10} className="mt-2px ms-1 px-1 text-status">
+      <Col xs={10} className="mt-2px ms-1 px-1 text-status" data-testid="status-alert-message">
         {titleCase(props.responseMessage)}
       </Col>
       {props.responseStatus !== CallStatus.PENDING ? (
