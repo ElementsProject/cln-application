@@ -49,6 +49,7 @@ const FeerateRange = (props) => {
             max="2"
             onClick={props.selFeeRateChangeHandler}
             onChange={props.selFeeRateChangeHandler}
+            data-testid='feerate-range' 
           />
         </OverlayTrigger>
       </div>
