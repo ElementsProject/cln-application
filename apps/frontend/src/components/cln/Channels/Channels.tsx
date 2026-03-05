@@ -5,7 +5,7 @@ import { Spinner, Card, Row, Col, ListGroup, Alert, ProgressBar, OverlayTrigger,
 
 import { titleCase } from '../../../utilities/data-formatters';
 import { ActionSVG } from '../../../svgs/Action';
-import { STAGERRED_SPRING_VARIANTS_3 } from '../../../utilities/constants';
+import { channelStateMap, STAGERRED_SPRING_VARIANTS_3 } from '../../../utilities/constants';
 import { NoChannelLightSVG } from '../../../svgs/NoChannelLight';
 import { NoChannelDarkSVG } from '../../../svgs/NoChannelDark';
 import { useSelector } from 'react-redux';
@@ -45,7 +45,7 @@ const Channels = (props) => {
                             <OverlayTrigger
                               placement='auto'
                               delay={{ show: 250, hide: 250 }}
-                              overlay={<Tooltip>{titleCase(channel.current_state)}</Tooltip>}
+                              overlay={<Tooltip>{titleCase(channel.current_state) + ' - ' + (channelStateMap[channel.state] ?? titleCase(channel.state?.replaceAll('_', ' ')))}</Tooltip>}
                               >
                               <span data-testid='channel-node-alias'>
                                 <div className={'d-inline-block mx-1 dot ' + (channel.current_state?.toLowerCase() === 'active' ? 'bg-success' : channel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>

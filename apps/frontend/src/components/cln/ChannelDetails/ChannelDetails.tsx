@@ -4,7 +4,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Card, Row, Col, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { copyTextToClipboard, formatCurrency, titleCase } from '../../../utilities/data-formatters';
-import { CallStatus, CLEAR_STATUS_ALERT_DELAY, Units } from '../../../utilities/constants';
+import { CallStatus, channelStateMap, CLEAR_STATUS_ALERT_DELAY, Units } from '../../../utilities/constants';
 import { ActionSVG } from '../../../svgs/Action';
 import { CloseSVG } from '../../../svgs/Close';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
@@ -119,7 +119,7 @@ const ChannelDetails = (props) => {
                   <OverlayTrigger
                     placement='auto'
                     delay={{ show: 250, hide: 250 }}
-                    overlay={<Tooltip>{titleCase(props.selChannel.current_state)}</Tooltip>}
+                    overlay={<Tooltip>{titleCase(props.selChannel.current_state) + ' - ' + (channelStateMap[props.selChannel.state] ?? titleCase(props.selChannel.state?.replaceAll('_', ' ')))}</Tooltip>}
                   >
                     <span className='d-flex align-items-center justify-content-start fw-bold'>
                       <div className={'d-inline-block mx-1 dot ' + (props.selChannel.current_state?.toLowerCase() === 'active' ? 'bg-success' : props.selChannel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>
