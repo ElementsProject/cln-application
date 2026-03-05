@@ -171,7 +171,7 @@ describe('ChannelOpen component', () => {
     await waitFor(() => {
       expect(customFeeRateCheckbox).toBeChecked();
       expect(screen.getByTestId('fee-rate-input')).toBeInTheDocument();
-      expect(screen.getByTestId('fee-rate-unit')).toHaveTextContent('perkw');
+      expect(screen.getByTestId('fee-rate-unit')).toHaveTextContent('Sat/vB');
     });
   });
 
