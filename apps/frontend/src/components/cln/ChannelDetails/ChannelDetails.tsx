@@ -24,7 +24,7 @@ const ChannelDetails = (props) => {
   const nodeInfo = useSelector(selectNodeInfo);
   const showToast = useSelector(selectShowToast);
   const [showToastState, setShowToastState] = useState(false);
-  const [channelClosed, setChannelClosed] = useState(props.selChannel.current_state !== 'ACTIVE');
+  const [channelClosed, setChannelClosed] = useState(props.selChannel.current_state !== 'ACTIVE' && props.selChannel.state !== 'CHANNELD_NORMAL');
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
@@ -72,14 +72,17 @@ const ChannelDetails = (props) => {
     if (response) {
       setResponseStatus(CallStatus.PENDING);
       setResponseMessage('Closing Channel...');
-      CLNService.closeChannel(props.selChannel.channel_id)
+      CLNService.closeChannel(props.selChannel.channel_id, props.selChannel.current_state === 'INACTIVE')
         .then((response: any) => {
           logger.info(response);
           if (response.type) {
-            props.selChannel.current_state = 'PENDING';
+            props.onChannelStateChange('PENDING');
             setChannelClosed(true);
             setResponseStatus(CallStatus.SUCCESS);
-            setResponseMessage('Channel ' + response.type + ' closed' + (response.txid ? (' with transaction id ' + response.txid) : ''));
+            setResponseMessage('Channel ' + response.type + ' closed' + 
+              (response.txid ? (' with transaction id ' + response.txid) : 
+                response.txids && response.txids.length > 0 ? (' with transaction id ' + response.txids[0]) : '')
+            );
             delayedClearStatusAlert();
           } else {
             setResponseStatus(CallStatus.ERROR);
@@ -190,113 +193,6 @@ const ChannelDetails = (props) => {
                   <Col xs={1} onClick={openLinkHandler} className='btn-sm-svg btn-svg-open'><OpenLinkSVG id={props.selChannel.funding_txid} /></Col>
                 </Row>
               </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Withdrawal Timelock
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {props.selChannel.their_to_self_delay} Blocks
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Opened By
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {titleCase(props.selChannel.opener)}
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Channel Type
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {props.selChannel.private ? 'Private' : 'Public'}
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Dust Limit
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {formatCurrency(
-                    props.selChannel.dust_limit_msat,
-                    Units.MSATS,
-                    uiConfigUnit,
-                    false,
-                    8,
-                    'string',
-                  )}{' '}
-                  {uiConfigUnit}
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Spendable
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {formatCurrency(
-                    props.selChannel.spendable_msat,
-                    Units.MSATS,
-                    uiConfigUnit,
-                    false,
-                    8,
-                    'string',
-                  )}{' '}
-                  {uiConfigUnit}
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Receivable
-                </Col>
-                <Col xs={12} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {formatCurrency(
-                    props.selChannel.receivable_msat,
-                    Units.MSATS,
-                    uiConfigUnit,
-                    false,
-                    8,
-                    'string',
-                  )}{' '}
-                  {uiConfigUnit}
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Channel ID
-                </Col>
-                <Col xs={11} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {props.selChannel.channel_id}
-                </Col>
-                <Col
-                  xs={1}
-                  onClick={copyHandler}
-                  className="btn-sm-svg btn-svg-copy"
-                  id="Channel ID"
-                >
-                  <CopySVG id="Channel ID" showTooltip={true} />
-                </Col>
-              </Row>
-              <Row className="mt-12px">
-                <Col xs={12} className="fs-7 text-light">
-                  Funding ID
-                </Col>
-                <Col xs={10} className="pe-1 overflow-x-ellipsis fw-bold">
-                  {props.selChannel.funding_txid}
-                </Col>
-                <Col
-                  xs={1}
-                  onClick={copyHandler}
-                  className="btn-sm-svg btn-svg-copy"
-                  id="Funding ID"
-                >
-                  <CopySVG id="Funding ID" showTooltip={true} />
-                </Col>
-                <Col xs={1} onClick={openLinkHandler} className="btn-sm-svg btn-svg-open">
-                  <OpenLinkSVG id={props.selChannel.funding_txid} />
-                </Col>
-              </Row>
               <ToastMessage
                 showOnComponent={true}
                 show={showToastState}
@@ -324,7 +220,7 @@ const ChannelDetails = (props) => {
                 className="btn-rounded bg-primary"
                 disabled={responseStatus === CallStatus.PENDING}
               >
-                Close Channel
+                {props.selChannel.current_state === 'INACTIVE' ? 'Force Close Channel' : 'Close Channel'}
                 {responseStatus === CallStatus.PENDING ? (
                   <Spinner className="mt-1 ms-2 text-white-dark" size="sm" />
                 ) : (

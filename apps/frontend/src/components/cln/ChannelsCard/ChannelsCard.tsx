@@ -36,7 +36,13 @@ const ChannelsCard = () => {
           {selChannelCard === 'open' ? (
             <ChannelOpen onClose={onCloseHandler} />
           ) : selChannelCard === 'details' ? (
-            <ChannelDetails onClose={() => setSelChannelCard('channels')} selChannel={selChannel} />
+            <ChannelDetails 
+              onClose={() => setSelChannelCard('channels')}
+              selChannel={selChannel}
+              onChannelStateChange={(newState) => setSelChannel(prev => 
+                prev ? { ...prev, current_state: newState } as PeerChannel : null
+              )}
+            />
           ) : (
             <Channels
               newlyOpenedChannelId={newlyOpenedChannelId}
