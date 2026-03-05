@@ -236,7 +236,6 @@ const ChannelOpen = (props) => {
                   data-testid='show-custom-fee-rate'
                 />
               </Col>
-
               <AnimatePresence mode="wait">
                 {showCustomFeeRate ? (
                   <motion.div
@@ -267,7 +266,7 @@ const ChannelOpen = (props) => {
                           data-testid='fee-rate-input'
                         />
                         <InputGroup.Text data-testid='fee-rate-unit' id='Fee Rate Unit' className='form-control-addon form-control-addon-right text-light'>
-                          perkw
+                          Sat/vB
                         </InputGroup.Text>
                       </InputGroup>
                       {(feeRateHasError) ?
