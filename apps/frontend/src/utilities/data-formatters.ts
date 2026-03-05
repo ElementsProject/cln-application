@@ -129,7 +129,8 @@ export const sortDescByKey = (array, key) => {
 };
 
 export const titleCase = (str: string | undefined) => {
-  return str && typeof str === 'string' ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '';
+  if (!str || typeof str !== 'string') return '';
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 export const copyTextToClipboard = (textToCopy: string | undefined) => {
