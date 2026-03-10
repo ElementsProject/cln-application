@@ -2,6 +2,9 @@
 
 .settings-menu.dropdown {
   & .dropdown-toggle.btn-settings-menu {
+    &.btn-compact {
+      margin-left: 0;
+    }
     margin-left: 0.5rem;
     padding: 1.25rem 1.375rem;
     &::after {
