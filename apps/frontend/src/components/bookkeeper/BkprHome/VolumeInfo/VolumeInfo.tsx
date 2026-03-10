@@ -55,7 +55,7 @@ const VolumeInfo = () => {
               </Row>
             :
             <>
-              <div className='d-flex flex-column align-items-start p-2 pb-0 h-50'>
+              <Row className='h-100 align-items-stretch'>
                 <span className='fs-6 text-dark'>Route with Most Traffic</span>
                 <OverlayTrigger
                   placement='auto'
@@ -64,8 +64,6 @@ const VolumeInfo = () => {
                 >
                   <span className='fs-4 fw-bold positive'>{bkprSummary.most_traffic_route?.channel_scids}</span>
                 </OverlayTrigger>
-              </div>
-              <div className='d-flex flex-column align-items-start p-2 pt-0 h-50'>
                 <span className='fs-6 text-dark'>Route with Least Traffic</span>
                 <OverlayTrigger
                   placement='auto'
@@ -74,7 +72,7 @@ const VolumeInfo = () => {
                 >
                   <span className='fs-4 fw-bold negative'>{bkprSummary.least_traffic_route?.channel_scids}</span>
                 </OverlayTrigger>
-              </div>
+              </Row>
             </>
         }
       </Card.Body>

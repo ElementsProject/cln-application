@@ -41,7 +41,7 @@ const AccountEventsInfo = () => {
                 </Row>
               </Row>
             :
-              <>
+              <Row className='h-100 align-items-stretch'>
                 <div className='d-flex flex-column align-items-stretch justify-content-between'>
                   <div className='d-flex flex-column align-items-start p-2'>
                     <span className='fs-6 text-dark'>Total Invoice Received</span>
@@ -51,8 +51,6 @@ const AccountEventsInfo = () => {
                     <span className='fs-6 text-dark'>Total Payments Sent</span>
                     <span className='fs-2 fw-bold primary'>-<CurrencyBox value={bkprSummary.total_payments_sent_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-2 fw-bold primary'></CurrencyBox></span>
                   </div>
-                </div>
-                <div className='d-flex flex-column align-items-stretch justify-content-between'>
                   <div className='d-flex flex-column align-items-start p-2'>
                     <span className='fs-6 text-dark'>Routing Revenue</span>
                     <span className='fs-2 fw-bold primary'>+<CurrencyBox value={bkprSummary.routing_revenue_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-2 fw-bold primary'></CurrencyBox></span>
@@ -62,7 +60,7 @@ const AccountEventsInfo = () => {
                     <span className='fs-2 fw-bold primary'>-<CurrencyBox value={bkprSummary.onchain_fee_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-2 fw-bold primary'></CurrencyBox></span>
                   </div>
                 </div>
-              </>
+              </Row>
         }
       </Card.Body>
       <Card.Footer className='d-flex justify-content-end px-2'>
