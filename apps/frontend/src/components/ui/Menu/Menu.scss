@@ -4,7 +4,6 @@
   text-decoration: none;  
   & .dropdown-toggle.btn-menu {
     background-color: $primary;
-    width: 8rem;
     padding: 1.25rem 1.375rem;
     &::after {
       display: none;
@@ -32,8 +31,13 @@
   .menu-dropdown.dropdown {
     & .dropdown-toggle.btn-menu {
       color: $white;
-      & svg path {
-        fill: $white;
+      & svg {
+        .cls-1 {
+          fill:none;
+          stroke:$white;
+          stroke-linecap:round;
+          stroke-linejoin:round;
+        }
       }
     }
     & > .dropdown-menu {
@@ -42,9 +46,14 @@
   }
   .btn-compact {
     background-color: $primary;
-    & svg > path {
-      fill: $dark;
-    }
+      & svg {
+        .cls-1 {
+          fill:none;
+          stroke:$dark;
+          stroke-linecap:round;
+          stroke-linejoin:round;
+        }
+      }
   }
 }
 
@@ -52,8 +61,13 @@
   .menu-dropdown.dropdown {
     & .dropdown-toggle.btn-menu {
       color: $card-bg-dark;
-      & svg path {
-        fill: $card-bg-dark;
+      & svg {
+        .cls-1 {
+          fill:none;
+          stroke:$card-bg-dark;
+          stroke-linecap:round;
+          stroke-linejoin:round;
+        }
       }
     }
     & .dropdown-menu {
@@ -64,8 +78,13 @@
   }
   .btn-compact {
     background-color: $primary;
-    & svg > path {
-      fill: $dark;
+    & svg {
+      .cls-1 {
+        fill:none;
+        stroke:$dark;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+      }
     }
   }
 }

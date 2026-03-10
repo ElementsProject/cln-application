@@ -42,75 +42,84 @@ const Header = (props) => {
 
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
-      <Row className="header mb-5 mx-1" data-testid="header">
+      <Row className="header mb-2 mx-1" data-testid="header">
         <Col xs={12} data-testid="header-info">
-          <AnimatePresence>
-            <motion.img
-              key='cln-logo'
-              alt='Core Lightning Logo'
-              src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
-              className='header-info-logo me-3 rounded float-start'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.05, duration: 0.01 }}
-            />
-          </AnimatePresence>
-          <Col className="h-100 d-flex align-items-center justify-content-between">
-            <h4 className="m-0 text-dark">
-              <strong>CLN</strong>
-            </h4>
-            <div className="d-flex align-items-center">
-              <Menu compact={true} />
-              <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
-              {serverConfig.singleSignOn === true || serverConfig.singleSignOn === "true" ?
-                <span className='mx-3'></span>
-                :
-                <div onClick={logoutHandler}>
-                  <LogoutSVG className="svg-logout ms-3 cursor-pointer" />
-                </div>
-              }
-              <div onClick={modeChangeHandler}>
-                {(isDarkMode) ? <NightModeSVG className='svg-night me-3' /> : <DayModeSVG className='svg-day me-3' />}
-              </div>
-            </div>
-          </Col>
-          <Row className='header-info-text my-2'>
-            <Col xs={12} className='d-flex align-items-center text-light'>
-              {isAuthenticated && nodeInfo.isLoading ?
-                <>
-                  <OverlayTrigger
-                    placement="auto"
-                    delay={{ show: 250, hide: 250 }}
-                    overlay={<Tooltip>Loading</Tooltip>}
-                  >
-                    <span className="d-inline-block mx-3 dot bg-warning"></span>
-                  </OverlayTrigger>
-                  <span className="fs-7">Loading...</span>
-                </>
-                :
-                nodeInfo.error ?
-                  <>
-                    <OverlayTrigger
-                      placement='auto'
-                      delay={{ show: 250, hide: 250 }}
-                      overlay={<Tooltip>Error</Tooltip>}
-                    >
-                      <span className='d-inline-block mx-3 dot bg-danger'></span>
-                    </OverlayTrigger>
-                    <span className='fs-7'>{('Error: ' + nodeInfo.error)}</span>
-                  </>
-                  :
-                  <>
-                    <OverlayTrigger
-                      placement='auto'
-                      delay={{ show: 250, hide: 250 }}
-                      overlay={<Tooltip>Connected</Tooltip>}
-                    >
-                      <span className='d-inline-block mx-3 dot bg-success'></span>
-                    </OverlayTrigger>
-                    <span className='fs-7'>{nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '') + ' (' + nodeInfo.version + ')'}</span>
-                  </>
-              }
+          <Row>
+            <Col xs={3} className='mb-3'>
+              <AnimatePresence>
+                <motion.img
+                  key='cln-logo'
+                  alt='Core Lightning Logo'
+                  src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
+                  className='header-info-logo me-3 rounded float-start'
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.05, duration: 0.01 }}
+                />
+              </AnimatePresence>
+            </Col>
+            <Col xs={9}>
+              <h4 className="ms-3 m-0 text-dark">
+                <strong>Core Lightning Node</strong>
+              </h4>
+              <Row className='header-info-text my-1'>
+                <Col xs={12} className='d-flex align-items-center text-light'>
+                  {isAuthenticated && nodeInfo.isLoading ?
+                    <>
+                      <OverlayTrigger
+                        placement="auto"
+                        delay={{ show: 250, hide: 250 }}
+                        overlay={<Tooltip>Loading</Tooltip>}
+                      >
+                        <span className="d-inline-block mx-3 dot bg-warning"></span>
+                      </OverlayTrigger>
+                      <span className="fs-7">Loading...</span>
+                    </>
+                    :
+                    nodeInfo.error ?
+                      <>
+                        <OverlayTrigger
+                          placement='auto'
+                          delay={{ show: 250, hide: 250 }}
+                          overlay={<Tooltip>Error</Tooltip>}
+                        >
+                          <span className='d-inline-block mx-3 dot bg-danger'></span>
+                        </OverlayTrigger>
+                        <span className='fs-7'>{('Error: ' + nodeInfo.error)}</span>
+                      </>
+                      :
+                      <>
+                        <OverlayTrigger
+                          placement='auto'
+                          delay={{ show: 250, hide: 250 }}
+                          overlay={<Tooltip>Connected</Tooltip>}
+                        >
+                          <span className='d-inline-block mx-3 dot bg-success'></span>
+                        </OverlayTrigger>
+                        <span className='fs-7'>{nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '')}</span>
+                      </>
+                  }
+                </Col>
+              </Row>
+              <Row className='ms-1'>
+                <Col className="h-100 d-flex align-items-end justify-content-between">
+                  <div className="d-flex align-items-center">
+                    <Menu compact={true} />
+                    <Settings compact={true} onShowConnectWallet={props.onShowConnectWallet} />
+                    {serverConfig.singleSignOn === true || serverConfig.singleSignOn === "true" ?
+                      <span className='mx-2'></span>
+                      :
+                      <div onClick={logoutHandler}>
+                        <LogoutSVG className="svg-logout ms-2 cursor-pointer" />
+                      </div>
+                    }
+                    <div onClick={modeChangeHandler}>
+                      {(isDarkMode) ? <NightModeSVG className='svg-night mx-2' /> : <DayModeSVG className='svg-day mx-2' />}
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+
             </Col>
           </Row>
         </Col>
@@ -213,4 +222,3 @@ const Header = (props) => {
 };
 
 export default Header;
-

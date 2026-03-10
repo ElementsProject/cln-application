@@ -1,12 +1,5 @@
 @use '../../../styles/constants' as *;
 
-[data-screensize='SM'],
-[data-screensize='XS'] {
-  & .cards-container {
-    height: 77vh;
-  }
-}
-
 .bookkeeper-dashboard-container {
     padding: 0 1rem;
 }
