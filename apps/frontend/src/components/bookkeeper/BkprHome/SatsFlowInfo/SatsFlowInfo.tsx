@@ -41,7 +41,7 @@ const SatsFlowInfo = () => {
                 </Row>
               </Row>
             :
-              <div className='d-flex flex-row justify-content-between '>
+              <Row className='h-100 align-items-stretch'>
                 <div className='d-flex flex-column align-items-start p-2'>
                   <span className='fs-6 text-dark'>Inflow this month</span>
                   <span className='fs-3 fw-bold positive'>
@@ -54,7 +54,7 @@ const SatsFlowInfo = () => {
                     <CurrencyBox value={bkprSummary.outflows_for_period_msat} shorten={false} hideUnit={true} fromUnit={Units.MSATS} rootClasses='d-inline-flex flex-column' currencyClasses='fs-3 fw-bold negative'></CurrencyBox>
                   </span>
                 </div>
-              </div>
+              </Row>
         }
       </Card.Body>
       <Card.Footer className='d-flex justify-content-end px-2'>
