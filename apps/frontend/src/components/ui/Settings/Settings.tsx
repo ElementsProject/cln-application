@@ -1,18 +1,22 @@
 import './Settings.scss';
 import { Dropdown } from 'react-bootstrap';
-
+import { useDispatch, useSelector } from 'react-redux';
 import logger from '../../../services/logger.service';
 import useBreakpoint from '../../../hooks/use-breakpoint';
-import { CURRENCY_UNITS } from '../../../utilities/constants';
+import { CURRENCY_UNITS, Units } from '../../../utilities/constants';
 import { SettingsSVG } from '../../../svgs/Settings';
 import FiatSelection from '../../shared/FiatSelection/FiatSelection';
 import ToggleSwitch from '../../shared/ToggleSwitch/ToggleSwitch';
 import { setShowModals } from '../../../store/rootSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { RootService } from '../../../services/http.service';
+import { setConfig } from '../../../store/rootSlice';
+import { selectAppConfig } from '../../../store/rootSelectors';
 import { selectIsAuthenticated, selectNodeInfo, selectServerConfig, selectShowModals, selectUIConfigUnit, selectWalletConnect } from '../../../store/rootSelectors';
+import { ApplicationConfiguration } from '../../../types/root.type';
 
 const Settings = (props) => {
   const dispatch = useDispatch();
+  const appConfig = useSelector(selectAppConfig);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const uiConfigUnit = useSelector(selectUIConfigUnit);
   const nodeInfo = useSelector(selectNodeInfo);
@@ -21,6 +25,18 @@ const Settings = (props) => {
   const serverConfig = useSelector(selectServerConfig);
   const currentScreenSize = useBreakpoint();
   logger.info('Screen Size Changed: ' + currentScreenSize);
+
+  const changeCurrencyUnitHandler = async(changedIndex: number) => {
+    const updatedConfig: ApplicationConfiguration = { 
+      ...appConfig, 
+      uiConfig: {
+        ...appConfig.uiConfig,
+        unit: CURRENCY_UNITS[changedIndex]
+      }
+    };
+    await RootService.updateConfig(updatedConfig);
+    dispatch(setConfig(updatedConfig));
+  };
 
   return (
     <Dropdown autoClose={'outside'} className={!!(nodeInfo.error || (isAuthenticated && nodeInfo.isLoading)) ? 'settings-menu dropdown-disabled' : 'settings-menu'} data-testid='settings'>
@@ -40,7 +56,7 @@ const Settings = (props) => {
         }
         <Dropdown.Divider />
         <Dropdown.Item as='div' className='d-flex align-items-center justify-content-between'>Fiat Currency <FiatSelection className='ms-4 fiat-dropdown' /></Dropdown.Item>
-        <Dropdown.Item as='div' className='d-flex align-items-center justify-content-between'>Currency <ToggleSwitch values={CURRENCY_UNITS} selValue={uiConfigUnit} /></Dropdown.Item>
+        <Dropdown.Item as='div' className='d-flex align-items-center justify-content-between'>Currency <ToggleSwitch onChange={changeCurrencyUnitHandler} values={CURRENCY_UNITS} selIndex={uiConfigUnit === Units.BTC ? 1 : 0} /></Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

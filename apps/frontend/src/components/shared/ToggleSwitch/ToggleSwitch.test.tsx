@@ -4,7 +4,6 @@ import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
 import { createMockStore } from '../../../utilities/test-utilities/mockStore';
 import { mockAppStore } from '../../../utilities/test-utilities/mockData';
 import ToggleSwitch from './ToggleSwitch';
-import { Units } from '../../../utilities/constants';
 
 describe('ToggleSwitch component ', () => {
   it('should be in the document', async () => {
@@ -13,9 +12,8 @@ describe('ToggleSwitch component ', () => {
       <Provider store={store}>
         <ToggleSwitch
           values={['SATS', 'BTC']}
-          selValue={Units.SATS}
-          storeSelector="appConfig"
-          storeKey="unit"
+          selIndex={0}
+          onChange={() => {}}
         />
       </Provider>
     );
