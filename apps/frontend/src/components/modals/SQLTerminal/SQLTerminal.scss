@@ -14,29 +14,75 @@
 }
 
 .terminal-output {
-  height: 47vh;
+  height: 40vh;
   overflow: hidden;
   width: 100%;
   resize: none;
   font-size: $font-size-base;
   white-space: pre-wrap;
-  padding: 1rem 0 1rem 2rem;
+  padding: 1rem;
   margin-bottom: 1.5rem;
   background-color: $body-bg-light;
-  border-radius: $border-radius;
+  border-radius: $border-radius-sm;
   border: $input-border-width solid $input-border-color;
   box-shadow: 0px 1px 2px rgba($dark-blue, 0.05);
+
+  & .terminal-json-header {
+    padding: 1rem 1rem 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &.terminal-table-wrapper {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+
+    .terminal-table-header {
+      padding: 0.75rem 1rem 0.25rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .ps {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden !important;
+      &.ps--active-x > .ps__rail-x {
+        display: block !important;
+        background-color: transparent;
+        opacity: 1;
+        z-index: 99;
+        height: 0.5rem;
+        & .ps__thumb-x {
+          height: 0.25rem;
+          background-color: #DFB316;
+        }
+      }
+    }
+  }
+
+  & .terminal-output-scroll-container {
+    height: 33vh;
+    overflow: hidden;
+    width: 100%;
+    resize: none;
+    white-space: pre-wrap;
+    background-color: transparent;
+  }
 }
 
 .btn-copy-output {
-  padding: 1rem;
+  padding: 0;
   border: none;
   cursor: pointer;
-  position: absolute;
-  right: 0;
   background: transparent;
   z-index: 1;
-  border-radius: $border-radius;
+  border-radius: $border-radius-sm;
   &:hover,
   &:focus-visible {
     outline: none;
@@ -50,9 +96,64 @@
   }
 }
 
+.sql-table {
+  height: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+
+  & .sql-table-head {
+    & .sql-table-header-row > th {
+      color: $primary;
+      border: 1px solid $border-color;
+      background-color: $body-bg;
+      padding: 0.5rem 0.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 1;      
+    }
+  }
+
+  & .sql-table-body {
+    & .sql-table-row {
+      background-color: $card-bg;
+
+      &:hover {
+        background-color: $body-bg-light;
+      }
+
+      & > td {
+        border: 1px solid $border-color;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+  }
+}
+
 @include color-mode(dark) {
   .terminal-output {
     background-color: $body-bg-dark;
-    border: $input-border-width solid $input-border-color;
+  }
+
+  .sql-table {
+    & .sql-table-head {
+      & .sql-table-header-row > th {
+        background-color: $tooltip-bg-dark;
+        border: 1px solid $border-color-dark;
+      }
+    }
+
+    & .sql-table-body {
+      & .sql-table-row {
+        background-color: $card-bg-dark;
+
+        &:hover {
+          background-color: $tooltip-bg-dark;
+        }
+
+        & > td {
+          border: 1px solid $border-color-dark;
+        }
+      }
+    }
   }
 }
