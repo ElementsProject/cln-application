@@ -16,6 +16,13 @@
   display: flex;
   justify-content: flex-start;
 
+  &.toggle-disabled {
+    opacity: 0.45;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+
   & .toggle-bg-text {
     height: 100%;
   }

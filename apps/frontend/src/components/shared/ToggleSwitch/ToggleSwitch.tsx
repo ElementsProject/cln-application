@@ -1,52 +1,56 @@
 import './ToggleSwitch.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-import { SPRING_VARIANTS } from '../../../utilities/constants';
-import { RootService } from '../../../services/http.service';
-import { setConfig } from '../../../store/rootSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAppConfig } from '../../../store/rootSelectors';
+import { BOUNCY_SPRING_VARIANTS_1 } from '../../../utilities/constants';
 
-const ToggleSwitch = props => {
-  const dispatch = useDispatch();
-  const [isSwitchOn, setIsSwitchOn] = useState(props.selValue === props.values[1]);
-  const appConfig = useSelector(selectAppConfig);
- 
-  const changeValueHandler = async() => {
-    setIsSwitchOn((prevValue) => !prevValue);
-    const currValue = isSwitchOn ? 0 : 1;
-    const updatedConfig = { 
-      ...appConfig, 
-      uiConfig: {
-        ...appConfig.uiConfig,
-        unit: props.values[currValue]
-      }
-    };
-    await RootService.updateConfig(updatedConfig);
-    dispatch(setConfig(updatedConfig));
+const ToggleSwitch = ({
+  values,
+  selIndex,
+  onChange,
+  className = '',
+  disabled = false,
+}: {
+  values: (string | React.ReactNode)[];
+  selIndex: number;
+  onChange: (index: number) => void;
+  className?: string;
+  disabled?: boolean;
+}) => {
+  const [isSwitchOn, setIsSwitchOn] = useState(selIndex === 1);
+
+  useEffect(() => {
+    setIsSwitchOn(selIndex === 1);
+  }, [selIndex]);
+
+  const changeValueHandler = () => {
+    if (disabled) return;
+    const nextIndex = isSwitchOn ? 0 : 1;
+    setIsSwitchOn(!isSwitchOn);
+    onChange(nextIndex);
   };
 
   return (
     <div
-      className={'fs-7 toggle ' + (props.className ? props.className : '')}
+      className={'fs-7 toggle ' + (className ? className : '') + (disabled ? ' toggle-disabled' : '')}
       data-isswitchon={isSwitchOn}
       onClick={changeValueHandler}
       data-testid="toggle-switch"
+      aria-disabled={disabled}
     >
       <div className="toggle-bg-text px-2 d-flex flex-fill align-items-center justify-content-between">
-        <span className="text-center me-2">{props.values[0]}</span>
-        <span className="text-center ms-2">{props.values[1]}</span>
+        <span>{values[0]}</span>
+        <span className="me-1">{values[1]}</span>
       </div>
       <motion.div
         layout
-        transition={SPRING_VARIANTS}
+        transition={BOUNCY_SPRING_VARIANTS_1}
         className={
-          'toggle-switch justify-content-center d-flex align-items-center ' +
+          'toggle-switch d-flex align-items-center justify-content-center ' +
           (isSwitchOn ? 'toggle-right' : 'toggle-left')
         }
       >
-        <span>{props.selValue}</span>
+        <span>{isSwitchOn ? values[1] : values[0]}</span>
       </motion.div>
     </div>
   );
