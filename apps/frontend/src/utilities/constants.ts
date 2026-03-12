@@ -68,7 +68,7 @@ export const channelStateMap: Record<string, string> = {
   DUALOPEND_OPEN_COMMIT_READY: "Dual Open Commit Ready",
 };
 
-export const CURRENCY_UNITS = ['SATS', 'BTC'];
+export const CURRENCY_UNITS: Units[] = [Units.SATS, Units.BTC];
 
 export const CURRENCY_UNIT_FORMATS = { Sats: '1.0-0', BTC: '1.6-6', OTHER: '1.2-2' };
 

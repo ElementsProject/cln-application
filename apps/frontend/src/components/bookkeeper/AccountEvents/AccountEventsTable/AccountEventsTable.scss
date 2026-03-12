@@ -2,11 +2,10 @@
 
 .account-events-table {
   padding: 0 !important;
-  border-radius: 1rem;
+  border-radius: $border-radius-sm;
   overflow: hidden;
   border: 1px solid $border-color;
   height: 100%;
-  border-radius: 1rem;
   & .expandable-table {
     table-layout: fixed;
     overflow: hidden;
