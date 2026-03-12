@@ -227,6 +227,10 @@ export class RootService {
     return HttpService.clnCall('sql', { query });
   }
 
+  static async listSqlSchemas(table?: string) {
+    return HttpService.clnCall('listsqlschemas', { table });
+  }
+
   static async fetchAuthData() {
     const [ config, authStatus ] = await Promise.all([
       this.getAppConfigurations(),
