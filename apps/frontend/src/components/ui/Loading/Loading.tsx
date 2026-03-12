@@ -7,7 +7,7 @@ export const Loading = () => {
         <Spinner animation='grow' variant='primary' />
       </Col>
       <Col xs={12} className='d-flex align-items-center justify-content-center'>
-        <div>Loading...</div>
+        <div className="text-light">Loading...</div>
       </Col>
     </Row>
   );
