@@ -16,6 +16,7 @@ describe('SQLTerminal', () => {
     cln: mockCLNStoreData,
     bkpr: mockBKPRStoreData
   };
+
   it('should be in the document', async () => {
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     expect(screen.getByTestId('terminal-container')).not.toBeEmptyDOMElement();
@@ -23,14 +24,12 @@ describe('SQLTerminal', () => {
 
   it('should render the terminal container', async () => {
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
-    const terminalContainer = screen.getByTestId('terminal-container');
-    expect(terminalContainer).toBeInTheDocument();
+    expect(screen.getByTestId('terminal-container')).toBeInTheDocument();
   });
 
   it('should display initial placeholder in the input field', async () => {
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
-    const inputField = screen.getByTestId('query-input');
-    expect(inputField).toBeInTheDocument();
+    expect(screen.getByTestId('query-input')).toBeInTheDocument();
   });
 
   it('should update query state on input change', async () => {
@@ -40,16 +39,29 @@ describe('SQLTerminal', () => {
     expect(inputField).toHaveValue('select * from bkpr_accountevents');
   });
 
-  it('should call executeSql and display result in the output area', async () => {
+  it('should call executeSql and display result as table by default', async () => {
     spyOnExecuteSql();
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     const inputField = screen.getByTestId('query-input');
-    const executeButton = screen.getByText('Execute');
     fireEvent.change(inputField, { target: { value: 'select * from bkpr_accountevents' } });
-    fireEvent.click(executeButton);
+    fireEvent.click(screen.getByText('Execute'));
+    await waitFor(() => {
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).toBeInTheDocument();
+    });
+  });
+
+  it('should display result as JSON when switched to JSON view', async () => {
+    spyOnExecuteSql();
+    await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
+    const inputField = screen.getByTestId('query-input');
+    fireEvent.change(inputField, { target: { value: 'select * from bkpr_accountevents' } });
+    fireEvent.click(screen.getByText('Execute'));
+    await waitFor(() => {
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByTestId('toggle-switch'));
     await waitFor(() => {
       const output = screen.getByTestId('terminal-container').textContent;
-      expect(output).toContain('select * from bkpr_accountevents');
       expect(output).toContain(JSON.stringify(mockSQLResponse.rows, null, 2));
     });
   });
@@ -58,9 +70,8 @@ describe('SQLTerminal', () => {
     spyOnExecuteSql();
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     const inputField = screen.getByTestId('query-input');
-    const executeButton = screen.getByText('Execute');
     fireEvent.change(inputField, { target: { value: 'select * from non_existing_table' } });
-    fireEvent.click(executeButton);
+    fireEvent.click(screen.getByText('Execute'));
     await waitFor(() => {
       const output = screen.getByTestId('terminal-container').textContent;
       expect(output).not.toContain(JSON.stringify(mockSQLResponse.rows, null, 2));
@@ -68,29 +79,46 @@ describe('SQLTerminal', () => {
   });
 
   it('should open the help link when Help button is clicked', async () => {
-    await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });    
-    const helpButton = screen.getByText('Help');
+    await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
-    fireEvent.click(helpButton);
+    fireEvent.click(screen.getByText('Help'));
     expect(windowOpenSpy).toHaveBeenCalledWith('https://docs.corelightning.org/reference/sql', '_blank');
   });
 
-  it('should clear the output when Clear button is clicked', async () => {
+  it('should clear the query and output when Clear button is clicked', async () => {
     spyOnExecuteSql();
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     const inputField = screen.getByTestId('query-input');
-    const executeButton = screen.getByText('Execute');
-    const clearButton = screen.getByText('Clear');
     fireEvent.change(inputField, { target: { value: 'select * from bkpr_accountevents' } });
-    fireEvent.click(executeButton);
+    fireEvent.click(screen.getByText('Execute'));
     await waitFor(() => {
-      const output = screen.getByTestId('terminal-container').textContent;
-      expect(output).toContain('select * from bkpr_accountevents');
-      expect(output).toContain(JSON.stringify(mockSQLResponse.rows, null, 2));
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).toBeInTheDocument();
     });
-    fireEvent.click(clearButton);
+    fireEvent.click(screen.getByText('Clear'));
+    await waitFor(() => {
+      expect(screen.getByTestId('query-input')).toHaveValue('');
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).not.toBeInTheDocument();
+    });
+  });
 
-    const outputAfterClear = screen.getByTestId('terminal-container').textContent;
-    expect(outputAfterClear).not.toContain('select * from bkpr_accountevents');
+  it('should reset to Table view when Clear button is clicked', async () => {
+    spyOnExecuteSql();
+    await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
+    const inputField = screen.getByTestId('query-input');
+    fireEvent.change(inputField, { target: { value: 'select * from bkpr_accountevents' } });
+    fireEvent.click(screen.getByText('Execute'));
+    await waitFor(() => {
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByTestId('toggle-switch'));
+    await waitFor(() => {
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).not.toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Clear'));
+    fireEvent.change(inputField, { target: { value: 'select * from bkpr_accountevents' } });
+    fireEvent.click(screen.getByText('Execute'));
+    await waitFor(() => {
+      expect(screen.getByTestId('terminal-container').querySelector('.sql-table')).toBeInTheDocument();
+    });
   });
 });
