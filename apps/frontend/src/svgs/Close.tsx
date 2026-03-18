@@ -1,11 +1,12 @@
 import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 export const CloseSVG = props => {
-  return (
+  const svg = (
     <svg
       className={props.className}
-      width='17'
-      height='17'
+      width={props.width || '17'}
+      height={props.height || '17'}
       viewBox='0 0 17 17'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
@@ -23,5 +24,17 @@ export const CloseSVG = props => {
         className='stroke-light'
       />
     </svg>
+  );
+
+  if (!props.showTooltip) return svg;
+
+  return (
+    <OverlayTrigger
+      placement='right'
+      delay={{ show: 250, hide: 250 }}
+      overlay={<Tooltip>{props.tooltipText || 'Clear'}</Tooltip>}
+    >
+      {svg}
+    </OverlayTrigger>
   );
 };
