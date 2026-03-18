@@ -2,9 +2,8 @@ import moment from 'moment';
 import './DataFilterOptions.scss';
 import { useCallback, useEffect, useState, ChangeEvent } from 'react';
 import { Row, Col, Dropdown, InputGroup, Form } from 'react-bootstrap';
-import { getTimestampWithGranularity, TimeGranularity } from '../../../utilities/constants';
+import { FilterMode, getTimestampWithGranularity, TimeGranularity } from '../../../utilities/constants';
 import CLNDatePicker from '../DatepickerInput/DatepickerInput';
-import { ChevronDown } from '../../../svgs/ChevronDown';
 import { BookkeeperService } from '../../../services/http.service';
 import logger from '../../../services/logger.service';
 import { setAccountEvents, setSatsFlow } from '../../../store/bkprSlice';
@@ -12,8 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { appStore } from '../../../store/appStore';
 import { selectIsAuthenticated } from '../../../store/rootSelectors';
 import { AppState } from '../../../store/store.type';
+import { ChevronSVG } from '../../../svgs/Chevron';
+import MultiSelectDropdown from '../MultiSelectDropdown/MultiSelectDropdown';
+import { titleCase } from '../../../utilities/data-formatters';
 
-const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (show: boolean) => void}) => {
+const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (show: boolean) => void, multiSelectValues?: { dataKey: string, name: string }[], multiSelectPlaceholder?: string, multiSelectChangeHandler?: (selectedOptions: string[], filterMode: FilterMode) => void}) => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const currentDate = new Date();
@@ -84,7 +86,7 @@ const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (sh
               <InputGroup.Text
                 className='form-control-addon form-control-addon-right'
               >
-                <ChevronDown width={12} height={7} />
+                <ChevronSVG open={false} width={'12'} height={'12'} />
               </InputGroup.Text>
             </Dropdown.Toggle>
             <Dropdown.Menu data-testid='time-granularity-menu'>
@@ -115,6 +117,15 @@ const DataFilterOptions = (props: {filter: string, onShowZeroActivityChange: (sh
           onChangeDate={date => setRangeEnd(date)}
         />
       </Col>
+      {props.multiSelectValues && props.multiSelectValues.length > 0 &&
+        <Col xs="auto" className='px-2'>
+          <MultiSelectDropdown
+            options={props.multiSelectValues?.map(entry => ({ value: entry.dataKey, label: titleCase(entry.name.replace(/_/g, ' ')) })) || []}
+            placeholder={props.multiSelectPlaceholder}
+            onChange={props.multiSelectChangeHandler}
+          />
+        </Col>
+      }
       <Col xs="auto" className='px-2'>
         <Form.Check
           tabIndex={4}

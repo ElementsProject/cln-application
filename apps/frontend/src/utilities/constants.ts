@@ -7,7 +7,7 @@ import {
   faRubleSign,
   faLiraSign,
 } from '@fortawesome/free-solid-svg-icons';
-import { cubicBezier, spring } from 'framer-motion';
+import { cubicBezier, spring, Variants } from 'framer-motion';
 import moment from 'moment';
 
 export const HOST = process.env.NODE_ENV !== 'production' ? 'localhost' : window.location.hostname;
@@ -29,6 +29,8 @@ export const BTC_SATS = 100000000;
 export const SATS_MSAT = 1000;
 
 export type LogLevel = 'info' | 'warn' | 'error';
+
+export type FilterMode = 'include' | 'exclude';
 
 export enum InputType {
   ORIGINAL = 'original',
@@ -428,3 +430,36 @@ export const STAGERRED_COLOR_DRAIN = {
     };
   },
 } as const;
+
+export const itemVariants: Variants = {
+  hidden: { opacity: 0, x: -6 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.03, duration: 0.15, ease: 'easeOut' as const },
+  }),
+};
+
+export const dropdownVariants: Variants = {
+  hidden: { opacity: 0, y: -6, scaleY: 0.95, transformOrigin: 'top' },
+  visible: {
+    opacity: 1, y: 0, scaleY: 1,
+    transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: {
+    opacity: 0, y: -4, scaleY: 0.97,
+    transition: { duration: 0.13, ease: 'easeIn' as const },
+  },
+};
+
+export const badgeVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, scale: 1, 
+    transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: { 
+    opacity: 0, scale: 0.75, 
+    transition: { duration: 0.1 },
+  },
+};
