@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import './DatepickerInput.scss';
 import DatePicker from 'react-datepicker';
 import { InputGroup } from 'react-bootstrap';
-import { ChevronDown } from '../../../svgs/ChevronDown';
+import { ChevronSVG } from '../../../svgs/Chevron';
 
 const CLNDatePicker = (props) => {
   const datePickerRef = useRef<DatePicker>(null);
@@ -30,7 +30,7 @@ const CLNDatePicker = (props) => {
         className="form-control-addon form-control-addon-right"
         onClick={openDetapicker}
       >
-        <ChevronDown width={12} height={7} />
+        <ChevronSVG open={false} width={'12'} height={'12'} />
       </InputGroup.Text>
     </InputGroup>
   );

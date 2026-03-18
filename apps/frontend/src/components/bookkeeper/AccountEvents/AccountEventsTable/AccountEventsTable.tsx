@@ -3,12 +3,12 @@ import './AccountEventsTable.scss';
 import { Button, OverlayTrigger, Table, Tooltip } from 'react-bootstrap';
 import { formatCurrency } from '../../../../utilities/data-formatters';
 import { TRANSITION_DURATION, Units } from '../../../../utilities/constants';
-import { ChevronDown } from '../../../../svgs/ChevronDown';
 import { motion, AnimatePresence } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { AccountEventsPeriod } from '../../../../types/bookkeeper.type';
 import { useSelector } from 'react-redux';
 import { selectUIConfigUnit } from '../../../../store/rootSelectors';
+import { ChevronSVG } from '../../../../svgs/Chevron';
 
 function AccountEventsTable({periods}: {periods: AccountEventsPeriod[]}) {
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
@@ -65,13 +65,8 @@ function AccountEventsTable({periods}: {periods: AccountEventsPeriod[]}) {
                     overlay={<Tooltip>{expandedRows.includes(period.period_key) ? 'Hide Details' : 'Show Details'}</Tooltip>}
                   >
                     <td>
-                      <Button variant="link" onClick={() => toggleRow(period.period_key)}>
-                        <motion.div
-                          animate={{ rotate: expandedRows.includes(period.period_key) ? -180 : 0 }}
-                          transition={{ duration: TRANSITION_DURATION }}
-                        >
-                          <ChevronDown width={16} height={10} />
-                        </motion.div>
+                      <Button className='py-0' variant="link" onClick={() => toggleRow(period.period_key)}>
+                        <ChevronSVG open={expandedRows.includes(period.period_key)} width={'16'} height={'10'} />
                       </Button>
                     </td>
                   </OverlayTrigger>
