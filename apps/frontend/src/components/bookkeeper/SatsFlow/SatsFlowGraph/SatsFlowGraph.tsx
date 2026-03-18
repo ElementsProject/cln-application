@@ -1,15 +1,5 @@
 import { memo, useMemo } from 'react';
-import {
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ComposedChart,
-  Legend,
-  Line
-} from 'recharts';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Legend, Line } from 'recharts';
 import './SatsFlowGraph.scss';
 import { Row, Col } from 'react-bootstrap';
 import { Units } from '../../../../utilities/constants';
@@ -69,11 +59,15 @@ const CustomActiveDot = (props) => <circle cx={props.cx} cy={props.cy} r={4} fil
 
 function SatsFlowGraph({periods}: {periods: SatsFlowPeriod[]}) {
   const uiConfigUnit = useSelector(selectUIConfigUnit);
-  const barColors = ["rgba(0, 198, 160, 1)", "rgba(121, 203, 96, 1)", "rgba(201, 222, 83, 1)", "rgba(242, 207, 32, 1)", "rgba(240, 147, 46, 1)", "rgba(237, 88, 59, 1)"];
-  
-  const data = useMemo(() => {
-    return transformSatsFlowGraphData(periods);
-  }, [periods]);
+  const barValues = [
+    { name: 'routed', dataKey: 'routed', fill: "rgba(201, 222, 83, 1)" },
+    { name: 'invoice_fee', dataKey: 'invoice_fee', fill: "rgba(237, 88, 59, 1)" },
+    { name: 'received_invoice', dataKey: 'received_invoice', fill: "rgba(121, 203, 96, 1)" },
+    { name: 'paid_invoice', dataKey: 'paid_invoice', fill: "rgba(240, 147, 46, 1)" },
+    { name: 'deposit', dataKey: 'deposit', fill: "rgba(0, 198, 160, 1)" },
+    { name: 'onchain_fee', dataKey: 'onchain_fee', fill: "rgba(242, 207, 32, 1)" }
+  ];
+  const data = useMemo(() => transformSatsFlowGraphData(periods), [periods]);
 
   return (
     <div data-testid='sats-flow-graph' className='sats-flow-graph'>
@@ -93,12 +87,9 @@ function SatsFlowGraph({periods}: {periods: SatsFlowPeriod[]}) {
           />
           <Tooltip content={<SatsFlowGraphTooltip unit={uiConfigUnit} periods={periods} />} />
           <Legend content={SatsFlowGraphLegend} />
-          <Bar name='routed' dataKey='routed' stackId='bar' fill={barColors[2]} />
-          <Bar name='invoice_fee' dataKey='invoice_fee' stackId='bar' fill={barColors[5]} />
-          <Bar name='received_invoice' dataKey='received_invoice' stackId='bar' fill={barColors[1]} />
-          <Bar name='paid_invoice' dataKey='paid_invoice' stackId='bar' fill={barColors[4]} />
-          <Bar name='deposit' dataKey='deposit' stackId='bar' fill={barColors[0]} />
-          <Bar name='onchain_fee' dataKey='onchain_fee' stackId='bar' fill={barColors[3]} />
+          {barValues.map((value: any) => (
+            <Bar name={value.name} key={value.name} dataKey={value.dataKey} stackId='bar' fill={value.fill} />
+          ))}
           <Line className='series-net-inflow' type='monotone' dataKey='net_inflow_msat' activeDot={<CustomActiveDot />} />
         </ComposedChart>
       </ResponsiveContainer>
