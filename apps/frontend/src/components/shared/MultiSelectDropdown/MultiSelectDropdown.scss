@@ -1,0 +1,180 @@
+@use '../../../styles/constants' as *;
+
+.msd-wrapper {
+  min-width: 12rem;
+  max-width: 12rem;
+
+  .svg-chevron {
+    :hover {
+      stroke: $primary;
+    }
+  }
+
+  .form-control.msd-trigger {
+    display: flex;
+    align-items: center;
+    border-radius: $dropdown-border-radius !important;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0.675rem;
+  }
+
+  .msd-badges {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 4px;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    min-width: 0;
+
+    .msd-badge {
+      flex-shrink: 0;
+      max-width: 6rem;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      padding: 0.125rem 0.675rem;
+      background-color: $body-bg !important;
+      color: $dark;
+      border: 0.5px solid $gray-300;
+      font-weight: $font-weight-base;
+
+      .msd-badge-label {
+        font-size: $font-size-base;
+        display: inline-block;
+        max-width: 4rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+        margin-right: 0.125rem;
+      }
+
+      .msd-badge-remove {
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
+        font-size: 0;
+        vertical-align: middle;
+        border: none;
+        height: auto;
+      }
+
+    }
+
+    .msd-badge-overflow {
+      font-size: $font-size-base;
+    }
+  }
+
+  .btn.btn-link.msd-btn-remove, .msd-btn-chevron {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    font-size: 0;
+    vertical-align: middle;
+    border: none;
+    height: auto;
+    padding: 0;
+  }
+
+  .msd-dropdown {
+    position: absolute;
+    background-color: $body-bg;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    border-radius: $dropdown-border-radius !important;
+    border: 1px solid $gray-300;
+  }
+
+  .msd-search-input {
+    width: 90%;
+    margin: auto;
+    margin-top: 0.25rem;
+    border-radius: $dropdown-border-radius !important;
+  }
+
+  .msd-mode-radio {
+    font-size: $font-size-base;
+    font-weight: $font-weight-base;
+    .form-check-label {
+      cursor: pointer;
+    }
+  }
+
+  .msd-scroll-container {
+    max-height: 15rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .msd-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    max-height: 13rem;
+    .form-check .form-check-label {
+      margin: 1px 0 0 0.5rem;
+    }
+  }
+
+  .msd-option {
+    cursor: pointer;
+
+    .msd-option-check {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: $font-size-base;
+      font-weight: $font-weight-base;
+    }
+  }
+
+  .msd-empty {
+    padding: 10px 12px;
+    font-size: $font-size-base;
+    text-align: center;
+  }
+
+  .msd-footer {
+    padding: 0.5rem 1rem;
+    font-size: $font-size-base * 0.9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    border-top: 1px solid $gray-300;
+    max-height: 2rem;
+  }
+
+  .msd-footer-clear {
+    padding: 0;
+    font-size: $font-size-base * 0.9;
+    font-weight: 700;
+    color: $primary !important;
+  }
+
+}
+
+
+@include color-mode(dark) {
+  .msd-wrapper {
+    .msd-badges {
+      .msd-badge {
+        color: $white;
+        background-color: $card-bg-dark !important;
+        border-color: $border-color-dark;
+      }
+    }
+    .msd-dropdown {
+      color: $white;
+      background-color: $card-bg-dark;
+      border-color: $border-color-dark;
+    }
+  }
+}
