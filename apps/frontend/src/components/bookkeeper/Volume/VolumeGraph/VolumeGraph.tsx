@@ -1,6 +1,6 @@
-import { useMemo, useState, useEffect, memo } from 'react';
-import { ResponsiveContainer, Cell, PieChart, Pie, Tooltip, Legend } from 'recharts';
 import './VolumeGraph.scss';
+import { useMemo, useState, useEffect, memo, useCallback } from 'react';
+import { ResponsiveContainer, Cell, PieChart, Pie, Tooltip, Legend } from 'recharts';
 import { getBarColors, TOTAL_LABELS, Units } from '../../../../utilities/constants';
 import { formatCurrency } from '../../../../utilities/data-formatters';
 import { transformVolumeGraphData } from '../../../../services/data-transform.service';
@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectIsDarkMode, selectUIConfigUnit } from '../../../../store/rootSelectors';
 import { selectVolumeForwards } from '../../../../store/bkprSelectors';
+import MultiSelectDropdown from '../../../shared/MultiSelectDropdown/MultiSelectDropdown';
 
 const VolumeGraphTooltip = ({ active, payload, unit }: any) => {
   if (active && payload && payload.length >= 0) {
@@ -70,6 +71,23 @@ const VolumeGraph = () => {
   const uiConfigUnit = useSelector(selectUIConfigUnit);
   const volumeForwards = useSelector(selectVolumeForwards);
   const [animate, setAnimate] = useState(false);
+  const [selectedScids, setSelectedScids] = useState<string[]>([]);
+  const [filterMode, setFilterMode] = useState<string>('include');
+
+  const uniqueInChannelSCIDOptions = useMemo(() => (
+    [...new Set(volumeForwards?.map(forward => forward.in_channel_scid) ?? [])]
+      .map(scid => ({ value: scid, label: scid }))
+  ), [volumeForwards]);
+
+  const filteredVolumeForwards = useMemo(() => {
+    if (!volumeForwards) return [];
+    if (selectedScids.length === 0) return volumeForwards;
+
+    return volumeForwards.filter(forward => {
+      const isMatch = selectedScids.includes(forward.in_channel_scid);
+      return filterMode === 'include' ? isMatch : !isMatch;
+    });
+  }, [volumeForwards, selectedScids, filterMode]);
 
   useEffect(() => {
     setAnimate(false);
@@ -83,7 +101,10 @@ const VolumeGraph = () => {
   const RADIAN = Math.PI / 180;
 
   const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, data, isInner = false }: any) => {
-    const entry = data[index];
+    const entry = data?.[index];
+    
+    if (!entry) return null;
+
     const radius = innerRadius + (outerRadius - innerRadius) * (isInner ? 0.5 : 1.4);
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -91,7 +112,7 @@ const VolumeGraph = () => {
     const textAnchor = isInner  
       ? (x > cx ? 'start' : 'end') 
       : (Math.cos(midAngle * RADIAN) > 0 ? 'start' : 'end');
-  
+
     return (
       <text 
         x={x} 
@@ -112,8 +133,8 @@ const VolumeGraph = () => {
   };
 
   const { inbound, outbound }: any = useMemo(() => {
-    return transformVolumeGraphData(volumeForwards);
-  }, [volumeForwards]);
+    return transformVolumeGraphData(filteredVolumeForwards);
+  }, [filteredVolumeForwards]);
 
   pieColors = getBarColors(inbound.length);
   const colorChannelMap = new Map();
@@ -121,64 +142,86 @@ const VolumeGraph = () => {
     colorChannelMap.set(channel.in_channel_scid, pieColors[inbound.length - index - 1]);
   });
 
+  const multiSelectChangeHandler = useCallback((selectedOptions: string[], mode: string) => {
+    setTimeout(() => {
+      setSelectedScids(selectedOptions);
+      setFilterMode(mode);
+    }, 0);
+  }, []);
+
   return (
     <div data-testid='volume-graph' className='volume-graph'>
       <ResponsiveContainer width='100%' key={location.key}>
-        {animate ? (
-          <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-            <Tooltip content={<VolumeGraphTooltip unit={uiConfigUnit} />} />
-            <Legend
-              content={<VolumeGraphLegend colorChannelMap={colorChannelMap} />}
-              layout='horizontal'
-              verticalAlign='bottom'
-              align='center'
+        <div className="d-flex w-100 h-100 volume-graph-container">
+          <div className="left-column">
+            <MultiSelectDropdown
+              options={uniqueInChannelSCIDOptions}
+              placeholder='Filter Inbound'
+              onChange={multiSelectChangeHandler}
             />
-            <Pie
-              data={inbound}
-              cx='50%'
-              cy='50%'
-              labelLine={false}
-              label={(props) => renderLabel({ ...props, data: inbound, isInner: true })}
-              outerRadius='76%'
-              dataKey='fee_msat'
-              isAnimationActive={true}
-              animationBegin={0}
-              animationDuration={1000}
-              nameKey='in_channel_scid'
-            >
-              {inbound.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={colorChannelMap.get(entry.in_channel_scid)} 
-                  stroke='#333'
-                  strokeWidth={1}
+          </div>
+          <div className="right-column p-2">
+            {animate ? (
+              <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <Tooltip content={<VolumeGraphTooltip unit={uiConfigUnit} />} />
+                <Legend
+                  content={<VolumeGraphLegend colorChannelMap={colorChannelMap} />}
+                  layout='horizontal'
+                  verticalAlign='bottom'
+                  align='center'
                 />
-              ))}
-            </Pie>
-            <Pie
-              data={outbound}
-              dataKey='fee_msat'
-              cx='50%'
-              cy='50%'
-              innerRadius='80%'
-              outerRadius='98%'
-              label={(props) => (outbound[props.index].show_label) ? renderLabel({ ...props, data: outbound, isInner: false }) : null}
-              labelLine={outbound.length <= TOTAL_LABELS}
-              isAnimationActive={true}
-              animationBegin={200}
-              animationDuration={1000}
-            >
-              {outbound.map((entry, index) => (
-                <Cell 
-                  key={`outbound-cell-${index}`} 
-                  fill={colorChannelMap.get(entry.in_channel_scid)} 
-                  stroke='#333'
-                  strokeWidth={1}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        ) : (<></>)}
+                <Pie
+                  data={inbound}
+                  cx='50%'
+                  cy='50%'
+                  labelLine={false}
+                  label={(props) => renderLabel({ ...props, data: inbound, isInner: true })}
+                  outerRadius='76%'
+                  dataKey='fee_msat'
+                  isAnimationActive={true}
+                  animationBegin={0}
+                  animationDuration={1000}
+                  nameKey='in_channel_scid'
+                >
+                  {inbound.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={colorChannelMap.get(entry.in_channel_scid)} 
+                      stroke='#333'
+                      strokeWidth={1}
+                    />
+                  ))}
+                </Pie>
+                <Pie
+                  data={outbound}
+                  dataKey='fee_msat'
+                  cx='50%'
+                  cy='50%'
+                  innerRadius='80%'
+                  outerRadius='98%'
+                  label={(props) => {
+                    const entry = outbound?.[props.index];
+                    if (!entry) return null;
+                    return entry.show_label ? renderLabel({ ...props, data: outbound, isInner: false }) : null;
+                  }}
+                  labelLine={outbound.length <= TOTAL_LABELS}
+                  isAnimationActive={true}
+                  animationBegin={200}
+                  animationDuration={1000}
+                >
+                  {outbound.map((entry, index) => (
+                    <Cell 
+                      key={`outbound-cell-${index}`} 
+                      fill={colorChannelMap.get(entry.in_channel_scid)} 
+                      stroke='#333'
+                      strokeWidth={1}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            ) : null}
+          </div>
+        </div>
       </ResponsiveContainer>
     </div>
   );
