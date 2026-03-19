@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 const VolumeRoot = () => {
   const navigate = useNavigate();
-
   return (
     <div data-testid='volume-container' className='volume-container'>
       <Card className='h-100 p-3 pb-4'>
