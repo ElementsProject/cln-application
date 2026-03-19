@@ -9,6 +9,15 @@ import { SatsFlowPeriod } from '../../../../types/bookkeeper.type';
 import { useSelector } from 'react-redux';
 import { selectUIConfigUnit } from '../../../../store/rootSelectors';
 
+const ALL_EVENTS_VALUES = [
+  { name: 'routed', dataKey: 'routed', fill: "rgba(201, 222, 83, 1)" },
+  { name: 'invoice_fee', dataKey: 'invoice_fee', fill: "rgba(237, 88, 59, 1)" },
+  { name: 'received_invoice', dataKey: 'received_invoice', fill: "rgba(121, 203, 96, 1)" },
+  { name: 'paid_invoice', dataKey: 'paid_invoice', fill: "rgba(240, 147, 46, 1)" },
+  { name: 'deposit', dataKey: 'deposit', fill: "rgba(0, 198, 160, 1)" },
+  { name: 'onchain_fee', dataKey: 'onchain_fee', fill: "rgba(242, 207, 32, 1)" },
+];
+
 const SatsFlowGraphTooltip = ({ active, payload, label, unit, periods }: any) => {
   if (active && payload && payload.length >= 0) {
     const period = periods.find(d => d.period_key === label);
@@ -32,41 +41,36 @@ const SatsFlowGraphTooltip = ({ active, payload, label, unit, periods }: any) =>
             return null;
           }
         })}
-    </div>
+      </div>
     );
   }
   return null;
 };
 
-const SatsFlowGraphLegend = (props: any) => {
-  const { payload } = props;
+const SatsFlowGraphLegend = ({ eventValues }: { eventValues: typeof ALL_EVENTS_VALUES }) => {
   return (
     <Row className='gx-3 gy-1 justify-content-center align-items-center'>
-      {payload
-        .filter((entry: any) => entry.value !== 'net_inflow_msat')
-        .map((entry: any, index: number) => (
-          <Col key={`item-${index}`} xs='auto' className='col-sats-flow-lagend d-flex align-items-center'>
-            <div className='sats-flow-lagend-bullet' style={{ backgroundColor: entry.color }}/>
-            <span className='span-sats-flow-lagend'>{titleCase(entry.value.replace(/_/g, ' '))}</span>
-          </Col>
-        ))
-      }
+      {eventValues.map((entry, index) => (
+        <Col key={`item-${index}`} xs='auto' className='col-sats-flow-lagend d-flex align-items-center'>
+          <div className='sats-flow-lagend-bullet' style={{ backgroundColor: entry.fill }} />
+          <span className='span-sats-flow-lagend'>{titleCase(entry.name.replace(/_/g, ' '))}</span>
+        </Col>
+      ))}
     </Row>
-  )
+  );
 };
 
 const CustomActiveDot = (props) => <circle cx={props.cx} cy={props.cy} r={4} fill="var(--bs-body-color)" />;
 
-function SatsFlowGraph({periods}: {periods: SatsFlowPeriod[]}) {
+function SatsFlowGraph({ periods }: { periods: SatsFlowPeriod[] }) {
   const uiConfigUnit = useSelector(selectUIConfigUnit);
-  const barValues = [
-    { name: 'routed', dataKey: 'routed', fill: "rgba(201, 222, 83, 1)" },
-    { name: 'invoice_fee', dataKey: 'invoice_fee', fill: "rgba(237, 88, 59, 1)" },
-    { name: 'received_invoice', dataKey: 'received_invoice', fill: "rgba(121, 203, 96, 1)" },
-    { name: 'paid_invoice', dataKey: 'paid_invoice', fill: "rgba(240, 147, 46, 1)" },
-    { name: 'deposit', dataKey: 'deposit', fill: "rgba(0, 198, 160, 1)" },
-    { name: 'onchain_fee', dataKey: 'onchain_fee', fill: "rgba(242, 207, 32, 1)" }
-  ];
+  const eventValues = useMemo(() => {
+    const presentTags = new Set(
+      periods.flatMap(period => period.tag_groups.map(group => group.tag))
+    );
+    return ALL_EVENTS_VALUES.filter(bar => presentTags.has(bar.name));
+  }, [periods]);
+
   const data = useMemo(() => transformSatsFlowGraphData(periods), [periods]);
 
   return (
@@ -79,15 +83,15 @@ function SatsFlowGraph({periods}: {periods: SatsFlowPeriod[]}) {
         >
           <CartesianGrid strokeDasharray='3 3' />
           <XAxis dataKey='name' />
-          <YAxis 
+          <YAxis
             tickFormatter={(value) => {
               const formatted = formatCurrency(value, Units.MSATS, uiConfigUnit, false, 0, 'string');
               return typeof formatted === 'string' ? formatted : String(formatted);
             }}
           />
           <Tooltip content={<SatsFlowGraphTooltip unit={uiConfigUnit} periods={periods} />} />
-          <Legend content={SatsFlowGraphLegend} />
-          {barValues.map((value: any) => (
+          <Legend content={<SatsFlowGraphLegend eventValues={eventValues} />} />
+          {eventValues.map((value: any) => (
             <Bar name={value.name} key={value.name} dataKey={value.dataKey} stackId='bar' fill={value.fill} />
           ))}
           <Line className='series-net-inflow' type='monotone' dataKey='net_inflow_msat' activeDot={<CustomActiveDot />} />
@@ -95,6 +99,6 @@ function SatsFlowGraph({periods}: {periods: SatsFlowPeriod[]}) {
       </ResponsiveContainer>
     </div>
   );
-};
+}
 
 export default memo(SatsFlowGraph);
