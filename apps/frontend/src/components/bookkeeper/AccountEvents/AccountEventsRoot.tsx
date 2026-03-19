@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import './AccountEventsRoot.scss';
 import { Card, Row, Col } from 'react-bootstrap';
 import AccountEventsGraph from './AccountEventsGraph/AccountEventsGraph';
@@ -10,21 +10,72 @@ import { filterZeroActivityAccountEvents } from '../../../services/data-transfor
 import { AccountEventsPeriod } from '../../../types/bookkeeper.type';
 import { useSelector } from 'react-redux';
 import { selectAccountEventPeriods } from '../../../store/bkprSelectors';
+import { FilterMode } from '../../../utilities/constants';
 
 const AccountEventsRoot = () => {
   const navigate = useNavigate();
   const accEvntPeriods = useSelector(selectAccountEventPeriods);
   const [showZeroActivityPeriods, setShowZeroActivityPeriods] = useState<boolean>(false);
+  const [selectedChannelIds, setSelectedChannelIds] = useState<string[]>([]);
+  const [channelFilterMode, setChannelFilterMode] = useState<FilterMode>('include');
   const [accountEventsData, setAccountEventsData] = useState<AccountEventsPeriod[]>(accEvntPeriods);
+  const multiSelectOptions = useMemo(() => {
+      const seen = new Set<string>();
+      const accounts: { name: string; dataKey: string }[] = [];
+      accEvntPeriods.forEach(period => {
+        period.accounts.forEach(account => {
+          const id = account.short_channel_id || account.account || account.remote_alias || '';
+          if (!seen.has(id)) {
+            seen.add(id);
+            accounts.push({ name: id, dataKey: id });
+          }
+        });
+      });
+      return accounts;
+    }, [accEvntPeriods]);
 
-  const handleShowZeroActivityChange = (show: boolean) => {
+  const applyFilters = useCallback((
+    periods: AccountEventsPeriod[],
+    showZero: boolean,
+    channelIds: string[],
+    filterMode: FilterMode,
+  ): AccountEventsPeriod[] => {
+    const zeroFiltered = filterZeroActivityAccountEvents(periods, showZero);
+
+    if (!channelIds || channelIds.length === 0) {
+      return zeroFiltered;
+    }
+
+    return zeroFiltered.map(period => ({
+      ...period,
+      accounts: period.accounts.filter(account => {
+        const id = account.short_channel_id;
+        const isMatch = id ? channelIds.includes(id) : false;
+        return filterMode === 'include' ? isMatch : !isMatch;
+      }),
+    }));
+  }, []);
+
+  const handleShowZeroActivityChange = useCallback((show: boolean) => {
     setShowZeroActivityPeriods(show);
-    setAccountEventsData(filterZeroActivityAccountEvents((accEvntPeriods), show));
-  };
+    setAccountEventsData(applyFilters(accEvntPeriods, show, selectedChannelIds, channelFilterMode));
+  }, [accEvntPeriods, selectedChannelIds, channelFilterMode, applyFilters]);
+
+  const multiSelectChangeHandler = useCallback((selectedOptions: string[], filterMode: FilterMode) => {
+    setTimeout(() => {
+      setSelectedChannelIds(selectedOptions);
+      setChannelFilterMode(filterMode);
+      setAccountEventsData(
+        applyFilters(accEvntPeriods, showZeroActivityPeriods, selectedOptions, filterMode)
+      );
+    }, 0);
+  }, [accEvntPeriods, showZeroActivityPeriods, applyFilters]);
 
   useEffect(() => {
-    setAccountEventsData(filterZeroActivityAccountEvents((accEvntPeriods), showZeroActivityPeriods));
-  }, [accEvntPeriods, showZeroActivityPeriods]);
+    setAccountEventsData(
+      applyFilters(accEvntPeriods, showZeroActivityPeriods, selectedChannelIds, channelFilterMode)
+    );
+  }, [accEvntPeriods]);
 
   return (
     <div className='account-events-container' data-testid='account-events-container'>
@@ -35,20 +86,24 @@ const AccountEventsRoot = () => {
             <Col className='text-end'>
               <span
                 className='span-close-svg'
-                onClick={() => {
-                  navigate('..');
-                }}
+                onClick={() => navigate('..')}
               >
                 <CloseSVG />
               </span>
             </Col>
           </Row>
-          <DataFilterOptions filter='accountevents' onShowZeroActivityChange={handleShowZeroActivityChange} />
+          <DataFilterOptions
+            filter='accountevents'
+            onShowZeroActivityChange={handleShowZeroActivityChange}
+            multiSelectValues={multiSelectOptions}
+            multiSelectPlaceholder='Filter Channels'
+            multiSelectChangeHandler={multiSelectChangeHandler}
+          />
         </Card.Header>
         <Card.Body className='pt-1 pb-3 d-flex flex-column align-items-center'>
-            <Col xs={12} className='account-events-graph-container'>
-              <AccountEventsGraph periods={accountEventsData} />
-            </Col>
+          <Col xs={12} className='account-events-graph-container'>
+            <AccountEventsGraph periods={accountEventsData} />
+          </Col>
           <Col xs={12} className='account-events-table-container'>
             <AccountEventsTable periods={accountEventsData} />
           </Col>
