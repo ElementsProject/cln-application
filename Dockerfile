@@ -31,7 +31,7 @@ RUN npm prune --omit=dev
 # Final image
 FROM node:20-bookworm-slim AS cln-app-final
 
-# Install jq for JSON parsing in entrypoint.sh
+# Install jq for JSON parsing in scripts/entrypoint.sh
 RUN apt-get update && apt-get install -y jq socat
 
 # Copy built code from build stages to '/app/frontend' directory
@@ -51,6 +51,6 @@ COPY --from=cln-app-builder /app/node_modules /app/node_modules
 # Change directory to '/app' 
 WORKDIR /app
 
-COPY entrypoint.sh entrypoint.sh
+COPY scripts/entrypoint.sh scripts/entrypoint.sh
 
-ENTRYPOINT ["bash", "./entrypoint.sh"]
+ENTRYPOINT ["bash", "./scripts/entrypoint.sh"]
