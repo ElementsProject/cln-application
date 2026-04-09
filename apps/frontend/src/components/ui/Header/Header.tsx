@@ -19,9 +19,9 @@ const NetworkBanner = ({ network }: { network?: string }) => {
   const label = network.charAt(0).toUpperCase() + network.slice(1);
   const variant = network === 'regtest' ? 'danger' : 'warning';
   return (
-    <div className={`network-banner bg-${variant} text-center py-2 px-3 mb-2 mx-1 rounded`}>
-      <span className='fw-bold fs-6 text-dark'>{label} Network</span>
-      <span className='fs-6 ms-2 text-dark'>&mdash; Not real bitcoin</span>
+    <div className={`network-banner bg-${variant} text-center py-1 px-3 mb-2 mx-1 rounded d-flex align-items-center justify-content-center`}>
+      <span className='fw-bold text-dark' style={{fontSize: '0.95rem'}}>{label} Network</span>
+      <span className='text-dark ms-2' style={{fontSize: '0.95rem'}}>&mdash; Not real bitcoin</span>
     </div>
   );
 };
