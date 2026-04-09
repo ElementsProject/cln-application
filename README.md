@@ -24,9 +24,10 @@ SuperScalar enables multiple users to share a single on-chain UTXO for non-custo
 
 ## Prerequisites
 
-- Synced Bitcoin and Core Lightning node
+- [Core Lightning (bLIP-56 fork)](https://github.com/8144225309/lightning/tree/blip-56) — the `blip-56` branch with pluggable channel factory support
 - [SuperScalar CLN plugin](https://github.com/8144225309/superscalar-cln) installed and active
-- [Node.js](https://nodejs.org/en/download/)
+- Bitcoin Core 28+, synced to network
+- [Node.js](https://nodejs.org/en/download/) 16+
 - Recommended browsers: Chrome, Firefox, MS Edge
 
 ## Getting Started
@@ -92,7 +93,8 @@ Environment variables take precedence over `config.json` values. Full variable r
 | Project | Description |
 |---------|-------------|
 | [SuperScalar](https://github.com/8144225309/SuperScalar) | Reference implementation of the SuperScalar protocol |
-| [superscalar-cln](https://github.com/8144225309/superscalar-cln) | Core Lightning plugin for SuperScalar channel factories |
+| [superscalar-cln](https://github.com/8144225309/superscalar-cln) | SuperScalar channel factory plugin for Core Lightning (bLIP-56) |
+| [lightning (bLIP-56 fork)](https://github.com/8144225309/lightning/tree/blip-56) | Core Lightning fork with pluggable channel factory support |
 | [superscalar-docs](https://github.com/8144225309/superscalar-docs) | Protocol documentation and visual guides |
 | [superscalar.win](https://superscalar.win) | SuperScalar explainer and documentation site |
 
