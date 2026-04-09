@@ -1,89 +1,77 @@
 @use '../../../styles/constants' as *;
 
-.menu-dropdown.dropdown {
-  text-decoration: none;  
-  & .dropdown-toggle.btn-menu {
-    background-color: $primary;
-    padding: 1.25rem 1.375rem;
-    &::after {
-      display: none;
+.menu-nav {
+  .menu-nav-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+
+    &.menu-nav-btn-active {
+      background-color: $primary;
+      border-color: $primary;
     }
-  }
-  & .dropdown-menu {
-    & a.dropdown-item {
-      &.active,
-      &:active,
-      &:focus,
-      &:hover {
-        color: $primary;
-      }
+
+    &:not(.menu-nav-btn-active) {
+      background-color: transparent;
+      border-color: $gray-400;
     }
-    & div.dropdown-item {
-      color: $dark;
+
+    &:hover:not(.menu-nav-btn-active):not(.disabled) {
+      border-color: $primary;
+      background-color: rgba($primary, 0.1);
     }
-  }
-  &:focus-visible {
-    outline: none;
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 }
 
 @include color-mode(light) {
-  .menu-dropdown.dropdown {
-    & .dropdown-toggle.btn-menu {
-      color: $white;
-      & svg {
-        .cls-1 {
-          fill:none;
-          stroke:$white;
-          stroke-linecap:round;
-          stroke-linejoin:round;
+  .menu-nav {
+    .menu-nav-btn {
+      color: $dark;
+
+      &.menu-nav-btn-active {
+        color: $white;
+
+        & svg {
+          .fill-contrast {
+            fill: $white;
+          }
+          .cls-1 {
+            stroke: $white;
+          }
         }
       }
     }
-    & > .dropdown-menu {
-      border: none;
-    }
-  }
-  .btn-compact {
-    background-color: $primary;
-      & svg {
-        .cls-1 {
-          fill:none;
-          stroke:$dark;
-          stroke-linecap:round;
-          stroke-linejoin:round;
-        }
-      }
   }
 }
 
 @include color-mode(dark) {
-  .menu-dropdown.dropdown {
-    & .dropdown-toggle.btn-menu {
-      color: $card-bg-dark;
-      & svg {
-        .cls-1 {
-          fill:none;
-          stroke:$card-bg-dark;
-          stroke-linecap:round;
-          stroke-linejoin:round;
+  .menu-nav {
+    .menu-nav-btn {
+      color: $white;
+
+      &.menu-nav-btn-active {
+        color: $card-bg-dark;
+
+        & svg {
+          .fill-contrast {
+            fill: $card-bg-dark;
+          }
+          .cls-1 {
+            stroke: $card-bg-dark;
+          }
         }
       }
-    }
-    & .dropdown-menu {
-      & div.dropdown-item {
-        color: $white;
-      }
-    }
-  }
-  .btn-compact {
-    background-color: $primary;
-    & svg {
-      .cls-1 {
-        fill:none;
-        stroke:$dark;
-        stroke-linecap:round;
-        stroke-linejoin:round;
+
+      &:not(.menu-nav-btn-active) {
+        border-color: $gray-600;
       }
     }
   }

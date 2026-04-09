@@ -1,0 +1,8 @@
+@use '../../../styles/constants' as *;
+
+.list-item-factory {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba($primary, 0.08);
+  }
+}

@@ -1,0 +1,53 @@
+@use '../../../styles/constants' as *;
+
+.ceremony-progress {
+  .ceremony-steps {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .ceremony-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    &::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    &.active::before {
+      background-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.3);
+    }
+
+    &.completed::before {
+      background-color: $success;
+    }
+
+    &.pending::before {
+      background-color: $gray-400;
+    }
+  }
+
+  .ceremony-line {
+    width: 20px;
+    height: 2px;
+    background-color: $gray-400;
+    margin-bottom: 16px;
+
+    &.completed {
+      background-color: $success;
+    }
+  }
+
+  .ceremony-label {
+    white-space: nowrap;
+    color: $gray-600;
+  }
+}

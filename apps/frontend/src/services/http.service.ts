@@ -13,6 +13,8 @@ import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL, Li
 import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '../store/rootSlice';
 import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
+import { setFactoryList } from '../store/factoriesSlice';
+import { Factory, FactoryCreateResponse, FactoryRotateResponse, FactoryCloseResponse, FactoryForceCloseResponse, FactoryCheckBreachResponse } from '../types/factories.type';
 import { isCompatibleVersion } from '../utilities/data-formatters';
 
 const axiosInstance = axios.create({
@@ -538,5 +540,56 @@ export class BookkeeperService {
       };
     }
   }
-  
+
+}
+
+export class FactoriesService {
+  static async listFactories(): Promise<{ factories: Factory[] }> {
+    return HttpService.clnCall('factory-list');
+  }
+
+  static async createFactory(fundingSats: number, clients: string[]): Promise<FactoryCreateResponse> {
+    return HttpService.clnCall('factory-create', { funding_sats: fundingSats, clients });
+  }
+
+  static async rotateFactory(instanceId: string): Promise<FactoryRotateResponse> {
+    return HttpService.clnCall('factory-rotate', { instance_id: instanceId });
+  }
+
+  static async closeFactory(instanceId: string): Promise<FactoryCloseResponse> {
+    return HttpService.clnCall('factory-close', { instance_id: instanceId });
+  }
+
+  static async forceCloseFactory(instanceId: string): Promise<FactoryForceCloseResponse> {
+    return HttpService.clnCall('factory-force-close', { instance_id: instanceId });
+  }
+
+  static async checkBreach(instanceId: string, txid: string, vout: number, amountSats: number, epoch: number): Promise<FactoryCheckBreachResponse> {
+    return HttpService.clnCall('factory-check-breach', {
+      instance_id: instanceId, txid, vout, amount_sats: amountSats, epoch,
+    });
+  }
+
+  static async openChannels(instanceId: string): Promise<any> {
+    return HttpService.clnCall('factory-open-channels', { instance_id: instanceId });
+  }
+
+  static async fetchFactoriesData() {
+    const state = appStore.getState() as AppState;
+    if (state.root.authStatus.isAuthenticated) {
+      const results = await executeRequests(
+        {
+          factoryList: this.listFactories(),
+        },
+        (key, data) => {
+          switch (key) {
+            case 'factoryList':
+              appStore.dispatch(setFactoryList(data));
+              break;
+          }
+        }
+      );
+      return { factoryList: results.factoryList };
+    }
+  }
 }

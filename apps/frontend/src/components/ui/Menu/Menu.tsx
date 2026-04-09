@@ -1,41 +1,46 @@
 import './Menu.scss';
 import { Link, useLocation } from 'react-router-dom';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectNodeInfo } from '../../../store/rootSelectors';
 import { HomeSVG } from '../../../svgs/Home';
 import { BookkeeperSVG } from '../../../svgs/Bookkeeper';
+import { FactorySVG } from '../../../svgs/Factory';
+
+const menuItems = [
+  { path: '/cln', label: 'Dashboard', icon: HomeSVG },
+  { path: '/bookkeeper', label: 'Bookkeeper', icon: BookkeeperSVG },
+  { path: '/factories', label: 'Factories', icon: FactorySVG },
+];
 
 const Menu = props => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const nodeInfo = useSelector(selectNodeInfo);
   const location = useLocation();
 
+  const isDisabled = !!(nodeInfo.error || (isAuthenticated && nodeInfo.isLoading));
+
   return (
-    <Dropdown
-      as={Link} to={location.pathname.includes('/bookkeeper') ? '/cln' : '/bookkeeper'}
-      className={
-        !!(nodeInfo.error || (isAuthenticated && nodeInfo.isLoading))
-          ? 'me-2 menu-dropdown dropdown-disabled'
-          : 'me-2 menu-dropdown'
-      }
-      data-testid="menu"
-    >
-      <Dropdown.Toggle
-        variant={props.compact ? '' : 'primary'}
-        disabled={!!(nodeInfo.error || (isAuthenticated && nodeInfo.isLoading))}
-        className={
-          props.compact
-            ? 'd-flex align-items-center justify-content-between btn-rounded btn-compact btn-menu'
-            : 'd-flex align-items-center justify-content-between btn-rounded btn-menu'
-        }
-      >
-        <span className={props.compact ? '' : 'me-3'}>
-          <span className={props.compact ? '' : 'me-2'}>{props.compact ? '' : location.pathname.includes('bookkeeper') ? 'Dashboard' : 'Bookkeeper'}</span>
-          {location.pathname.includes('bookkeeper') ? <HomeSVG className={((!!nodeInfo.error || (isAuthenticated && nodeInfo.isLoading)) ? 'svg-fill-disabled' : '')} /> : <BookkeeperSVG className={((!!nodeInfo.error || (isAuthenticated && nodeInfo.isLoading)) ? 'svg-fill-disabled' : '')} />}
-        </span>
-      </Dropdown.Toggle>
-    </Dropdown>
+    <div className='d-flex align-items-center menu-nav' data-testid='menu'>
+      {menuItems.map(item => {
+        const Icon = item.icon;
+        const isActive = location.pathname.includes(item.path);
+        return (
+          <Link
+            key={item.path}
+            to={isDisabled ? '#' : item.path}
+            className={
+              'btn btn-sm btn-rounded menu-nav-btn me-1 d-flex align-items-center' +
+              (isActive ? ' menu-nav-btn-active' : '') +
+              (isDisabled ? ' disabled' : '')
+            }
+            onClick={(e) => isDisabled && e.preventDefault()}
+          >
+            <Icon className={isDisabled ? 'svg-fill-disabled' : isActive ? '' : ''} />
+            {!props.compact && <span className='ms-1'>{item.label}</span>}
+          </Link>
+        );
+      })}
+    </div>
   );
 };
 

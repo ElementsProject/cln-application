@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { clearBKPRStore } from '../store/bkprSlice';
 import { clearCLNStore } from '../store/clnSlice';
+import { clearFactoriesStore } from '../store/factoriesSlice';
 import { APP_WAIT_TIME } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { BookkeeperService, CLNService, RootService } from '../services/http.service';
+import { BookkeeperService, CLNService, FactoriesService, RootService } from '../services/http.service';
 import { selectAuthStatus } from '../store/rootSelectors';
 import logger from '../services/logger.service';
 
@@ -22,6 +23,9 @@ export function RootRouterReduxSync() {
       if (document.visibilityState === 'visible' && authStatus?.isAuthenticated) {
         try {
           await RootService.refreshData();
+          if (pathname.includes('/factories')) {
+            await FactoriesService.fetchFactoriesData();
+          }
         } catch (error) {
           logger.error('Error fetching root data:', error);
         }
@@ -48,8 +52,17 @@ export function RootRouterReduxSync() {
           logger.error('Error fetching BKPR data:', error);
         }
       }
+      else if (pathname.includes('/factories')) {
+        try {
+          await FactoriesService.fetchFactoriesData();
+        } catch (error) {
+          logger.error('Error fetching factories data:', error);
+        }
+      }
     };
-    const targetPath = pathname.includes('/bookkeeper') ? pathname : '/cln';
+    const targetPath = pathname.includes('/bookkeeper') ? pathname
+      : pathname.includes('/factories') ? pathname
+      : '/cln';
     fetchRouteData();
     if (pathname !== targetPath) {
       navigate(targetPath, { replace: true });
@@ -64,6 +77,9 @@ export function RootRouterReduxSync() {
       }
       else if (pathname.includes('/bookkeeper')) {
         dispatch(clearBKPRStore());
+      }
+      else if (pathname.includes('/factories')) {
+        dispatch(clearFactoriesStore());
       }
     };
   }, [pathname, dispatch]);

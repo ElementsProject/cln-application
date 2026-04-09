@@ -14,6 +14,18 @@ import { setShowModals, setConfig } from '../../../store/rootSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAppConfig, selectIsAuthenticated, selectIsDarkMode, selectNodeInfo, selectServerConfig, selectShowModals } from '../../../store/rootSelectors';
 
+const NetworkBanner = ({ network }: { network?: string }) => {
+  if (!network || network === 'bitcoin') return null;
+  const label = network.charAt(0).toUpperCase() + network.slice(1);
+  const variant = network === 'regtest' ? 'danger' : 'warning';
+  return (
+    <div className={`network-banner bg-${variant} text-center py-1 px-2 mb-2 rounded`}>
+      <span className='fw-bold fs-7'>{label} Network</span>
+      <span className='fs-8 ms-2'>Not real bitcoin</span>
+    </div>
+  );
+};
+
 const Header = (props) => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -42,6 +54,8 @@ const Header = (props) => {
 
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
+      <>
+      <NetworkBanner network={nodeInfo.network} />
       <Row className="header mb-2 mx-1" data-testid="header">
         <Col xs={12} data-testid="header-info">
           <Row>
@@ -49,7 +63,7 @@ const Header = (props) => {
               <AnimatePresence>
                 <motion.img
                   key='cln-logo'
-                  alt='Core Lightning Logo'
+                  alt='SuperScalar Wallet'
                   src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
                   className='header-info-logo me-3 rounded float-start'
                   initial={{ opacity: 0 }}
@@ -60,7 +74,7 @@ const Header = (props) => {
             </Col>
             <Col xs={9}>
               <h4 className="ms-3 m-0 text-dark">
-                <strong>Core Lightning Node</strong>
+                <strong>SuperScalar Wallet</strong>
               </h4>
               <Row className='header-info-text my-1'>
                 <Col xs={12} className='d-flex align-items-center text-light'>
@@ -124,19 +138,22 @@ const Header = (props) => {
           </Row>
         </Col>
       </Row>
+      </>
     );
   }
 
   return (
+    <>
+    <NetworkBanner network={nodeInfo.network} />
     <Row className='header mb-4 mx-1' data-testid='header'>
       <Col xs={12} lg={8} data-testid='header-info'>
-        <Image src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
+        <Image src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='SuperScalar Wallet' />
         <Row className='header-info-text mt-3'>
           {(currentScreenSize !== Breakpoints.MD) ?
-            <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
+            <h4 className='m-0 text-dark'><strong>SuperScalar Wallet</strong></h4>
             :
             <Col xs={12} lg={4} className='d-flex align-items-center justify-content-between' data-testid='header-context'>
-              <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
+              <h4 className='m-0 text-dark'><strong>SuperScalar Wallet</strong></h4>
               <div className='d-flex align-items-center'>
                 <Menu />
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
@@ -218,6 +235,7 @@ const Header = (props) => {
         <></>
       )}
     </Row>
+    </>
   );
 };
 
