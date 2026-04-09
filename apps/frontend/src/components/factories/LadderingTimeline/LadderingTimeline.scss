@@ -1,0 +1,46 @@
+@use '../../../styles/constants' as *;
+
+.timeline-container {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.timeline-row {
+  position: relative;
+}
+
+.timeline-bar-container {
+  position: relative;
+  height: 12px;
+  background-color: $gray-200;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.timeline-bar {
+  position: absolute;
+  height: 100%;
+  border-radius: 6px;
+  opacity: 0.85;
+  transition: width 0.3s ease;
+}
+
+.timeline-current-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: $primary;
+  z-index: 1;
+
+  &::after {
+    content: 'Now';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    color: $primary;
+    white-space: nowrap;
+  }
+}

@@ -10,6 +10,7 @@ import { RootRouterReduxSync } from './routerReduxSync';
 const App = lazy(() => import('../components/App/App'));
 const CLNHome = lazy(() => import('../components/cln/CLNHome/CLNHome'));
 const Bookkeeper = lazy(() => import('../components/bookkeeper/BkprHome/BkprHome'));
+const FactoriesHome = lazy(() => import('../components/factories/FactoriesHome/FactoriesHome'));
 
 export const rootRouteConfig = [
   {
@@ -28,6 +29,14 @@ export const rootRouteConfig = [
         element: (
           <Suspense fallback={<Loading />}>
             <CLNHome />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'factories',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <FactoriesHome />
           </Suspense>
         ),
       },
