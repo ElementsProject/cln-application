@@ -49,7 +49,7 @@ const Header = (props) => {
               <AnimatePresence>
                 <motion.img
                   key='cln-logo'
-                  alt='Core Lightning Logo'
+                  alt='SuperScalar Wallet'
                   src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'}
                   className='header-info-logo me-3 rounded float-start'
                   initial={{ opacity: 0 }}
@@ -60,7 +60,7 @@ const Header = (props) => {
             </Col>
             <Col xs={9}>
               <h4 className="ms-3 m-0 text-dark">
-                <strong>Core Lightning Node</strong>
+                <strong>SuperScalar Wallet</strong>
               </h4>
               <Row className='header-info-text my-1'>
                 <Col xs={12} className='d-flex align-items-center text-light'>
@@ -130,13 +130,13 @@ const Header = (props) => {
   return (
     <Row className='header mb-4 mx-1' data-testid='header'>
       <Col xs={12} lg={8} data-testid='header-info'>
-        <Image src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='Core Lightning Logo' />
+        <Image src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='SuperScalar Wallet' />
         <Row className='header-info-text mt-3'>
           {(currentScreenSize !== Breakpoints.MD) ?
-            <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
+            <h4 className='m-0 text-dark'><strong>SuperScalar Wallet</strong></h4>
             :
             <Col xs={12} lg={4} className='d-flex align-items-center justify-content-between' data-testid='header-context'>
-              <h4 className='m-0 text-dark'><strong>Core Lightning Node</strong></h4>
+              <h4 className='m-0 text-dark'><strong>SuperScalar Wallet</strong></h4>
               <div className='d-flex align-items-center'>
                 <Menu />
                 <Settings onShowConnectWallet={props.onShowConnectWallet} />
