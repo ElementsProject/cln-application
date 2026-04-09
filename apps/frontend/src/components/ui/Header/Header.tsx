@@ -14,6 +14,18 @@ import { setShowModals, setConfig } from '../../../store/rootSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAppConfig, selectIsAuthenticated, selectIsDarkMode, selectNodeInfo, selectServerConfig, selectShowModals } from '../../../store/rootSelectors';
 
+const NetworkBanner = ({ network }: { network?: string }) => {
+  if (!network || network === 'bitcoin') return null;
+  const label = network.charAt(0).toUpperCase() + network.slice(1);
+  const variant = network === 'regtest' ? 'danger' : 'warning';
+  return (
+    <div className={`network-banner bg-${variant} text-center py-1 px-2 mb-2 rounded`}>
+      <span className='fw-bold fs-7'>{label} Network</span>
+      <span className='fs-8 ms-2'>Not real bitcoin</span>
+    </div>
+  );
+};
+
 const Header = (props) => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -42,6 +54,8 @@ const Header = (props) => {
 
   if (currentScreenSize === Breakpoints.XS || currentScreenSize === Breakpoints.SM) {
     return (
+      <>
+      <NetworkBanner network={nodeInfo.network} />
       <Row className="header mb-2 mx-1" data-testid="header">
         <Col xs={12} data-testid="header-info">
           <Row>
@@ -124,10 +138,13 @@ const Header = (props) => {
           </Row>
         </Col>
       </Row>
+      </>
     );
   }
 
   return (
+    <>
+    <NetworkBanner network={nodeInfo.network} />
     <Row className='header mb-4 mx-1' data-testid='header'>
       <Col xs={12} lg={8} data-testid='header-info'>
         <Image src={isDarkMode ? '/images/cln-logo-dark.png' : '/images/cln-logo-light.png'} className='header-info-logo me-3 rounded float-start' alt='SuperScalar Wallet' />
@@ -218,6 +235,7 @@ const Header = (props) => {
         <></>
       )}
     </Row>
+    </>
   );
 };
 
