@@ -62,6 +62,7 @@ export function RootRouterReduxSync() {
     };
     const targetPath = pathname.includes('/bookkeeper') ? pathname
       : pathname.includes('/factories') ? pathname
+      : pathname.includes('/connect') ? pathname
       : '/cln';
     fetchRouteData();
     if (pathname !== targetPath) {

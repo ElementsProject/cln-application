@@ -5,11 +5,13 @@ import { selectIsAuthenticated, selectNodeInfo } from '../../../store/rootSelect
 import { HomeSVG } from '../../../svgs/Home';
 import { BookkeeperSVG } from '../../../svgs/Bookkeeper';
 import { FactorySVG } from '../../../svgs/Factory';
+import { ConnectSVG } from '../../../svgs/Connect';
 
 const menuItems = [
   { path: '/cln', label: 'Dashboard', icon: HomeSVG },
   { path: '/bookkeeper', label: 'Bookkeeper', icon: BookkeeperSVG },
   { path: '/factories', label: 'Factories', icon: FactorySVG },
+  { path: '/connect', label: 'Connect', icon: ConnectSVG },
 ];
 
 const Menu = props => {

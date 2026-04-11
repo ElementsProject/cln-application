@@ -11,6 +11,7 @@ const App = lazy(() => import('../components/App/App'));
 const CLNHome = lazy(() => import('../components/cln/CLNHome/CLNHome'));
 const Bookkeeper = lazy(() => import('../components/bookkeeper/BkprHome/BkprHome'));
 const FactoriesHome = lazy(() => import('../components/factories/FactoriesHome/FactoriesHome'));
+const ConnectHome = lazy(() => import('../components/connect/ConnectHome/ConnectHome'));
 
 export const rootRouteConfig = [
   {
@@ -33,10 +34,18 @@ export const rootRouteConfig = [
         ),
       },
       {
-        path: 'factories',
+        path: 'factories/*',
         element: (
           <Suspense fallback={<Loading />}>
             <FactoriesHome />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'connect',
+        element: (
+          <Suspense fallback={<Loading />}>
+            <ConnectHome />
           </Suspense>
         ),
       },

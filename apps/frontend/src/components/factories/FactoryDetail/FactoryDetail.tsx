@@ -6,6 +6,8 @@ import { Factory, FactoryLifecycle, FactoryCeremony } from '../../../types/facto
 import { FactoriesService } from '../../../services/http.service';
 import StatusAlert from '../../shared/StatusAlert/StatusAlert';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
+import { useSelector } from 'react-redux';
+import { selectNodeInfo } from '../../../store/rootSelectors';
 import CeremonyProgress from '../CeremonyProgress/CeremonyProgress';
 
 type FactoryDetailProps = {
@@ -16,6 +18,7 @@ type FactoryDetailProps = {
 const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
+  const nodeInfo = useSelector(selectNodeInfo);
 
   const resetStatus = () => {
     setTimeout(() => {
@@ -88,10 +91,19 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
     }
   };
 
+  const handleInvite = () => {
+    const text = `Factory ID: ${factory.instance_id}\nLSP Pubkey: ${nodeInfo.id || 'unknown'}`;
+    copyTextToClipboard(text);
+    setResponseStatus(CallStatus.SUCCESS);
+    setResponseMessage('Invite info copied to clipboard');
+    resetStatus();
+  };
+
   const canRotate = factory.lifecycle === FactoryLifecycle.ACTIVE && factory.ceremony === FactoryCeremony.COMPLETE && !factory.rotation_in_progress;
   const canClose = factory.lifecycle === FactoryLifecycle.ACTIVE;
   const canForceClose = factory.lifecycle !== FactoryLifecycle.EXPIRED;
   const canOpenChannels = factory.lifecycle === FactoryLifecycle.ACTIVE && factory.ceremony === FactoryCeremony.COMPLETE;
+  const canInvite = factory.is_lsp && factory.lifecycle === FactoryLifecycle.ACTIVE;
 
   return (
     <Card className='h-100 d-flex align-items-stretch px-4 pt-4 pb-3' data-testid='factory-detail'>
@@ -244,6 +256,11 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
         {canRotate && (
           <button className='btn-rounded bg-primary btn-sm' onClick={handleRotate} disabled={responseStatus === CallStatus.PENDING}>
             Rotate
+          </button>
+        )}
+        {canInvite && (
+          <button className='btn-rounded bg-secondary btn-sm' onClick={handleInvite} disabled={responseStatus === CallStatus.PENDING}>
+            Invite
           </button>
         )}
         {canClose && (

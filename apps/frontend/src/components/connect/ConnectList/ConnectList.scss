@@ -1,0 +1,40 @@
+@use '../../../styles/constants' as *;
+
+.connect-filter-chip {
+  border: none;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: background-color 0.15s;
+}
+
+.connect-list-item {
+  cursor: pointer;
+  transition: background-color 0.12s;
+
+  &.selected {
+    background-color: rgba($primary, 0.08);
+  }
+
+  &:hover {
+    background-color: rgba($primary, 0.05);
+  }
+}
+
+.connect-disclaimer {
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
+@include color-mode(light) {
+  .connect-disclaimer {
+    color: $gray-500;
+  }
+}
+
+@include color-mode(dark) {
+  .connect-disclaimer {
+    color: $gray-500;
+  }
+}
