@@ -44,7 +44,7 @@ export type Factory = {
   rotation_in_progress: boolean;
   n_breach_epochs: number;
   dist_tx_status: string;
-  tree_nodes: TreeNode[];
+  tree_nodes: number | TreeNode[];
   funding_txid: string;
   funding_outnum: number;
   channels: FactoryChannel[];

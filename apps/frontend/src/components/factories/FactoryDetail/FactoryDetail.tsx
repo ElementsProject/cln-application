@@ -203,24 +203,30 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
           </Row>
         )}
 
-        {factory.tree_nodes && factory.tree_nodes.length > 0 && (
+        {factory.tree_nodes && (
           <Row className='mb-2'>
             <Col xs={12}>
-              <div className='fs-7 text-light fw-bold mb-1'>Tree Nodes ({factory.tree_nodes.length})</div>
-              <ListGroup variant='flush' className='fs-7'>
-                {factory.tree_nodes.map((node, idx) => (
-                  <ListGroup.Item key={idx} className='px-0 py-1 d-flex justify-content-between'>
-                    <span className='text-dark'>#{node.node_idx} {node.type}</span>
-                    {node.txid && (
-                      <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy TXID</Tooltip>}>
-                        <span className='text-light cursor-pointer' onClick={() => copyTextToClipboard(node.txid!)}>
-                          {node.txid.substring(0, 16)}...
-                        </span>
-                      </OverlayTrigger>
-                    )}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
+              {typeof factory.tree_nodes === 'number' ? (
+                <div className='fs-7 text-light'>Tree Nodes: <span className='fw-bold text-dark'>{factory.tree_nodes}</span></div>
+              ) : Array.isArray(factory.tree_nodes) && factory.tree_nodes.length > 0 ? (
+                <>
+                  <div className='fs-7 text-light fw-bold mb-1'>Tree Nodes ({factory.tree_nodes.length})</div>
+                  <ListGroup variant='flush' className='fs-7'>
+                    {factory.tree_nodes.map((node, idx) => (
+                      <ListGroup.Item key={idx} className='px-0 py-1 d-flex justify-content-between'>
+                        <span className='text-dark'>#{node.node_idx} {node.type}</span>
+                        {node.txid && (
+                          <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy TXID</Tooltip>}>
+                            <span className='text-light cursor-pointer' onClick={() => copyTextToClipboard(node.txid!)}>
+                              {node.txid.substring(0, 16)}...
+                            </span>
+                          </OverlayTrigger>
+                        )}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </>
+              ) : null}
             </Col>
           </Row>
         )}
