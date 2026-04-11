@@ -68,7 +68,7 @@ const CeremonyProgress = ({ ceremony }: CeremonyProgressProps) => {
                 }
                 title={stepLabel(step)}
               >
-                <span className='ceremony-label fs-8'>{stepLabel(step)}</span>
+                <span className='ceremony-label'>{stepLabel(step)}</span>
               </div>
             </div>
           );

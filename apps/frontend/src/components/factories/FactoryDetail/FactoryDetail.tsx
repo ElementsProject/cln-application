@@ -259,7 +259,7 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
           </button>
         )}
         {canInvite && (
-          <button className='btn-rounded bg-secondary btn-sm' onClick={handleInvite} disabled={responseStatus === CallStatus.PENDING}>
+          <button className='btn btn-rounded btn-secondary btn-sm' onClick={handleInvite} disabled={responseStatus === CallStatus.PENDING}>
             Invite
           </button>
         )}

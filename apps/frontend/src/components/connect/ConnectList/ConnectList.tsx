@@ -86,8 +86,15 @@ const ConnectList = () => {
             <Row className='text-center pb-4'>No {sortFilter !== 'all' ? sortFilter : ''} factories available right now.</Row>
           </Row>
         ) : (
+          <>
+            <Row className='connect-col-headers text-light px-0 pt-2 pb-1 mx-0'>
+              <Col xs={3}>Slots</Col>
+              <Col xs={3}>Capacity</Col>
+              <Col xs={3}>Min Ch</Col>
+              <Col xs={3}>Opens</Col>
+            </Row>
           <PerfectScrollbar>
-            <ListGroup variant='flush' className='fs-7'>
+            <ListGroup variant='flush' className='fs-7 pe-1'>
               {sorted.map((factory: CoordinationFactory) => {
                 const request = joinRequests[factory.id];
                 const isSelected = selectedId === factory.id;
@@ -160,6 +167,7 @@ const ConnectList = () => {
               Sample data — coordination server coming soon
             </div>
           </PerfectScrollbar>
+          </>
         )}
       </Card.Body>
 
