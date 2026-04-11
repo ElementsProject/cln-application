@@ -92,7 +92,7 @@ const NodePicker = () => {
     || nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '')
     || activeProfile?.label
     || 'Node';
-  const displayPubkey = activeProfile?.pubkey || '';
+  const displayPubkey = activeProfile?.pubkey || nodeInfo.id || '';
 
   // Status dot logic
   const getStatusDot = () => {
@@ -129,8 +129,11 @@ const NodePicker = () => {
     );
   };
 
+  // Determine if we're actually connected — nodeInfo having an id means commando works
+  const actuallyConnected = isConnected || !!nodeInfo.id;
+
   // No connection and no profiles — show scan button
-  if (!isConnected && profiles.length === 0 && !nodeInfo.isLoading) {
+  if (!actuallyConnected && profiles.length === 0 && !nodeInfo.isLoading && !nodeInfo.error) {
     return (
       <span className='fs-7 d-flex align-items-center'>
         <OverlayTrigger placement='auto' delay={{ show: 250, hide: 250 }} overlay={<Tooltip>Disconnected</Tooltip>}>
