@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { FactoriesState, FactoryLifecycle } from '../types/factories.type';
+import { FactoriesState, FactoryCeremony, FactoryLifecycle } from '../types/factories.type';
 
 export const defaultFactoriesState: FactoriesState = {
   factoryList: { isLoading: true, factories: [] },
@@ -48,5 +48,7 @@ export const selectFactoryCounts = createSelector(
     init: factories.filter(f => f.lifecycle === FactoryLifecycle.INIT).length,
     dying: factories.filter(f => f.lifecycle === FactoryLifecycle.DYING).length,
     expired: factories.filter(f => f.lifecycle === FactoryLifecycle.EXPIRED).length,
+    signed: factories.filter(f => f.ceremony === FactoryCeremony.COMPLETE).length,
+    totalChannels: factories.reduce((sum, f) => sum + (f.n_channels || 0), 0),
   })
 );

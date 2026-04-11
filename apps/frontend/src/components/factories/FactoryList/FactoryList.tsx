@@ -63,19 +63,27 @@ const FactoryList = (props: FactoryListProps) => {
                               </span>
                             </OverlayTrigger>
                           </div>
-                          <span className='fs-7 text-light'>
-                            {factory.is_lsp ? 'LSP' : 'Client'}
-                          </span>
+                          <div className='d-flex align-items-center'>
+                            <span className={'badge me-1 bg-' + (factory.lifecycle === 'active' ? 'success' : factory.ceremony === 'complete' ? 'primary' : 'secondary')}>
+                              {factory.lifecycle === 'active' ? 'Active' : factory.ceremony === 'complete' ? 'Signed' : factory.ceremony}
+                            </span>
+                            <span className='fs-7 text-light'>
+                              {factory.is_lsp ? 'LSP' : 'Client'}
+                            </span>
+                          </div>
                         </div>
                         <Row className='text-light fs-7 mt-1'>
-                          <Col xs={4}>
-                            Epoch: <span className='fw-bold text-dark'>{factory.epoch}/{factory.max_epochs}</span>
+                          <Col xs={3}>
+                            <span className='fw-bold text-dark'>{factory.n_channels}</span> ch
                           </Col>
-                          <Col xs={4}>
-                            Clients: <span className='fw-bold text-dark'>{factory.n_clients}</span>
+                          <Col xs={3}>
+                            <span className='fw-bold text-dark'>{factory.n_clients}</span> clients
                           </Col>
-                          <Col xs={4}>
-                            Channels: <span className='fw-bold text-dark'>{factory.n_channels}</span>
+                          <Col xs={3}>
+                            Ep <span className='fw-bold text-dark'>{factory.epoch}/{factory.max_epochs || '?'}</span>
+                          </Col>
+                          <Col xs={3}>
+                            <span className='fw-bold text-dark'>{factory.tree_nodes || 0}</span> nodes
                           </Col>
                         </Row>
                       </div>

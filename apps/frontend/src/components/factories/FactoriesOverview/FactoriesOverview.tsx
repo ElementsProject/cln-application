@@ -15,8 +15,8 @@ const FactoriesOverview = () => {
 
   const countTotal: any = useMotionValue(0);
   const roundedTotal: any = useTransform(countTotal, Math.round);
-  const countActive: any = useMotionValue(0);
-  const roundedActive: any = useTransform(countActive, Math.round);
+  const countChannels: any = useMotionValue(0);
+  const roundedChannels: any = useTransform(countChannels, Math.round);
 
   useEffect(() => {
     const anim = animate(countTotal, counts.total, { duration: COUNTUP_DURATION });
@@ -24,18 +24,18 @@ const FactoriesOverview = () => {
   }, [counts.total, countTotal]);
 
   useEffect(() => {
-    const anim = animate(countActive, counts.active, { duration: COUNTUP_DURATION });
+    const anim = animate(countChannels, counts.totalChannels, { duration: COUNTUP_DURATION });
     return anim.stop;
-  }, [counts.active, countActive]);
+  }, [counts.totalChannels, countChannels]);
 
   return (
     <Row className='mx-1 align-items-stretch'>
-      <Col xs={12} lg={3} className='d-lg-flex d-xl-flex mb-4'>
+      <Col xs={6} lg={3} className='d-lg-flex d-xl-flex mb-4'>
         <Card className='card overview-balance-card w-100' data-testid='factories-total-card'>
           <Card.Body className='d-flex align-items-center'>
             <Row className='flex-fill'>
-              <Col xs={8} data-testid='factories-total-col'>
-                <div className='fs-6 fw-bold'>Total Factories</div>
+              <Col xs={8}>
+                <div className='fs-6 fw-bold'>Factories</div>
                 {isAuthenticated && isLoading ?
                   <Spinner animation='grow' variant='secondary' /> :
                   error ?
@@ -50,39 +50,47 @@ const FactoriesOverview = () => {
           </Card.Body>
         </Card>
       </Col>
-      <Col xs={12} lg={9} className='mb-4'>
-        <Card className='inner-box-shadow h-100' data-testid='factories-counts-card'>
+      <Col xs={6} lg={3} className='d-lg-flex d-xl-flex mb-4'>
+        <Card className='card overview-balance-card w-100'>
+          <Card.Body className='d-flex align-items-center'>
+            <Row className='flex-fill'>
+              <Col xs={12}>
+                <div className='fs-6 fw-bold'>Channels</div>
+                {isAuthenticated && isLoading ?
+                  <Spinner animation='grow' variant='secondary' /> :
+                  <motion.div className='fs-4 fw-bold text-dark-primary'>{roundedChannels}</motion.div>
+                }
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </Col>
+      <Col xs={12} lg={6} className='mb-4'>
+        <Card className='inner-box-shadow h-100'>
           <Card.Body className='px-4'>
             <Row className='h-100'>
-              <Col xs={6} md={3} className='d-flex align-items-center justify-content-start'>
-                <div>
-                  <div className='text-light-white'>Active</div>
-                  <div className='fs-4 fw-bold text-dark-primary'>
-                    {isAuthenticated && isLoading ?
-                      <Spinner animation='grow' variant='primary' /> :
-                      error ?
-                        <Alert className='py-0 px-1 fs-7' variant='danger'>{error}</Alert> :
-                        <motion.div>{roundedActive}</motion.div>
-                    }
-                  </div>
+              <Col xs={3} className='d-flex align-items-center justify-content-center'>
+                <div className='text-center'>
+                  <div className='fs-4 fw-bold text-success'>{counts.active}</div>
+                  <div className='text-light-white fs-7'>Active</div>
                 </div>
               </Col>
-              <Col xs={6} md={3} className='d-flex align-items-center justify-content-start'>
-                <div>
-                  <div className='text-light-white'>Initializing</div>
-                  <div className='fs-4 fw-bold text-dark-primary'>{counts.init}</div>
+              <Col xs={3} className='d-flex align-items-center justify-content-center'>
+                <div className='text-center'>
+                  <div className='fs-4 fw-bold text-primary'>{counts.signed}</div>
+                  <div className='text-light-white fs-7'>Signed</div>
                 </div>
               </Col>
-              <Col xs={6} md={3} className='d-flex align-items-center justify-content-start'>
-                <div>
-                  <div className='text-light-white'>Dying</div>
-                  <div className='fs-4 fw-bold text-warning'>{counts.dying}</div>
+              <Col xs={3} className='d-flex align-items-center justify-content-center'>
+                <div className='text-center'>
+                  <div className='fs-4 fw-bold text-warning'>{counts.init}</div>
+                  <div className='text-light-white fs-7'>Init</div>
                 </div>
               </Col>
-              <Col xs={6} md={3} className='d-flex align-items-center justify-content-start'>
-                <div>
-                  <div className='text-light-white'>Expired</div>
-                  <div className='fs-4 fw-bold text-danger'>{counts.expired}</div>
+              <Col xs={3} className='d-flex align-items-center justify-content-center'>
+                <div className='text-center'>
+                  <div className={'fs-4 fw-bold ' + (counts.expired > 0 ? 'text-danger' : 'text-light')}>{counts.dying + counts.expired}</div>
+                  <div className='text-light-white fs-7'>Dying/Exp</div>
                 </div>
               </Col>
             </Row>
