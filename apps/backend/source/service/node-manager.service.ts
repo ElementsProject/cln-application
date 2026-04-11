@@ -127,6 +127,21 @@ export class NodeManager {
         if (tempProfile.label === 'Discovered Node' && info.alias) {
           tempProfile.label = info.alias;
         }
+
+        // Auto-add to saved profiles if not already there
+        if (!existing) {
+          this.profilesService.addProfile(tempProfile);
+          logger.info('Auto-added discovered node: ' + tempProfile.label + ' (' + profileId + ')');
+        } else {
+          // Update existing profile with fresh info
+          const config = this.profilesService.loadProfiles();
+          const idx = config.profiles.findIndex(p => p.id === profileId);
+          if (idx >= 0) {
+            config.profiles[idx] = { ...config.profiles[idx], ...tempProfile };
+            this.profilesService.saveProfiles(config);
+          }
+        }
+
         discovered.push(tempProfile);
       } catch (err: any) {
         logger.warn(

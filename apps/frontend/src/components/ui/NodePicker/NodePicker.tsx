@@ -64,8 +64,16 @@ const NodePicker = () => {
       appStore.dispatch(setIsDiscovering(true));
       const result = await NodesService.discoverNodes();
       if (result.profiles && result.profiles.length > 0) {
-        // Re-fetch full profile list to pick up any newly added
+        // Re-fetch profile list
         await NodesService.fetchAndDispatchNodes();
+        const nodeData = await NodesService.listNodes();
+        // If not connected yet, auto-switch to the first discovered node
+        if (!nodeData.activeProfileId && result.profiles.length > 0) {
+          await handleSwitchNode(result.profiles[0].id);
+        } else if (nodeData.activeProfileId && !nodeData.isConnected) {
+          // Profile exists but not connected — reconnect
+          await handleSwitchNode(nodeData.activeProfileId);
+        }
       }
     } catch (error) {
       logger.error('Failed to discover nodes:', error);
