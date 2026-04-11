@@ -10,6 +10,14 @@ import { useSelector } from 'react-redux';
 import { selectNodeInfo } from '../../../store/rootSelectors';
 import CeremonyProgress from '../CeremonyProgress/CeremonyProgress';
 
+const ZERO_TXID = '0000000000000000000000000000000000000000000000000000000000000000';
+
+const isValidTxid = (txid: string | undefined): boolean =>
+  !!txid && txid !== ZERO_TXID && txid !== '';
+
+const formatBlock = (block: number): string =>
+  block > 0 ? block.toLocaleString() : 'N/A';
+
 type FactoryDetailProps = {
   factory: Factory;
   onClose: () => void;
@@ -150,7 +158,7 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
         <Row className='mb-2'>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Epoch</div>
-            <div className='fw-bold text-dark'>{factory.epoch} / {factory.max_epochs}</div>
+            <div className='fw-bold text-dark'>{factory.epoch} / {factory.max_epochs || '?'}</div>
           </Col>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Channels</div>
@@ -165,11 +173,11 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
         <Row className='mb-2'>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Creation Block</div>
-            <div className='fw-bold text-dark'>{factory.creation_block}</div>
+            <div className='fw-bold text-dark'>{formatBlock(factory.creation_block)}</div>
           </Col>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Expiry Block</div>
-            <div className='fw-bold text-dark'>{factory.expiry_block}</div>
+            <div className='fw-bold text-dark'>{formatBlock(factory.expiry_block)}</div>
           </Col>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Breach Epochs</div>
@@ -180,18 +188,26 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
         <Row className='mb-2'>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Dist TX Status</div>
-            <div className='fw-bold text-dark'>{factory.dist_tx_status || 'N/A'}</div>
+            <div className='fw-bold text-dark'>{factory.dist_tx_status && factory.dist_tx_status !== 'unknown' ? factory.dist_tx_status : 'N/A'}</div>
           </Col>
-          <Col xs={6} md={8}>
+          <Col xs={6} md={4}>
+            <div className='fs-7 text-light'>Tree Nodes</div>
+            <div className='fw-bold text-dark'>{typeof factory.tree_nodes === 'number' && factory.tree_nodes > 0 ? factory.tree_nodes : 'N/A'}</div>
+          </Col>
+          <Col xs={12}>
             <div className='fs-7 text-light'>Funding TXID</div>
-            <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy</Tooltip>}>
-              <div
-                className='fw-bold text-dark fs-7 cursor-pointer text-break'
-                onClick={() => copyTextToClipboard(factory.funding_txid)}
-              >
-                {factory.funding_txid ? `${factory.funding_txid}:${factory.funding_outnum}` : 'N/A'}
-              </div>
-            </OverlayTrigger>
+            {isValidTxid(factory.funding_txid) ? (
+              <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy</Tooltip>}>
+                <div
+                  className='fw-bold text-dark fs-7 cursor-pointer text-break'
+                  onClick={() => copyTextToClipboard(factory.funding_txid)}
+                >
+                  {factory.funding_txid}:{factory.funding_outnum}
+                </div>
+              </OverlayTrigger>
+            ) : (
+              <div className='fw-bold text-dark'>N/A</div>
+            )}
           </Col>
         </Row>
 
@@ -201,13 +217,22 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
               <div className='fs-7 text-light fw-bold mb-1'>Factory Channels</div>
               <ListGroup variant='flush' className='fs-7'>
                 {factory.channels.map((ch, idx) => (
-                  <ListGroup.Item key={ch.channel_id || idx} className='px-0 py-1 d-flex justify-content-between'>
-                    <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy</Tooltip>}>
-                      <span className='text-dark cursor-pointer' onClick={() => copyTextToClipboard(ch.channel_id)}>
-                        {ch.channel_id.substring(0, 20)}...
-                      </span>
-                    </OverlayTrigger>
-                    <span className='text-light'>leaf {ch.leaf_index} ({ch.leaf_side})</span>
+                  <ListGroup.Item key={ch.channel_id || idx} className='px-0 py-1'>
+                    <div className='d-flex justify-content-between'>
+                      <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy channel ID</Tooltip>}>
+                        <span className='text-dark cursor-pointer' onClick={() => copyTextToClipboard(ch.channel_id)}>
+                          {ch.channel_id.substring(0, 20)}...
+                        </span>
+                      </OverlayTrigger>
+                      <span className='text-light'>leaf {ch.leaf_index} ({ch.leaf_side})</span>
+                    </div>
+                    {isValidTxid(ch.funding_txid) && (
+                      <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy leaf funding outpoint</Tooltip>}>
+                        <div className='text-light fs-8 cursor-pointer' onClick={() => copyTextToClipboard(`${ch.funding_txid}:${ch.funding_outnum}`)}>
+                          funding: {ch.funding_txid!.substring(0, 16)}...:{ch.funding_outnum}
+                        </div>
+                      </OverlayTrigger>
+                    )}
                   </ListGroup.Item>
                 ))}
               </ListGroup>
@@ -215,30 +240,24 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
           </Row>
         )}
 
-        {factory.tree_nodes && (
+        {Array.isArray(factory.tree_nodes) && factory.tree_nodes.length > 0 && (
           <Row className='mb-2'>
             <Col xs={12}>
-              {typeof factory.tree_nodes === 'number' ? (
-                <div className='fs-7 text-light'>Tree Nodes: <span className='fw-bold text-dark'>{factory.tree_nodes}</span></div>
-              ) : Array.isArray(factory.tree_nodes) && factory.tree_nodes.length > 0 ? (
-                <>
-                  <div className='fs-7 text-light fw-bold mb-1'>Tree Nodes ({factory.tree_nodes.length})</div>
-                  <ListGroup variant='flush' className='fs-7'>
-                    {factory.tree_nodes.map((node, idx) => (
-                      <ListGroup.Item key={idx} className='px-0 py-1 d-flex justify-content-between'>
-                        <span className='text-dark'>#{node.node_idx} {node.type}</span>
-                        {node.txid && (
-                          <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy TXID</Tooltip>}>
-                            <span className='text-light cursor-pointer' onClick={() => copyTextToClipboard(node.txid!)}>
-                              {node.txid.substring(0, 16)}...
-                            </span>
-                          </OverlayTrigger>
-                        )}
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                </>
-              ) : null}
+              <div className='fs-7 text-light fw-bold mb-1'>Tree Nodes ({factory.tree_nodes.length})</div>
+              <ListGroup variant='flush' className='fs-7'>
+                {factory.tree_nodes.map((node, idx) => (
+                  <ListGroup.Item key={idx} className='px-0 py-1 d-flex justify-content-between'>
+                    <span className='text-dark'>#{node.node_idx} {node.type}</span>
+                    {node.txid && (
+                      <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy TXID</Tooltip>}>
+                        <span className='text-light cursor-pointer' onClick={() => copyTextToClipboard(node.txid!)}>
+                          {node.txid.substring(0, 16)}...
+                        </span>
+                      </OverlayTrigger>
+                    )}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </Col>
           </Row>
         )}

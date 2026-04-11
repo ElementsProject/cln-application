@@ -21,6 +21,8 @@ export type FactoryChannel = {
   channel_id: string;
   leaf_index: number;
   leaf_side: string;
+  funding_txid?: string;
+  funding_outnum?: number;
 };
 
 export type TreeNode = {
