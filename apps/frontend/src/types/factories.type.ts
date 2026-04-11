@@ -1,20 +1,20 @@
 export enum FactoryLifecycle {
-  INIT = 'INIT',
-  ACTIVE = 'ACTIVE',
-  DYING = 'DYING',
-  EXPIRED = 'EXPIRED',
+  INIT = 'init',
+  ACTIVE = 'active',
+  DYING = 'dying',
+  EXPIRED = 'expired',
 }
 
 export enum FactoryCeremony {
-  IDLE = 'IDLE',
-  PROPOSED = 'PROPOSED',
-  NONCES_COLLECTED = 'NONCES_COLLECTED',
-  PSIGS_COLLECTED = 'PSIGS_COLLECTED',
-  COMPLETE = 'COMPLETE',
-  ROTATING = 'ROTATING',
-  ROTATE_COMPLETE = 'ROTATE_COMPLETE',
-  REVOKED = 'REVOKED',
-  FAILED = 'FAILED',
+  IDLE = 'idle',
+  PROPOSED = 'proposed',
+  NONCES_COLLECTED = 'nonces_collected',
+  PSIGS_COLLECTED = 'psigs_collected',
+  COMPLETE = 'complete',
+  ROTATING = 'rotating',
+  ROTATE_COMPLETE = 'rotate_complete',
+  REVOKED = 'revoked',
+  FAILED = 'failed',
 }
 
 export type FactoryChannel = {
