@@ -2,8 +2,7 @@
 
 .ceremony-progress {
   .ceremony-steps {
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
   }
 
   .ceremony-dot {
