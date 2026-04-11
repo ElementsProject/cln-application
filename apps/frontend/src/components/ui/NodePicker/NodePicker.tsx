@@ -3,8 +3,8 @@ import { Dropdown, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useInjectReducer } from '../../../hooks/use-injectreducer';
 import nodesReducer from '../../../store/nodesSlice';
-import { setIsSwitching, setActiveProfileId } from '../../../store/nodesSlice';
-import { selectNodeProfiles, selectActiveProfile, selectIsSwitchingNode, selectHasMultipleNodes, selectActiveProfileId } from '../../../store/nodesSelectors';
+import { setIsSwitching, setIsDiscovering, setActiveProfileId, setNodeProfiles } from '../../../store/nodesSlice';
+import { selectNodeProfiles, selectActiveProfile, selectIsSwitchingNode, selectHasMultipleNodes, selectActiveProfileId, selectIsConnected, selectIsDiscovering } from '../../../store/nodesSelectors';
 import { selectNodeInfo } from '../../../store/rootSelectors';
 import { NodesService, RootService } from '../../../services/http.service';
 import { clearRootStore } from '../../../store/rootSlice';
@@ -22,6 +22,8 @@ const NodePicker = () => {
   const activeProfile = useSelector(selectActiveProfile);
   const activeProfileId = useSelector(selectActiveProfileId);
   const isSwitching = useSelector(selectIsSwitchingNode);
+  const isConnected = useSelector(selectIsConnected);
+  const isDiscovering = useSelector(selectIsDiscovering);
   const hasMultipleNodes = useSelector(selectHasMultipleNodes);
   const nodeInfo = useSelector(selectNodeInfo);
 
@@ -53,6 +55,22 @@ const NodePicker = () => {
       logger.error('Failed to switch node:', error);
     } finally {
       appStore.dispatch(setIsSwitching(false));
+    }
+  };
+
+  const handleDiscover = async () => {
+    if (isDiscovering) return;
+    try {
+      appStore.dispatch(setIsDiscovering(true));
+      const result = await NodesService.discoverNodes();
+      if (result.profiles && result.profiles.length > 0) {
+        // Re-fetch full profile list to pick up any newly added
+        await NodesService.fetchAndDispatchNodes();
+      }
+    } catch (error) {
+      logger.error('Failed to discover nodes:', error);
+    } finally {
+      appStore.dispatch(setIsDiscovering(false));
     }
   };
 
@@ -103,7 +121,25 @@ const NodePicker = () => {
     );
   };
 
-  // If no multiple nodes, just show alias with status dot (no dropdown)
+  // No connection and no profiles — show scan button
+  if (!isConnected && profiles.length === 0 && !nodeInfo.isLoading) {
+    return (
+      <span className='fs-7 d-flex align-items-center'>
+        <OverlayTrigger placement='auto' delay={{ show: 250, hide: 250 }} overlay={<Tooltip>Disconnected</Tooltip>}>
+          <span className='d-inline-block me-2 dot bg-danger'></span>
+        </OverlayTrigger>
+        <button
+          className='btn btn-sm btn-outline-warning btn-rounded px-3'
+          onClick={handleDiscover}
+          disabled={isDiscovering}
+        >
+          {isDiscovering ? <><Spinner animation='border' size='sm' className='me-1' /> Scanning...</> : 'Scan for Nodes'}
+        </button>
+      </span>
+    );
+  }
+
+  // Single node, no dropdown needed
   if (!hasMultipleNodes) {
     return (
       <span className='fs-7 d-flex align-items-center'>
@@ -183,8 +219,8 @@ const NodePicker = () => {
           );
         })}
         <Dropdown.Divider />
-        <Dropdown.Item className='node-item' disabled>
-          Manage Nodes...
+        <Dropdown.Item className='node-item' onClick={handleDiscover} disabled={isDiscovering}>
+          {isDiscovering ? <><Spinner animation='border' size='sm' className='me-1' /> Scanning...</> : 'Rescan for Nodes'}
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>

@@ -14,6 +14,8 @@ export interface NodesState {
   isLoading: boolean;
   profiles: NodeProfile[];
   activeProfileId: string | null;
+  isConnected: boolean;
   isSwitching: boolean;
+  isDiscovering: boolean;
   error: any;
 }

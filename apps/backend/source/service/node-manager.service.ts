@@ -77,10 +77,17 @@ export class NodeManager {
         this.legacyService = new LightningService();
         logger.info('Legacy LightningService initialized successfully');
       } catch (err: any) {
-        logger.error('Legacy LightningService initialization failed: ' + (err.message || err));
-        throw err;
+        logger.warn('Legacy LightningService initialization failed: ' + (err.message || err));
+        logger.warn('No CLN nodes available. Wallet will start in disconnected mode.');
+        // Don't throw — let the wallet start without a node connection.
+        // The frontend will show a "no nodes found" state.
       }
     }
+  }
+
+  /** Returns true if any node connection is available */
+  isConnected(): boolean {
+    return !!(this.activeService || this.legacyService);
   }
 
   /**

@@ -26,6 +26,7 @@ export class NodesController {
       res.status(200).json({
         activeProfileId: activeProfile?.id || null,
         profiles: profiles.map(sanitizeProfile),
+        isConnected: this.nodeManager.isConnected(),
       });
     } catch (error: any) {
       handleError(error, req, res, next);

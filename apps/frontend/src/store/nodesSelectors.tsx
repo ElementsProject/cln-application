@@ -5,7 +5,9 @@ export const defaultNodesState: NodesState = {
   isLoading: true,
   profiles: [],
   activeProfileId: null,
+  isConnected: false,
   isSwitching: false,
+  isDiscovering: false,
   error: null,
 };
 
@@ -46,4 +48,14 @@ export const selectNodesError = createSelector(
 export const selectNodesLoading = createSelector(
   selectNodesState,
   (n) => n.isLoading
+);
+
+export const selectIsConnected = createSelector(
+  selectNodesState,
+  (n) => n.isConnected
+);
+
+export const selectIsDiscovering = createSelector(
+  selectNodesState,
+  (n) => n.isDiscovering
 );

@@ -6,10 +6,13 @@ const nodesSlice = createSlice({
   name: 'nodes',
   initialState: defaultNodesState,
   reducers: {
-    setNodeProfiles(state, action: PayloadAction<{ profiles: NodeProfile[]; activeProfileId?: string | null }>) {
+    setNodeProfiles(state, action: PayloadAction<{ profiles: NodeProfile[]; activeProfileId?: string | null; isConnected?: boolean }>) {
       state.profiles = action.payload.profiles || [];
       if (action.payload.activeProfileId !== undefined) {
         state.activeProfileId = action.payload.activeProfileId;
+      }
+      if (action.payload.isConnected !== undefined) {
+        state.isConnected = action.payload.isConnected;
       }
       state.isLoading = false;
       state.error = null;
@@ -19,6 +22,9 @@ const nodesSlice = createSlice({
     },
     setIsSwitching(state, action: PayloadAction<boolean>) {
       state.isSwitching = action.payload;
+    },
+    setIsDiscovering(state, action: PayloadAction<boolean>) {
+      state.isDiscovering = action.payload;
     },
     setNodesError(state, action: PayloadAction<any>) {
       state.error = action.payload;
@@ -34,6 +40,7 @@ export const {
   setNodeProfiles,
   setActiveProfileId,
   setIsSwitching,
+  setIsDiscovering,
   setNodesError,
   clearNodesStore,
 } = nodesSlice.actions;
