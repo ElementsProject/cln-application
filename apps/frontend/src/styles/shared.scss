@@ -688,9 +688,10 @@ label.form-label {
   border: none;
 }
 
-// Force dark text on yellow/primary backgrounds regardless of color mode
+// Force dark text on yellow/warning backgrounds regardless of color mode
 .badge.bg-primary,
-.btn-rounded.bg-primary.badge {
+.btn-rounded.bg-primary.badge,
+.badge.bg-warning {
   color: $dark !important;
 }
 
