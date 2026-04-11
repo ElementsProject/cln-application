@@ -6,3 +6,25 @@
     background-color: rgba($primary, 0.08);
   }
 }
+
+.factory-section-header {
+  border-bottom: 1px solid rgba($gray-400, 0.4);
+  margin-bottom: 4px;
+}
+
+.factory-section-label {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@include color-mode(light) {
+  .factory-section-label {
+    color: $gray-600;
+  }
+}
+
+@include color-mode(dark) {
+  .factory-section-label {
+    color: $gray-400;
+  }
+}
