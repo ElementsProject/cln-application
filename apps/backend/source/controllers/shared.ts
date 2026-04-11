@@ -8,13 +8,13 @@ import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { addServerConfig, setEnvVariables } from '../shared/utils.js';
 import { ShowRunes } from '../models/showrunes.type.js';
-import { LightningService } from '../service/lightning.service.js';
+import { NodeManager } from '../service/node-manager.service.js';
 
 export class SharedController {
-  private clnService: LightningService;
+  private nodeManager: NodeManager;
 
-  constructor(clnService: LightningService) {
-    this.clnService = clnService;
+  constructor(nodeManager: NodeManager) {
+    this.nodeManager = nodeManager;
   }
 
   getApplicationSettings = async (req: Request, res: Response, next: NextFunction) => {
@@ -105,7 +105,8 @@ export class SharedController {
   saveInvoiceRune = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Saving Invoice Rune');
-      const showRunes: ShowRunes = await this.clnService.call('showrunes', []);
+      const clnService = this.nodeManager.getActiveService();
+      const showRunes: ShowRunes = await clnService.call('showrunes', []);
       const invoiceRune = showRunes.runes.find(
         rune =>
           rune.restrictions.some(restriction =>

@@ -1,0 +1,194 @@
+import './NodePicker.scss';
+import { Dropdown, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { useInjectReducer } from '../../../hooks/use-injectreducer';
+import nodesReducer from '../../../store/nodesSlice';
+import { setIsSwitching, setActiveProfileId } from '../../../store/nodesSlice';
+import { selectNodeProfiles, selectActiveProfile, selectIsSwitchingNode, selectHasMultipleNodes, selectActiveProfileId } from '../../../store/nodesSelectors';
+import { selectNodeInfo } from '../../../store/rootSelectors';
+import { NodesService, RootService } from '../../../services/http.service';
+import { clearRootStore } from '../../../store/rootSlice';
+import { clearCLNStore } from '../../../store/clnSlice';
+import { clearBKPRStore } from '../../../store/bkprSlice';
+import { clearFactoriesStore } from '../../../store/factoriesSlice';
+import { appStore } from '../../../store/appStore';
+import { truncatePubkey } from '../../../utilities/data-formatters';
+import logger from '../../../services/logger.service';
+
+const NodePicker = () => {
+  useInjectReducer('nodes', nodesReducer);
+
+  const profiles = useSelector(selectNodeProfiles);
+  const activeProfile = useSelector(selectActiveProfile);
+  const activeProfileId = useSelector(selectActiveProfileId);
+  const isSwitching = useSelector(selectIsSwitchingNode);
+  const hasMultipleNodes = useSelector(selectHasMultipleNodes);
+  const nodeInfo = useSelector(selectNodeInfo);
+
+  const handleSwitchNode = async (profileId: string) => {
+    if (profileId === activeProfileId || isSwitching) return;
+
+    try {
+      appStore.dispatch(setIsSwitching(true));
+
+      // Call switch endpoint
+      const result = await NodesService.switchNode(profileId);
+
+      // Clear all stores
+      appStore.dispatch(clearRootStore());
+      appStore.dispatch(clearCLNStore());
+      appStore.dispatch(clearBKPRStore());
+      appStore.dispatch(clearFactoriesStore());
+
+      // Update active profile
+      appStore.dispatch(setActiveProfileId(result.profile?.id || profileId));
+
+      // Re-fetch root data
+      await RootService.fetchRootData();
+      await RootService.refreshData();
+
+      // Re-fetch node profiles
+      await NodesService.fetchAndDispatchNodes();
+    } catch (error) {
+      logger.error('Failed to switch node:', error);
+    } finally {
+      appStore.dispatch(setIsSwitching(false));
+    }
+  };
+
+  const getNetworkBadgeVariant = (network?: string) => {
+    if (!network || network === 'bitcoin') return null;
+    return network === 'regtest' ? 'danger' : 'warning';
+  };
+
+  // Determine display alias and status based on nodeInfo
+  const displayAlias = activeProfile?.alias
+    || nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '')
+    || activeProfile?.label
+    || 'Node';
+  const displayPubkey = activeProfile?.pubkey || '';
+
+  // Status dot logic
+  const getStatusDot = () => {
+    if (isSwitching || (nodeInfo.isLoading)) {
+      return (
+        <OverlayTrigger
+          placement='auto'
+          delay={{ show: 250, hide: 250 }}
+          overlay={<Tooltip>{isSwitching ? 'Switching' : 'Loading'}</Tooltip>}
+        >
+          <span className='d-inline-block me-2 dot bg-warning'></span>
+        </OverlayTrigger>
+      );
+    }
+    if (nodeInfo.error) {
+      return (
+        <OverlayTrigger
+          placement='auto'
+          delay={{ show: 250, hide: 250 }}
+          overlay={<Tooltip>Error</Tooltip>}
+        >
+          <span className='d-inline-block me-2 dot bg-danger'></span>
+        </OverlayTrigger>
+      );
+    }
+    return (
+      <OverlayTrigger
+        placement='auto'
+        delay={{ show: 250, hide: 250 }}
+        overlay={<Tooltip>Connected</Tooltip>}
+      >
+        <span className='d-inline-block me-2 dot bg-success'></span>
+      </OverlayTrigger>
+    );
+  };
+
+  // If no multiple nodes, just show alias with status dot (no dropdown)
+  if (!hasMultipleNodes) {
+    return (
+      <span className='fs-7 d-flex align-items-center'>
+        {getStatusDot()}
+        {isSwitching ? (
+          <>
+            <Spinner animation='border' size='sm' className='me-2' />
+            Switching...
+          </>
+        ) : nodeInfo.isLoading ? (
+          'Loading...'
+        ) : nodeInfo.error ? (
+          'Error: ' + nodeInfo.error
+        ) : (
+          <>
+            {displayAlias}
+            {displayPubkey && (
+              <span className='ms-1 opacity-75'>({truncatePubkey(displayPubkey)})</span>
+            )}
+            {nodeInfo.version && <span className='ms-1'>({nodeInfo.version})</span>}
+          </>
+        )}
+      </span>
+    );
+  }
+
+  // Multiple nodes: show dropdown
+  return (
+    <Dropdown className='node-picker d-inline-flex align-items-center'>
+      <span className='d-flex align-items-center'>
+        {getStatusDot()}
+      </span>
+      <Dropdown.Toggle variant='link' className='node-picker-toggle text-light p-0 fs-7'>
+        {isSwitching ? (
+          <>
+            <Spinner animation='border' size='sm' className='me-1' />
+            Switching...
+          </>
+        ) : nodeInfo.isLoading ? (
+          'Loading...'
+        ) : nodeInfo.error ? (
+          'Error: ' + nodeInfo.error
+        ) : (
+          <>
+            {displayAlias}
+            {displayPubkey && (
+              <span className='ms-1 opacity-75'>({truncatePubkey(displayPubkey)})</span>
+            )}
+          </>
+        )}
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        {profiles.map((profile) => {
+          const isActive = profile.id === activeProfileId;
+          const badgeVariant = getNetworkBadgeVariant(profile.network);
+          return (
+            <Dropdown.Item
+              key={profile.id}
+              className='node-item'
+              onClick={() => handleSwitchNode(profile.id)}
+              active={isActive}
+            >
+              <span
+                className='node-dot'
+                style={{ backgroundColor: isActive ? '#33db95' : '#9f9f9f' }}
+              ></span>
+              <div className='node-details'>
+                <div className='node-alias'>{profile.alias || profile.label}</div>
+                <div className='node-pubkey'>{truncatePubkey(profile.pubkey)}</div>
+              </div>
+              {badgeVariant && (
+                <span className={`node-network-badge badge bg-${badgeVariant} text-dark`}>
+                  {profile.network}
+                </span>
+              )}
+            </Dropdown.Item>
+          );
+        })}
+        <Dropdown.Divider />
+        <Dropdown.Item className='node-item' disabled>
+          Manage Nodes...
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+};
+
+export default NodePicker;

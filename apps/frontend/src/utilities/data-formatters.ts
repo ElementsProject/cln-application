@@ -167,6 +167,11 @@ export const isCompatibleVersion = (currentVersion: string, checkVersion: string
   return false;
 };
 
+export const truncatePubkey = (pubkey: string, chars: number = 4): string => {
+  if (!pubkey || pubkey.length <= chars * 2) return pubkey || '';
+  return pubkey.slice(0, chars) + '...' + pubkey.slice(-chars);
+};
+
 export const decodeCombinedCerts = (encodedValue) => {
   try {
     const base64Encoded = decodeURIComponent(encodedValue);

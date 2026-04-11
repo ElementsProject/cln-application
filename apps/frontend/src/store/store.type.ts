@@ -2,6 +2,7 @@ import { EnhancedStore } from "@reduxjs/toolkit";
 import { BKPRState } from "../types/bookkeeper.type";
 import { CLNState } from "../types/cln.type";
 import { FactoriesState } from "../types/factories.type";
+import { NodesState } from "../types/node.type";
 import { RootState } from "../types/root.type";
 
 export type ReducerManager = {
@@ -22,4 +23,5 @@ export type AppState = {
   cln?: CLNState;
   bkpr?: BKPRState;
   factories?: FactoriesState;
+  nodes?: NodesState;
 };

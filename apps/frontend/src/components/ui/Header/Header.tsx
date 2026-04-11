@@ -1,6 +1,6 @@
 import './Header.scss';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Row, Col, Image, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Image } from 'react-bootstrap';
 
 import useBreakpoint from '../../../hooks/use-breakpoint';
 import { ApplicationModes, Breakpoints } from '../../../utilities/constants';
@@ -9,10 +9,11 @@ import { NightModeSVG } from '../../../svgs/NightMode';
 import { LogoutSVG } from '../../../svgs/Logout';
 import Menu from '../Menu/Menu';
 import Settings from '../Settings/Settings';
+import NodePicker from '../NodePicker/NodePicker';
 import { RootService } from '../../../services/http.service';
 import { setShowModals, setConfig } from '../../../store/rootSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAppConfig, selectIsAuthenticated, selectIsDarkMode, selectNodeInfo, selectServerConfig, selectShowModals } from '../../../store/rootSelectors';
+import { selectAppConfig, selectIsDarkMode, selectNodeInfo, selectServerConfig, selectShowModals } from '../../../store/rootSelectors';
 
 const NetworkBanner = ({ network }: { network?: string }) => {
   if (!network || network === 'bitcoin') return null;
@@ -28,7 +29,6 @@ const NetworkBanner = ({ network }: { network?: string }) => {
 
 const Header = (props) => {
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
   const showModals = useSelector(selectShowModals);
   const isDarkMode = useSelector(selectIsDarkMode);
   const serverConfig = useSelector(selectServerConfig);
@@ -78,41 +78,7 @@ const Header = (props) => {
               </h4>
               <Row className='header-info-text my-1'>
                 <Col xs={12} className='d-flex align-items-center text-light'>
-                  {isAuthenticated && nodeInfo.isLoading ?
-                    <>
-                      <OverlayTrigger
-                        placement="auto"
-                        delay={{ show: 250, hide: 250 }}
-                        overlay={<Tooltip>Loading</Tooltip>}
-                      >
-                        <span className="d-inline-block mx-3 dot bg-warning"></span>
-                      </OverlayTrigger>
-                      <span className="fs-7">Loading...</span>
-                    </>
-                    :
-                    nodeInfo.error ?
-                      <>
-                        <OverlayTrigger
-                          placement='auto'
-                          delay={{ show: 250, hide: 250 }}
-                          overlay={<Tooltip>Error</Tooltip>}
-                        >
-                          <span className='d-inline-block mx-3 dot bg-danger'></span>
-                        </OverlayTrigger>
-                        <span className='fs-7'>{('Error: ' + nodeInfo.error)}</span>
-                      </>
-                      :
-                      <>
-                        <OverlayTrigger
-                          placement='auto'
-                          delay={{ show: 250, hide: 250 }}
-                          overlay={<Tooltip>Connected</Tooltip>}
-                        >
-                          <span className='d-inline-block mx-3 dot bg-success'></span>
-                        </OverlayTrigger>
-                        <span className='fs-7'>{nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '')}</span>
-                      </>
-                  }
+                  <NodePicker />
                 </Col>
               </Row>
               <Row className='ms-1'>
@@ -171,41 +137,7 @@ const Header = (props) => {
             </Col>
           }
           <Col xs={12} className='d-flex align-items-center text-light'>
-            {isAuthenticated && nodeInfo.isLoading ?
-              <>
-                <OverlayTrigger
-                  placement='auto'
-                  delay={{ show: 250, hide: 250 }}
-                  overlay={<Tooltip>Loading</Tooltip>}
-                >
-                  <span className='d-inline-block me-3 dot bg-warning'></span>
-                </OverlayTrigger>
-                <span className='fs-7'>Loading...</span>
-              </>
-              :
-              nodeInfo.error ?
-                <>
-                  <OverlayTrigger
-                    placement='auto'
-                    delay={{ show: 250, hide: 250 }}
-                    overlay={<Tooltip>Error</Tooltip>}
-                  >
-                    <span className='d-inline-block me-3 dot bg-danger'></span>
-                  </OverlayTrigger>
-                  <span className='fs-7'>{('Error: ' + nodeInfo.error)}</span>
-                </>
-                :
-                <>
-                  <OverlayTrigger
-                    placement='auto'
-                    delay={{ show: 250, hide: 250 }}
-                    overlay={<Tooltip>Connected</Tooltip>}
-                  >
-                    <span className='d-inline-block me-3 dot bg-success'></span>
-                  </OverlayTrigger>
-                  <span className='fs-7'>{nodeInfo.alias?.replace('--', '-').replace(/-\d+-.*$/, '') + ' (' + nodeInfo.version + ')'}</span>
-                </>
-            }
+            <NodePicker />
           </Col>
         </Row>
       </Col>

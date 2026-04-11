@@ -3,21 +3,21 @@ import { CommonRoutesConfig } from '../../shared/routes.config.js';
 import { AuthController } from '../../controllers/auth.js';
 import { SharedController } from '../../controllers/shared.js';
 import { API_VERSION } from '../../shared/consts.js';
-import { LightningService } from '../../service/lightning.service.js';
+import { NodeManager } from '../../service/node-manager.service.js';
 
 const SHARED_ROUTE = '/shared';
 
 export class SharedRoutes extends CommonRoutesConfig {
-  private clnService: LightningService;
+  private nodeManager: NodeManager;
 
-  constructor(app: express.Application, clnService: LightningService) {
+  constructor(app: express.Application, nodeManager: NodeManager) {
     super(app, 'Shared Routes');
-    this.clnService = clnService;
+    this.nodeManager = nodeManager;
   }
 
   configureRoutes() {
     const authController = new AuthController();
-    const sharedController = new SharedController(this.clnService);
+    const sharedController = new SharedController(this.nodeManager);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.app.route(API_VERSION + SHARED_ROUTE + '/csrf/').get((req, res, next) => {

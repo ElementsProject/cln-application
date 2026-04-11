@@ -2,16 +2,22 @@ import * as crypto from 'crypto';
 import https from 'https';
 import axios, { AxiosHeaders } from 'axios';
 import Lnmessage from 'lnmessage';
+import WebSocket from 'ws';
 import { GRPCError, LightningError, ValidationError } from '../models/errors.js';
 import {
   HttpStatusCode,
   APP_CONSTANTS,
   AppConnect,
+  Environment,
   LN_MESSAGE_CONFIG,
   REST_CONFIG,
 } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import { setEnvVariables, validateEnvVariables } from '../shared/utils.js';
+import { NodeProfile } from '../models/node-profile.type.js';
+
+/** Internal flag to skip env-based init in the constructor */
+const SKIP_INIT = Symbol('skipInit');
 
 export class LightningService {
   private clnService: any = null;
@@ -20,14 +26,21 @@ export class LightningService {
     headers: {},
     httpsAgent: null,
   };
+  /** Per-instance rune. Defaults to APP_CONSTANTS.ADMIN_RUNE for legacy path. */
+  private rune: string = '';
 
-  constructor() {
+  constructor(skipInit?: typeof SKIP_INIT) {
+    if (skipInit === SKIP_INIT) {
+      // Factory-created instance: skip env setup
+      return;
+    }
     try {
       setEnvVariables();
       validateEnvVariables();
     } catch (error: any) {
       throw new ValidationError(HttpStatusCode.INVALID_DATA, error);
     }
+    this.rune = APP_CONSTANTS.ADMIN_RUNE;
     try {
       logger.info('Strating Lightning Service with APP_CONNECT: ' + APP_CONSTANTS.APP_CONNECT);
       switch (APP_CONSTANTS.APP_CONNECT) {
@@ -64,8 +77,82 @@ export class LightningService {
     }
   }
 
+  /**
+   * Create a LightningService from a NodeProfile without mutating globals.
+   */
+  static createFromProfile(profile: NodeProfile): LightningService {
+    const wsProtocol = APP_CONSTANTS.LIGHTNING_WS_PROTOCOL || 'ws';
+    const config: any = {
+      remoteNodePublicKey: profile.pubkey,
+      wsProxy: wsProtocol + '://' + profile.wsHost + ':' + profile.wsPort,
+      ip: profile.wsHost,
+      port: profile.wsPort,
+      privateKey: crypto.randomBytes(32).toString('hex'),
+      socket: (url: string) =>
+        wsProtocol === 'wss'
+          ? new WebSocket(url, { rejectUnauthorized: false })
+          : new WebSocket(url),
+      logger: {
+        info: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.info,
+        warn: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? () => {} : console.warn,
+        error: console.error,
+      },
+    };
+
+    const svc = new LightningService(SKIP_INIT);
+    svc.clnService = new Lnmessage(config);
+    svc.clnService.connect();
+    svc.rune = profile.rune;
+    logger.info(
+      'Created LightningService from profile: ' + profile.id + ' (' + profile.label + ')',
+    );
+    return svc;
+  }
+
+  /**
+   * Probe a node profile: create temp connection, call getinfo, disconnect, return info.
+   */
+  static async probe(profile: NodeProfile): Promise<{
+    alias: string;
+    pubkey: string;
+    network: string;
+    blockheight: number;
+    version: string;
+  }> {
+    const svc = LightningService.createFromProfile(profile);
+    try {
+      // Wait a moment for the connection to establish
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const info: any = await svc.call('getinfo', []);
+      return {
+        alias: info.alias || '',
+        pubkey: info.id || profile.pubkey,
+        network: info.network || '',
+        blockheight: info.blockheight || 0,
+        version: info.version || '',
+      };
+    } finally {
+      svc.disconnect();
+    }
+  }
+
+  /**
+   * Tear down the lnmessage connection.
+   */
+  disconnect(): void {
+    try {
+      if (this.clnService && typeof this.clnService.disconnect === 'function') {
+        this.clnService.disconnect();
+        logger.info('LightningService disconnected');
+      }
+    } catch (error: any) {
+      logger.error('Error disconnecting LightningService: ' + (error.message || error));
+    }
+    this.clnService = null;
+  }
+
   getLNMsgPubkey = () => {
-    return this.clnService.publicKey;
+    return this.clnService?.publicKey || '';
   };
 
   call = async (method: string, methodParams: any[]) => {
@@ -108,7 +195,7 @@ export class LightningService {
           .commando({
             method: method,
             params: methodParams,
-            rune: APP_CONSTANTS.ADMIN_RUNE,
+            rune: this.rune || APP_CONSTANTS.ADMIN_RUNE,
             reqId: crypto.randomBytes(8).toString('hex'),
             reqIdPrefix: 'clnapp',
           })

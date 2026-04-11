@@ -13,10 +13,11 @@ import { CommonRoutesConfig } from './shared/routes.config.js';
 import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
 import { AuthRoutes } from './routes/v1/auth.js';
+import { NodesRoutes } from './routes/v1/nodes.js';
 import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
-import { LightningService } from './service/lightning.service.js';
+import { NodeManager } from './service/node-manager.service.js';
 
 const directoryName = dirname(fileURLToPath(import.meta.url));
 const routes: Array<CommonRoutesConfig> = [];
@@ -90,17 +91,20 @@ export const throwApiError = (err: any) => {
 
 async function startServer() {
   try {
-    const clnService = new LightningService();
+    const nodeManager = new NodeManager();
+    await nodeManager.initialize();
 
     const authRoutes = new AuthRoutes(app);
-    const sharedRoutes = new SharedRoutes(app, clnService);
-    const lightningRoutes = new LightningRoutes(app, clnService);
+    const sharedRoutes = new SharedRoutes(app, nodeManager);
+    const lightningRoutes = new LightningRoutes(app, nodeManager);
+    const nodesRoutes = new NodesRoutes(app, nodeManager);
 
     authRoutes.configureRoutes();
     sharedRoutes.configureRoutes();
     lightningRoutes.configureRoutes();
+    nodesRoutes.configureRoutes();
 
-    routes.push(authRoutes, sharedRoutes, lightningRoutes);
+    routes.push(authRoutes, sharedRoutes, lightningRoutes, nodesRoutes);
 
     // serve frontend
     app.use('/', express.static(join(directoryName, '..', '..', 'frontend', 'build')));

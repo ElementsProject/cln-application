@@ -1,0 +1,77 @@
+@use '../../../styles/constants' as *;
+
+.node-picker {
+  .node-picker-toggle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &::after {
+      margin-left: 0.25rem;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: inherit !important;
+    }
+  }
+
+  .dropdown-menu {
+    min-width: 16rem;
+    padding: 0.5rem 0;
+  }
+
+  .node-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 1rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+
+    &:hover {
+      background-color: rgba($primary, 0.1);
+    }
+
+    .node-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .node-details {
+      flex: 1;
+      min-width: 0;
+
+      .node-alias {
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .node-pubkey {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        font-family: monospace;
+      }
+    }
+
+    .node-network-badge {
+      font-size: 0.6875rem;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      flex-shrink: 0;
+    }
+  }
+}

@@ -72,7 +72,7 @@ export function isValidPassword() {
   }
 }
 
-function parseEnvFile(filePath: string): { [key: string]: string } {
+export function parseEnvFile(filePath: string): { [key: string]: string } {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split('\n');

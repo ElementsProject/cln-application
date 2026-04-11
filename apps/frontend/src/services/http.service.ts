@@ -14,6 +14,7 @@ import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '..
 import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
 import { setFactoryList } from '../store/factoriesSlice';
+import { setNodeProfiles } from '../store/nodesSlice';
 import { Factory, FactoryCreateResponse, FactoryRotateResponse, FactoryCloseResponse, FactoryForceCloseResponse, FactoryCheckBreachResponse } from '../types/factories.type';
 import { isCompatibleVersion } from '../utilities/data-formatters';
 
@@ -590,6 +591,41 @@ export class FactoriesService {
         }
       );
       return { factoryList: results.factoryList };
+    }
+  }
+}
+
+export class NodesService {
+  static async listNodes() {
+    return HttpService.get('/nodes');
+  }
+
+  static async getActiveNode() {
+    return HttpService.get('/nodes/active');
+  }
+
+  static async switchNode(profileId: string) {
+    return HttpService.post('/nodes/switch', { profileId });
+  }
+
+  static async discoverNodes() {
+    return HttpService.post('/nodes/discover', {});
+  }
+
+  static async addNode(params: { pubkey: string; rune: string; wsHost: string; wsPort: number; label?: string }) {
+    return HttpService.post('/nodes', params);
+  }
+
+  static async removeNode(id: string) {
+    return HttpService.delete('/nodes/' + id);
+  }
+
+  static async fetchAndDispatchNodes() {
+    try {
+      const data = await this.listNodes();
+      appStore.dispatch(setNodeProfiles(data));
+    } catch (error) {
+      logger.error('Failed to fetch node profiles:', error);
     }
   }
 }

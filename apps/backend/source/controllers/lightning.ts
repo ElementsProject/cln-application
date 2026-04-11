@@ -1,20 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import handleError from '../shared/error-handler.js';
-import { LightningService } from '../service/lightning.service.js';
+import { NodeManager } from '../service/node-manager.service.js';
 import { logger } from '../shared/logger.js';
 import { AppConnect, APP_CONSTANTS } from '../shared/consts.js';
 
 export class LightningController {
-  private clnService: LightningService;
+  private nodeManager: NodeManager;
 
-  constructor(clnService: LightningService) {
-    this.clnService = clnService;
+  constructor(nodeManager: NodeManager) {
+    this.nodeManager = nodeManager;
   }
 
   callMethod = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Calling method: ' + req.body.method);
-      this.clnService
+      const clnService = this.nodeManager.getActiveService();
+      clnService
         .call(req.body.method, req.body.params)
         .then((commandRes: any) => {
           logger.info(
@@ -29,7 +30,7 @@ export class LightningController {
             req.body.method === 'listpeers'
           ) {
             // Filter out ln message pubkey from peers list
-            const lnmPubkey = this.clnService.getLNMsgPubkey();
+            const lnmPubkey = clnService.getLNMsgPubkey();
             commandRes.peers = commandRes.peers.filter((peer: any) => peer.id !== lnmPubkey);
             res.status(200).json(commandRes);
           } else {

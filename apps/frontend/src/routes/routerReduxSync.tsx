@@ -5,7 +5,7 @@ import { clearCLNStore } from '../store/clnSlice';
 import { clearFactoriesStore } from '../store/factoriesSlice';
 import { APP_WAIT_TIME } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { BookkeeperService, CLNService, FactoriesService, RootService } from '../services/http.service';
+import { BookkeeperService, CLNService, FactoriesService, NodesService, RootService } from '../services/http.service';
 import { selectAuthStatus } from '../store/rootSelectors';
 import logger from '../services/logger.service';
 
@@ -15,6 +15,13 @@ export function RootRouterReduxSync() {
   const { pathname } = useLocation();
   const authStatus = useSelector(selectAuthStatus);
   
+  // Fetch node profiles once after auth
+  useEffect(() => {
+    if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
+
+    NodesService.fetchAndDispatchNodes();
+  }, [authStatus?.isAuthenticated, authStatus?.isValidPassword]);
+
   // Handle polling
   useEffect(() => {
     if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
