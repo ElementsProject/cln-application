@@ -121,7 +121,7 @@ const ConnectList = () => {
                         {request === 'confirmed' && (
                           <span className='badge bg-success connect-badge-md'>✓ Confirmed</span>
                         )}
-                        <span className={`badge connect-badge-md ${factory.status === 'forming' ? 'bg-primary text-dark' : 'bg-info text-dark'}`}>
+                        <span className={`badge connect-badge-md ${factory.status === 'forming' ? 'bg-primary' : 'bg-info text-dark'}`}>
                           {factory.status === 'forming' ? 'Forming' : 'Rotating'}
                         </span>
                       </div>

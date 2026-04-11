@@ -688,6 +688,12 @@ label.form-label {
   border: none;
 }
 
+// Force dark text on yellow/primary backgrounds regardless of color mode
+.badge.bg-primary,
+.btn-rounded.bg-primary.badge {
+  color: $dark !important;
+}
+
 .card.overview-balance-card {
   padding-left: 0.5rem !important;
   background-color: $primary;
