@@ -88,7 +88,7 @@ const ConnectList = () => {
         ) : (
           <>
             <Row className='connect-col-headers text-light px-0 pt-2 pb-1 mx-0'>
-              <Col xs={3}>Slots</Col>
+              <Col xs={3}>Factory</Col>
               <Col xs={3}>Capacity</Col>
               <Col xs={3}>Min Ch</Col>
               <Col xs={3}>Opens</Col>
@@ -121,7 +121,7 @@ const ConnectList = () => {
                         {request === 'confirmed' && (
                           <span className='badge bg-success connect-badge-md'>✓ Confirmed</span>
                         )}
-                        <span className={`badge connect-badge-md ${factory.status === 'forming' ? 'bg-primary' : 'bg-info text-dark'}`}>
+                        <span className={`badge connect-badge-md ${factory.status === 'forming' ? 'bg-primary text-dark' : 'bg-info text-dark'}`}>
                           {factory.status === 'forming' ? 'Forming' : 'Rotating'}
                         </span>
                       </div>
