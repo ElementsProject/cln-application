@@ -10,7 +10,7 @@ import { Factory, FactoryLifecycle } from '../../../types/factories.type';
 const SectionHeader = ({ label, count }: { label: string; count: number }) => (
   <div className='factory-section-header d-flex align-items-center gap-2 px-0 py-2'>
     <span className='factory-section-label fw-bold fs-7'>{label}</span>
-    <span className='badge bg-secondary rounded-pill'>{count}</span>
+    <span className='badge bg-primary rounded-pill'>{count}</span>
   </div>
 );
 

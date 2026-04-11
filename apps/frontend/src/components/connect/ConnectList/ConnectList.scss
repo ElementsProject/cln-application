@@ -2,11 +2,21 @@
 
 .connect-filter-chip {
   border: none;
-  padding: 2px 10px;
+  padding: 3px 12px;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.connect-chip-active {
+  background-color: $primary;
+  color: #fff;
+}
+
+.connect-chip-inactive {
+  background-color: rgba($primary, 0.15);
+  color: $primary;
 }
 
 .connect-list-item {
@@ -22,6 +32,18 @@
   }
 }
 
+.connect-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.connect-badge-md {
+  font-size: 0.72rem;
+  padding: 4px 7px;
+}
+
 .connect-disclaimer {
   font-size: 0.7rem;
   font-style: italic;
@@ -31,10 +53,17 @@
   .connect-disclaimer {
     color: $gray-500;
   }
+  .connect-chip-inactive {
+    color: $primary;
+  }
 }
 
 @include color-mode(dark) {
   .connect-disclaimer {
     color: $gray-500;
+  }
+  .connect-chip-inactive {
+    background-color: rgba($primary, 0.2);
+    color: lighten($primary, 20%);
   }
 }

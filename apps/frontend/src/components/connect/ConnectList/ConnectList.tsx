@@ -3,7 +3,7 @@ import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Card, Row, Col, ListGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { selectUIConfigUnit, selectFiatConfig } from '../../../store/rootSelectors';
+import { selectUIConfigUnit } from '../../../store/rootSelectors';
 import { Units, BTC_SATS } from '../../../utilities/constants';
 import { CoordinationFactory, SAMPLE_COORDINATION_FACTORIES } from '../../../types/coordination.type';
 import { copyTextToClipboard } from '../../../utilities/data-formatters';
@@ -13,13 +13,12 @@ type JoinStatus = 'requested' | 'confirmed';
 
 const blocksToApproxDays = (blocks: number): string => {
   const days = Math.round(blocks * 10 / 60 / 24);
-  if (days < 1) return '<1 day';
-  return `~${days} day${days !== 1 ? 's' : ''}`;
+  if (days < 1) return '<1d';
+  return `~${days}d`;
 };
 
 const ConnectList = () => {
   const uiConfigUnit = useSelector(selectUIConfigUnit);
-  const fiatConfig = useSelector(selectFiatConfig);
   const [sortFilter, setSortFilter] = useState<SortFilter>('all');
   const [joinRequests, setJoinRequests] = useState<Record<string, JoinStatus>>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -72,7 +71,7 @@ const ConnectList = () => {
           {(['all', 'forming', 'rotating'] as SortFilter[]).map(f => (
             <button
               key={f}
-              className={`connect-filter-chip btn-rounded btn-sm ${sortFilter === f ? 'bg-primary' : 'bg-secondary'}`}
+              className={`connect-filter-chip btn-rounded btn-sm ${sortFilter === f ? 'connect-chip-active' : 'connect-chip-inactive'}`}
               onClick={() => setSortFilter(f)}
             >
               {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -92,7 +91,6 @@ const ConnectList = () => {
               {sorted.map((factory: CoordinationFactory) => {
                 const request = joinRequests[factory.id];
                 const isSelected = selectedId === factory.id;
-                const perSlotSats = Math.floor(factory.total_capacity_sats / factory.total_slots);
 
                 return (
                   <ListGroup.Item
@@ -101,48 +99,42 @@ const ConnectList = () => {
                     onClick={() => handleRowClick(factory.id)}
                   >
                     <div className='d-flex justify-content-between align-items-start'>
-                      <div className='fw-bold text-dark d-flex align-items-center gap-1'>
+                      <div className='fw-bold text-dark d-flex align-items-center gap-1 connect-name'>
                         {factory.lsp_alias}
                         {factory.n_breach_epochs > 0 && (
                           <OverlayTrigger placement='auto' overlay={<Tooltip>{factory.n_breach_epochs} breach epoch(s) on record</Tooltip>}>
-                            <span className='badge bg-danger fs-8'>! breach</span>
+                            <span className='badge bg-danger connect-badge-md'>! breach</span>
                           </OverlayTrigger>
                         )}
                       </div>
-                      <div className='d-flex align-items-center gap-1'>
+                      <div className='d-flex align-items-center gap-1 flex-shrink-0 ms-2'>
                         {request === 'requested' && (
-                          <span className='badge bg-warning text-dark'>⏳ Requested</span>
+                          <span className='badge bg-warning text-dark connect-badge-md'>⏳ Requested</span>
                         )}
                         {request === 'confirmed' && (
-                          <span className='badge bg-success'>✓ Confirmed</span>
+                          <span className='badge bg-success connect-badge-md'>✓ Confirmed</span>
                         )}
-                        <span className={`badge ${factory.status === 'forming' ? 'bg-primary' : 'bg-info text-dark'}`}>
+                        <span className={`badge connect-badge-md ${factory.status === 'forming' ? 'bg-primary' : 'bg-info text-dark'}`}>
                           {factory.status === 'forming' ? 'Forming' : 'Rotating'}
                         </span>
                       </div>
                     </div>
 
                     <Row className='text-light mt-1'>
-                      <Col xs={4}>
+                      <Col xs={3}>
                         <span className='fw-bold text-dark'>{factory.open_slots}</span>/{factory.total_slots} slots
                       </Col>
-                      <Col xs={4}>
+                      <Col xs={3}>
                         {formatSats(factory.total_capacity_sats)}
                       </Col>
-                      <Col xs={4}>
+                      <Col xs={3}>
+                        {formatSats(factory.min_channel_sats)}
+                      </Col>
+                      <Col xs={3}>
                         {factory.status === 'forming'
                           ? <span className='text-success fw-bold'>open now</span>
-                          : <span>opens in {blocksToApproxDays(factory.blocks_until_rotation)}</span>
+                          : <span>{blocksToApproxDays(factory.blocks_until_rotation)}</span>
                         }
-                      </Col>
-                    </Row>
-
-                    <Row className='text-light'>
-                      <Col xs={6}>
-                        Min ch: {formatSats(factory.min_channel_sats)}
-                      </Col>
-                      <Col xs={6}>
-                        Per slot: {formatSats(perSlotSats)}
                       </Col>
                     </Row>
 
@@ -180,7 +172,7 @@ const ConnectList = () => {
           Join Factory
         </button>
         <button
-          className='btn-rounded bg-secondary btn-sm'
+          className={`btn-rounded btn-sm ${canCancel ? 'bg-warning text-dark' : 'bg-secondary'}`}
           onClick={handleCancel}
           disabled={!canCancel}
         >
