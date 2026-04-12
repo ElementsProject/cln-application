@@ -15,11 +15,17 @@ export function RootRouterReduxSync() {
   const { pathname } = useLocation();
   const authStatus = useSelector(selectAuthStatus);
   
-  // Fetch node profiles and detect factory plugin once after auth
+  // Fetch node profiles, run background discovery, detect factory plugin
   useEffect(() => {
     if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
 
     NodesService.fetchAndDispatchNodes();
+
+    // Run background discovery to find all local CLN nodes
+    NodesService.discoverNodes()
+      .then(() => NodesService.fetchAndDispatchNodes())
+      .catch(() => {});
+
     // Delay plugin detection to ensure commando connection is ready
     const timer = setTimeout(() => NodesService.detectFactoryPlugin(), 3000);
     return () => clearTimeout(timer);
