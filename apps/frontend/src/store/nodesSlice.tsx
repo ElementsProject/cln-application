@@ -26,6 +26,9 @@ const nodesSlice = createSlice({
     setIsDiscovering(state, action: PayloadAction<boolean>) {
       state.isDiscovering = action.payload;
     },
+    setHasFactoryPlugin(state, action: PayloadAction<boolean>) {
+      state.hasFactoryPlugin = action.payload;
+    },
     setNodesError(state, action: PayloadAction<any>) {
       state.error = action.payload;
       state.isLoading = false;
@@ -41,6 +44,7 @@ export const {
   setActiveProfileId,
   setIsSwitching,
   setIsDiscovering,
+  setHasFactoryPlugin,
   setNodesError,
   clearNodesStore,
 } = nodesSlice.actions;

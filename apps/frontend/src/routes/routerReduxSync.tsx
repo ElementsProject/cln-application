@@ -15,11 +15,12 @@ export function RootRouterReduxSync() {
   const { pathname } = useLocation();
   const authStatus = useSelector(selectAuthStatus);
   
-  // Fetch node profiles once after auth
+  // Fetch node profiles and detect factory plugin once after auth
   useEffect(() => {
     if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
 
     NodesService.fetchAndDispatchNodes();
+    NodesService.detectFactoryPlugin();
   }, [authStatus?.isAuthenticated, authStatus?.isValidPassword]);
 
   // Handle polling

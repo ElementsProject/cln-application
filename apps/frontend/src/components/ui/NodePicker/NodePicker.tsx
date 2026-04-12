@@ -49,8 +49,9 @@ const NodePicker = () => {
       await RootService.fetchRootData();
       await RootService.refreshData();
 
-      // Re-fetch node profiles
+      // Re-fetch node profiles and detect factory plugin
       await NodesService.fetchAndDispatchNodes();
+      await NodesService.detectFactoryPlugin();
     } catch (error) {
       logger.error('Failed to switch node:', error);
     } finally {

@@ -15,6 +15,7 @@ export interface NodesState {
   profiles: NodeProfile[];
   activeProfileId: string | null;
   isConnected: boolean;
+  hasFactoryPlugin: boolean;
   isSwitching: boolean;
   isDiscovering: boolean;
   error: any;

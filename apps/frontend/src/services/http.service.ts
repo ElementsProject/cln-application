@@ -14,7 +14,7 @@ import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '..
 import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
 import { setFactoryList } from '../store/factoriesSlice';
-import { setNodeProfiles } from '../store/nodesSlice';
+import { setNodeProfiles, setHasFactoryPlugin } from '../store/nodesSlice';
 import { Factory, FactoryCreateResponse, FactoryRotateResponse, FactoryCloseResponse, FactoryForceCloseResponse, FactoryCheckBreachResponse } from '../types/factories.type';
 import { isCompatibleVersion } from '../utilities/data-formatters';
 
@@ -626,6 +626,15 @@ export class NodesService {
       appStore.dispatch(setNodeProfiles(data));
     } catch (error) {
       logger.error('Failed to fetch node profiles:', error);
+    }
+  }
+
+  static async detectFactoryPlugin() {
+    try {
+      await HttpService.clnCall('factory-list');
+      appStore.dispatch(setHasFactoryPlugin(true));
+    } catch {
+      appStore.dispatch(setHasFactoryPlugin(false));
     }
   }
 }

@@ -6,6 +6,7 @@ export const defaultNodesState: NodesState = {
   profiles: [],
   activeProfileId: null,
   isConnected: false,
+  hasFactoryPlugin: false,
   isSwitching: false,
   isDiscovering: false,
   error: null,
@@ -58,4 +59,9 @@ export const selectIsConnected = createSelector(
 export const selectIsDiscovering = createSelector(
   selectNodesState,
   (n) => n.isDiscovering
+);
+
+export const selectHasFactoryPlugin = createSelector(
+  selectNodesState,
+  (n) => n.hasFactoryPlugin
 );
