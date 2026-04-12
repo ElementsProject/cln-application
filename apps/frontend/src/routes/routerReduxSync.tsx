@@ -20,7 +20,9 @@ export function RootRouterReduxSync() {
     if (!authStatus?.isAuthenticated || !authStatus?.isValidPassword) return;
 
     NodesService.fetchAndDispatchNodes();
-    NodesService.detectFactoryPlugin();
+    // Delay plugin detection to ensure commando connection is ready
+    const timer = setTimeout(() => NodesService.detectFactoryPlugin(), 3000);
+    return () => clearTimeout(timer);
   }, [authStatus?.isAuthenticated, authStatus?.isValidPassword]);
 
   // Handle polling
