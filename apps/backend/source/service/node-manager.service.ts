@@ -95,8 +95,48 @@ export class NodeManager {
    * For each discovered .commando-env, probe the node to verify and get info.
    */
   async discoverNodes(): Promise<NodeProfile[]> {
-    const candidates = this.profilesService.discoverCommandoEnvFiles();
     const discovered: NodeProfile[] = [];
+
+    // Method 1: Scan for lightning-rpc Unix sockets (finds all local CLN nodes)
+    try {
+      const socketCandidates = await this.profilesService.discoverLocalSockets();
+      for (const candidate of socketCandidates) {
+        const profileId = this.profilesService.generateProfileId(
+          candidate.pubkey, candidate.wsHost, candidate.wsPort,
+        );
+        const existing = this.profilesService.getProfile(profileId);
+        const profile: NodeProfile = {
+          id: profileId,
+          label: existing?.label || candidate.alias || 'Discovered Node',
+          pubkey: candidate.pubkey,
+          rune: candidate.rune,
+          wsHost: candidate.wsHost,
+          wsPort: candidate.wsPort,
+          alias: candidate.alias,
+          network: candidate.network,
+          blockheight: candidate.blockheight,
+          lastSeen: Date.now(),
+        };
+        if (!existing) {
+          this.profilesService.addProfile(profile);
+          logger.info('Auto-added discovered node via socket: ' + profile.label + ' (' + profileId + ')');
+        } else {
+          const config = this.profilesService.loadProfiles();
+          const idx = config.profiles.findIndex(p => p.id === profileId);
+          if (idx >= 0) {
+            config.profiles[idx] = { ...config.profiles[idx], ...profile, rune: candidate.rune };
+            this.profilesService.saveProfiles(config);
+          }
+        }
+        discovered.push(profile);
+      }
+    } catch (err: any) {
+      logger.warn('Socket discovery failed: ' + (err.message || err));
+    }
+
+    // Method 2: Scan for .commando-env files (fallback)
+    const candidates = this.profilesService.discoverCommandoEnvFiles();
+    const discoveredIds = new Set(discovered.map(d => d.id));
 
     for (const candidate of candidates) {
       const profileId = this.profilesService.generateProfileId(
@@ -104,6 +144,9 @@ export class NodeManager {
         candidate.wsHost,
         candidate.wsPort,
       );
+
+      // Skip if already found via socket discovery
+      if (discoveredIds.has(profileId)) continue;
 
       // Check if we already have this profile
       const existing = this.profilesService.getProfile(profileId);

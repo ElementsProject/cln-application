@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as net from 'net';
 import { NodeProfile, NodeProfilesConfig } from '../models/node-profile.type.js';
 import { logger } from '../shared/logger.js';
 import { APP_CONSTANTS } from '../shared/consts.js';
@@ -283,6 +284,173 @@ export class NodeProfilesService {
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
+    });
+  }
+
+  /**
+   * Scan for lightning-rpc Unix sockets on the system.
+   * For each found socket, connect directly and call getinfo + createrune.
+   * Returns discovered profiles with auto-generated credentials.
+   */
+  async discoverLocalSockets(): Promise<Array<{
+    pubkey: string;
+    rune: string;
+    alias: string;
+    network: string;
+    blockheight: number;
+    wsHost: string;
+    wsPort: number;
+    sourcePath: string;
+  }>> {
+    const results: Array<any> = [];
+    if (os.platform() === 'win32') return results; // No Unix sockets on Windows
+
+    const socketPaths: string[] = [];
+
+    // Scan known CLN directories for lightning-rpc sockets
+    const searchDirs = ['/var/lib'];
+    try {
+      const homeDir = os.homedir();
+      if (fs.existsSync(path.join(homeDir, '.lightning'))) {
+        searchDirs.push(path.join(homeDir, '.lightning'));
+      }
+    } catch { /* ignore */ }
+
+    for (const baseDir of searchDirs) {
+      try {
+        if (!fs.existsSync(baseDir)) continue;
+        const entries = fs.readdirSync(baseDir);
+        for (const entry of entries) {
+          if (!entry.startsWith('cln')) continue;
+          const clnDir = path.join(baseDir, entry);
+          try {
+            const stat = fs.statSync(clnDir);
+            if (!stat.isDirectory()) continue;
+            // Check network subdirectories: bitcoin/, signet/, testnet4/, regtest/
+            const subEntries = fs.readdirSync(clnDir);
+            for (const sub of subEntries) {
+              const rpcPath = path.join(clnDir, sub, 'lightning-rpc');
+              try {
+                if (fs.existsSync(rpcPath)) {
+                  const rpcStat = fs.statSync(rpcPath);
+                  if (rpcStat.isSocket()) {
+                    socketPaths.push(rpcPath);
+                  }
+                }
+              } catch { /* skip */ }
+            }
+          } catch { /* skip */ }
+        }
+      } catch { /* skip */ }
+    }
+
+    // Also check /tmp for test nodes
+    try {
+      const tmpEntries = fs.readdirSync('/tmp');
+      for (const entry of tmpEntries) {
+        if (!entry.startsWith('cln')) continue;
+        const subDir = path.join('/tmp', entry);
+        try {
+          const subEntries = fs.readdirSync(subDir);
+          for (const sub of subEntries) {
+            const rpcPath = path.join(subDir, sub, 'lightning-rpc');
+            try {
+              if (fs.existsSync(rpcPath) && fs.statSync(rpcPath).isSocket()) {
+                socketPaths.push(rpcPath);
+              }
+            } catch { /* skip */ }
+          }
+        } catch { /* skip */ }
+      }
+    } catch { /* skip */ }
+
+    logger.info('Found ' + socketPaths.length + ' lightning-rpc sockets: ' + socketPaths.join(', '));
+
+    for (const socketPath of socketPaths) {
+      try {
+        const info = await this.rpcCall(socketPath, 'getinfo', {});
+        if (!info || !info.id) continue;
+
+        // Try to create a rune for commando access
+        let rune = '';
+        try {
+          const runeResult = await this.rpcCall(socketPath, 'createrune', {});
+          rune = runeResult?.rune || '';
+        } catch (err: any) {
+          logger.warn('Could not create rune on ' + socketPath + ': ' + (err.message || err));
+          continue;
+        }
+
+        // Find WebSocket port from the node's config
+        let wsPort = 0;
+        let wsHost = '127.0.0.1';
+        const configPath = path.join(path.dirname(path.dirname(socketPath)), 'config');
+        try {
+          if (fs.existsSync(configPath)) {
+            const configContent = fs.readFileSync(configPath, 'utf-8');
+            const wsMatch = configContent.match(/bind-addr=ws:([^:]+):(\d+)/);
+            if (wsMatch) {
+              wsHost = wsMatch[1];
+              wsPort = parseInt(wsMatch[2], 10);
+            }
+          }
+        } catch { /* skip */ }
+
+        if (!wsPort) {
+          logger.warn('No WebSocket binding found for ' + socketPath + ', skipping');
+          continue;
+        }
+
+        results.push({
+          pubkey: info.id,
+          rune,
+          alias: info.alias || '',
+          network: info.network || '',
+          blockheight: info.blockheight || 0,
+          wsHost,
+          wsPort,
+          sourcePath: socketPath,
+        });
+      } catch (err: any) {
+        logger.warn('Failed to query socket ' + socketPath + ': ' + (err.message || err));
+      }
+    }
+
+    return results;
+  }
+
+  /** Send a JSON-RPC call over a Unix socket */
+  private rpcCall(socketPath: string, method: string, params: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const client = net.createConnection({ path: socketPath }, () => {
+        const id = Math.floor(Math.random() * 1000000);
+        const request = JSON.stringify({ jsonrpc: '2.0', id, method, params });
+        client.write(request);
+      });
+
+      let data = '';
+      client.on('data', (chunk) => {
+        data += chunk.toString();
+        try {
+          const parsed = JSON.parse(data);
+          client.destroy();
+          if (parsed.error) {
+            reject(new Error(parsed.error.message || JSON.stringify(parsed.error)));
+          } else {
+            resolve(parsed.result);
+          }
+        } catch { /* incomplete JSON, wait for more */ }
+      });
+
+      client.on('error', (err) => {
+        client.destroy();
+        reject(err);
+      });
+
+      client.setTimeout(5000, () => {
+        client.destroy();
+        reject(new Error('Socket timeout'));
+      });
     });
   }
 
