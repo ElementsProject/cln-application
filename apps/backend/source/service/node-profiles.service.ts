@@ -292,16 +292,18 @@ export class NodeProfilesService {
    * For each found socket, connect directly and call getinfo + createrune.
    * Returns discovered profiles with auto-generated credentials.
    */
-  async discoverLocalSockets(): Promise<Array<{
-    pubkey: string;
-    rune: string;
-    alias: string;
-    network: string;
-    blockheight: number;
-    wsHost: string;
-    wsPort: number;
-    sourcePath: string;
-  }>> {
+  async discoverLocalSockets(): Promise<
+    Array<{
+      pubkey: string;
+      rune: string;
+      alias: string;
+      network: string;
+      blockheight: number;
+      wsHost: string;
+      wsPort: number;
+      sourcePath: string;
+    }>
+  > {
     const results: Array<any> = [];
     if (os.platform() === 'win32') return results; // No Unix sockets on Windows
 
@@ -314,7 +316,9 @@ export class NodeProfilesService {
       if (fs.existsSync(path.join(homeDir, '.lightning'))) {
         searchDirs.push(path.join(homeDir, '.lightning'));
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     for (const baseDir of searchDirs) {
       try {
@@ -337,11 +341,17 @@ export class NodeProfilesService {
                     socketPaths.push(rpcPath);
                   }
                 }
-              } catch { /* skip */ }
+              } catch {
+                /* skip */
+              }
             }
-          } catch { /* skip */ }
+          } catch {
+            /* skip */
+          }
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     // Also check /tmp for test nodes
@@ -358,13 +368,21 @@ export class NodeProfilesService {
               if (fs.existsSync(rpcPath) && fs.statSync(rpcPath).isSocket()) {
                 socketPaths.push(rpcPath);
               }
-            } catch { /* skip */ }
+            } catch {
+              /* skip */
+            }
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
 
-    logger.info('Found ' + socketPaths.length + ' lightning-rpc sockets: ' + socketPaths.join(', '));
+    logger.info(
+      'Found ' + socketPaths.length + ' lightning-rpc sockets: ' + socketPaths.join(', '),
+    );
 
     for (const socketPath of socketPaths) {
       try {
@@ -394,7 +412,9 @@ export class NodeProfilesService {
               wsPort = parseInt(wsMatch[2], 10);
             }
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
 
         if (!wsPort) {
           logger.warn('No WebSocket binding found for ' + socketPath + ', skipping');
@@ -429,7 +449,7 @@ export class NodeProfilesService {
       });
 
       let data = '';
-      client.on('data', (chunk) => {
+      client.on('data', chunk => {
         data += chunk.toString();
         try {
           const parsed = JSON.parse(data);
@@ -439,10 +459,12 @@ export class NodeProfilesService {
           } else {
             resolve(parsed.result);
           }
-        } catch { /* incomplete JSON, wait for more */ }
+        } catch {
+          /* incomplete JSON, wait for more */
+        }
       });
 
-      client.on('error', (err) => {
+      client.on('error', err => {
         client.destroy();
         reject(err);
       });

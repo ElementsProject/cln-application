@@ -102,7 +102,9 @@ export class NodeManager {
       const socketCandidates = await this.profilesService.discoverLocalSockets();
       for (const candidate of socketCandidates) {
         const profileId = this.profilesService.generateProfileId(
-          candidate.pubkey, candidate.wsHost, candidate.wsPort,
+          candidate.pubkey,
+          candidate.wsHost,
+          candidate.wsPort,
         );
         const existing = this.profilesService.getProfile(profileId);
         const profile: NodeProfile = {
@@ -119,7 +121,9 @@ export class NodeManager {
         };
         if (!existing) {
           this.profilesService.addProfile(profile);
-          logger.info('Auto-added discovered node via socket: ' + profile.label + ' (' + profileId + ')');
+          logger.info(
+            'Auto-added discovered node via socket: ' + profile.label + ' (' + profileId + ')',
+          );
         } else {
           const config = this.profilesService.loadProfiles();
           const idx = config.profiles.findIndex(p => p.id === profileId);
