@@ -124,6 +124,15 @@ const rootSlice = createSlice({
     clearRootStore(state) {
       return { ...defaultRootState, appConfig: state.appConfig };
     },
+    clearNodeData(state) {
+      // Clear only node-specific data, preserving auth and app config so
+      // polling and route guards keep running during a node switch
+      state.nodeInfo = { isLoading: true, alias: '', version: '', num_peers: 0, error: null };
+      state.walletBalances = { isLoading: true, clnLocalBalance: 0, clnRemoteBalance: 0, clnPendingBalance: 0, clnInactiveBalance: 0, btcSpendableBalance: 0, btcReservedBalance: 0 };
+      state.listFunds = { isLoading: true, channels: [], outputs: [] };
+      state.listChannels = { isLoading: true, activeChannels: [], pendingChannels: [], inactiveChannels: [], mergedChannels: [] };
+      state.connectWallet = { isLoading: true };
+    },
   },
 });
 
@@ -139,6 +148,7 @@ export const {
   setListFunds,
   setListChannels,
   clearRootStore,
+  clearNodeData,
 } = rootSlice.actions;
 
 export default rootSlice.reducer;

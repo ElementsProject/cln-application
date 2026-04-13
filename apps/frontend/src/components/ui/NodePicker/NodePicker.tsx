@@ -8,7 +8,7 @@ import { setIsSwitching, setIsDiscovering, setActiveProfileId, setNodeProfiles }
 import { selectNodeProfiles, selectActiveProfile, selectIsSwitchingNode, selectHasMultipleNodes, selectActiveProfileId, selectIsConnected, selectIsDiscovering } from '../../../store/nodesSelectors';
 import { selectNodeInfo } from '../../../store/rootSelectors';
 import { NodesService, RootService, CLNService, BookkeeperService, FactoriesService } from '../../../services/http.service';
-import { clearRootStore } from '../../../store/rootSlice';
+import { clearNodeData } from '../../../store/rootSlice';
 import { clearCLNStore } from '../../../store/clnSlice';
 import { clearBKPRStore } from '../../../store/bkprSlice';
 import { clearFactoriesStore } from '../../../store/factoriesSlice';
@@ -38,8 +38,8 @@ const NodePicker = () => {
       // Call switch endpoint
       const result = await NodesService.switchNode(profileId);
 
-      // Clear all stores
-      appStore.dispatch(clearRootStore());
+      // Clear node-specific data (preserves authStatus so polling keeps running)
+      appStore.dispatch(clearNodeData());
       appStore.dispatch(clearCLNStore());
       appStore.dispatch(clearBKPRStore());
       appStore.dispatch(clearFactoriesStore());
