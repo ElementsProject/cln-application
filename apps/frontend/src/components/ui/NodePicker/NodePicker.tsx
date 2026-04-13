@@ -1,12 +1,13 @@
 import './NodePicker.scss';
 import { Dropdown, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { useInjectReducer } from '../../../hooks/use-injectreducer';
 import nodesReducer from '../../../store/nodesSlice';
 import { setIsSwitching, setIsDiscovering, setActiveProfileId, setNodeProfiles } from '../../../store/nodesSlice';
 import { selectNodeProfiles, selectActiveProfile, selectIsSwitchingNode, selectHasMultipleNodes, selectActiveProfileId, selectIsConnected, selectIsDiscovering } from '../../../store/nodesSelectors';
 import { selectNodeInfo } from '../../../store/rootSelectors';
-import { NodesService, RootService } from '../../../services/http.service';
+import { NodesService, RootService, CLNService, BookkeeperService, FactoriesService } from '../../../services/http.service';
 import { clearRootStore } from '../../../store/rootSlice';
 import { clearCLNStore } from '../../../store/clnSlice';
 import { clearBKPRStore } from '../../../store/bkprSlice';
@@ -17,6 +18,7 @@ import logger from '../../../services/logger.service';
 
 const NodePicker = () => {
   useInjectReducer('nodes', nodesReducer);
+  const { pathname } = useLocation();
 
   const profiles = useSelector(selectNodeProfiles);
   const activeProfile = useSelector(selectActiveProfile);
@@ -45,9 +47,19 @@ const NodePicker = () => {
       // Update active profile
       appStore.dispatch(setActiveProfileId(result.profile?.id || profileId));
 
-      // Re-fetch root data
+      // Re-fetch root data (nodeInfo, balances, channels)
       await RootService.fetchRootData();
       await RootService.refreshData();
+
+      // Re-fetch route-specific data immediately so the current page populates
+      // without waiting up to 30s for the next poll tick
+      if (pathname.includes('/bookkeeper')) {
+        await BookkeeperService.fetchBKPRData();
+      } else if (pathname.includes('/factories')) {
+        await FactoriesService.fetchFactoriesData();
+      } else {
+        await CLNService.fetchCLNData();
+      }
 
       // Re-fetch node profiles and detect factory plugin
       await NodesService.fetchAndDispatchNodes();
