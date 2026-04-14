@@ -20,7 +20,7 @@ import { isCompatibleVersion } from '../utilities/data-formatters';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
-  timeout: APP_WAIT_TIME * 10,
+  timeout: 30 * 1000, // 30s — long enough for any real CLN call, fast enough to fail if node unreachable
   withCredentials: true,
 });
 

@@ -47,28 +47,29 @@ const NodePicker = () => {
       // Update active profile
       appStore.dispatch(setActiveProfileId(result.profile?.id || profileId));
 
-      // Re-fetch root data (nodeInfo, balances, channels)
+      // Critical path: node info + balances only — clears the spinner fast
       await RootService.fetchRootData();
       await RootService.refreshData();
-
-      // Re-fetch route-specific data immediately so the current page populates
-      // without waiting up to 30s for the next poll tick
-      if (pathname.includes('/bookkeeper')) {
-        await BookkeeperService.fetchBKPRData();
-      } else if (pathname.includes('/factories')) {
-        await FactoriesService.fetchFactoriesData();
-      } else {
-        await CLNService.fetchCLNData();
-      }
-
-      // Re-fetch node profiles and detect factory plugin
-      await NodesService.fetchAndDispatchNodes();
-      await NodesService.detectFactoryPlugin();
     } catch (error) {
       logger.error('Failed to switch node:', error);
     } finally {
+      // Clear switching state as soon as balances are loaded
       appStore.dispatch(setIsSwitching(false));
     }
+
+    // Non-critical background refresh — transactions, offers, plugin detection.
+    // Fire-and-forget so a slow query on any node never blocks the UI.
+    const bgRefresh = pathname.includes('/bookkeeper')
+      ? BookkeeperService.fetchBKPRData()
+      : pathname.includes('/factories')
+        ? FactoriesService.fetchFactoriesData()
+        : CLNService.fetchCLNData();
+
+    Promise.all([
+      bgRefresh,
+      NodesService.fetchAndDispatchNodes(),
+      NodesService.detectFactoryPlugin(),
+    ]).catch(err => logger.error('Background post-switch refresh failed:', err));
   };
 
   const handleDiscover = async () => {
