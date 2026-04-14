@@ -192,7 +192,7 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
           </Col>
           <Col xs={6} md={4}>
             <div className='fs-7 text-light'>Tree Nodes</div>
-            <div className='fw-bold text-dark'>{typeof factory.tree_nodes === 'number' && factory.tree_nodes > 0 ? factory.tree_nodes : 'N/A'}</div>
+            <div className='fw-bold text-dark'>{factory.tree_nodes > 0 ? factory.tree_nodes : 'N/A'}</div>
           </Col>
           <Col xs={12}>
             <div className='fs-7 text-light'>Funding TXID</div>
@@ -240,27 +240,6 @@ const FactoryDetail = ({ factory, onClose }: FactoryDetailProps) => {
           </Row>
         )}
 
-        {Array.isArray(factory.tree_nodes) && factory.tree_nodes.length > 0 && (
-          <Row className='mb-2'>
-            <Col xs={12}>
-              <div className='fs-7 text-light fw-bold mb-1'>Tree Nodes ({factory.tree_nodes.length})</div>
-              <ListGroup variant='flush' className='fs-7'>
-                {factory.tree_nodes.map((node, idx) => (
-                  <ListGroup.Item key={idx} className='px-0 py-1 d-flex justify-content-between'>
-                    <span className='text-dark'>#{node.node_idx} {node.type}</span>
-                    {node.txid && (
-                      <OverlayTrigger placement='auto' overlay={<Tooltip>Click to copy TXID</Tooltip>}>
-                        <span className='text-light cursor-pointer' onClick={() => copyTextToClipboard(node.txid!)}>
-                          {node.txid.substring(0, 16)}...
-                        </span>
-                      </OverlayTrigger>
-                    )}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Col>
-          </Row>
-        )}
 
         {responseStatus !== CallStatus.NONE && (
           <StatusAlert responseStatus={responseStatus} responseMessage={responseMessage} />

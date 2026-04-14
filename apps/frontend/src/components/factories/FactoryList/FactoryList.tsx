@@ -64,7 +64,7 @@ const FactoryListItem = ({ factory, onClick }: { factory: Factory; onClick: () =
           Ep <span className='fw-bold text-dark'>{factory.epoch}/{factory.max_epochs || '?'}</span>
         </Col>
         <Col xs={3}>
-          <span className='fw-bold text-dark'>{typeof factory.tree_nodes === 'number' ? factory.tree_nodes : 0}</span> nodes
+          <span className='fw-bold text-dark'>{factory.tree_nodes}</span> nodes
         </Col>
       </Row>
     </div>

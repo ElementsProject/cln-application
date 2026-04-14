@@ -20,16 +20,9 @@ export enum FactoryCeremony {
 export type FactoryChannel = {
   channel_id: string;
   leaf_index: number;
-  leaf_side: string;
+  leaf_side: number;
   funding_txid?: string;
   funding_outnum?: number;
-};
-
-export type TreeNode = {
-  node_idx: number;
-  type: string;
-  txid?: string;
-  [key: string]: any;
 };
 
 export type Factory = {
@@ -46,7 +39,7 @@ export type Factory = {
   rotation_in_progress: boolean;
   n_breach_epochs: number;
   dist_tx_status: string;
-  tree_nodes: number | TreeNode[];
+  tree_nodes: number;
   funding_txid: string;
   funding_outnum: number;
   channels: FactoryChannel[];
