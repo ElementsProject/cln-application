@@ -40,7 +40,7 @@ cd superscalar-wallet
 npm ci
 npm run build
 npm prune --omit=dev
-npm run start
+APP_PORT=9876 APP_HOST=0.0.0.0 APP_SINGLE_SIGN_ON=true npm run start
 ```
 
 ### Docker
@@ -52,6 +52,47 @@ For Docker deployment with a remote Core Lightning node, see the [Docker Setup G
 The application connects to Core Lightning via [Commando](https://docs.corelightning.org/reference/lightning-commando) (default) or REST. See [Environment Variables](#environment-variables) for connection options.
 
 Authentication uses [runes](https://docs.corelightning.org/reference/lightning-commando) for trustless, end-to-end encrypted communication. The `entrypoint.sh` script can auto-generate credentials for local installations, or they can be configured manually for remote nodes.
+
+## Multi-Node Setup
+
+The wallet can manage multiple Core Lightning nodes simultaneously. Nodes are **auto-discovered** at startup — no manual configuration required as long as each node meets two requirements:
+
+### Requirements per node
+
+**1. WebSocket binding in CLN config**
+
+Each CLN node must expose a WebSocket port. Add this line to the node's `config` file (use a unique port per node):
+
+```
+bind-addr=ws:127.0.0.1:5001
+```
+
+Without this, the node is visible on the filesystem but cannot be reached by the dashboard — the scanner will skip it with a warning. This is a Core Lightning/Commando protocol requirement, not a wallet limitation.
+
+**2. Node must be running**
+
+The scanner connects to each node via its Unix socket (`lightning-rpc`) at startup. Stopped nodes leave their socket file on disk but refuse connections and are skipped automatically.
+
+### How discovery works
+
+On every page load the wallet scans `/var/lib/cln*` (and `~/.lightning`) for running CLN nodes, calls `getinfo` via Unix socket, auto-generates a commando rune, reads the WS port from the node's config, and saves the profile to `node-profiles.json`. This is fully automatic — profiles persist across restarts and runes are refreshed on each scan.
+
+To trigger a manual rescan at any time, use the **Rescan for Nodes** option in the node picker dropdown.
+
+### Factory tab visibility
+
+The **Factories** tab only appears when the active node has the SuperScalar plugin loaded (`factory-list` returns successfully). On vanilla CLN nodes the tab is hidden automatically.
+
+### Bookkeeper (transaction history)
+
+BTC transaction history requires the CLN `bookkeeper` plugin to be enabled (it is by default). If you see "Failed to load transactions", check that bookkeeper is not disabled in the node's config:
+
+```
+# This line disables transaction history — remove it if you want BTC tx history:
+# disable-plugin=bookkeeper
+```
+
+Note: on a freshly started node, bookkeeper may take 10–30 seconds to finish its initial sync before transaction queries become available.
 
 ## Environment Variables
 
