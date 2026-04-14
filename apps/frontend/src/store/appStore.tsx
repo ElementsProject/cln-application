@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './rootSlice';
+import nodesReducer from './nodesSlice';
 import { StoreWithManager } from './store.type';
 import { combineReducers } from "@reduxjs/toolkit";
 
@@ -23,7 +24,7 @@ export function createReducerManager(initialReducers: any) {
   };
 }
 
-const reducerManager = createReducerManager({ root: rootReducer });
+const reducerManager = createReducerManager({ root: rootReducer, nodes: nodesReducer });
 
 export const appStore = configureStore({
   reducer: reducerManager.reduce,
