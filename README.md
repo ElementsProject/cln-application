@@ -147,6 +147,19 @@
 
 ---
 
+# Feature Walkthroughs
+
+Step-by-step guides for basic node management flows by the
+CLN application, captured against a Core Lightning regtest network
+(5 nodes, the app connected to node *ODDSPORK*).
+
+| Guide | What it covers |
+|---|---|
+| [CLN Dashboard](.github/docs/Dashboard.md) | The home page: balances, wallets, channels — with guides for sending & receiving payments, BOLT12 offers and opening channels |
+| [Bookkeeper](.github/docs/Bookkeeper.md) | Accounting dashboard: Account Events, Sats Flow and the Volume Chart |
+
+---
+
 # Contributing
 
 - We welcome and appreciate new contributions!
