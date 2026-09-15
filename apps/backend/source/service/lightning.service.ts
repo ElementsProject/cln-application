@@ -68,7 +68,7 @@ export class LightningService {
     return this.clnService.publicKey;
   };
 
-  call = async (method: string, methodParams: any[]) => {
+  call = async (method: string, methodParams: Record<string, any>) => {
     switch (APP_CONSTANTS.APP_CONNECT) {
       case AppConnect.REST:
         return axios
