@@ -103,7 +103,7 @@ const SetPasswordComponent = () => {
       }        
     } catch (error: any) {
       setResponseStatus(CallStatus.ERROR);
-      setResponseMessage(error.response || error.message || 'Unknown Error');
+      setResponseMessage(typeof error === 'string' ? error : (error?.response?.data || error?.message || 'Unknown Error'));
     }
   };
 

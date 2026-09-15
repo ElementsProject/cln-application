@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { APP_CONSTANTS, HttpStatusCode, SECRET_KEY } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
-import { verifyPassword, isAuthenticated, isValidPassword } from '../shared/utils.js';
+import { verifyPassword, isAuthenticated, isValidPassword, safeCompare } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
 export class AuthController {
@@ -40,39 +40,54 @@ export class AuthController {
   resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Resetting password');
-      const isValid = req.body.isValid;
-      const currPassword = req.body.currPassword;
-      const newPassword = req.body.newPassword;
-      if (fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
-        try {
-          const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-          if (config.password === currPassword || !isValid) {
-            try {
-              config.password = newPassword;
-              try {
-                fs.writeFileSync(
-                  APP_CONSTANTS.APP_CONFIG_FILE,
-                  JSON.stringify(config, null, 2),
-                  'utf-8',
-                );
-                const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
-                res.cookie('token', token, { httpOnly: true, maxAge: 3600 * 24 * 7 });
-                res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
-              } catch (error: any) {
-                handleError(error, req, res, next);
-              }
-            } catch (error: any) {
-              handleError(error, req, res, next);
-            }
-          } else {
-            return new AuthError(HttpStatusCode.UNAUTHORIZED, 'Incorrect current password');
-          }
-        } catch (error: any) {
-          handleError(error, req, res, next);
-        }
-      } else {
-        throw new AuthError(HttpStatusCode.UNAUTHORIZED, 'Config file does not exist');
+      const currPassword = req.body?.currPassword;
+      const newPassword = req.body?.newPassword;
+
+      if (
+        typeof newPassword !== 'string' ||
+        newPassword.trim() === '' ||
+        newPassword.length > 256
+      ) {
+        return handleError(
+          new AuthError(HttpStatusCode.BAD_REQUEST, 'New password is required'),
+          req,
+          res,
+          next,
+        );
       }
+      if (!fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
+        return handleError(
+          new AuthError(HttpStatusCode.UNAUTHORIZED, 'Config file does not exist'),
+          req,
+          res,
+          next,
+        );
+      }
+
+      const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
+      const passwordAlreadySet = typeof config.password === 'string' && config.password !== '';
+      if (passwordAlreadySet) {
+        const hasSession =
+          APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true' ||
+          isAuthenticated(req.cookies?.token) === true;
+        if (!hasSession) {
+          return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized user' });
+        }
+        if (!safeCompare(config.password, currPassword)) {
+          return handleError(
+            new AuthError(HttpStatusCode.UNAUTHORIZED, 'Incorrect current password'),
+            req,
+            res,
+            next,
+          );
+        }
+      }
+
+      config.password = newPassword;
+      fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+      const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
+      res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 24 });
+      return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
     } catch (error: any) {
       handleError(error, req, res, next);
     }
