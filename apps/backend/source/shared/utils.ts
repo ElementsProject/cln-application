@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import { logger } from '../shared/logger.js';
 import {
   APP_CONSTANTS,
@@ -38,11 +39,23 @@ export function isAuthenticated(token: string) {
   }
 }
 
+export function safeCompare(expected: unknown, actual: unknown): boolean {
+  if (typeof expected !== 'string' || typeof actual !== 'string') {
+    return false;
+  }
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  const actualBuf = Buffer.from(actual, 'utf8');
+  if (expectedBuf.length !== actualBuf.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(expectedBuf, actualBuf);
+}
+
 export function verifyPassword(password: string) {
   if (fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
     try {
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-      if (config.password === password) {
+      if (safeCompare(config.password, password)) {
         return true;
       } else {
         return 'Incorrect password';
