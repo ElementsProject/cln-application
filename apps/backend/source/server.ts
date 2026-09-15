@@ -90,7 +90,7 @@ export const throwApiError = (err: any) => {
     case 'ECONNREFUSED':
       return new APIError(HttpStatusCode.UNAUTHORIZED, 'Server is down/locked');
     case 'EBADCSRFTOKEN':
-      return new APIError(HttpStatusCode.BAD_CSRF_TOKEN, 'Invalid CSRF token. Form tempered.');
+      return new APIError(HttpStatusCode.FORBIDDEN, 'Invalid CSRF token. Form tempered.');
     default:
       return new APIError(HttpStatusCode.BAD_REQUEST, err?.message || err);
   }

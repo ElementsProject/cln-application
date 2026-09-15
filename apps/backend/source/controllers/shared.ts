@@ -7,8 +7,28 @@ import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { addServerConfig, setEnvVariables } from '../shared/utils.js';
-import { ShowRunes } from '../models/showrunes.type.js';
+import { Rune, ShowRunes } from '../models/showrunes.type.js';
 import { LightningService } from '../service/lightning.service.js';
+
+const INVOICE_RUNE_METHODS = ['invoice', 'listinvoices'];
+
+// A rune qualifies as the invoice rune only when every restriction on the
+// method field is an equality on invoice or listinvoices, both methods are
+// named, and the node has not blacklisted it. Matching on the value alone
+// would also accept "method/invoice" (any method except invoice).
+export function isInvoiceOnlyRune(rune: Rune): boolean {
+  if (rune.blacklisted) return false;
+  const methodAlternatives = rune.restrictions
+    .flatMap(restriction => restriction.alternatives)
+    .filter(alternative => alternative.fieldname === 'method');
+  if (methodAlternatives.length === 0) return false;
+  const allEquality = methodAlternatives.every(
+    alternative =>
+      alternative.condition === '=' && INVOICE_RUNE_METHODS.includes(alternative.value),
+  );
+  const named = methodAlternatives.map(alternative => alternative.value);
+  return allEquality && INVOICE_RUNE_METHODS.every(method => named.includes(method));
+}
 
 export class SharedController {
   private clnService: LightningService;
@@ -107,16 +127,8 @@ export class SharedController {
   saveInvoiceRune = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Saving Invoice Rune');
-      const showRunes: ShowRunes = await this.clnService.call('showrunes', []);
-      const invoiceRune = showRunes.runes.find(
-        rune =>
-          rune.restrictions.some(restriction =>
-            restriction.alternatives.some(alternative => alternative.value === 'invoice'),
-          ) &&
-          rune.restrictions.some(restriction =>
-            restriction.alternatives.some(alternative => alternative.value === 'listinvoices'),
-          ),
-      );
+      const showRunes: ShowRunes = await this.clnService.call('showrunes', {});
+      const invoiceRune = showRunes.runes.find(isInvoiceOnlyRune);
       if (invoiceRune && fs.existsSync(APP_CONSTANTS.LIGHTNING_VARS_FILE)) {
         const invoiceRuneString = `INVOICE_RUNE="${invoiceRune.rune}"\n`;
         fs.appendFileSync(APP_CONSTANTS.LIGHTNING_VARS_FILE, invoiceRuneString, 'utf-8');

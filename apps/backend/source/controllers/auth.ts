@@ -1,7 +1,12 @@
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { APP_CONSTANTS, HttpStatusCode, SESSION_COOKIE_ATTRIBUTES, SESSION_COOKIE_OPTIONS } from '../shared/consts.js';
+import {
+  APP_CONSTANTS,
+  HttpStatusCode,
+  SESSION_COOKIE_ATTRIBUTES,
+  SESSION_COOKIE_OPTIONS,
+} from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import {
@@ -10,7 +15,7 @@ import {
   hashPassword,
   isAuthenticated,
   isValidPassword,
-  createSessionToken
+  createSessionToken,
 } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
@@ -18,13 +23,22 @@ export class AuthController {
   userLogin = async (req: Request, res: Response, next: NextFunction) => {
     logger.info('Logging in');
     try {
-      const vpRes = await verifyPassword(req.body.password);
+      const password = req.body?.password;
+      if (typeof password !== 'string' || password === '' || password.length > 256) {
+        return handleError(
+          new AuthError(HttpStatusCode.BAD_REQUEST, 'Password is required'),
+          req,
+          res,
+          next,
+        );
+      }
+      const vpRes = await verifyPassword(password);
       if (vpRes === true) {
         res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
       } else {
-        const err = new AuthError(HttpStatusCode.UNAUTHORIZED, vpRes);
-        handleError(err, req, res, next);
+        const message = vpRes instanceof Error ? vpRes.message : vpRes;
+        handleError(new AuthError(HttpStatusCode.UNAUTHORIZED, message), req, res, next);
       }
     } catch (error: any) {
       handleError(error, req, res, next);

@@ -109,9 +109,15 @@ export async function verifyPassword(password: string) {
         return 'Incorrect password';
       }
       if (needsUpgrade) {
-        config.password = await hashPassword(password);
-        fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
-        logger.info('Stored password upgraded to scrypt');
+        try {
+          config.password = await hashPassword(password);
+          fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+          logger.info('Stored password upgraded to scrypt');
+        } catch (upgradeError: any) {
+          logger.warn(
+            'Could not upgrade stored password: ' + (upgradeError?.message || upgradeError),
+          );
+        }
       }
       return true;
     } catch (error: any) {
