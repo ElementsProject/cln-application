@@ -295,7 +295,7 @@ export class CLNService {
   static async listOffers(offset: number, store = appStore) {
     const state = store.getState() as AppState;
     const nodeInfo = state.root.nodeInfo;
-    const isCompatible = isCompatibleVersion(nodeInfo.version || '', '26.04');
+    const isCompatible = isCompatibleVersion(nodeInfo.version || '', '26.09');
     const primaryQuery = isCompatible ? ListOffersSQL(SCROLL_PAGE_SIZE, offset) : ListOffersSQLWithoutDesc(SCROLL_PAGE_SIZE, offset);
     try {
       const listOffersArr: any = await HttpService.clnCall('sql', { query: primaryQuery });
