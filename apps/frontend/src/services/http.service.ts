@@ -10,7 +10,7 @@ import { AppState } from '../store/store.type';
 import { appStore } from '../store/appStore';
 import { AccountEventsAccount, SatsFlowEvent, VolumeRow } from '../types/bookkeeper.type';
 import { listBTCTransactionsSQL, listLightningTransactionsSQL, ListOffersSQL, ListOffersSQLWithoutDesc } from '../utilities/cln-sql';
-import { setConnectWallet, setListChannels, setListFunds, setNodeInfo } from '../store/rootSlice';
+import { setConnectWallet, setFiatConfig, setListChannels, setListFunds, setNodeInfo } from '../store/rootSlice';
 import { setFeeRate, setListBitcoinTransactions, setListLightningTransactions, setListOffers } from '../store/clnSlice';
 import { setAccountEvents, setSatsFlow, setVolume } from '../store/bkprSlice';
 import { isCompatibleVersion } from '../utilities/data-formatters';
@@ -238,7 +238,7 @@ export class RootService {
     ]);
 
     let fiatConfig = { ...defaultRootState.fiatConfig, isLoading: false };
-    if (config.uiConfig.fiatUnit) {
+    if (authStatus.isAuthenticated && config.uiConfig.fiatUnit) {
       fiatConfig = await this.getFiatConfig(config.uiConfig.fiatUnit);
     }
 
@@ -250,9 +250,11 @@ export class RootService {
   }
 
   static async fetchRootData() {
+    const fiatUnit = (appStore.getState() as AppState).root.appConfig.uiConfig.fiatUnit;
     const results = await executeRequests({
       nodeInfo: this.getNodeInfo(),
       connectWallet: this.getConnectWallet(),
+      fiatConfig: this.getFiatConfig(fiatUnit),
     },
     (key, data) => {
       switch(key) {
@@ -261,6 +263,9 @@ export class RootService {
           break;
         case 'connectWallet':
           appStore.dispatch(setConnectWallet(data));
+          break;
+        case 'fiatConfig':
+          appStore.dispatch(setFiatConfig(data));
           break;
       }
     });

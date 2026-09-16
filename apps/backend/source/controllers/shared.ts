@@ -7,6 +7,7 @@ import {
   DEFAULT_CONFIG,
   FIAT_CURRENCIES,
   FIAT_RATE_API,
+  FIAT_RATE_CACHE_MS,
   HttpStatusCode,
   UI_APP_MODES,
   UI_UNITS,
@@ -53,6 +54,9 @@ export function isInvoiceOnlyRune(rune: Rune): boolean {
   const named = methodAlternatives.map(alternative => alternative.value);
   return allEquality && INVOICE_RUNE_METHODS.every(method => named.includes(method));
 }
+
+// Last rate fetched per currency, reused for FIAT_RATE_CACHE_MS
+const fiatRateCache = new Map<string, { rate: number; fetchedAt: number }>();
 
 export class SharedController {
   private clnService: LightningService;
@@ -131,30 +135,32 @@ export class SharedController {
 
   getFiatRate = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      logger.info('Getting Fiat Rate for: ' + req.params.fiatCurrency);
-      logger.info('Fiat URL: ' + FIAT_RATE_API + req.params.fiatCurrency);
-      return axios
-        .get(FIAT_RATE_API + req.params.fiatCurrency)
-        .then((response: any) => {
-          logger.info('Fiat Response: ' + JSON.stringify(response?.data));
-          if (response.data?.bitcoin) {
-            const bitcoinValues = Object.values(response.data.bitcoin);
-            const rate = bitcoinValues[0];
-            if (rate === undefined) {
-              return handleError(
-                new APIError(HttpStatusCode.NOT_FOUND, 'Price value not found'),
-                req,
-                res,
-                next,
-              );
-            }
-            return res.status(200).json({ rate });
-          }
-        })
-        .catch(err => {
-          logger.error('Fiat Error Response: ' + (err?.message || err));
-          res.status(200).json({ rate: 0 });
-        });
+      const fiatCurrency = String(req.params.fiatCurrency);
+      if (!FIAT_CURRENCIES.includes(fiatCurrency)) {
+        return handleError(
+          new APIError(HttpStatusCode.BAD_REQUEST, 'Unsupported fiat currency'),
+          req,
+          res,
+          next,
+        );
+      }
+      const cached = fiatRateCache.get(fiatCurrency);
+      if (cached && Date.now() - cached.fetchedAt < FIAT_RATE_CACHE_MS) {
+        return res.status(200).json({ rate: cached.rate });
+      }
+      logger.info('Getting Fiat Rate for: ' + fiatCurrency);
+      const response = await axios.get(FIAT_RATE_API + encodeURIComponent(fiatCurrency));
+      const rate = response.data?.bitcoin?.[fiatCurrency.toLowerCase()];
+      if (typeof rate !== 'number') {
+        return handleError(
+          new APIError(HttpStatusCode.NOT_FOUND, 'Price value not found'),
+          req,
+          res,
+          next,
+        );
+      }
+      fiatRateCache.set(fiatCurrency, { rate, fetchedAt: Date.now() });
+      return res.status(200).json({ rate });
     } catch (error: any) {
       logger.error('Error from Fiat Rate: ' + (error?.message || error));
       res.status(200).json({ rate: 0 });
