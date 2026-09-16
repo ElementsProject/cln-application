@@ -57,7 +57,7 @@
       - BITCOIN_NETWORK: Bitcoin network type (for entrypoint.sh; valid values: bitcoin/signet/testnet/regtest; default: `bitcoin`)
 
       # cln-application Values
-      - APP_SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
+      - APP_SINGLE_SIGN_ON: DANGEROUS. Disables the application's own login entirely; every request is treated as authenticated. Only for platforms whose proxy authenticates users before traffic reaches this app (valid values: true/false, default: false)
       - APP_PROTOCOL: Protocol the browser uses to reach the application; `https` marks cookies Secure and sends HSTS, so only set it when TLS is really in front (valid values: http/https, default: `http`)
       - APP_HOST: Hostname/IP address of cln-application's container (default: `localhost`)
       - APP_PORT: Port on which this application should be served (default: `2103`)
@@ -101,6 +101,9 @@
       - LIGHTNING_GRPC_CLIENT_CERT_FILE: Client certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client.pem`)
       - LIGHTNING_GRPC_CA_CERT_FILE: CA certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./ca.pem`)
       ```
+
+  - ### Single Sign-On Mode (APP_SINGLE_SIGN_ON)
+      **Do not enable this unless another system authenticates users before they reach the application.** With `APP_SINGLE_SIGN_ON=true` the password screen disappears and the backend accepts every request as an authenticated session. Because the backend holds the node's admin rune, anyone who can open the port can then call `withdraw`, `pay`, `close` and `createrune`, and can drain the node. The mode exists for platforms such as Umbrel, where the platform's own proxy enforces the user's login and the application port is not reachable directly. On a standalone install, a Docker host with a published port, or any machine exposed to a LAN or the internet, leave it at `false`. There is currently no runtime guard that stops a wrong setting; the responsibility is on the operator.
 
   - ### Transport Security (HTTPS)
       The backend listens on plain HTTP by default. That is fine on `localhost`, but as soon as `APP_HOST` is a LAN or public address the login password and the session cookie cross the network unencrypted. Choose one of the following before exposing the application:
