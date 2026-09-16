@@ -5,6 +5,7 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import expressWinston from 'express-winston';
 
 import { logger, expressLogConfiguration } from './shared/logger.js';
@@ -44,12 +45,32 @@ app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.set('trust proxy', true);
 app.use(cookieParser());
 app.use(csrfProtection);
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        'default-src': ["'self'"],
+        'base-uri': ["'self'"],
+        'connect-src': ["'self'"],
+        'font-src': ["'self'"],
+        'form-action': ["'self'"],
+        'frame-ancestors': ["'self'"],
+        'frame-src': ["'self'"],
+        'img-src': ["'self'", 'data:'],
+        'object-src': ["'none'"],
+        'script-src': ["'self'"],
+        'style-src': ["'self'"],
+      },
+    },
+    strictTransportSecurity: APP_PROTOCOL === 'https' ? { maxAge: 15552000 } : false,
+    crossOriginOpenerPolicy: APP_PROTOCOL === 'https',
+    originAgentCluster: APP_PROTOCOL === 'https',
+  }),
+);
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; font-src 'self'; img-src 'self' data:; script-src 'self'; frame-src 'self'; style-src 'self';",
-  );
+  res.setHeader('Permissions-Policy', 'camera=(), geolocation=(), microphone=(), payment=()');
   next();
 });
 
