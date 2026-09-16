@@ -25,6 +25,19 @@ export function addServerConfig(config: any) {
   return config;
 }
 
+// Express "trust proxy" setting from APP_TRUST_PROXY:
+// "false" (default) ignores X-Forwarded-* headers
+// "true" trusts every hop
+// an integer trusts that many hops
+// anything else is a comma separated list of proxy addresses or subnets
+export function parseTrustProxy(value: string): boolean | number | string {
+  const normalized = (value || '').trim().toLowerCase();
+  if (normalized === '' || normalized === 'false') return false;
+  if (normalized === 'true') return true;
+  if (/^\d+$/.test(normalized)) return parseInt(normalized, 10);
+  return value.trim();
+}
+
 export function createSessionToken() {
   return jwt.sign({ userID: crypto.randomUUID() }, SECRET_KEY, {
     algorithm: 'HS256',

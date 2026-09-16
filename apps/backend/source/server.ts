@@ -17,6 +17,7 @@ import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 import { LightningService } from './service/lightning.service.js';
+import { parseTrustProxy } from './shared/utils.js';
 import { csrfProtection } from './shared/csrf.js';
 
 const directoryName = dirname(fileURLToPath(import.meta.url));
@@ -42,7 +43,7 @@ export function normalizePort(val: string) {
 
 app.use(bodyParser.json({ limit: '25mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
-app.set('trust proxy', true);
+app.set('trust proxy', parseTrustProxy(APP_CONSTANTS.APP_TRUST_PROXY));
 app.use(cookieParser());
 app.use(csrfProtection);
 app.use(
