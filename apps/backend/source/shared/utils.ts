@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
+import { promisify } from 'util';
 import { logger } from '../shared/logger.js';
 import {
   APP_CONSTANTS,
@@ -59,15 +60,60 @@ export function safeCompare(expected: unknown, actual: unknown): boolean {
   return crypto.timingSafeEqual(expectedBuf, actualBuf);
 }
 
-export function verifyPassword(password: string) {
+// Entries without the prefix are legacy values written before server-side hashing
+// and are upgraded in place the first time they verify successfully.
+const SCRYPT_PREFIX = 'scrypt';
+const SCRYPT_COST = 16384;
+const SCRYPT_KEYLEN = 64;
+const scrypt = promisify(crypto.scrypt) as (
+  password: string,
+  salt: Buffer,
+  keylen: number,
+  options: crypto.ScryptOptions,
+) => Promise<Buffer>;
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.randomBytes(16);
+  const hash = await scrypt(password, salt, SCRYPT_KEYLEN, { N: SCRYPT_COST });
+  return [SCRYPT_PREFIX, SCRYPT_COST, salt.toString('hex'), hash.toString('hex')].join('$');
+}
+
+export async function verifyStoredPassword(
+  stored: unknown,
+  candidate: unknown,
+): Promise<{ ok: boolean; needsUpgrade: boolean }> {
+  if (typeof stored !== 'string' || typeof candidate !== 'string' || stored === '') {
+    return { ok: false, needsUpgrade: false };
+  }
+  const parts = stored.split('$');
+  if (parts.length === 4 && parts[0] === SCRYPT_PREFIX) {
+    const cost = Number(parts[1]);
+    const salt = Buffer.from(parts[2], 'hex');
+    const expected = Buffer.from(parts[3], 'hex');
+    if (!Number.isInteger(cost) || salt.length === 0 || expected.length === 0) {
+      return { ok: false, needsUpgrade: false };
+    }
+    const actual = await scrypt(candidate, salt, expected.length, { N: cost });
+    return { ok: crypto.timingSafeEqual(expected, actual), needsUpgrade: false };
+  }
+  const ok = safeCompare(stored, candidate);
+  return { ok, needsUpgrade: ok };
+}
+
+export async function verifyPassword(password: string) {
   if (fs.existsSync(APP_CONSTANTS.APP_CONFIG_FILE)) {
     try {
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-      if (safeCompare(config.password, password)) {
-        return true;
-      } else {
+      const { ok, needsUpgrade } = await verifyStoredPassword(config.password, password);
+      if (!ok) {
         return 'Incorrect password';
       }
+      if (needsUpgrade) {
+        config.password = await hashPassword(password);
+        fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+        logger.info('Stored password upgraded to scrypt');
+      }
+      return true;
     } catch (error: any) {
       return error;
     }
