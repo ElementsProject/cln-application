@@ -44,10 +44,13 @@ if (!RUNE) {
 
 class SecureWebSocket extends WebSocket {
   constructor(url) {
-    const options = {};
-    options.rejectUnauthorized = false;
-    options.cert = fs.readFileSync(process.env.LIGHTNING_WS_CLIENT_CERT_FILE);
-    options.key = fs.readFileSync(process.env.LIGHTNING_WS_CLIENT_KEY_FILE);
+    const options = {
+      ca: fs.readFileSync(process.env.LIGHTNING_WS_CA_CERT_FILE),
+      cert: fs.readFileSync(process.env.LIGHTNING_WS_CLIENT_CERT_FILE),
+      key: fs.readFileSync(process.env.LIGHTNING_WS_CLIENT_KEY_FILE),
+      rejectUnauthorized: true,
+      checkServerIdentity: () => undefined,
+    };
     super(url, options);
   }
 }

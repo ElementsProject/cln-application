@@ -144,12 +144,18 @@ export const DEFAULT_CONFIG = {
   password: '',
 };
 
+// Core Lightning's generated server certificate names "cln" and "localhost"
+// only a certificate issued by the CA in LIGHTNING_WS_CA_CERT_FILE is accepted.
+const acceptServerIdentity = (): any => undefined;
+
 class SecureWebSocket extends WebSocket {
   constructor(url: string) {
-    const options = {
-      rejectUnauthorized: false,
+    const options: WebSocket.ClientOptions = {
+      ca: fs.readFileSync(APP_CONSTANTS.LIGHTNING_WS_CA_CERT_FILE),
       cert: fs.readFileSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_CERT_FILE),
       key: fs.readFileSync(APP_CONSTANTS.LIGHTNING_WS_CLIENT_KEY_FILE),
+      rejectUnauthorized: true,
+      checkServerIdentity: acceptServerIdentity,
     };
     super(url, options);
   }
