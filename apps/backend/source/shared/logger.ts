@@ -42,12 +42,8 @@ export const logConfiguration = {
       filename: path.basename(APP_CONSTANTS.APP_LOG_FILE),
       dirname: logDir,
       maxsize: 5 * 1024 * 1024,
-      level:
-        APP_CONSTANTS.APP_MODE === Environment.PRODUCTION
-          ? LogLevel.DEBUG
-          : APP_CONSTANTS.APP_MODE === Environment.TESTING
-            ? LogLevel.DEBUG
-            : LogLevel.DEBUG,
+      maxFiles: 5,
+      level: APP_CONSTANTS.APP_MODE === Environment.PRODUCTION ? LogLevel.INFO : LogLevel.DEBUG,
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
         winston.format.timestamp(),
@@ -62,6 +58,7 @@ export const logConfiguration = {
 export const expressLogConfiguration = {
   ...logConfiguration,
   meta: APP_CONSTANTS.APP_MODE !== Environment.PRODUCTION,
+  headerBlacklist: ['cookie', 'authorization', 'x-xsrf-token', 'xsrf-token'],
   message: 'HTTP {{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}',
   expressFormat: false,
   colorize: true,

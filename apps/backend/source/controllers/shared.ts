@@ -46,7 +46,9 @@ export class SharedController {
 
   setApplicationSettings = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      logger.info('Updating Application Settings: ' + JSON.stringify(req.body));
+      logger.info(
+        'Updating Application Settings: ' + Object.keys(req.body?.uiConfig || {}).join(', '),
+      );
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
       req.body.uiConfig.password = config.password; // Before saving, add password in the config received from frontend
       fs.writeFileSync(
@@ -93,11 +95,11 @@ export class SharedController {
           }
         })
         .catch(err => {
-          logger.error('Fiat Error Response: ' + JSON.stringify(err));
+          logger.error('Fiat Error Response: ' + (err?.message || err));
           res.status(200).json({ rate: 0 });
         });
     } catch (error: any) {
-      logger.error('Error from Fiat Rate: ' + JSON.stringify(error));
+      logger.error('Error from Fiat Rate: ' + (error?.message || error));
       res.status(200).json({ rate: 0 });
     }
   };
