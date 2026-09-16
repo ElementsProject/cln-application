@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { APP_CONSTANTS, HttpStatusCode, SESSION_TTL_SECONDS } from '../shared/consts.js';
+import { APP_CONSTANTS, HttpStatusCode, SESSION_COOKIE_ATTRIBUTES, SESSION_COOKIE_OPTIONS } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import {
@@ -19,7 +19,7 @@ export class AuthController {
     try {
       const vpRes = verifyPassword(req.body.password);
       if (vpRes === true) {
-        res.cookie('token', createSessionToken(), { httpOnly: true, maxAge: SESSION_TTL_SECONDS * 1000 });
+        res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
       } else {
         const err = new AuthError(HttpStatusCode.UNAUTHORIZED, vpRes);
@@ -33,7 +33,7 @@ export class AuthController {
   userLogout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Logging out');
-      res.clearCookie('token');
+      res.clearCookie('token', SESSION_COOKIE_ATTRIBUTES);
       res.status(201).json({ isAuthenticated: false, isValidPassword: isValidPassword() });
     } catch (error: any) {
       handleError(error, req, res, next);
@@ -88,7 +88,7 @@ export class AuthController {
 
       config.password = newPassword;
       fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
-      res.cookie('token', createSessionToken(), { httpOnly: true, maxAge: SESSION_TTL_SECONDS * 1000 });
+      res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
       return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
     } catch (error: any) {
       handleError(error, req, res, next);

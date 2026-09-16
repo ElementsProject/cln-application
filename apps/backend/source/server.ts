@@ -43,7 +43,15 @@ app.use(bodyParser.json({ limit: '25mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.set('trust proxy', true);
 app.use(cookieParser());
-app.use(csurf({ cookie: true }) as unknown as express.RequestHandler);
+app.use(
+  csurf({
+    cookie: {
+      httpOnly: true,
+      secure: APP_PROTOCOL === 'https',
+      sameSite: 'strict',
+    },
+  }) as unknown as express.RequestHandler,
+);
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader(
