@@ -136,6 +136,38 @@ export const APP_CONSTANTS = {
   LIGHTNING_GRPC_TLS_CERTS: '',
 };
 
+export const UI_UNITS = ['MSATS', 'SATS', 'BTC'];
+export const UI_APP_MODES = ['LIGHT', 'DARK'];
+export const FIAT_CURRENCIES = [
+  'USD',
+  'AUD',
+  'BRL',
+  'CAD',
+  'CHF',
+  'CNY',
+  'CZK',
+  'DKK',
+  'EUR',
+  'GBP',
+  'HKD',
+  'IDR',
+  'INR',
+  'JPY',
+  'MXN',
+  'MYR',
+  'NGN',
+  'NOK',
+  'NZD',
+  'PLN',
+  'RUB',
+  'SEK',
+  'SGD',
+  'THB',
+  'TRY',
+  'VND',
+  'ZAR',
+];
+
 export const DEFAULT_CONFIG = {
   unit: 'SATS',
   fiatUnit: 'USD',
