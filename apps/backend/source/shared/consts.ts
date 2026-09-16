@@ -217,3 +217,14 @@ export const FIAT_RATE_API =
   'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=';
 
 export const SESSION_TTL_SECONDS = 24 * 60 * 60; // 24hrs as cookie maxAge
+
+export const SESSION_COOKIE_ATTRIBUTES = {
+  httpOnly: true,
+  secure: APP_CONSTANTS.APP_PROTOCOL === 'https',
+  sameSite: 'strict' as const,
+};
+
+export const SESSION_COOKIE_OPTIONS = {
+  ...SESSION_COOKIE_ATTRIBUTES,
+  maxAge: SESSION_TTL_SECONDS * 1000,
+};
