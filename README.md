@@ -61,6 +61,7 @@
       - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: `http`)
       - APP_HOST: Hostname/IP address of cln-application's container (default: `localhost`)
       - APP_PORT: Port on which this application should be served (default: `2103`)
+      - APP_TRUST_PROXY: Which upstream proxies may set X-Forwarded-* headers; passed to Express `trust proxy` (valid values: false/true/hop count/comma separated addresses or subnets such as `loopback, 10.0.0.0/8`; default: `false`)
       - APP_CONFIG_FILE: Path for cln-application's configuration file (default: `./config.json`)
       - APP_LOG_FILE: Path for cln-application's log file (default: `./application-cln.log`)
       - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: `production`)
