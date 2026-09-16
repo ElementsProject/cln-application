@@ -6,9 +6,10 @@ import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import {
   verifyPassword,
+  verifyStoredPassword,
+  hashPassword,
   isAuthenticated,
   isValidPassword,
-  safeCompare,
   createSessionToken
 } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
@@ -17,7 +18,7 @@ export class AuthController {
   userLogin = async (req: Request, res: Response, next: NextFunction) => {
     logger.info('Logging in');
     try {
-      const vpRes = verifyPassword(req.body.password);
+      const vpRes = await verifyPassword(req.body.password);
       if (vpRes === true) {
         res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
@@ -76,7 +77,8 @@ export class AuthController {
         if (!hasSession) {
           return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized user' });
         }
-        if (!safeCompare(config.password, currPassword)) {
+        const { ok } = await verifyStoredPassword(config.password, currPassword);
+        if (!ok) {
           return handleError(
             new AuthError(HttpStatusCode.UNAUTHORIZED, 'Incorrect current password'),
             req,
@@ -86,7 +88,7 @@ export class AuthController {
         }
       }
 
-      config.password = newPassword;
+      config.password = await hashPassword(newPassword);
       fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
       res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
       return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
