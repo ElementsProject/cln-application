@@ -58,10 +58,12 @@
 
       # cln-application Values
       - APP_SINGLE_SIGN_ON: Flag to bypass application level authentication (valid values: true/false, default: false)
-      - APP_PROTOCOL: Protocol on which the application will be served (valid values: http/https, default: `http`)
+      - APP_PROTOCOL: Protocol the browser uses to reach the application; `https` marks cookies Secure and sends HSTS, so only set it when TLS is really in front (valid values: http/https, default: `http`)
       - APP_HOST: Hostname/IP address of cln-application's container (default: `localhost`)
       - APP_PORT: Port on which this application should be served (default: `2103`)
       - APP_TRUST_PROXY: Which upstream proxies may set X-Forwarded-* headers; passed to Express `trust proxy` (valid values: false/true/hop count/comma separated addresses or subnets such as `loopback, 10.0.0.0/8`; default: `false`)
+      - APP_TLS_KEY_FILE: Private key (PEM) for serving the application itself over HTTPS; leave empty when a reverse proxy terminates TLS (default: ``)
+      - APP_TLS_CERT_FILE: Certificate (PEM) for serving the application itself over HTTPS; used together with APP_TLS_KEY_FILE (default: ``)
       - APP_CONFIG_FILE: Path for cln-application's configuration file (default: `./config.json`)
       - APP_LOG_FILE: Path for cln-application's log file (default: `./application-cln.log`)
       - APP_MODE: Mode for logging and other settings (valid values: production/development/testing, default: `production`)
@@ -99,6 +101,17 @@
       - LIGHTNING_GRPC_CLIENT_CERT_FILE: Client certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./client.pem`)
       - LIGHTNING_GRPC_CA_CERT_FILE: CA certificate file path including file name for GRPC TLS authentication (used by `GRPC` APP_CONNECT; default: `./ca.pem`)
       ```
+
+  - ### Transport Security (HTTPS)
+      The backend listens on plain HTTP by default. That is fine on `localhost`, but as soon as `APP_HOST` is a LAN or public address the login password and the session cookie cross the network unencrypted. Choose one of the following before exposing the application:
+
+      - **Reverse proxy (recommended):** put nginx, your platform's proxy, etc. in front of the app, terminate TLS there and set `APP_PROTOCOL=https`.
+
+      - **Native HTTPS:** set `APP_TLS_KEY_FILE` and `APP_TLS_CERT_FILE` to a PEM key and certificate and set `APP_PROTOCOL=https`. The server then serves TLS itself.
+      
+      - **Loopback only:** keep `APP_HOST=localhost` and reach the UI through an SSH tunnel or VPN.
+
+      `APP_PROTOCOL=https` is a statement about what the browser sees, not a switch that enables TLS. With it set, cookies are marked `Secure`, so a deployment that still answers plain `http://` will fail to log in. The server logs a warning at startup when it is served over plain HTTP on a non-loopback address.
 
       Set these variables either via terminal OR by env.sh script OR by explicitly loading variables from .env files.
       Important Note: Environment variables take precedence over config.json variables. Like `APP_SINGLE_SIGN_ON` will take higher precedence over 

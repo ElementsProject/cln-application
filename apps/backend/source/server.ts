@@ -2,6 +2,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -24,11 +26,49 @@ const directoryName = dirname(fileURLToPath(import.meta.url));
 const routes: Array<CommonRoutesConfig> = [];
 
 export const app: express.Application = express();
-export const server: http.Server = http.createServer(app);
+
+const NATIVE_TLS = APP_CONSTANTS.APP_TLS_KEY_FILE !== '' && APP_CONSTANTS.APP_TLS_CERT_FILE !== '';
+export const server: http.Server = NATIVE_TLS
+  ? https.createServer(
+      {
+        key: fs.readFileSync(APP_CONSTANTS.APP_TLS_KEY_FILE),
+        cert: fs.readFileSync(APP_CONSTANTS.APP_TLS_CERT_FILE),
+      },
+      app,
+    )
+  : http.createServer(app);
 
 const APP_PORT = normalizePort(process.env.APP_PORT || '2103');
 const APP_HOST = process.env.APP_HOST || 'localhost';
 const APP_PROTOCOL = process.env.APP_PROTOCOL || 'http';
+
+const LOOPBACK_HOSTS = ['localhost', '127.0.0.1', '::1', '[::1]'];
+export function isLoopbackHost(host: string) {
+  return LOOPBACK_HOSTS.includes(host) || host.startsWith('127.');
+}
+
+function logTransportWarnings() {
+  if (NATIVE_TLS && APP_PROTOCOL !== 'https') {
+    logger.warn(
+      'APP_TLS_KEY_FILE and APP_TLS_CERT_FILE are set but APP_PROTOCOL is not https. ' +
+        'Set APP_PROTOCOL=https so cookies are marked Secure and HSTS is sent.',
+    );
+  }
+  if (APP_PROTOCOL === 'http' && !isLoopbackHost(APP_HOST)) {
+    logger.warn(
+      `The application is served over plain HTTP on ${APP_HOST}:${APP_PORT}. ` +
+        'The login password and session cookie cross the network unencrypted. ' +
+        'Place it behind a TLS-terminating reverse proxy (then set APP_PROTOCOL=https), ' +
+        'or set APP_TLS_KEY_FILE and APP_TLS_CERT_FILE to serve HTTPS directly.',
+    );
+  }
+  if (APP_PROTOCOL === 'https' && !NATIVE_TLS) {
+    logger.info(
+      'APP_PROTOCOL is https while the server listens on plain HTTP: TLS must be terminated by ' +
+        'a reverse proxy in front of the app. Browsers reject the Secure cookies over plain http.',
+    );
+  }
+}
 
 export function normalizePort(val: string) {
   const port = parseInt(val, 10);
@@ -145,9 +185,10 @@ async function startServer() {
       process.exit(1);
     });
 
-    server.on('listening', () =>
-      logger.warn(`Server running at ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}`),
-    );
+    server.on('listening', () => {
+      logger.warn(`Server running at ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}`);
+      logTransportWarnings();
+    });
 
     server.listen({ port: APP_PORT, host: APP_HOST });
   } catch (err: any) {
