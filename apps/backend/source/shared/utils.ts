@@ -10,6 +10,7 @@ import {
   SECRET_KEY,
   AppConnect,
   DEFAULT_ENV_VALUES,
+  SESSION_TTL_SECONDS,
 } from '../shared/consts.js';
 
 export function addServerConfig(config: any) {
@@ -23,13 +24,20 @@ export function addServerConfig(config: any) {
   return config;
 }
 
+export function createSessionToken() {
+  return jwt.sign({ userID: crypto.randomUUID() }, SECRET_KEY, {
+    algorithm: 'HS256',
+    expiresIn: SESSION_TTL_SECONDS,
+  });
+}
+
 export function isAuthenticated(token: string) {
   try {
     if (!token) {
       return 'Token missing';
     }
     try {
-      const decoded: any = jwt.verify(token, SECRET_KEY);
+      const decoded: any = jwt.verify(token, SECRET_KEY, { algorithms: ['HS256'] });
       return !!decoded.userID;
     } catch (error: any) {
       return error.message || 'Invalid user';

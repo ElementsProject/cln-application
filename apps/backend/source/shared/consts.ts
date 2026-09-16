@@ -215,3 +215,5 @@ export const GRPC_CONFIG = {
 export const API_VERSION = '/v1';
 export const FIAT_RATE_API =
   'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=';
+
+export const SESSION_TTL_SECONDS = 24 * 60 * 60; // 24hrs as cookie maxAge

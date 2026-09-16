@@ -1,11 +1,16 @@
-import jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { APP_CONSTANTS, HttpStatusCode, SECRET_KEY } from '../shared/consts.js';
+import { APP_CONSTANTS, HttpStatusCode, SESSION_TTL_SECONDS } from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
-import { verifyPassword, isAuthenticated, isValidPassword, safeCompare } from '../shared/utils.js';
+import {
+  verifyPassword,
+  isAuthenticated,
+  isValidPassword,
+  safeCompare,
+  createSessionToken
+} from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
 export class AuthController {
@@ -14,9 +19,7 @@ export class AuthController {
     try {
       const vpRes = verifyPassword(req.body.password);
       if (vpRes === true) {
-        const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
-        // Expire the token in a day
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 24 });
+        res.cookie('token', createSessionToken(), { httpOnly: true, maxAge: SESSION_TTL_SECONDS * 1000 });
         return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
       } else {
         const err = new AuthError(HttpStatusCode.UNAUTHORIZED, vpRes);
@@ -85,8 +88,7 @@ export class AuthController {
 
       config.password = newPassword;
       fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
-      const token = jwt.sign({ userID: SECRET_KEY }, SECRET_KEY);
-      res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 24 });
+      res.cookie('token', createSessionToken(), { httpOnly: true, maxAge: SESSION_TTL_SECONDS * 1000 });
       return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
     } catch (error: any) {
       handleError(error, req, res, next);
