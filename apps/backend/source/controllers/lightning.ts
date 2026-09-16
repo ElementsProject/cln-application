@@ -17,12 +17,7 @@ export class LightningController {
       this.clnService
         .call(req.body.method, req.body.params)
         .then((commandRes: any) => {
-          logger.info(
-            'Controller received response for ' +
-              req.body.method +
-              ': ' +
-              JSON.stringify(commandRes),
-          );
+          logger.info('Controller received response for ' + req.body.method);
           if (
             APP_CONSTANTS.APP_CONNECT == AppConnect.COMMANDO &&
             req.body.method &&
@@ -41,7 +36,7 @@ export class LightningController {
             'Controller caught lightning error from ' +
               req.body.method +
               ': ' +
-              JSON.stringify(err),
+              (err?.message || err),
           );
           return handleError(err, req, res, next);
         });

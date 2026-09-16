@@ -32,7 +32,7 @@ export class LightningService {
       logger.info('Strating Lightning Service with APP_CONNECT: ' + APP_CONSTANTS.APP_CONNECT);
       switch (APP_CONSTANTS.APP_CONNECT) {
         case AppConnect.REST:
-          logger.info('REST connecting with config: ' + JSON.stringify(REST_CONFIG));
+          logger.info('REST connecting to ' + REST_CONFIG.url);
           const headers = new AxiosHeaders();
           headers.set('rune', REST_CONFIG.rune);
           this.axiosConfig = {
@@ -53,7 +53,7 @@ export class LightningService {
           // this.clnService = new GRPCService(GRPC_CONFIG);
           break;
         default:
-          logger.info('lnMessage connecting with config: ' + JSON.stringify(LN_MESSAGE_CONFIG));
+          logger.info('lnMessage connecting to ' + LN_MESSAGE_CONFIG.wsProxy);
           this.clnService = new Lnmessage(LN_MESSAGE_CONFIG);
           this.clnService.connect();
           break;
@@ -74,12 +74,7 @@ export class LightningService {
         return axios
           .post(method, methodParams, this.axiosConfig)
           .then((commandRes: any) => {
-            logger.info(
-              'REST response for ' +
-                method +
-                ': ' +
-                JSON.stringify(commandRes.data || commandRes.rows),
-            );
+            logger.info('REST response received for ' + method);
             return Promise.resolve(commandRes.data || commandRes.rows);
           })
           .catch((err: any) => {
@@ -88,7 +83,7 @@ export class LightningService {
               logger.error(err);
               throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
             } else {
-              logger.error(JSON.stringify(err));
+              logger.error(err?.message || err?.code || 'Unknown lightning error');
               throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
             }
           });
@@ -96,7 +91,7 @@ export class LightningService {
         return this.clnService
           .callMethod(method, methodParams)
           .then((gRPCRes: any) => {
-            logger.info('gRPC response for ' + method + ': ' + JSON.stringify(gRPCRes));
+            logger.info('gRPC response received for ' + method);
             return Promise.resolve(gRPCRes);
           })
           .catch((err: GRPCError) => {
@@ -113,7 +108,7 @@ export class LightningService {
             reqIdPrefix: 'clnapp',
           })
           .then((commandRes: any) => {
-            logger.info('Commando response for ' + method + ': ' + JSON.stringify(commandRes));
+            logger.info('Commando response received for ' + method);
             return Promise.resolve(commandRes);
           })
           .catch((err: any) => {
@@ -122,7 +117,7 @@ export class LightningService {
               logger.error(err);
               throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
             } else {
-              logger.error(JSON.stringify(err));
+              logger.error(err?.message || err?.code || 'Unknown lightning error');
               throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
             }
           });
