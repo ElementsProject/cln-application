@@ -4,7 +4,6 @@ import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import csurf from 'csurf';
 import cookieParser from 'cookie-parser';
 import expressWinston from 'express-winston';
 
@@ -17,6 +16,7 @@ import { APIError } from './models/errors.js';
 import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 import { LightningService } from './service/lightning.service.js';
+import { csrfProtection } from './shared/csrf.js';
 
 const directoryName = dirname(fileURLToPath(import.meta.url));
 const routes: Array<CommonRoutesConfig> = [];
@@ -43,15 +43,7 @@ app.use(bodyParser.json({ limit: '25mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '25mb' }));
 app.set('trust proxy', true);
 app.use(cookieParser());
-app.use(
-  csurf({
-    cookie: {
-      httpOnly: true,
-      secure: APP_PROTOCOL === 'https',
-      sameSite: 'strict',
-    },
-  }) as unknown as express.RequestHandler,
-);
+app.use(csrfProtection);
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader(
