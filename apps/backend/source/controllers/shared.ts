@@ -2,13 +2,37 @@ import axios from 'axios';
 import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 
-import { APP_CONSTANTS, DEFAULT_CONFIG, FIAT_RATE_API, HttpStatusCode } from '../shared/consts.js';
+import {
+  APP_CONSTANTS,
+  DEFAULT_CONFIG,
+  FIAT_CURRENCIES,
+  FIAT_RATE_API,
+  HttpStatusCode,
+  UI_APP_MODES,
+  UI_UNITS,
+} from '../shared/consts.js';
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import { APIError } from '../models/errors.js';
 import { addServerConfig, setEnvVariables } from '../shared/utils.js';
 import { Rune, ShowRunes } from '../models/showrunes.type.js';
 import { LightningService } from '../service/lightning.service.js';
+
+function validateUiConfig(uiConfig: any): string | null {
+  if (!uiConfig || typeof uiConfig !== 'object' || Array.isArray(uiConfig)) {
+    return 'uiConfig object is required';
+  }
+  if (!UI_UNITS.includes(uiConfig.unit)) {
+    return 'Invalid unit, expected one of ' + UI_UNITS.join(', ');
+  }
+  if (!FIAT_CURRENCIES.includes(uiConfig.fiatUnit)) {
+    return 'Invalid fiatUnit, expected one of ' + FIAT_CURRENCIES.join(', ');
+  }
+  if (!UI_APP_MODES.includes(uiConfig.appMode)) {
+    return 'Invalid appMode, expected one of ' + UI_APP_MODES.join(', ');
+  }
+  return null;
+}
 
 const INVOICE_RUNE_METHODS = ['invoice', 'listinvoices'];
 
@@ -66,14 +90,27 @@ export class SharedController {
 
   setApplicationSettings = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      logger.info(
-        'Updating Application Settings: ' + Object.keys(req.body?.uiConfig || {}).join(', '),
-      );
+      const uiConfig = req.body?.uiConfig;
+      logger.info('Updating Application Settings: ' + Object.keys(uiConfig || {}).join(', '));
+      const validationError = validateUiConfig(uiConfig);
+      if (validationError) {
+        return handleError(
+          new APIError(HttpStatusCode.BAD_REQUEST, validationError),
+          req,
+          res,
+          next,
+        );
+      }
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
-      req.body.uiConfig.password = config.password; // Before saving, add password in the config received from frontend
+      const updatedConfig = {
+        unit: uiConfig.unit,
+        fiatUnit: uiConfig.fiatUnit,
+        appMode: uiConfig.appMode,
+        password: config.password,
+      };
       fs.writeFileSync(
         APP_CONSTANTS.APP_CONFIG_FILE,
-        JSON.stringify(req.body.uiConfig, null, 2),
+        JSON.stringify(updatedConfig, null, 2),
         'utf-8',
       );
       res.status(201).json({ message: 'Application Settings Updated Successfully' });
