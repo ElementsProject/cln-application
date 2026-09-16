@@ -276,6 +276,9 @@ export function validateCommandoConfig() {
     if (LN_MESSAGE_CONFIG.wssClientCert === '') {
       throw `Missing or Invalid WSS Client Certificate at ${APP_CONSTANTS.LIGHTNING_WS_CLIENT_CERT_FILE}.`;
     }
+    if (LN_MESSAGE_CONFIG.wssCaCert === '') {
+      throw `Missing or Invalid WSS CA Certificate at ${APP_CONSTANTS.LIGHTNING_WS_CA_CERT_FILE}.`;
+    }
   }
 }
 
