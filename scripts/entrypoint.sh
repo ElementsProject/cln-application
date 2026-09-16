@@ -48,14 +48,13 @@ generate_new_rune() {
 
     RUNE=$(echo "$RUNE_RESPONSE" | jq -r '.result.rune')
     UNIQUE_ID=$(echo "$RUNE_RESPONSE" | jq -r '.result.unique_id')
-    echo "RUNE_RESPONSE"
-    echo "$RUNE_RESPONSE"
-    echo "RUNE"
-    echo "$RUNE"
 
     if [ "$RUNE" != "" ] && [ "$RUNE" != "null" ]; then
-      # Save rune in env file
+      # Save rune in env file; the value itself is never printed
       echo "LIGHTNING_RUNE=\"$RUNE\"" >> "$LIGHTNING_VARS_FILE"
+      echo "New rune saved to $LIGHTNING_VARS_FILE"
+    else
+      echo "createrune returned no rune: $(echo "$RUNE_RESPONSE" | jq -r '.error.message // "empty response"')"
     fi
 
     if [ "$UNIQUE_ID" != "" ] &&  [ "$UNIQUE_ID" != "null" ]; then
@@ -72,10 +71,7 @@ generate_new_rune() {
 if [ -f "$LIGHTNING_VARS_FILE" ]; then
   EXISTING_PUBKEY=$(head -n1 "$LIGHTNING_VARS_FILE")
   EXISTING_RUNE=$(sed -n "2p" "$LIGHTNING_VARS_FILE")
-  echo "EXISTING_PUBKEY"
-  echo "$EXISTING_PUBKEY"
-  echo "EXISTING_RUNE"
-  echo "$EXISTING_RUNE"
+  echo "Found existing commando config at $LIGHTNING_VARS_FILE"
 fi
 
 # Getinfo from CLN
@@ -84,11 +80,10 @@ do
   echo "Waiting for lightningd"
   # Send 'getinfo' request
   GETINFO_RESPONSE=$( (echo "$(getinfo_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
-  echo "$GETINFO_RESPONSE"
 done
 # Write 'id' from the response as pubkey
 LIGHTNING_PUBKEY="$(jq -n "$GETINFO_RESPONSE" | jq -r '.result.id')"
-echo "$LIGHTNING_PUBKEY"
+echo "Node pubkey: $LIGHTNING_PUBKEY"
 
 # Compare existing pubkey with current
 if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" ] ||
@@ -96,7 +91,7 @@ if [ "$EXISTING_PUBKEY" != "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" ] ||
   [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"\"" ] ||
   [ "$EXISTING_RUNE" = "LIGHTNING_RUNE=\"null\"" ]; then
   # Pubkey changed or missing rune; rewrite new data on the file.
-  echo "Pubkey mismatched or missing rune; Rewriting the data."
+  echo "Pubkey mismatched or missing rune; generating a new rune."
   cat /dev/null > "$LIGHTNING_VARS_FILE"
   echo "LIGHTNING_PUBKEY=\"$LIGHTNING_PUBKEY\"" >> "$LIGHTNING_VARS_FILE"
   generate_new_rune
