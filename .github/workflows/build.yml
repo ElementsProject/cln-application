@@ -3,18 +3,21 @@ name: Build
 on:
   pull_request:
   workflow_dispatch:
-  
+
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 18.x
+          node-version: 22.x
 
       - name: Get version from package.json
         id: package-version
@@ -23,32 +26,18 @@ jobs:
           echo "Project Version: $VERSION"
 
       - name: Cache node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: cache-npm-packages
         with:
           path: node_modules
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node22-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install NPM dependencies
         if: steps.cache-npm-packages.outputs.cache-hit != 'true'
         run: npm clean-install
 
-      - name: Cache build frontend
-        uses: actions/cache@v3
-        id: cache-build-frontend
-        with:
-          path: apps/frontend
-          key: ${{ runner.os }}-frontend-${{ github.sha }}
-
       - name: Run build production application
         run: npm run frontend:build
-
-      - name: Cache build backend
-        uses: actions/cache@v3
-        id: cache-build-backend
-        with:
-          path: apps/backend
-          key: ${{ runner.os }}-backend-${{ github.sha }}
 
       - name: Run build backend server
         run: npm run backend:build
