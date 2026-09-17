@@ -138,7 +138,7 @@ export const throwApiError = (err: any) => {
       );
     case 'EADDRINUSE':
       return new APIError(
-        HttpStatusCode.ADDR_IN_USE,
+        HttpStatusCode.CONFLICT,
         `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT} is already in use`,
       );
     case 'ECONNREFUSED':
