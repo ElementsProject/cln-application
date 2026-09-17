@@ -1,0 +1,21 @@
+# Build context for the Dockerfile: only sources are needed
+.git
+.github
+.claude
+.vscode
+node_modules
+apps/*/node_modules
+apps/frontend/build
+apps/backend/dist
+data
+release
+*.log
+.commando
+.commando-env
+.env
+env.sh
+env-local.sh
+docker-compose.yml
+Dockerfile
+README.md
+LICENSE

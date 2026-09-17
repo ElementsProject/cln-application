@@ -9,3 +9,4 @@ release
 env-local.sh
 apps/frontend/build
 apps/backend/dist
+.env
