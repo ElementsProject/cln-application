@@ -82,10 +82,17 @@ export class LightningService {
             if (typeof err === 'string') {
               logger.error(err);
               throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err);
-            } else {
-              logger.error(err?.message || err?.code || 'Unknown lightning error');
-              throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, err.message || err.code);
             }
+            const nodeMessage = err?.response?.data?.error?.message || err?.response?.data?.message;
+            if (nodeMessage) {
+              logger.error(nodeMessage);
+              throw new LightningError(HttpStatusCode.LIGHTNING_SERVER, nodeMessage);
+            }
+            logger.error(err?.message || err?.code || 'Unknown lightning error');
+            throw new LightningError(
+              HttpStatusCode.LIGHTNING_SERVER,
+              'Unable to reach the Core Lightning REST interface',
+            );
           });
       case AppConnect.GRPC:
         return this.clnService

@@ -177,7 +177,10 @@ export class SharedController {
         fs.appendFileSync(APP_CONSTANTS.LIGHTNING_VARS_FILE, invoiceRuneString, 'utf-8');
         res.status(201).send();
       } else {
-        throw new Error('Invoice rune not found or .commando-env does not exist.');
+        throw new APIError(
+          HttpStatusCode.NOT_FOUND,
+          'Invoice rune not found or the commando env file does not exist.',
+        );
       }
     } catch (error: any) {
       handleError(error, req, res, next);
