@@ -251,7 +251,6 @@ export const GRPC_CONFIG = {
   ip: APP_CONSTANTS.LIGHTNING_GRPC_HOST,
   port: APP_CONSTANTS.LIGHTNING_GRPC_PORT,
   url: 'https://' + APP_CONSTANTS.LIGHTNING_GRPC_HOST + ':' + APP_CONSTANTS.LIGHTNING_GRPC_PORT,
-  protoPath: APP_CONSTANTS.LIGHTNING_GRPC_PROTO_PATH,
   grpcClientKey: '',
   grpcClientCert: '',
   grpcCaCert: '',
