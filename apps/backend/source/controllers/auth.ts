@@ -10,12 +10,14 @@ import {
 import { logger } from '../shared/logger.js';
 import handleError from '../shared/error-handler.js';
 import {
-  verifyPassword,
-  verifyStoredPassword,
+  createSessionToken,
   hashPassword,
   isAuthenticated,
   isValidPassword,
-  createSessionToken,
+  revokeAllSessions,
+  revokeSession,
+  verifyPassword,
+  verifyStoredPassword,
 } from '../shared/utils.js';
 import { AuthError } from '../models/errors.js';
 
@@ -48,6 +50,7 @@ export class AuthController {
   userLogout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Logging out');
+      revokeSession(req.cookies?.token);
       res.clearCookie('token', SESSION_COOKIE_ATTRIBUTES);
       res.status(201).json({ isAuthenticated: false, isValidPassword: isValidPassword() });
     } catch (error: any) {
@@ -104,6 +107,7 @@ export class AuthController {
 
       config.password = await hashPassword(newPassword);
       fs.writeFileSync(APP_CONSTANTS.APP_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+      revokeAllSessions();
       res.cookie('token', createSessionToken(), SESSION_COOKIE_OPTIONS);
       return res.status(201).json({ isAuthenticated: true, isValidPassword: isValidPassword() });
     } catch (error: any) {

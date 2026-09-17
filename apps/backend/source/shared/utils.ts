@@ -38,11 +38,39 @@ export function parseTrustProxy(value: string): boolean | number | string {
   return value.trim();
 }
 
+const revokedSessions = new Map<string, number>(); // session id -> expiry (seconds)
+let sessionEpoch = 0;
+
+function pruneRevokedSessions(nowSeconds: number) {
+  for (const [id, exp] of revokedSessions) {
+    if (exp <= nowSeconds) revokedSessions.delete(id);
+  }
+}
+
 export function createSessionToken() {
-  return jwt.sign({ userID: crypto.randomUUID() }, SECRET_KEY, {
+  return jwt.sign({ userID: crypto.randomUUID(), epoch: sessionEpoch }, SECRET_KEY, {
     algorithm: 'HS256',
     expiresIn: SESSION_TTL_SECONDS,
   });
+}
+
+export function revokeSession(token: string) {
+  if (!token) return;
+  try {
+    const decoded: any = jwt.verify(token, SECRET_KEY, { algorithms: ['HS256'] });
+    if (decoded?.userID) {
+      const now = Math.floor(Date.now() / 1000);
+      pruneRevokedSessions(now);
+      revokedSessions.set(decoded.userID, decoded.exp || now + SESSION_TTL_SECONDS);
+    }
+  } catch {
+    // an invalid or expired token has nothing to revoke
+  }
+}
+
+export function revokeAllSessions() {
+  sessionEpoch += 1;
+  revokedSessions.clear();
 }
 
 export function isAuthenticated(token: string) {
@@ -52,7 +80,12 @@ export function isAuthenticated(token: string) {
     }
     try {
       const decoded: any = jwt.verify(token, SECRET_KEY, { algorithms: ['HS256'] });
-      return !!decoded.userID;
+      if (!decoded.userID) return 'Invalid user';
+      if (revokedSessions.has(decoded.userID)) return 'Session revoked';
+      if ((decoded.epoch ?? 0) !== sessionEpoch) {
+        return 'Session expired after password change';
+      }
+      return true;
     } catch (error: any) {
       return error.message || 'Invalid user';
     }
