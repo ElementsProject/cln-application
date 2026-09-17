@@ -1,4 +1,7 @@
 import * as crypto from 'crypto';
+import { readdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import axios, { AxiosHeaders } from 'axios';
 import https from 'https';
 import protobuf from 'protobufjs';
@@ -6,31 +9,26 @@ import { HttpStatusCode } from '../shared/consts.js';
 import { GRPCError } from '../models/errors.js';
 import { logger } from '../shared/logger.js';
 
+// Definitions ship with the backend (apps/backend/proto), never fetched over the network.
+const PROTO_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'proto');
+
 export class GRPCService {
   private authPubkey: string;
   private authSignature: string;
-  private clnNode!: protobuf.Root;
+  private clnNode: protobuf.Root;
   private axiosConfig: any;
 
   constructor(grpcConfig: {
     pubkey: string;
     url: string;
-    protoPath: string;
     grpcClientKey: string;
     grpcClientCert: string;
     grpcCaCert: string;
   }) {
     this.authSignature = crypto.randomBytes(32).toString('hex');
     this.authPubkey = Buffer.from(grpcConfig.pubkey, 'hex').toString('base64');
-    this.loadLightningProtos(grpcConfig.protoPath)
-      .then(protoRes => {
-        logger.info('gRPC Protos loaded successfully');
-        this.clnNode = protoRes;
-      })
-      .catch(error => {
-        logger.error('Failed to load gRPC Protos: ', error);
-        throw new GRPCError(HttpStatusCode.GRPC_UNKNOWN, 'Failed to load gRPC Protos');
-      });
+    this.clnNode = GRPCService.loadLightningProtos();
+    logger.info('gRPC Protos loaded from ' + PROTO_DIR);
     const headers = new AxiosHeaders();
     headers.set('content-type', 'application/grpc');
     headers.set('accept', 'application/grpc');
@@ -48,40 +46,14 @@ export class GRPCService {
     });
   }
 
-  private loadLightningProtos(protoPath: string): Promise<protobuf.Root> {
-    return axios
-      .get(protoPath)
-      .then(response => {
-        const files = response.data;
-        const protoFiles = files.filter(
-          (file: any) => file.name.endsWith('.proto') && file.type === 'file',
-        );
-
-        if (protoFiles.length === 0) {
-          logger.error('No proto files found in the directory.');
-          throw new Error('No proto files found in the directory.');
-        }
-
-        return Promise.all(
-          protoFiles.map((file: any) =>
-            axios
-              .get(file.download_url)
-              .then(rawResponse => rawResponse.data)
-              .catch(error => {
-                logger.error(`Failed to fetch ${file.name}:`, error);
-                throw error;
-              }),
-          ),
-        );
-      })
-      .then(protoContents => {
-        const parsed = protobuf.parse(protoContents.join('\n'));
-        return protobuf.Root.fromJSON(parsed.root.toJSON());
-      })
-      .catch(error => {
-        logger.error('Failed to load proto files:', error);
-        throw error;
-      });
+  private static loadLightningProtos(): protobuf.Root {
+    const files = readdirSync(PROTO_DIR)
+      .filter(file => file.endsWith('.proto'))
+      .map(file => join(PROTO_DIR, file));
+    if (files.length === 0) {
+      throw new GRPCError(HttpStatusCode.GRPC_UNKNOWN, 'No proto files found in ' + PROTO_DIR);
+    }
+    return protobuf.loadSync(files);
   }
 
   private static getGrpcStatusMessages(method: string): Record<number, string> {
