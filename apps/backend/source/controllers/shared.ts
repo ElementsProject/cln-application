@@ -170,6 +170,10 @@ export class SharedController {
   saveInvoiceRune = async (req: Request, res: Response, next: NextFunction) => {
     try {
       logger.info('Saving Invoice Rune');
+      setEnvVariables();
+      if (APP_CONSTANTS.INVOICE_RUNE !== '') {
+        throw new APIError(HttpStatusCode.CONFLICT, 'Invoice rune already exists');
+      }
       const showRunes: ShowRunes = await this.clnService.call('showrunes', {});
       const invoiceRune = showRunes.runes.find(isInvoiceOnlyRune);
       if (invoiceRune && fs.existsSync(APP_CONSTANTS.LIGHTNING_VARS_FILE)) {
