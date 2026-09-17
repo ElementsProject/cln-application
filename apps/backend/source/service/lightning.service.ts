@@ -68,6 +68,34 @@ export class LightningService {
     return this.clnService.publicKey;
   };
 
+  // lnmessage stops retrying after a few failed attempts and then waits
+  // forever for a connection on the next request. Wait for an in-progress
+  // attempt to settle, and start a fresh one when the last one failed.
+  private ensureCommandoConnection = async () => {
+    const status$ = this.clnService.connectionStatus$;
+    let status: string = status$.value;
+    if (status === 'connecting' || status === 'waiting_reconnect') {
+      status = await new Promise<string>(resolve => {
+        const sub = status$.subscribe((next: string) => {
+          if (next === 'connected' || next === 'disconnected' || next === 'failed') {
+            sub.unsubscribe();
+            resolve(next);
+          }
+        });
+      });
+    }
+    if (status === 'connected') return;
+    logger.warn('Commando connection is ' + status + ', reconnecting');
+    this.clnService._attemptedReconnects = 0;
+    const connected = await this.clnService.connect();
+    if (!connected) {
+      throw new LightningError(
+        HttpStatusCode.LIGHTNING_SERVER,
+        'Could not establish a connection to the Core Lightning node',
+      );
+    }
+  };
+
   call = async (method: string, methodParams: Record<string, any>) => {
     switch (APP_CONSTANTS.APP_CONNECT) {
       case AppConnect.REST:
@@ -106,6 +134,7 @@ export class LightningService {
             throw err;
           });
       default:
+        await this.ensureCommandoConnection();
         return this.clnService
           .commando({
             method: method,

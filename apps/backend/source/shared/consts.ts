@@ -200,12 +200,12 @@ class SecureWebSocket extends WebSocket {
   }
 }
 
-if (
-  APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss' &&
-  typeof (globalThis as any).WebSocket === 'undefined'
-) {
-  (globalThis as any).WebSocket = SecureWebSocket;
-}
+// lnmessage uses globalThis.WebSocket when one exists. Node 22 ships a
+// built-in one that does not complete Core Lightning's upgrade handshake and
+// knows nothing about the CA pinning above, so the ws client is installed
+// unconditionally: CA-pinned for wss, plain for ws.
+(globalThis as any).WebSocket =
+  APP_CONSTANTS.LIGHTNING_WS_PROTOCOL === 'wss' ? SecureWebSocket : WebSocket;
 
 export const LN_MESSAGE_CONFIG = {
   remoteNodePublicKey: '',
