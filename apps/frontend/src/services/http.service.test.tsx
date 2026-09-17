@@ -10,9 +10,9 @@ describe('CLNService', () => {
   });
 
   describe('listOffers', () => {
-    it('should use ListOffersSQL when version is compatible (>= 26.04)', async () => {
+    it('should use ListOffersSQL when version is compatible (>= 26.09)', async () => {
       const mockStore = createMockStore('/', {
-        root: { ...mockRootStoreData, nodeInfo: { ...mockNodeInfo, version: '26.04' } },
+        root: { ...mockRootStoreData, nodeInfo: { ...mockNodeInfo, version: '26.09' } },
       });
       const isCompatibleVersionSpy = spyOnIsCompatibleVersion();
       const listOffersSQLSpy = spyOnListOffersSQL('desc');
@@ -20,12 +20,12 @@ describe('CLNService', () => {
       jest.spyOn(HttpService, 'clnCall').mockResolvedValue({ rows: [] });
       await CLNService.listOffers(0, mockStore);
 
-      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('26.04', '26.04');
+      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('26.09', '26.09');
       expect(listOffersSQLSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(listOffersSQLWithoutDescSpy).not.toHaveBeenCalled();
     });
 
-    it('should use ListOffersSQLWithoutDesc when version is not compatible (< 26.04)', async () => {
+    it('should use ListOffersSQLWithoutDesc when version is not compatible (< 26.09)', async () => {
       const mockStore = createMockStore('/', {
         root: { ...mockRootStoreData, nodeInfo: { ...mockNodeInfo, version: '25.12' } },
       });
@@ -36,14 +36,14 @@ describe('CLNService', () => {
 
       await CLNService.listOffers(0, mockStore);
 
-      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('25.12', '26.04');
+      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('25.12', '26.09');
       expect(listOffersSQLWithoutDescSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(listOffersSQLSpy).not.toHaveBeenCalled();
     });
 
     it('should fallback to ListOffersSQLWithoutDesc when query fails with "no such column: description"', async () => {
       const mockStore = createMockStore('/', {
-        root: { ...mockRootStoreData, nodeInfo: { ...mockNodeInfo, version: '26.04' } },
+        root: { ...mockRootStoreData, nodeInfo: { ...mockNodeInfo, version: '26.09' } },
       });
       const isCompatibleVersionSpy = spyOnIsCompatibleVersion();
       const listOffersSQLSpy = spyOnListOffersSQL('desc');
@@ -58,7 +58,7 @@ describe('CLNService', () => {
       const result = await CLNService.listOffers(0, mockStore);
       
       expect(clnCallSpy).toHaveBeenCalledTimes(2);
-      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('26.04', '26.04');
+      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('26.09', '26.09');
       expect(listOffersSQLSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(listOffersSQLWithoutDescSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(result.offers).toEqual([]);
@@ -75,7 +75,7 @@ describe('CLNService', () => {
 
       const result = await CLNService.listOffers(0, mockStore);
 
-      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('', '26.04');
+      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('', '26.09');
       expect(listOffersSQLWithoutDescSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(listOffersSQLSpy).not.toHaveBeenCalled();
       expect(result.offers).toBeDefined();
@@ -91,7 +91,7 @@ describe('CLNService', () => {
       jest.spyOn(HttpService, 'clnCall').mockResolvedValue({});
       const result = await CLNService.listOffers(0, mockStore);
 
-      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('25.12', '26.04');
+      expect(isCompatibleVersionSpy).toHaveBeenCalledWith('25.12', '26.09');
       expect(listOffersSQLWithoutDescSpy).toHaveBeenCalledWith(SCROLL_PAGE_SIZE, 0);
       expect(listOffersSQLSpy).not.toHaveBeenCalled();
       expect(result.offers).toEqual([]);
