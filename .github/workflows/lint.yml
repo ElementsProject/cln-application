@@ -4,33 +4,37 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   eslint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.x
 
-    - name: Get version from package.json
-      id: package-version
-      run: |
-        echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-        echo "Project Version: $VERSION"
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "Project Version: $VERSION"
 
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      id: cache-npm-packages
-      with:
-        path: node_modules
-        key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+      - name: Cache node_modules
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: cache-npm-packages
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node22-${{ hashFiles('**/package-lock.json') }}
 
-    - name: Install NPM dependencies
-      if: steps.cache-npm-packages.outputs.cache-hit != 'true'
-      run: npm clean-install
+      - name: Install NPM dependencies
+        if: steps.cache-npm-packages.outputs.cache-hit != 'true'
+        run: npm clean-install
 
-    - name: Check lint errors
-      run: npm run lint
+      - name: Check lint errors
+        run: npm run lint
