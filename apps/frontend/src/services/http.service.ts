@@ -83,10 +83,7 @@ export class HttpService {
       });
       return response.data;
     } catch (error: any) {
-      logger.error(`HTTP Request failed for ${method} ${url}`, {
-        data,
-        error: error.response?.data || error.message
-      });
+      logger.error(`HTTP request failed for ${method} ${url}: ${handleAxiosError(error)}`);
       throw handleAxiosError(error);
     }
   }
@@ -96,10 +93,7 @@ export class HttpService {
       const response = await axiosInstance.get(url, { params });
       return response.data;
     } catch (error: any) {
-      logger.error(`GET request failed for ${url}`, {
-        params,
-        error: error.response?.data || error.message
-      });
+      logger.error(`GET request failed for ${url}: ${handleAxiosError(error)}`);
       throw handleAxiosError(error);
     }
   }
@@ -131,7 +125,7 @@ export class HttpService {
     try {
       return await this.post('/cln/call', { method, params });
     } catch (error) {
-      logger.error('CLN call failed', { method, params, error });
+      logger.error(`CLN call ${method} failed: ${handleAxiosError(error)}`);
       throw handleAxiosError(error);
     }
   }

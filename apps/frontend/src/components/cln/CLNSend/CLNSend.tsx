@@ -87,7 +87,6 @@ const CLNSend = (props) => {
       }
       CLNService.decodeInvoice(event.target.value)
       .then((decodeRes: any) => {
-        logger.info(decodeRes);
         if (paymentType === PaymentType.OFFER) {
           if (!decodeRes.valid) {
             logger.error('Offer Invalid');
@@ -152,7 +151,6 @@ const CLNSend = (props) => {
         : amount * SATS_MSAT;
       CLNService.clnSendPayment(type, invoice, amtMSats)
       .then((response: any) => {
-        logger.info(response);
         if (response.payment_hash) {
           setResponseStatus(CallStatus.SUCCESS);
           setResponseMessage('Payment sent with payment hash ' + response.payment_hash);
@@ -183,7 +181,6 @@ const CLNSend = (props) => {
     if (paymentType === PaymentType.OFFER) {
       CLNService.fetchInvoice(invoiceValue, +amountValue)
         .then((fetchInvoiceRes: any) => {
-          logger.info(fetchInvoiceRes);
           sendInvoice(PaymentType.OFFER, fetchInvoiceRes.invoice, +amountValue || 0);
         })
         .catch(err => {
