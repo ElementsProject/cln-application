@@ -1,57 +1,77 @@
-version: "3.8"
-
+# DEVELOPMENT ONLY. This file brings up a regtest network (bitcoind, two
+# Core Lightning nodes and two application instances) for local testing.
+# It is not a production deployment: bitcoind's RPC is reachable from the
+# whole compose subnet and the nodes run without a wallet backup strategy.
 services:
   bitcoind:
     image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
     command:
-      - -${BITCOIN_NETWORK}
+      - -regtest
+      - -datadir=/tmp/cln-application/bitcoin
       - -fallbackfee=0.0002
       - -rpcbind=0.0.0.0
-      - -rpcallowip=0.0.0.0/0
-      - -rpcauth=user:d58ddb294b3a3812ff5fee50d6f24b29$19212992730deeaf6e596d471260a966b011a00446d45b193c94e79c4f4a1266
+      - -rpcallowip=170.21.22.0/24
+      - -rpcauth=user:a1b2c3d4e5f60718293a4b5c6d7e8f90$$ce244f286dd056467c8dd8c142b5130d08d21ef880559bbdff66ea2e16f650c2
     restart: on-failure
+    user: root
     volumes:
-      - ${PWD}/data/bitcoin:/root/.bitcoin
+      - /tmp/cln-application/bitcoin:/tmp/cln-application/bitcoin
     networks:
       networkcln:
-        ipv4_address: ${BITCOIN_HOST}
+        ipv4_address: 170.21.22.10
 
   lightningd:
-    image: lncm/clightning:v22.11.1@sha256:e9939341ca6736566e0499db5a339b25140d6e77fb16ab202c217112f0df9b77
+    image: elementsproject/lightningd:v26.06.7@sha256:0421a5f0d1b2e1ad639edfa17d777816040e3850d91bae7f2d32186d9c1e6da4
     command:
-      - --bitcoin-rpcconnect=${BITCOIN_HOST}
-      - --bitcoin-rpcuser=${BITCOIN_RPC_USER}
-      - --bitcoin-rpcpassword=${BITCOIN_RPC_PASSWORD}
-      - --bind-addr=${LIGHTNING_HOST}:9735
-      - --network=${BITCOIN_NETWORK}
+      - --bitcoin-rpcconnect=170.21.22.10
+      - --bitcoin-rpcuser=user
+      - --bitcoin-rpcpassword=password
+      - --lightning-dir=/tmp/cln-application/lightningd
+      - --bind-addr=170.21.22.11:9735
+      - --bind-addr=ws:0.0.0.0:5001
+      - --clnrest-host=0.0.0.0
+      - --clnrest-port=3010
       - --database-upgrade=true
-      - --grpc-port=${LIGHTNING_GRPC_PORT}
-      - --bind-addr=ws:127.0.0.1:${LIGHTNING_WS_PORT}
-      - --experimental-offers
     restart: on-failure
+    environment:
+      LIGHTNINGD_NETWORK: regtest
+      LIGHTNINGD_DATA: /tmp/cln-application/lightningd
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/5001"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
     volumes:
-      - ${PWD}/data/lightningd:${LIGHTNING_DATA_DIR}
+      - /tmp/cln-application/lightningd:/tmp/cln-application/lightningd
     ports:
-      - ${LIGHTNING_WS_PORT}:${LIGHTNING_WS_PORT}
+      - 5001:5001
     networks:
       networkcln:
-        ipv4_address: ${LIGHTNING_HOST}
+        ipv4_address: 170.21.22.11
 
   lightningd-2:
-    image: lncm/clightning:v22.11.1@sha256:e9939341ca6736566e0499db5a339b25140d6e77fb16ab202c217112f0df9b77
+    image: elementsproject/lightningd:v26.06.7@sha256:0421a5f0d1b2e1ad639edfa17d777816040e3850d91bae7f2d32186d9c1e6da4
     command:
-      - --bitcoin-rpcconnect=${BITCOIN_HOST}
-      - --bitcoin-rpcuser=${BITCOIN_RPC_USER}
-      - --bitcoin-rpcpassword=${BITCOIN_RPC_PASSWORD}
+      - --bitcoin-rpcconnect=170.21.22.10
+      - --bitcoin-rpcuser=user
+      - --bitcoin-rpcpassword=password
+      - --lightning-dir=/tmp/cln-application/lightningd-2
       - --bind-addr=170.21.22.13:9736
-      - --network=${BITCOIN_NETWORK}
+      - --bind-addr=ws:0.0.0.0:2116
+      - --clnrest-host=0.0.0.0
+      - --clnrest-port=2114
       - --database-upgrade=true
-      - --grpc-port=9737
-      - --bind-addr=ws:127.0.0.1:2116
-      - --experimental-offers
     restart: on-failure
+    environment:
+      LIGHTNINGD_NETWORK: regtest
+      LIGHTNINGD_DATA: /tmp/cln-application/lightningd-2
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/2116"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
     volumes:
-      - ${PWD}/data/lightningd-2:/data/.lightning-2
+      - /tmp/cln-application/lightningd-2:/tmp/cln-application/lightningd-2
     ports:
       - 2116:2116
     networks:
@@ -62,84 +82,86 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    # image: ghcr.io/elementsproject/cln-application:0.0.2@sha256:6188255f56a679b9e5785036ab50ad1d2c869568c2f29d07f0c482917c7442e9
     depends_on:
-      - bitcoind
-      - lightningd
+      bitcoind:
+        condition: service_started
+      lightningd:
+        condition: service_healthy
     environment:
-      APP_PORT: ${APP_PORT}
-      LIGHTNING_HOST: ${LIGHTNING_HOST}
-      BITCOIN_NETWORK: ${BITCOIN_NETWORK}
-      APP_HOST: ${APP_HOST}
-      LIGHTNING_GRPC_PORT: ${LIGHTNING_GRPC_PORT}
-      LIGHTNING_REST_PORT: ${LIGHTNING_REST_PORT}
-      LIGHTNING_WS_HOST: ${LIGHTNING_WS_HOST}
-      LIGHTNING_WS_TOR_HOST: ${LIGHTNING_WS_TOR_HOST}
-      LIGHTNING_WS_PORT: ${LIGHTNING_WS_PORT}
-      LIGHTNING_TOR_HOST: ${LIGHTNING_TOR_HOST}
-      LIGHTNING_DATA_DIR: ${LIGHTNING_DATA_DIR}
-      LIGHTNING_VARS_FILE: ${LIGHTNING_VARS_FILE}
-      APP_CONFIG_FILE: ${APP_CONFIG_FILE}
+      APP_PORT: 2110
+      LIGHTNING_HOST: 170.21.22.11
+      BITCOIN_NETWORK: regtest
+      APP_HOST: 170.21.22.12
+      LIGHTNING_GRPC_PORT: 9736
+      LIGHTNING_REST_PORT: 3010
+      LIGHTNING_WS_HOST: 170.21.22.11
+      LIGHTNING_WS_TOR_HOST: 
+      LIGHTNING_WS_PORT: 5001
+      LIGHTNING_TOR_HOST: 
+      LIGHTNING_DATA_DIR: /tmp/cln-application/lightningd
+      LIGHTNING_VARS_FILE: /tmp/cln-application/lightningd/.commando-env
+      APP_CONFIG_FILE: /tmp/cln-application/app/config.json
       APP_MODE: "production"
-      LIGHTNING_WS_CA_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/ca.pem
-      LIGHTNING_WS_CLIENT_KEY_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client-key.pem
-      LIGHTNING_WS_CLIENT_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client.pem
-      LIGHTNING_REST_CA_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/ca.pem
-      LIGHTNING_REST_CLIENT_KEY_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client-key.pem
-      LIGHTNING_REST_CLIENT_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client.pem
-      LIGHTNING_GRPC_CA_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/ca.pem
-      LIGHTNING_GRPC_CLIENT_KEY_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client-key.pem
-      LIGHTNING_GRPC_CLIENT_CERT_FILE: ${LIGHTNING_DATA_DIR}/bitcoin/client.pem
+      LIGHTNING_WS_CA_CERT_FILE: /tmp/cln-application/lightningd/regtest/ca.pem
+      LIGHTNING_WS_CLIENT_KEY_FILE: /tmp/cln-application/lightningd/regtest/client-key.pem
+      LIGHTNING_WS_CLIENT_CERT_FILE: /tmp/cln-application/lightningd/regtest/client.pem
+      LIGHTNING_REST_CA_CERT_FILE: /tmp/cln-application/lightningd/regtest/ca.pem
+      LIGHTNING_REST_CLIENT_KEY_FILE: /tmp/cln-application/lightningd/regtest/client-key.pem
+      LIGHTNING_REST_CLIENT_CERT_FILE: /tmp/cln-application/lightningd/regtest/client.pem
+      LIGHTNING_GRPC_CA_CERT_FILE: /tmp/cln-application/lightningd/regtest/ca.pem
+      LIGHTNING_GRPC_CLIENT_KEY_FILE: /tmp/cln-application/lightningd/regtest/client-key.pem
+      LIGHTNING_GRPC_CLIENT_CERT_FILE: /tmp/cln-application/lightningd/regtest/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd:${LIGHTNING_DATA_DIR}
-      - ${PWD}/data/app:/data/app
+      - /tmp/cln-application/lightningd:/tmp/cln-application/lightningd
+      - /tmp/cln-application/app:/tmp/cln-application/app
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - 2110:2110
     networks:
       networkcln:
-        ipv4_address: ${APP_HOST}
+        ipv4_address: 170.21.22.12
 
   application-2:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    # image: ghcr.io/elementsproject/cln-application:0.0.2@sha256:6188255f56a679b9e5785036ab50ad1d2c869568c2f29d07f0c482917c7442e9
     depends_on:
-      - bitcoind
-      - lightningd
+      bitcoind:
+        condition: service_started
+      lightningd-2:
+        condition: service_healthy
     environment:
-      APP_PORT: 2113
+      APP_PORT: 2120
       LIGHTNING_HOST: 170.21.22.13
-      BITCOIN_NETWORK: ${BITCOIN_NETWORK}
+      BITCOIN_NETWORK: regtest
       APP_HOST: 170.21.22.15
-      LIGHTNING_GRPC_PORT: 2115
+      LIGHTNING_GRPC_PORT: 2125
       LIGHTNING_REST_PORT: 2114
       LIGHTNING_WS_PORT: 2116
       LIGHTNING_WS_HOST: 170.21.22.13
       LIGHTNING_WS_TOR_HOST: tor2.onion
       LIGHTNING_TOR_HOST: tor2.onion
-      LIGHTNING_DATA_DIR: /data/.lightning-2
-      LIGHTNING_VARS_FILE: /data/.lightning-2/.commando-env
-      APP_CONFIG_FILE: /data/app-2/config.json
+      LIGHTNING_DATA_DIR: /tmp/cln-application/lightningd-2
+      LIGHTNING_VARS_FILE: /tmp/cln-application/lightningd-2/.commando-env
+      APP_CONFIG_FILE: /tmp/cln-application/app-2/config.json
       APP_MODE: "production"
-      LIGHTNING_WS_CA_CERT_FILE: /data/.lightning-2/bitcoin/ca.pem
-      LIGHTNING_WS_CLIENT_KEY_FILE: /data/.lightning-2/bitcoin/client-key.pem
-      LIGHTNING_WS_CLIENT_CERT_FILE: /data/.lightning-2/bitcoin/client.pem
-      LIGHTNING_REST_CA_CERT_FILE: /data/.lightning-2/bitcoin/ca.pem
-      LIGHTNING_REST_CLIENT_KEY_FILE: /data/.lightning-2/bitcoin/client-key.pem
-      LIGHTNING_REST_CLIENT_CERT_FILE: /data/.lightning-2/bitcoin/client.pem
-      LIGHTNING_GRPC_CA_CERT_FILE: /data/.lightning-2/bitcoin/ca.pem
-      LIGHTNING_GRPC_CLIENT_KEY_FILE: /data/.lightning-2/bitcoin/client-key.pem
-      LIGHTNING_GRPC_CLIENT_CERT_FILE: /data/.lightning-2/bitcoin/client.pem
+      LIGHTNING_WS_CA_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/ca.pem
+      LIGHTNING_WS_CLIENT_KEY_FILE: /tmp/cln-application/lightningd-2/regtest/client-key.pem
+      LIGHTNING_WS_CLIENT_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/client.pem
+      LIGHTNING_REST_CA_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/ca.pem
+      LIGHTNING_REST_CLIENT_KEY_FILE: /tmp/cln-application/lightningd-2/regtest/client-key.pem
+      LIGHTNING_REST_CLIENT_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/client.pem
+      LIGHTNING_GRPC_CA_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/ca.pem
+      LIGHTNING_GRPC_CLIENT_KEY_FILE: /tmp/cln-application/lightningd-2/regtest/client-key.pem
+      LIGHTNING_GRPC_CLIENT_CERT_FILE: /tmp/cln-application/lightningd-2/regtest/client.pem
     command: npm run start
     restart: on-failure
     volumes:
-      - ${PWD}/data/lightningd-2:data/.lightning-2
-      - ${PWD}/data/app-2:/data/app-2
+      - /tmp/cln-application/lightningd-2:/tmp/cln-application/lightningd-2
+      - /tmp/cln-application/app-2:/tmp/cln-application/app-2
     ports:
-      - 2113:2113
+      - 2120:2120
     networks:
       networkcln:
         ipv4_address: 170.21.22.15
@@ -149,5 +171,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 170.21.22.0/16
-          gateway: 170.21.22.0
+        - subnet: 170.21.22.0/24
+          gateway: 170.21.22.1
