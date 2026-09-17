@@ -145,9 +145,23 @@ export const throwApiError = (err: any) => {
       return new APIError(HttpStatusCode.UNAUTHORIZED, 'Server is down/locked');
     case 'EBADCSRFTOKEN':
       return new APIError(HttpStatusCode.FORBIDDEN, 'Invalid CSRF token. Form tempered.');
-    default:
-      return new APIError(HttpStatusCode.BAD_REQUEST, err?.message || err);
   }
+  switch (err?.type) {
+    case 'entity.too.large':
+      return new APIError(HttpStatusCode.PAYLOAD_TOO_LARGE, 'Request body too large');
+    case 'entity.parse.failed':
+      return new APIError(HttpStatusCode.BAD_REQUEST, 'Malformed JSON body');
+  }
+  if (
+    err?.expose === true &&
+    Number.isInteger(err.status) &&
+    err.status >= 400 &&
+    err.status < 500
+  ) {
+    return new APIError(err.status, err.message);
+  }
+  logger.error('Unhandled error: ' + (err?.message || err), err?.stack);
+  return new APIError(HttpStatusCode.INTERNAL_SERVER, 'Internal server error');
 };
 
 async function startServer() {
