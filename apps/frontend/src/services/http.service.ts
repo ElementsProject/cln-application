@@ -146,7 +146,7 @@ export class RootService {
 
   static async userLogout(): Promise<void> {
     try {
-      await HttpService.get('/auth/logout');
+      await HttpService.post('/auth/logout');
     } catch (error: any) {
       logger.error('Logout failed: ', error);
       throw error.response?.data || error.message || typeof error === 'object' ? JSON.stringify(error) : error;

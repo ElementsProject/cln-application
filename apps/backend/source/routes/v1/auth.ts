@@ -26,7 +26,7 @@ export class AuthRoutes extends CommonRoutesConfig {
 
   configureRoutes() {
     const authController = new AuthController();
-    this.app.route(API_VERSION + AUTH_ROUTE + '/logout/').get(authController.userLogout);
+    this.app.route(API_VERSION + AUTH_ROUTE + '/logout/').post(authController.userLogout);
     this.app
       .route(API_VERSION + AUTH_ROUTE + '/login/')
       .post(authAttemptLimiter, authController.userLogin);
