@@ -101,7 +101,7 @@ const BTCTransaction = (props) => {
   const nodeInfo = useSelector(selectNodeInfo);
   
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
+    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank', 'noopener,noreferrer');
   };
 
   const copyHandler = event => {

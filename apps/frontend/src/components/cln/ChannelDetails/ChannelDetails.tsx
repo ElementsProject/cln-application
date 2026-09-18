@@ -29,7 +29,7 @@ const ChannelDetails = (props) => {
   const [responseMessage, setResponseMessage] = useState('');
 
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank');
+    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank', 'noopener,noreferrer');
   };
 
   const ChannelCloseHandler = event => {

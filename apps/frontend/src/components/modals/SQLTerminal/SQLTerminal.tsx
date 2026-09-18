@@ -136,7 +136,7 @@ const SQLTerminal = () => {
   }, [query]);
 
   const handleHelp = async () => {
-    window.open('https://docs.corelightning.org/reference/sql', '_blank');
+    window.open('https://docs.corelightning.org/reference/sql', '_blank', 'noopener,noreferrer');
   };
 
   const handleClear = () => {
