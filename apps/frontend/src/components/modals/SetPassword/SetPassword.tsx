@@ -4,7 +4,7 @@ import SHA256 from "crypto-js/sha256";
 import { Modal, Row, Col, Spinner, InputGroup, Form } from 'react-bootstrap';
 import logger from '../../../services/logger.service';
 import useInput from '../../../hooks/use-input';
-import { CallStatus } from '../../../utilities/constants';
+import { CallStatus, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from '../../../utilities/constants';
 import { ActionSVG } from '../../../svgs/Action';
 import InvalidInputMessage from '../../shared/InvalidInputMessage/InvalidInputMessage';
 import { PasswordSVG } from '../../../svgs/Password';
@@ -30,7 +30,11 @@ const SetPasswordComponent = () => {
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
   const isValidCurrPassword = (value) => value.trim() !== '';
-  const isValidNewPassword = (value) => value.trim() !== '';
+  const isValidNewPassword = (value) =>
+    value.trim() !== '' &&
+    value.length >= MIN_PASSWORD_LENGTH &&
+    value.length <= MAX_PASSWORD_LENGTH &&
+    !(isValidPassword && value === currPasswordValue);
   const isValidConfirmNewPassword = (value) => value.trim() !== '' && value === newPasswordValue;
 
   const {
@@ -59,6 +63,19 @@ const SetPasswordComponent = () => {
     inputBlurHandler: confirmNewPasswordBlurHandler,
     reset: resetConfirmNewPassword,
   } = useInput(isValidConfirmNewPassword);
+
+  const newPasswordErrorMessage = () => {
+    if (newPasswordValue.trim() === '' || newPasswordValue.length < MIN_PASSWORD_LENGTH) {
+      return 'New Password must be at least ' + MIN_PASSWORD_LENGTH + ' characters';
+    }
+    if (newPasswordValue.length > MAX_PASSWORD_LENGTH) {
+      return 'New Password must be at most ' + MAX_PASSWORD_LENGTH + ' characters';
+    }
+    if (isValidPassword && newPasswordValue === currPasswordValue) {
+      return 'New Password must be different from Current Password';
+    }
+    return 'Invalid New Password';
+  };
 
   let formIsValid = false;
 
@@ -178,7 +195,7 @@ const SetPasswordComponent = () => {
                   autoFocus={!isValidPassword}
                   id='newpassword'
                   type={hideNewPassword ? 'password' : 'text'}
-                  placeholder='New Password'
+                  placeholder={'New Password (min ' + MIN_PASSWORD_LENGTH + ' characters)'}
                   aria-label='new-password'
                   aria-describedby='addon-new-password'
                   className={(hideNewPassword && newPasswordValue !== '') ? 'form-control-middle password-input-ctrl' : 'form-control-middle'}
@@ -191,7 +208,7 @@ const SetPasswordComponent = () => {
                 </InputGroup.Text>
               </InputGroup>
               {(newPasswordHasError) ?
-                  <InvalidInputMessage message={'Invalid New Password'} />
+                  <InvalidInputMessage message={newPasswordErrorMessage()} />
                 :
                   <div className='message'></div>
               }

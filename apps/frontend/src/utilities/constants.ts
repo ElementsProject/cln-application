@@ -19,6 +19,8 @@ export const LOG_LEVEL = process.env.NODE_ENV !== 'production' ? 'info' : 'warn'
 
 export const APP_WAIT_TIME = 30 * 1000; // 30 seconds
 export const CLEAR_STATUS_ALERT_DELAY = 10000; // 10 seconds
+export const MIN_PASSWORD_LENGTH = 12;
+export const MAX_PASSWORD_LENGTH = 256; // matches the backend limit
 export const TODAY = Math.floor(Date.now() / 1000);
 export const SCROLL_PAGE_SIZE = 100; // For infinite scroll, number of items to load per page
 export const SCROLL_THRESHOLD = 200; // For infinite scroll, distance from bottom in pixels (px) to trigger next page load.
