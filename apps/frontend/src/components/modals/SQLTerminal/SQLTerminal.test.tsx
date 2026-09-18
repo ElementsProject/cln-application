@@ -82,7 +82,7 @@ describe('SQLTerminal', () => {
     await renderWithProviders(<SQLTerminal />, { preloadedState: customMockStore });
     const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
     fireEvent.click(screen.getByText('Help'));
-    expect(windowOpenSpy).toHaveBeenCalledWith('https://docs.corelightning.org/reference/sql', '_blank');
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://docs.corelightning.org/reference/sql', '_blank', 'noopener,noreferrer');
   });
 
   it('should clear the query and output when Clear button is clicked', async () => {
