@@ -68,6 +68,13 @@ function logTransportWarnings() {
         'a reverse proxy in front of the app. Browsers reject the Secure cookies over plain http.',
     );
   }
+  if (APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true') {
+    logger.warn(
+      'APP_SINGLE_SIGN_ON is true: the login screen is disabled and every request that reaches ' +
+        `${APP_HOST}:${APP_PORT} is treated as the authenticated operator. Keep this port ` +
+        'reachable only through the platform proxy that performs the login.',
+    );
+  }
 }
 
 export function normalizePort(val: string) {
