@@ -10,6 +10,7 @@
     "serve": "node ./dist/server.js",
     "start": "tsc --project tsconfig.json --watch & prettier --write source/ & nodemon ./dist/server.js",
     "watch": "tsc --project tsconfig.json --watch & prettier --write source/",
+    "test": "node --test \"test/*.test.mjs\"",
     "lint": "eslint source --ext .js,.ts"
   },
   "dependencies": {

@@ -16,6 +16,7 @@
     "backend:build": "npm run build -w cln-application-backend",
     "backend:serve": "npm run serve -w cln-application-backend",
     "backend:watch": "npm run watch -w cln-application-backend",
+    "backend:test": "npm run backend:build && npm run test -w cln-application-backend",
     "backend:lint": "npm run lint -w cln-application-backend",
     "dev": "npm run backend:serve & npm run frontend:dev",
     "build": "npm run backend:build & npm run frontend:build",

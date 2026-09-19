@@ -19,7 +19,7 @@ import { addServerConfig, setEnvVariables } from '../shared/utils.js';
 import { Rune, ShowRunes } from '../models/showrunes.type.js';
 import { LightningService } from '../service/lightning.service.js';
 
-function validateUiConfig(uiConfig: any): string | null {
+export function validateUiConfig(uiConfig: any): string | null {
   if (!uiConfig || typeof uiConfig !== 'object' || Array.isArray(uiConfig)) {
     return 'uiConfig object is required';
   }
