@@ -24,7 +24,6 @@
     "jsonwebtoken": "9.0.3",
     "lnmessage": "0.2.9",
     "protobufjs": "8.8.0",
-    "ts-node": "10.9.2",
     "winston": "3.19.0",
     "ws": "8.21.3"
   },
