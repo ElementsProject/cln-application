@@ -25,7 +25,7 @@ COPY package-lock.json ./
 RUN npm ci
 
 # Build assets without source maps
-ENV GENERATE_SOURCEMAP=false
+ENV GENERATE_SOURCEMAP=false INLINE_RUNTIME_CHUNK=false
 RUN npm run build
 
 # Prune development dependencies
