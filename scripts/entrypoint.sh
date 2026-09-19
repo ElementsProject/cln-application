@@ -74,10 +74,18 @@ if [ -f "$LIGHTNING_VARS_FILE" ]; then
   echo "Found existing commando config at $LIGHTNING_VARS_FILE"
 fi
 
-# Getinfo from CLN
+# Getinfo from CLN; give up after roughly 30 minutes so a wrong socket path
+# surfaces as a failed start instead of a container that hangs forever
+WAIT_ATTEMPTS=0
+MAX_WAIT_ATTEMPTS=1800
 until [ "$GETINFO_RESPONSE" != "" ]
 do
-  echo "Waiting for lightningd"
+  if [ $WAIT_ATTEMPTS -ge $MAX_WAIT_ATTEMPTS ]; then
+    echo "Error: lightningd did not answer on $LIGHTNING_RPC after $WAIT_ATTEMPTS attempts"
+    exit 1
+  fi
+  WAIT_ATTEMPTS=$((WAIT_ATTEMPTS+1))
+  echo "Waiting for lightningd at $LIGHTNING_RPC (attempt $WAIT_ATTEMPTS of $MAX_WAIT_ATTEMPTS)"
   # Send 'getinfo' request
   GETINFO_RESPONSE=$( (echo "$(getinfo_request)"; sleep 1) | socat - UNIX-CONNECT:"$LIGHTNING_RPC")
 done
