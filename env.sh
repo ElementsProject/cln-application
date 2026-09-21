@@ -1,11 +1,9 @@
 #!/bin/bash
 
-export GENERATE_SOURCEMAP=false
-export INLINE_RUNTIME_CHUNK=false
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-nvm use 20.14.0
+nvm use 22
 
 export APP_SINGLE_SIGN_ON=false
 export BITCOIN_NETWORK="regtest"
