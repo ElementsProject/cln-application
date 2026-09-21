@@ -25,7 +25,7 @@
 
 # Prerequisites
 * Functioning and synced Bitcoin & Core lightning node.
-* Node.js, which can be downloaded [here](https://nodejs.org/en/download/)
+* Node.js (v20.19 or higher, or v22.12 or higher), which can be downloaded [here](https://nodejs.org/en/download/)
 * Recommended Browsers: Chrome, Firefox, MS Edge
 
 ---

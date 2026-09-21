@@ -1,7 +1,7 @@
 Development Setup
 ------------------
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v20.19 or higher, or v22.12 or higher)
 - npm
 - Running instances of bitcoind and core-lightning
 
