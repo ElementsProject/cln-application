@@ -16,7 +16,7 @@ import { LightningRoutes } from './routes/v1/lightning.js';
 import { SharedRoutes } from './routes/v1/shared.js';
 import { AuthRoutes } from './routes/v1/auth.js';
 import { APIError } from './models/errors.js';
-import { APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
+import { API_VERSION, APP_CONSTANTS, Environment, HttpStatusCode } from './shared/consts.js';
 import handleError from './shared/error-handler.js';
 import { LightningService } from './service/lightning.service.js';
 import { parseTrustProxy } from './shared/utils.js';
@@ -117,7 +117,8 @@ app.use(
   }),
 );
 app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-cache');
+  // API responses carry runes and keys, so keep them out of the browser cache entirely
+  res.setHeader('Cache-Control', req.path.startsWith(API_VERSION + '/') ? 'no-store' : 'no-cache');
   res.setHeader('Permissions-Policy', 'camera=(), geolocation=(), microphone=(), payment=()');
   next();
 });
