@@ -89,7 +89,6 @@ export function normalizePort(val: string) {
 }
 
 app.use(bodyParser.json({ limit: '500kb' }));
-app.use(bodyParser.urlencoded({ extended: false, limit: '500kb' }));
 app.set('trust proxy', parseTrustProxy(APP_CONSTANTS.APP_TRUST_PROXY));
 app.use(cookieParser());
 app.use(csrfProtection);
