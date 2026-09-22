@@ -16,7 +16,7 @@ describe('CurrencyBox component ', () => {
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
-    expect(currencyBox).toHaveTextContent('2,222K');
+    expect(currencyBox).toHaveTextContent('2.22M');
   });
 
   it('if in shorten mode', async () => {
@@ -29,7 +29,7 @@ describe('CurrencyBox component ', () => {
     await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
     const currencyBox = await screen.findByTestId('currency-box-finished-text');
     expect(currencyBox).toBeInTheDocument();
-    expect(currencyBox).toHaveTextContent('11,111K');
+    expect(currencyBox).toHaveTextContent('11.11M');
   });
 
   it('if using BTC as the appConfig unit without shortening', async () => {

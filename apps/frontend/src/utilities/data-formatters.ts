@@ -70,11 +70,11 @@ export const formatCurrencyType = (
   returnFormat: string = 'string',
 ) => {
   return returnFormat === 'string'
-    ? shorten
-      ? Math.floor(num / 1000).toLocaleString('en-us') + 'K'
+    ? shorten && num > 999999
+      ? (num / 1000000).toLocaleString('en-us', { maximumFractionDigits: 2 }) + 'M'
       : parseFloat(num.toString()).toLocaleString('en-us')
-    : shorten
-      ? Math.floor(num / 1000)
+    : shorten && num > 999999
+      ? num / 1000000
       : parseFloat(num.toString()); // number format
 };
 

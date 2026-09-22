@@ -14,13 +14,14 @@ const CurrencyBox = props => {
   const fiatConfig = useSelector(selectFiatConfig);
   const [animationFinished, setAnimationFinished] = useState(0);
   const count: any = useMotionValue(0);
-  const rounded: any = useTransform(count, (value: number) => uiConfigUnit === Units.BTC ? Number.parseFloat((value).toString()).toFixed(5) : Math.floor(value));
+  const inMillions = props.shorten && uiConfigUnit === Units.SATS && +props.value > 999999;
+  const rounded: any = useTransform(count, (value: number) => uiConfigUnit === Units.BTC ? Number.parseFloat((value).toString()).toFixed(5) : inMillions ? Math.round(value * 100) / 100 : Math.floor(value));
 
   useEffect(() => {
     setAnimationFinished(0);
     count.current = 0;
     count.prev = 0;
-    const animation = animate(count, +formatCurrency(props.value, Units.SATS, uiConfigUnit, false, 5, 'number'), { duration: COUNTUP_DURATION });
+    const animation = animate(count, +formatCurrency(props.value, Units.SATS, uiConfigUnit, props.shorten, 5, 'number'), { duration: COUNTUP_DURATION });
     setTimeout(() => {
       setAnimationFinished(1);
     }, APP_ANIMATION_DURATION * 1000);
@@ -44,7 +45,7 @@ const CurrencyBox = props => {
               <motion.div>
                 {rounded}
               </motion.div>
-              {(props.shorten && uiConfigUnit === Units.SATS) ? 'K' : ''}
+              {inMillions ? 'M' : ''}
             </div>
         }
         {!props.hideUnit && (

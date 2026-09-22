@@ -105,7 +105,7 @@ describe('Overview component ', () => {
     });
     const currencyBox = await screen.findAllByTestId('currency-box-finished-text');
     expect(currencyBox[1]).toBeInTheDocument();
-    expect(currencyBox[1]).toHaveTextContent('74,888K');
+    expect(currencyBox[1]).toHaveTextContent('74.89M');
   });
 
   it('check clnRemoteBalance is proper balance when not shortened', async () => {
