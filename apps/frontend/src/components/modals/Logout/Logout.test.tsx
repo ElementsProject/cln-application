@@ -33,6 +33,17 @@ describe('LogoutComponent', () => {
     });
   });
 
+  it('keeps the session view when the server does not end the session', async () => {
+    jest.spyOn(RootService, 'userLogout').mockImplementation(async () => { throw 'Invalid CSRF token'; });
+    const { getActions } = await renderWithProviders(<LogoutComponent />, { preloadedState: customMockStore });
+    fireEvent.click(screen.getByText('Yes'));
+    await waitFor(() => {
+      expect(getActions().map(a => a.type)).toContain('root/setShowToast');
+    });
+    expect(getActions().map(a => a.type)).not.toContain('root/clearRootStore');
+    expect(getActions().find(a => a.type === 'root/setShowModals').payload.loginModal).toBe(false);
+  });
+
   it('does not call userLogout on No click', async () => {
     spyOnUserLogout();
     await renderWithProviders(<LogoutComponent />, { preloadedState: customMockStore });

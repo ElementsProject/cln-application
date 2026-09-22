@@ -4,7 +4,7 @@ import { Modal, Col } from 'react-bootstrap';
 import { QuestionMarkSVG } from '../../../svgs/QuestionMark';
 import { RootService } from '../../../services/http.service';
 import { clearBKPRStore } from '../../../store/bkprSlice';
-import { clearRootStore, setShowModals } from '../../../store/rootSlice';
+import { clearRootStore, setShowModals, setShowToast } from '../../../store/rootSlice';
 import { clearCLNStore } from '../../../store/clnSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectShowModals } from '../../../store/rootSelectors';
@@ -13,9 +13,16 @@ const LogoutComponent = () => {
   const dispatch = useDispatch();
   const showModals = useSelector(selectShowModals); 
 
-  const logoutHandler = event => {
+  const logoutHandler = async event => {
     if (event === true) {
-      RootService.userLogout();
+      try {
+        // Wait for the server to end the session before clearing the screen
+        await RootService.userLogout();
+      } catch (err: any) {
+        dispatch(setShowToast({ show: true, message: ('Logout failed: ' + (typeof err === 'string' ? err : 'Server did not end the session')), bg: 'danger' }));
+        closeHandler(false);
+        return;
+      }
       dispatch(clearRootStore())
       dispatch(clearCLNStore())
       dispatch(clearBKPRStore())
