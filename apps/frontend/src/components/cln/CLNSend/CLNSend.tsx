@@ -181,6 +181,14 @@ const CLNSend = (props) => {
     if (paymentType === PaymentType.OFFER) {
       CLNService.fetchInvoice(invoiceValue, +amountValue)
         .then((fetchInvoiceRes: any) => {
+          // The issuer writes the amount into the invoice; pay it only if it matches what was requested
+          const invoiceMSats = +String(fetchInvoiceRes.changes?.amount_msat ?? '').replace('msat', '');
+          if (fetchInvoiceRes.changes?.amount_msat !== undefined && invoiceMSats !== Math.round(+amountValue * SATS_MSAT)) {
+            setResponseStatus(CallStatus.ERROR);
+            setResponseMessage('The offer returned an invoice for ' + (invoiceMSats / SATS_MSAT) + ' Sats instead of ' + amountValue + ' Sats. Payment not sent.');
+            delayedClearStatusAlert();
+            return;
+          }
           sendInvoice(PaymentType.OFFER, fetchInvoiceRes.invoice, +amountValue || 0);
         })
         .catch(err => {
