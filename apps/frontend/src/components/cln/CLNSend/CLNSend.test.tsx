@@ -1,7 +1,8 @@
 import { fireEvent, screen, waitFor, act } from '@testing-library/react';
 import { APP_ANIMATION_DURATION } from '../../../utilities/constants';
-import { mockAppStore } from '../../../utilities/test-utilities/mockData';
-import { spyOnDecode } from '../../../utilities/test-utilities/mockService';
+import { mockAppStore, mockFetchInvoice } from '../../../utilities/test-utilities/mockData';
+import { spyOnCLNSendPayment, spyOnDecode } from '../../../utilities/test-utilities/mockService';
+import { CLNService } from '../../../services/http.service';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 import CLNSend from './CLNSend';
 
@@ -100,5 +101,29 @@ describe('CLNSend component ', () => {
       expect(offerRadioButton).toBeChecked();
       expect(screen.queryByText('Invalid Offer')).not.toBeInTheDocument();
     });
+  });
+
+  it('should not pay an offer invoice whose amount differs from the requested amount', async () => {
+    spyOnDecode();
+    jest.spyOn(CLNService, 'fetchInvoice').mockImplementation(async () => ({ ...mockFetchInvoice, changes: { amount_msat: 200000 } }));
+    const sendPaymentSpy = spyOnCLNSendPayment();
+    await renderWithProviders(<CLNSend />, { preloadedState: mockAppStore, initialRoute: ['/cln'] });
+    await act(async () => jest.advanceTimersByTime(APP_ANIMATION_DURATION * 1000));
+
+    fireEvent.click(screen.getByTestId('send-button'));
+    await waitFor(() => {
+      act(() => fireEvent.click(screen.getByLabelText('Offer')));
+      act(() => fireEvent.change(screen.getByTestId('address-input'), { target: { value: 'lno12345' } }));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('amount-input')).toBeInTheDocument();
+    });
+    act(() => fireEvent.change(screen.getByTestId('amount-input'), { target: { value: '100' } }));
+    await act(async () => fireEvent.submit(screen.getByTestId('cln-send')));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status-alert-message')).toHaveTextContent(/200 sats instead of 100 sats\. payment not sent/i);
+    });
+    expect(sendPaymentSpy).not.toHaveBeenCalled();
   });
 });
