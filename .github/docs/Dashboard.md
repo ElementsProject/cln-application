@@ -21,7 +21,9 @@ node's full state at a glance:
 - **Total Balance** — combined on-chain + Lightning funds.
 - The summary strip beside it shows **Active Channels**, connected **Peers**,
   and **Maximum Send / Maximum Receive** — the node's total outbound and
-  inbound Lightning capacity.
+  inbound Lightning capacity. In sats mode these two values are shown in full
+  up to 999,999 sats and in millions above that (for example `1.5M`, `74.89M`);
+  hover over a value to see its fiat equivalent.
 
 ## Bitcoin Wallet card
 
