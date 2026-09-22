@@ -1,5 +1,5 @@
 import './Login.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SHA256 from "crypto-js/sha256";
 import { Modal, Col, Row, Spinner, InputGroup, Form } from 'react-bootstrap';
 
@@ -15,7 +15,7 @@ import { RootService } from '../../../services/http.service';
 import { setAuthStatus, setShowModals } from '../../../store/rootSlice';
 import logger from '../../../services/logger.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectShowModals } from '../../../store/rootSelectors';
+import { selectAuthStatus, selectShowModals } from '../../../store/rootSelectors';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const LoginComponent = () => {
@@ -23,9 +23,17 @@ const LoginComponent = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const showModals = useSelector(selectShowModals);
+  const authStatus = useSelector(selectAuthStatus);
   const [hidePassword, setHidePassword] = useState(true);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
+
+  useEffect(() => {
+    if (authStatus?.error) {
+      setResponseStatus(CallStatus.ERROR);
+      setResponseMessage('Could not verify the session: ' + authStatus.error + '. This is not a password problem. Reload the page to retry; if it persists, clear this site\'s cookies.');
+    }
+  }, [authStatus?.error]);
 
   const isValidPassword = value => value && value.trim() !== '';
 

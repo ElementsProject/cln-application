@@ -19,6 +19,7 @@ const axiosInstance = axios.create({
   baseURL: API_BASE_URL + API_VERSION,
   timeout: APP_WAIT_TIME * 10,
   withCredentials: true,
+  withXSRFToken: false,
 });
 
 function handleAxiosError(error) {
@@ -159,7 +160,7 @@ export class RootService {
       return { ...response, isLoading: false, error: null };
     } catch (error: any) {
       logger.error('Auth Status failed: ', error);
-      return { isLoading: true, isAuthenticated: false, isValidPassword: true };
+      return { isLoading: false, isAuthenticated: false, isValidPassword: true, error: handleAxiosError(error) };
     }
   }
 

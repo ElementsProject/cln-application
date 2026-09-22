@@ -62,4 +62,17 @@ describe('Login component ', () => {
     });
   });
 
+
+  it('shows the session-check error instead of implying a wrong password', async () => {
+    const storeWithError = {
+      ...customMockStore,
+      root: {
+        ...customMockStore.root,
+        authStatus: { isLoading: false, isAuthenticated: false, isValidPassword: true, error: 'Invalid CSRF token. Form tempered.' },
+      },
+    };
+    await renderWithProviders(<LoginComponent />, { preloadedState: storeWithError });
+    expect(await screen.findByText(/could not verify the session: invalid csrf token/i)).toBeInTheDocument();
+    expect(screen.getByText(/not a password problem/i)).toBeInTheDocument();
+  });
 });

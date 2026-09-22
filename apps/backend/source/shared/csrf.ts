@@ -8,7 +8,7 @@ import { APP_CONSTANTS, SECRET_KEY } from './consts.js';
 const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
   getSecret: () => SECRET_KEY,
   getSessionIdentifier: () => '',
-  cookieName: '_csrf',
+  cookieName: 'cln_csrf',
   cookieOptions: {
     httpOnly: true,
     sameSite: 'strict',
