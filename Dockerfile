@@ -48,7 +48,7 @@ COPY --from=cln-app-builder /app/apps/backend/proto /app/apps/backend/proto
 COPY --from=cln-app-builder /app/apps/backend/package.json /app/apps/backend/package.json
 
 # Copy built code from build stages to '/app' directory
-COPY --from=cln-app-builder /app/package.json /app/package-lock.json
+COPY --from=cln-app-builder /app/package-lock.json /app/package-lock.json
 COPY --from=cln-app-builder /app/package.json /app/package.json
 COPY --from=cln-app-builder /app/node_modules /app/node_modules
 
