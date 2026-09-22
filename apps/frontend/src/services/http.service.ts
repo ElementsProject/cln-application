@@ -371,7 +371,8 @@ export class CLNService {
   }
 
   static async createInvoiceRune() {
-    return HttpService.clnCall('createrune', { restrictions: [["method=invoice"], ["method=listinvoices"]] })
+    // One restriction with two alternatives: restrictions are ANDed, alternatives within one are ORed
+    return HttpService.clnCall('createrune', { restrictions: [["method=invoice", "method=listinvoices"]] })
       .then(() => {
         return this.saveInvoiceRune();
       })

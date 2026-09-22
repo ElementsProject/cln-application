@@ -43,16 +43,23 @@ const INVOICE_RUNE_METHODS = ['invoice', 'listinvoices'];
 // would also accept "method/invoice" (any method except invoice).
 export function isInvoiceOnlyRune(rune: Rune): boolean {
   if (rune.blacklisted) return false;
-  const methodAlternatives = rune.restrictions
-    .flatMap(restriction => restriction.alternatives)
-    .filter(alternative => alternative.fieldname === 'method');
-  if (methodAlternatives.length === 0) return false;
-  const allEquality = methodAlternatives.every(
-    alternative =>
-      alternative.condition === '=' && INVOICE_RUNE_METHODS.includes(alternative.value),
+  // Restrictions are ANDed, so every restriction that names a method must allow both methods
+  const methodRestrictions = rune.restrictions
+    .map(restriction =>
+      restriction.alternatives.filter(alternative => alternative.fieldname === 'method'),
+    )
+    .filter(alternatives => alternatives.length > 0);
+  if (methodRestrictions.length === 0) return false;
+  return methodRestrictions.every(
+    alternatives =>
+      alternatives.every(
+        alternative =>
+          alternative.condition === '=' && INVOICE_RUNE_METHODS.includes(alternative.value),
+      ) &&
+      INVOICE_RUNE_METHODS.every(method =>
+        alternatives.some(alternative => alternative.value === method),
+      ),
   );
-  const named = methodAlternatives.map(alternative => alternative.value);
-  return allEquality && INVOICE_RUNE_METHODS.every(method => named.includes(method));
 }
 
 // Last rate fetched per currency, reused for FIAT_RATE_CACHE_MS
