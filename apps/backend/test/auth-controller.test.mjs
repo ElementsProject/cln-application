@@ -22,9 +22,9 @@ function fakeResponse() {
   return res;
 }
 
-async function call(handler, { body = {}, cookies = {} } = {}) {
+async function call(handler, { body = {}, cookies = {}, hostname = 'localhost' } = {}) {
   const res = fakeResponse();
-  await handler({ body, cookies, originalUrl: '/test' }, res, () => {});
+  await handler({ body, cookies, hostname, originalUrl: '/test' }, res, () => {});
   return res;
 }
 
@@ -83,6 +83,25 @@ test('first-run reset sets a password when none exists', async () => {
   const res = await call(controller.resetPassword, { body: { newPassword: 'first-password' } });
   assert.equal(res.statusCode, 201);
   assert.match(JSON.parse(readFileSync(process.env.APP_CONFIG_FILE, 'utf8')).password, /^scrypt\$/);
+});
+
+test('first-run reset is accepted only from the server address', async () => {
+  for (const hostname of ['evil.example.com', 'node.tailnet.ts.net']) {
+    writeConfig('');
+    const res = await call(controller.resetPassword, { body: { newPassword: 'first-password' }, hostname });
+    assert.equal(res.statusCode, 403, hostname);
+    assert.equal(JSON.parse(readFileSync(process.env.APP_CONFIG_FILE, 'utf8')).password, '');
+  }
+  for (const hostname of ['127.0.0.1', '[::1]', '192.168.1.20', 'umbrel.local', 'abc.onion', process.env.APP_HOST || 'localhost']) {
+    writeConfig('');
+    const res = await call(controller.resetPassword, { body: { newPassword: 'first-password' }, hostname });
+    assert.equal(res.statusCode, 201, hostname);
+  }
+  // Once a password exists the hostname no longer matters
+  writeConfig(await hashPassword('secret-one'));
+  const token = createSessionToken();
+  const res = await call(controller.resetPassword, { body: { currPassword: 'secret-one', newPassword: 'secret-two' }, cookies: { token }, hostname: 'evil.example.com' });
+  assert.equal(res.statusCode, 201);
 });
 
 test('logout revokes the session it was called with', async () => {
