@@ -230,6 +230,8 @@ const SetPasswordComponent = () => {
                   value={confirmNewPasswordValue}
                   onChange={confirmNewPasswordChangeHandler}
                   onBlur={confirmNewPasswordBlurHandler}
+                  onPaste={event => event.preventDefault()}
+                  onDrop={event => event.preventDefault()}
                 />
                 <InputGroup.Text className={'form-control-addon form-control-addon-right'}>
                   <span onClick={() => toggleConfirmNewPasswordVisibility()}>{hideConfirmNewPassword ? <ShowSVG /> : <HideSVG />}</span>
