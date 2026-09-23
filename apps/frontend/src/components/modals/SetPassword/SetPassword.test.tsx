@@ -69,6 +69,17 @@ describe('Password component ', () => {
     expect(resetSpy).not.toHaveBeenCalled();
   });
 
+  it('does not accept pasted or dropped text in the confirm password field', async () => {
+    await renderWithProviders(<SetPasswordComponent />, { preloadedState: customMockStore });
+    const confirmInput = screen.getByLabelText('confirm-new-password');
+    // fireEvent returns false when the handler called preventDefault
+    expect(fireEvent.paste(confirmInput, { clipboardData: { getData: () => validPassword } })).toBe(false);
+    expect(fireEvent.drop(confirmInput, { dataTransfer: { getData: () => validPassword } })).toBe(false);
+    expect(confirmInput).toHaveValue('');
+    // The other password fields still accept paste
+    expect(fireEvent.paste(screen.getByLabelText('new-password'), { clipboardData: { getData: () => validPassword } })).toBe(true);
+  });
+
   it('submits a new password that meets the rules', async () => {
     const resetSpy = jest.spyOn(RootService, 'resetUserPassword').mockResolvedValue({ isAuthenticated: true, isValidPassword: true, isLoading: false, error: null });
     await renderWithProviders(<SetPasswordComponent />, { preloadedState: customMockStore });
