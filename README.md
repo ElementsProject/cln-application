@@ -156,6 +156,7 @@
       ```
         npm run start
       ```
+      - Open the UI and set the password straight away, before browsing anywhere else. Once a password is set, every change requires a signed-in session and the current password.
 - ## Docker
   - For a minimal Docker setup to run the application with a remote Core Lightning node, see our [Docker Setup Guide](./.github/docs/Docker-Setup.md).
 

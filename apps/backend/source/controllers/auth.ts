@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as net from 'net';
 import { Request, Response, NextFunction } from 'express';
 
 import {
@@ -87,7 +88,27 @@ export class AuthController {
 
       const config = JSON.parse(fs.readFileSync(APP_CONSTANTS.APP_CONFIG_FILE, 'utf-8'));
       const passwordAlreadySet = typeof config.password === 'string' && config.password !== '';
-      if (passwordAlreadySet) {
+      if (!passwordAlreadySet) {
+        // Before a password exists, only accept the request from the server's own address so a
+        // DNS-rebinding page on some other domain cannot claim the install
+        const host = String(req.hostname || '').replace(/^\[|\]$/g, '');
+        const firstRunHostOk =
+          host === 'localhost' ||
+          net.isIP(host) !== 0 ||
+          host === APP_CONSTANTS.APP_HOST ||
+          /\.(local|onion)$/.test(host);
+        if (!firstRunHostOk) {
+          return handleError(
+            new AuthError(
+              HttpStatusCode.FORBIDDEN,
+              'Set the first password from the server address, not from ' + host,
+            ),
+            req,
+            res,
+            next,
+          );
+        }
+      } else {
         const hasSession =
           APP_CONSTANTS.APP_SINGLE_SIGN_ON === 'true' ||
           isAuthenticated(req.cookies?.token) === true;
