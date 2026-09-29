@@ -11,7 +11,7 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "7.1.0",
+    "@fortawesome/fontawesome-svg-core": "7.3.1",
     "@fortawesome/free-solid-svg-icons": "7.1.0",
     "@fortawesome/react-fontawesome": "3.1.0",
     "@reduxjs/toolkit": "2.11.0",
