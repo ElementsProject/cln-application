@@ -1,5 +1,5 @@
 # Build Stage
-FROM node:22-bookworm@sha256:8a34c4ab3ea2c5cd194f07e317b2a8f09461d3c8b05c4e34c8ccd56d56024c4d AS cln-app-builder
+FROM node:25-bookworm@sha256:78839ac448c23517f8eab2e8f7943d9b4f73979eb7f8bed2c73dbf72ff869e7b AS cln-app-builder
 
 # Install system dependencies (native modules pulled in by the test tooling)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -31,7 +31,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Final image
-FROM node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5 AS cln-app-final
+FROM node:25-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS cln-app-final
 
 # Install jq and socat for scripts/entrypoint.sh
 RUN apt-get update && apt-get install -y --no-install-recommends jq socat \
