@@ -313,6 +313,20 @@ export class GRPCService {
         payload.amount_msat = this.transformTypes('Amount', payload.amount_msat);
       }
 
+      // CLN JSON-RPC uses hyphenated names; protobuf expects the numeric enum.
+      if (method?.toLowerCase() === 'datastore' && typeof payload.mode === 'string') {
+        const modes: Record<string, number> = {
+          'must-create': 0,
+          'must-replace': 1,
+          'create-or-replace': 2,
+          'must-append': 3,
+          'create-or-append': 4,
+        };
+        if (!Object.prototype.hasOwnProperty.call(modes, payload.mode))
+          throw new Error('Invalid datastore mode');
+        payload.mode = modes[payload.mode];
+      }
+
       // Map values with their Enums
       const enumsMapping: Record<string, string[]> = {
         Feerates: ['style'],

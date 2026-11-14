@@ -1,4 +1,6 @@
+import { localLiquidityPercent } from '../../../utilities/channel-status';
 import './Channels.scss';
+import SpliceStatus from '../ChannelDetails/SpliceStatus';
 import { motion } from 'framer-motion';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Card, Row, Col, ListGroup, Alert, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -34,7 +36,7 @@ const Channels = (props) => {
                   {listChannels.mergedChannels.map((channel, idx) => (
                     <motion.li
                       data-testid='list-item-channel'
-                      key={channel.short_channel_id || channel.node_alias || idx}
+                      key={channel.channel_id || channel.short_channel_id || idx}
                       className={'list-group-item list-item-channel ' + (props.newlyOpenedChannelId === channel.channel_id ? 'newly-opened' : '')}
                       variants={props.newlyOpenedChannelId === channel.channel_id ? STAGERRED_SPRING_VARIANTS_3 : {}} initial='hidden' animate='visible' exit='hidden' custom={0}
                       onClick={() => (props.onChannelClick(channel))}
@@ -47,15 +49,16 @@ const Channels = (props) => {
                               delay={{ show: 250, hide: 250 }}
                               overlay={<Tooltip>{titleCase(channel.current_state) + ' - ' + (channelStateMap[channel.state] ?? titleCase(channel.state?.replaceAll('_', ' ')))}</Tooltip>}
                               >
-                              <span data-testid='channel-node-alias'>
+                              <span className='channel-peer-name' data-testid='channel-node-alias'>
                                 <div className={'d-inline-block mx-1 dot ' + (channel.current_state?.toLowerCase() === 'active' ? 'bg-success' : channel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>
-                                {channel.node_alias}
+                                {channel.channel_label || channel.node_alias || channel.peer_id}
                               </span>
                             </OverlayTrigger>
                           </div>
+                          <SpliceStatus channel={channel} />
                           <ProgressBar>
-                            <ProgressBar variant='primary' now={(channel.to_us_sat > 1000000 || channel.to_them_sat > 1000000) ? (channel.to_us_sat / 1000) : channel.to_us_sat} key={1} />
-                            <ProgressBar variant='light' now={(channel.to_us_sat > 1000000 || channel.to_them_sat > 1000000) ? (channel.to_them_sat / 1000) : channel.to_them_sat} key={2} />
+                            <ProgressBar variant='primary' now={localLiquidityPercent(channel.to_us_sat, channel.to_them_sat)} key={1} />
+                            <ProgressBar variant='light' now={localLiquidityPercent(channel.to_them_sat, channel.to_us_sat)} key={2} />
                           </ProgressBar>
                           <Row className='text-light d-flex align-items-end justify-content-between'>
                             <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>

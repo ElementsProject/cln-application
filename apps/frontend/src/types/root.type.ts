@@ -176,7 +176,13 @@ export type ChannelType = {
 };
 
 export type PeerChannel = {
+  node_uris?: string[];
+  pending_splices?: { txid: string; delta: number; capacity: number; confirmations: number | null }[];
+  splice_status_error?: string | null;
   node_alias: string;
+  channel_label?: string;
+  channel_label_error?: string;
+  splice_supported?: boolean;
   peer_id: string;
   channel_id: string;
   short_channel_id?: string;

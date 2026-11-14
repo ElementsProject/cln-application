@@ -30,6 +30,14 @@
 
 ---
 
+# Channel management
+
+Open a channel's details to set a private label, copy its counterparty's advertised connection addresses, or review a splice. Labels are stored in the node's `cln-application/channel-labels` datastore namespace; they are not sent to peers. A credential without datastore access can still list channels, with a label-lookup warning.
+
+Splice in adds on-chain funds and splice out withdraws local channel funds without closing the channel. Both peers must support splicing, and the channel must be connected and active with no pending funding transaction. Enter whole sats, review the direction and amount, then confirm. CLN selects the fee using its normal safety checks. Splice RPCs are available through REST or Commando; the application's current gRPC schema does not expose them.
+
+An unresolved submission is retained in the browser so closing and reopening channel details does not submit it again. A lost reply is not proof of failure: check the channel and wallet before dismissing a record or attempting another splice. Pending splice amounts and confirmations come from the node, not the browser's saved record. Confirmation lookup requires CLN's SQL plugin and RPC permission; failures are shown as unavailable instead of an invented count. CLN does not report the peer's required confirmation count, so the UI does not guess it.
+
 # Getting started
 
 - ## Standalone

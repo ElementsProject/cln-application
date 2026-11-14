@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import Channels from './Channels';
+import { localLiquidityPercent } from '../../../utilities/channel-status';
 import { mockAppStore, mockBKPRStoreData, mockCLNStoreData, mockListChannels, mockRootStoreData } from '../../../utilities/test-utilities/mockData';
 import { renderWithProviders } from '../../../utilities/test-utilities/mockStore';
 
@@ -70,4 +71,16 @@ describe('Channels component ', () => {
     expect(screen.getByText("No channel found. Open channel to start!")).toBeInTheDocument();
   })
 
+});
+
+describe('channel liquidity proportions', () => {
+  it('keeps small and large channels on the same percentage scale', () => {
+    expect(localLiquidityPercent(75, 25)).toBe(75);
+    expect(localLiquidityPercent(7500000, 2500000)).toBe(75);
+    expect(localLiquidityPercent(0, 10000000)).toBe(0);
+    expect(localLiquidityPercent(10000000, 0)).toBe(100);
+    expect(localLiquidityPercent(0, 0)).toBe(0);
+    expect(localLiquidityPercent(NaN, 100)).toBe(0);
+    expect(localLiquidityPercent(-1, 100)).toBe(0);
+  });
 });
