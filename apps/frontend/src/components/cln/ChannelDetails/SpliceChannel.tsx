@@ -130,6 +130,29 @@ export default function SpliceChannel({ channel }) {
       setStatus('Status check failed: ' + String(error));
     }
   };
+  const dismiss = (archive = false) => {
+    try {
+      if (archive) {
+        let history: any[] = [];
+        try {
+          const stored = JSON.parse(localStorage.getItem(key + ':history') || '[]');
+          if (Array.isArray(stored)) history = stored;
+        } catch {
+          /* Keep the current record in the replacement history. */
+        }
+        localStorage.setItem(key + ':history', JSON.stringify([...history, record].slice(-20)));
+      }
+      localStorage.removeItem(key);
+      setRecord(null);
+      setAborted(false);
+      setSettled(false);
+      setStatus('');
+    } catch {
+      setStatus(
+        'Could not dismiss the saved splice record. It has been kept; no new splice was submitted.',
+      );
+    }
+  };
   if (record?.storageError)
     return (
       <Alert variant="warning">
@@ -182,40 +205,13 @@ export default function SpliceChannel({ channel }) {
                 dismissing this record. A missing inflight entry alone does not prove a lost request
                 failed.
               </p>
-              <button
-                type="button"
-                className="btn-rounded"
-                onClick={() => {
-                  let history: any[] = [];
-                  try {
-                    const stored = JSON.parse(localStorage.getItem(key + ':history') || '[]');
-                    if (Array.isArray(stored)) history = stored;
-                  } catch {
-                    /* Preserve the current record below. */
-                  }
-                  localStorage.setItem(
-                    key + ':history',
-                    JSON.stringify([...history, record].slice(-20)),
-                  );
-                  localStorage.removeItem(key);
-                  setRecord(null);
-                  setAborted(false);
-                }}
-              >
+              <button type="button" className="btn-rounded" onClick={() => dismiss(true)}>
                 Dismiss record after checking node
               </button>
             </div>
           )}
           {confirmed && (
-            <button
-              type="button"
-              className="btn-rounded mt-2"
-              onClick={() => {
-                localStorage.removeItem(key);
-                setRecord(null);
-                setSettled(false);
-              }}
-            >
+            <button type="button" className="btn-rounded mt-2" onClick={() => dismiss()}>
               Splice confirmed — dismiss result
             </button>
           )}

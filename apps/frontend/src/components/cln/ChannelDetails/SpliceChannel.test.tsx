@@ -80,3 +80,26 @@ test('disconnected channels and gRPC transport cannot submit', () => {
   ).toBeInTheDocument();
   expect(call).not.toHaveBeenCalled();
 });
+
+test('failed dismissal keeps the saved result and displays the storage error', () => {
+  localStorage.setItem(
+    'splice:' + channel.channel_id,
+    JSON.stringify({
+      direction: 'splicein',
+      amount: '1',
+      funding: 'previous',
+      txid: channel.funding_txid,
+    }),
+  );
+  render(<SpliceChannel channel={channel} />);
+  const spy = jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+    throw Error('storage');
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Splice confirmed — dismiss result' }));
+  expect(screen.getByText(/Could not dismiss the saved splice record/)).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: 'Splice confirmed — dismiss result' }),
+  ).toBeInTheDocument();
+  expect(call).not.toHaveBeenCalled();
+  spy.mockRestore();
+});
