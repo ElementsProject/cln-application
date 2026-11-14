@@ -3,6 +3,19 @@
 
 .channel-scroll-container {
   max-height: 53vh;
+  min-width: 0;
+  & .channel-balance-summary, & .channel-peer-heading, & .channel-peer-name {
+    min-width: 0;
+    max-width: 100%;
+  }
+  & .channel-peer-name {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  & .channel-peer-heading .dot {
+    flex-shrink: 0;
+    margin-top: 0.45em;
+  }
   & .progress {
     height: 6px;
   }

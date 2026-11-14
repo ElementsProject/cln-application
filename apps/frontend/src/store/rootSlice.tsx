@@ -121,6 +121,13 @@ const rootSlice = createSlice({
       const aggr = aggregatePeerChannels(listChannels);
       state.listChannels = { ...aggr, isLoading: false };
     },
+    setChannelLabel(state, action: PayloadAction<{channel_id: string; label: string}>) {
+      for (const key of ['mergedChannels', 'activeChannels', 'pendingChannels', 'inactiveChannels'] as const) {
+        for (const channel of state.listChannels[key]) {
+          if (channel.channel_id === action.payload.channel_id) channel.channel_label = action.payload.label;
+        }
+      }
+    },
     clearRootStore(state) {
       return { ...defaultRootState, appConfig: state.appConfig };
     },
@@ -138,6 +145,7 @@ export const {
   setNodeInfo,
   setListFunds,
   setListChannels,
+  setChannelLabel,
   clearRootStore,
 } = rootSlice.actions;
 

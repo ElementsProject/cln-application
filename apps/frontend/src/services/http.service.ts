@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { nodeUris, pendingSplices } from '../utilities/channel-status';
 import moment from 'moment';
 import { ApplicationConfiguration, AuthResponse, Peer } from '../types/root.type';
 import { API_BASE_URL, API_VERSION, APP_WAIT_TIME, PaymentType, TimeGranularity, getTimestampWithGranularity, SATS_MSAT, SCROLL_PAGE_SIZE } from '../utilities/constants';
@@ -202,9 +203,28 @@ export class RootService {
     const nodesMap = new Map<string, Peer>(
       nodes.nodes?.map(node => [node.nodeid, node]) || []
     );
+    let txRows: any[][] | null = null;
+    let tip: number | null = null;
+    let spliceStatusError: string | null = null;
+    if (peerChannels.channels?.some(channel => channel.state === 'CHANNELD_AWAITING_SPLICE')) {
+      try {
+        const txids = peerChannels.channels.flatMap(channel => (channel.inflight || []).map(f => f.funding_txid)).filter(txid => typeof txid === 'string' && /^[0-9a-f]{64}$/i.test(txid));
+        if (!txids.length) throw new Error('Pending splice transaction ID unavailable');
+        const [transactions, info]: [any, any] = await Promise.all([
+          HttpService.clnCall('sql', { query: "SELECT hash, blockheight FROM transactions WHERE hash IN (" + [...new Set(txids)].map(txid => "'" + txid + "'").join(',') + ")" }),
+          HttpService.clnCall('getinfo')
+        ]);
+        if (!Array.isArray(transactions.rows) || !Number.isInteger(info.blockheight)) throw new Error('Invalid confirmation response from node');
+        txRows = transactions.rows;
+        tip = info.blockheight;
+      } catch (error) { spliceStatusError = String(error); }
+    }
     const merged = peerChannels.channels?.map(channel => ({
       ...channel,
-      node_alias: nodesMap.get(channel.peer_id)?.alias ?? ''
+      node_alias: nodesMap.get(channel.peer_id)?.alias ?? '',
+      node_uris: nodeUris(channel.peer_id, nodesMap.get(channel.peer_id)?.addresses),
+      pending_splices: pendingSplices(channel, txRows, tip),
+      splice_status_error: spliceStatusError
     })) || [];
     return { channels: merged };
     // // No pagination, need full data for active, pending and inactive channels calculations

@@ -1,5 +1,6 @@
 import './NodeInfo.scss';
 import { useEffect, useState } from 'react';
+import { nodeUris } from '../../../utilities/channel-status';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Modal, Row, InputGroup, Form } from 'react-bootstrap';
@@ -20,20 +21,15 @@ const NodeInfo = () => {
   const [nodeURI, setNodeURI] = useState('');
 
   useEffect(() => {
-    let uri = (nodeInfo.id || '');
-    if (nodeInfo.address && nodeInfo.address?.length && nodeInfo.address.length > 0) {
-      uri = uri + '@' + nodeInfo.address[0].address + ':' + nodeInfo.address[0].port;
-    } else if (nodeInfo.binding && nodeInfo.binding?.length && nodeInfo.binding.length > 0) {
-      uri = uri + '@' + nodeInfo.binding[0].address + ':' + nodeInfo.binding[0].port;
-    } else {
-      uri = uri + '@ : ';
-    }
-    setNodeURI(uri);
+    const uris = nodeUris(nodeInfo.id || '', nodeInfo.address || []);
+    setNodeURI(previous => uris.includes(previous) ? previous : (uris[0] || ''));
   }, [nodeInfo]);
 
+  const uris = nodeUris(nodeInfo.id || '', nodeInfo.address || []);
+
   const copyHandler = () => {
-    copyTextToClipboard(nodeURI).then(() => {
-      dispatch(setShowToast({show: true, message: 'Node ID Copied Successfully!', bg: 'success'}));
+    copyTextToClipboard(nodeURI || nodeInfo.id || '').then(() => {
+      dispatch(setShowToast({show: true, message: nodeURI ? 'Node URI copied' : 'Node ID copied', bg: 'success'}));
     }).catch((err) => {
       logger.error(err);
     });
@@ -49,7 +45,7 @@ const NodeInfo = () => {
           <span className='span-close-svg' onClick={closeHandler}><CloseSVG /></span>
         </Modal.Header>
         <Modal.Body className='py-0'>
-          <Row className='qr-container m-auto d-flex'>
+          {nodeURI && <Row className='qr-container m-auto d-flex'>
             <AnimatePresence>
               <motion.img
                 key='cln-logo'
@@ -62,18 +58,21 @@ const NodeInfo = () => {
               />
             </AnimatePresence>
             <QRCodeCanvas value={nodeURI || ''} size={220} includeMargin={true} bgColor={isDarkMode ? '#0C0C0F' : '#FFFFFF'} fgColor={isDarkMode ? '#FFFFFF' : '#000000'} />
-          </Row>
+          </Row>}
           <Row className='d-flex align-items-start justify-content-center pt-2'>
-            <h4 className='text-blue fw-bold d-flex justify-content-center'>Node ID</h4>
+            <h4 className='text-blue fw-bold d-flex justify-content-center'>{nodeURI ? 'Node URI' : 'Node ID'}</h4>
             <p className='py-3 w-75 text-break text-dark d-flex justify-content-center'>
-              Other Lightning nodes can open payment channels to your node following this Node ID.            
+              {nodeURI ? 'Use this URI to connect to your node. LAN addresses require access to the same network or VPN.' : 'No reachable peer address is configured. Configure an advertised address on your Core Lightning node. A node ID alone is not a connection endpoint.'}
             </p>
+            {uris.length > 1 && <Form.Select aria-label="Peer address" value={nodeURI} onChange={event => setNodeURI(event.target.value)}>
+              {uris.map(uri => <option key={uri} value={uri}>{uri}</option>)}
+            </Form.Select>}
             <div className='mb-4 text-break text-dark d-flex justify-content-center'>
             <InputGroup className='mb-3'>
-              <Form.Control 
+              <Form.Control
                 onClick={copyHandler}
-                placeholder={nodeURI}
-                aria-label={nodeURI}
+                value={nodeURI || nodeInfo.id || ''}
+                aria-label='Node connection address'
                 aria-describedby="copy-addon"
                 className="form-control-left"
                 readOnly

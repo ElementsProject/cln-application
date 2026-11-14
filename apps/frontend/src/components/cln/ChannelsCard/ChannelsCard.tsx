@@ -1,5 +1,7 @@
 import './ChannelsCard.scss';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectListChannels } from '../../../store/rootSelectors';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from 'react-bootstrap';
 
@@ -12,6 +14,8 @@ import { PeerChannel } from '../../../types/root.type';
 const ChannelsCard = () => {
   const [selChannelCard, setSelChannelCard] = useState('channels');
   const [selChannel, setSelChannel] = useState<PeerChannel | null>(null);
+  const channels = useSelector(selectListChannels);
+  const liveChannel = channels.mergedChannels?.find(c => c.channel_id === selChannel?.channel_id) || selChannel;
   const [newlyOpenedChannelId, setNewlyOpenedChannelId] = useState<string>('');
 
   const onCloseHandler = channelId => {
@@ -38,7 +42,7 @@ const ChannelsCard = () => {
           ) : selChannelCard === 'details' ? (
             <ChannelDetails 
               onClose={() => setSelChannelCard('channels')}
-              selChannel={selChannel}
+              selChannel={liveChannel}
               onChannelStateChange={(newState) => setSelChannel(prev => 
                 prev ? { ...prev, current_state: newState } as PeerChannel : null
               )}

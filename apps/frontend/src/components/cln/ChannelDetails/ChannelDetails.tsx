@@ -1,4 +1,8 @@
+import { localLiquidityPercent } from '../../../utilities/channel-status';
 import './ChannelDetails.scss';
+import ChannelLabel from './ChannelLabel';
+import SpliceChannel from './SpliceChannel';
+import SpliceStatus from './SpliceStatus';
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Spinner, Card, Row, Col, ProgressBar, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -24,12 +28,12 @@ const ChannelDetails = (props) => {
   const nodeInfo = useSelector(selectNodeInfo);
   const showToast = useSelector(selectShowToast);
   const [showToastState, setShowToastState] = useState(false);
-  const [channelClosed, setChannelClosed] = useState(props.selChannel.current_state !== 'ACTIVE' && props.selChannel.state !== 'CHANNELD_NORMAL');
+  const [channelClosed, setChannelClosed] = useState(false);
   const [responseStatus, setResponseStatus] = useState(CallStatus.NONE);
   const [responseMessage, setResponseMessage] = useState('');
 
   const openLinkHandler = (event) => {
-    window.open('https://blockstream.info/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank', 'noopener,noreferrer');
+    window.open('https://mempool.guide/' + (nodeInfo.network === 'testnet' ? 'testnet/' : '') + 'tx/' + event.target.id, '_blank', 'noopener,noreferrer');
   };
 
   const ChannelCloseHandler = event => {
@@ -115,20 +119,20 @@ const ChannelDetails = (props) => {
           <Card.Body className='pt-1 pb-0 px-1 d-flex flex-column align-items-stretch justify-content-between channel-scroll-container'>
             <PerfectScrollbar options={{ suppressScrollX: true }}>
               <Row className='d-flex align-items-start justify-content-start'>
-                <Col className='me-3'>
+                <Col className='me-3 channel-balance-summary'>
                   <OverlayTrigger
                     placement='auto'
                     delay={{ show: 250, hide: 250 }}
                     overlay={<Tooltip>{titleCase(props.selChannel.current_state) + ' - ' + (channelStateMap[props.selChannel.state] ?? titleCase(props.selChannel.state?.replaceAll('_', ' ')))}</Tooltip>}
                   >
-                    <span className='d-flex align-items-center justify-content-start fw-bold'>
+                    <span className='d-flex align-items-start justify-content-start fw-bold channel-peer-heading'>
                       <div className={'d-inline-block mx-1 dot ' + (props.selChannel.current_state?.toLowerCase() === 'active' ? 'bg-success' : props.selChannel.current_state?.toLowerCase() === 'pending' ? 'bg-warning' : 'bg-danger')}></div>
-                      {props.selChannel.node_alias}
+                      <span className='channel-peer-name'>{props.selChannel.channel_label || props.selChannel.node_alias || props.selChannel.peer_id}</span>
                     </span>
                   </OverlayTrigger>
                   <ProgressBar>
-                    <ProgressBar variant='primary' now={(props.selChannel.to_us_sat > 1000000 || props.selChannel.to_them_sat > 1000000) ? (props.selChannel.to_us_sat / 1000) : props.selChannel.to_us_sat} key={1} />
-                    <ProgressBar variant='light' now={(props.selChannel.to_us_sat > 1000000 || props.selChannel.to_them_sat > 1000000) ? (props.selChannel.to_them_sat / 1000) : props.selChannel.to_them_sat} key={2} />
+                    <ProgressBar variant='primary' now={localLiquidityPercent(props.selChannel.to_us_sat, props.selChannel.to_them_sat)} key={1} />
+                    <ProgressBar variant='light' now={localLiquidityPercent(props.selChannel.to_them_sat, props.selChannel.to_us_sat)} key={2} />
                   </ProgressBar>
                   <Row className='text-light d-flex align-items-end justify-content-between'>
                     <Col xs={6} className='fs-7 fw-bold d-flex justify-content-start text-primary'>
@@ -139,6 +143,22 @@ const ChannelDetails = (props) => {
                     </Col>
                   </Row>
                 </Col>
+                <ChannelLabel key={props.selChannel.channel_id} channel={props.selChannel} />
+                <SpliceStatus channel={props.selChannel} detailed />
+                <Row className='mt-12px'>
+                  <Col xs={12} className='fs-7 text-light'>Counterparty node ID</Col>
+                  <Col xs={12} className='fw-bold' style={{ overflowWrap: 'anywhere' }}>{props.selChannel.peer_id}</Col>
+                  <Col xs={12}><button type="button" className="btn-rounded bg-primary mt-2" onClick={() => copyTextToClipboard(props.selChannel.peer_id).then(() => dispatch(setShowToast({show: true, message: 'Node ID copied', bg: 'success'}))).catch(error => { setResponseStatus(CallStatus.ERROR); setResponseMessage('Could not copy node ID: ' + String(error)); })}>Copy node ID</button></Col>
+                </Row>
+                <Row className='mt-12px'>
+                  <Col xs={12} className='fs-7 text-light'>Node URI</Col>
+                  <Col xs={12}>
+                    {props.selChannel.node_uris?.length ? props.selChannel.node_uris.map(uri => <div key={uri} className="mb-2">
+                      <div className="fw-bold" style={{ overflowWrap: 'anywhere' }}>{uri}</div>
+                      <button type="button" className="btn-rounded bg-primary mt-2" onClick={() => copyTextToClipboard(uri).then(() => dispatch(setShowToast({show: true, message: 'Node URI copied', bg: 'success'}))).catch(error => { setResponseStatus(CallStatus.ERROR); setResponseMessage('Could not copy node URI: ' + String(error)); })}>Copy node URI</button>
+                    </div>) : <span className="text-light">This peer has not advertised a connection address. Ask its operator for a node URI.</span>}
+                  </Col>
+                </Row>
                 <Row className='mt-1'>
                   <Col xs={12} className='fs-7 text-light'>Short Channel Id</Col>
                   <Col xs={12} className='pe-1 overflow-x-ellipsis fw-bold'>
@@ -193,6 +213,7 @@ const ChannelDetails = (props) => {
                   <Col xs={1} onClick={openLinkHandler} className='btn-sm-svg btn-svg-open'><OpenLinkSVG id={props.selChannel.funding_txid} /></Col>
                 </Row>
               </Row>
+              <SpliceChannel key={props.selChannel.channel_id} channel={props.selChannel} />
               <ToastMessage
                 showOnComponent={true}
                 show={showToastState}
@@ -210,7 +231,7 @@ const ChannelDetails = (props) => {
               <></>
             )}
           </Card.Body>
-          {channelClosed ? (
+          {channelClosed || !['ACTIVE', 'INACTIVE'].includes(props.selChannel.current_state) ? (
             <></>
           ) : (
             <Card.Footer className="d-flex justify-content-center">
